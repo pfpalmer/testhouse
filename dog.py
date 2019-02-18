@@ -23,7 +23,8 @@ class  GateWay:
     serialNumer=0
 
 
-###fp = open("channel.txt",'a+')
+###fp = open("channel.txt",'a+')Creating a token
+
 ###fp.write("1test and so on and so forth " + "\n")
 ###fp.seek(0)
 ###fpcontents = fp.read()
@@ -179,7 +180,7 @@ airTiesTerm.expect("#")
 
 airTiesTerm.logfile= sys.stdout
 
-
+## new comment
 #channelResultFile = open('/tmp/channelResult.txt', "a+")
 channelResultFP = open('channelResult.txt', 'w+')
 
@@ -284,14 +285,19 @@ print ("-channelResultContents:" + channelResultContents)
 #msg['Subject']="Test results"
 gmail_password="arris123"
 gmail_user= 'leandertesthouse@gmail.com'
+to = "paul.palmer@arris.com"
 
 sent_from = 'gmail_user'
-to = "paul.palmer@arris.com"
-subject ="Test results"
+to = "paul.palmer@arris.com"to = "paul.palmer@arris.com"
+
+subject ="Test results"to = "paul.palmer@arris.com"to = "paul.palmer@arris.com"
+
+
 body = "Results:" + channelResultContents
 #body = channelResultContents
+email_text = """\to = "paul.palmer@arris.com"
 
-email_text = """\
+
 From:%s
 To:%s
 Subject:%s
