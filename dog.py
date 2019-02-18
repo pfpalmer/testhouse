@@ -180,7 +180,7 @@ airTiesTerm.expect("#")
 
 airTiesTerm.logfile= sys.stdout
 
-## new comment
+## new comment -pfp-
 #channelResultFile = open('/tmp/channelResult.txt', "a+")
 channelResultFP = open('channelResult.txt', 'w+')
 
@@ -193,7 +193,7 @@ for l2g in list2GLite:
 
         # re-telnet into the airTies each time because the telnet session gets hung when channel is reset
         print("Checking airTies for channel match: "+str(i))
-        # i think we want to wait before trying to login to the airties
+        # i think we want to wait before trying to login to the airtiesssh-add ~/.ssh/id_rsa
         sleep(200)
         airTiesTerm = pexpect.spawn("telnet 192.168.1.67", encoding='utf-8')
         sleep(1)
