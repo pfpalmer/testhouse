@@ -19,15 +19,6 @@ import re
 import sys
 
 
-class nvg599(gateway):
-    pass
-
-class nvg5268:
-    pass
-
-
-
-
 ###fp = open("channel.txt",'a+')Creating a token
 
 ###fp.write("1test and so on and so forth " + "\n")
