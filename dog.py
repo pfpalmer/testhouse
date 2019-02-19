@@ -19,6 +19,10 @@ import re
 import sys
 
 
+import rgclass
+
+
+
 ###fp = open("channel.txt",'a+')Creating a token
 
 ###fp.write("1test and so on and so forth " + "\n")
