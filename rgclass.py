@@ -3,13 +3,21 @@ import sys
 from time import sleep
 
 class  gateway:
-    serialNumer=0
+    serialNumer=None
 
 class nvg599(gateway):
     def __init__(self):
         rg599 = pexpect.spawn("telnet 192.168.1.254")
         sleep(1)
         self.name="abc"
+
+#this would include th 4920 IPs
+    def getRGStatusInfo(self):
+        pass
+
+    def get4920Info(self):
+        sn4920=None
+        fw4920=None
 
     def login(self):
         pass
