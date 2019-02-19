@@ -189,7 +189,7 @@ for l2g in list2GLite:
     for i in list5GLite:
         print("Config RG channel="+str(i))
         output = rgTerm.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.Channel=' + str(i))
-        rgTerm.expect("UNLOCKED>")
+        rgTerm.expect("UNLOCKED>")dog.py:182
 
         # re-telnet into the airTies each time because the telnet session gets hung when channel is reset
         print("Checking airTies for channel match: "+str(i))
