@@ -19,10 +19,6 @@ import re
 import sys
 
 
-
-
-
-
 ###fp = open("channel.txt",'a+')Creating a token
 
 ###fp.write("1test and so on and so forth " + "\n")
@@ -284,11 +280,9 @@ print ("-channelResultContents:" + channelResultContents)
 #msg['Subject']="Test results"
 gmail_password="arris123"
 gmail_user= 'leandertesthouse@gmail.com'
-to = "paul.palmer@arris.com"
 
+to = "paul.palmer@arris.com"
 sent_from = 'gmail_user'
-to = "paul.palmer@arris.com"
-
 subject ="Test results"
 
 
@@ -347,18 +341,18 @@ except:
 #    server.login(sender_email, password)
 #    server.sendmail(sender_email, receiver_email, message)
 
-exit()
-
-
-
-print ("1-------------------")
-print (Channel)
-print("1----------------------")
 #exit()
-resultFile.write(str(result))
-rgTerm.sendline('exit')
-resultFile.close()
-sleep(1)
+
+
+
+#print ("1-------------------")
+#print (Channel)
+#print("1----------------------")
+#exit()
+#resultFile.write(str(result))
+#rgTerm.sendline('exit')
+#resultFile.close()
+#sleep(1)
 # driver.webdriver.quit()
 exit()
 # driver = webdriver.firefox('/home/palmer/.local/lib/python2.7/site-packages/chromedriver')
@@ -460,7 +454,7 @@ from selenium.webdriver.common.keys import Keys
 import os
 import pexpect
 import re
-import serial
+#import serial
 
 # driver = webdriverhttps://www.waketech.edu/programs-courses/credit/electrical-systems-technology/degrees-pathways.Chrome('/usr/local/bin/chromedriver')
 driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
