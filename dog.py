@@ -226,8 +226,6 @@ for l2g in list2GLite:
 
         sleep(10)
 
-        #print("what?"+ str(i))
-
         #print (type(i))
         #print ("airTies5GChannel is of type "+ type(airTies5GChannel))
 
