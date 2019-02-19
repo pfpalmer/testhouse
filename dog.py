@@ -19,20 +19,11 @@ import re
 import sys
 
 
-nvg599Info = { "228946241148656" : {'dac':"*<#/53#1/2",'magic':"kjundhkdxlxr",'mac':"D039B36056F1",'wiFi':'c2cmybt25dey'}}
+nvg599Info = { "228946241148656" : {'dac':"*<#/53#1/2",'magic':"kjundhkdxlxr",'mac': 'D039B36056F1', 'wiFi': 'c2cmybt25dey'}}
 
 
 
-###fp = open("channel.txt",'a+')Creating a token
 
-###fp.write("1test and so on and so forth " + "\n")
-###fp.seek(0)
-###fpcontents = fp.read()
-###print(fpcontents)
-###.close()
-#exit()
-#exit()
-#msg['Subject'] = 'From the test house'
 
 ###from email.MIMEMultipart import MIMEMultipart
 ###from email.MIMEText import MIMEText
