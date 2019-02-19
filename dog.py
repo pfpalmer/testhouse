@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
-
+import rgclass
 import time
 from time import sleep
 from selenium import webdriver
@@ -19,7 +19,7 @@ import re
 import sys
 
 
-import rgclass
+
 
 
 
@@ -187,10 +187,10 @@ channelResultFP = open('channelResult.txt', 'w+')
 
 
 for l2g in list2GLite:
-    for i in list5GLite:      dog.py:183
-        print("Config RG channel="+str(i))                       dog.py:183
+    for i in list5GLite:
+        print("Config RG channel="+str(i))
         output = rgTerm.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.Channel=' + str(i))
-        rgTerm.expect("UNLOCKED>")dog.py:182                       dog.py:183
+        rgTerm.expect("UNLOCKED>")
         # re-telnet into the airTies each time because the telnet session gets hung when channel is reset
         print("Checking airTies for channel match: "+str(i))
         # i think we want to wait before trying to login to the airtiesssh-add ~/.ssh/id_rsa
@@ -215,7 +215,7 @@ for l2g in list2GLite:
         airTiesTerm.sendline('wl -i wl1 chanspec')
         airTiesTerm.expect("#")
         airTies5GResult = airTiesTerm.before
-        airTies5GChannelInfo = airTies5GResult.split()[-2]ssh-add ~/.ssh/id_rsa
+        airTies5GChannelInfo = airTies5GResult.split()[-2]
         print("5G Info ", airTies5GChannelInfo)
 
         sleep(2)
@@ -288,9 +288,9 @@ gmail_user= 'leandertesthouse@gmail.com'
 to = "paul.palmer@arris.com"
 
 sent_from = 'gmail_user'
-to = "paul.palmer@arris.com"to = "paul.palmer@arris.com"
+to = "paul.palmer@arris.com"
 
-subject ="Test results"to = "paul.palmer@arris.com"to = "paul.palmer@arris.com"
+subject ="Test results"
 
 
 body = "Results:" + channelResultContents
