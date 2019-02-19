@@ -280,7 +280,6 @@ subject ="Test results"
 
 
 body = "Results:" + channelResultContents
-#body = channelResultContents
 email_text = """
 From:%s
 To:%s
@@ -344,14 +343,14 @@ except:
 #exit()
 #resultFile.write(str(result))
 #rgTerm.sendline('exit')
-#resultFile.close()
-#sleep(1)
 # driver.webdriver.quit()
 exit()
 # driver = webdriver.firefox('/home/palmer/.local/lib/python2.7/site-packages/chromedriver')
 # driver = webdriver.chrome()
 # browser.get('https://www.google.com')
 
+#resultFile.close()
+#sleep(1)
 
 # Note that, for Python 3 compatibility reasons, we are using spawnu and
 # importing unicode_literals (above). spawnu accepts Unicode input and
@@ -384,7 +383,6 @@ if 'min' in duration:
 # Print the parsed fields in CSV format.
 # print('days, hours, minutes, users, cpu avg 1 min, cpu avg 5 min, cpu avg 15 min')
 # print('%s, %s, %s, %s, %s, %s, %s' % (days, hours, mins, users, av1, av5, av15))
-
 
 print("Turning off supplicant")
 ip = "192.168.1.254"
