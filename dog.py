@@ -215,7 +215,7 @@ for l2g in list2GLite:
         airTiesTerm.sendline('wl -i wl1 chanspec')
         airTiesTerm.expect("#")
         airTies5GResult = airTiesTerm.before
-        airTies5GChannelInfo = airTies5GResult.split()[-2]
+        airTies5GChannelInfo = airTies5GResult.split()[-2]ssh-add ~/.ssh/id_rsa
         print("5G Info ", airTies5GChannelInfo)
 
         sleep(2)
