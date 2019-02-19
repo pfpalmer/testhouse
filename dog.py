@@ -279,7 +279,6 @@ channelResultFP.close()
 
 print ("-channelResultContents:" + channelResultContents)
 
-
 #msg['From']="leandertesthouse@gmail.com"
 #msg['To']= "paul.palmer@arris.com"
 #msg['Subject']="Test results"
@@ -295,13 +294,10 @@ subject ="Test results"
 
 body = "Results:" + channelResultContents
 #body = channelResultContents
-email_text = """\to = "paul.palmer@arris.com"
-
-
+email_text = """
 From:%s
 To:%s
 Subject:%s
-
 %s 
 """ % (sent_from, " ,".join(to),subject,body)
 
