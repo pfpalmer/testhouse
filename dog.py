@@ -181,13 +181,14 @@ airTiesTerm.expect("#")
 airTiesTerm.logfile= sys.stdout
 
 ## new comment -pfp-
+#add another comment
 #channelResultFile = open('/tmp/channelResult.txt', "a+")
 channelResultFP = open('channelResult.txt', 'w+')
 
 
 for l2g in list2GLite:
     for i in list5GLite:      dog.py:183
-        print("Config RG channel="+str(i))
+        print("Config RG channel="+str(i))                       dog.py:183
         output = rgTerm.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.Channel=' + str(i))
         rgTerm.expect("UNLOCKED>")dog.py:182                       dog.py:183
         # re-telnet into the airTies each time because the telnet session gets hung when channel is reset
