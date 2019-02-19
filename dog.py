@@ -319,6 +319,8 @@ try:
     server.starttls()
     server.login(gmail_user, gmail_password)
     server.sendmail(sent_from, to, email_text)
+    sleep(2)
+    server.quit()
 
 except:
     print ('Something went wrong')
@@ -337,7 +339,7 @@ except:
 #server.sendmail(sender_email,receiver_email,msg)
 #server.send_msg(msg)
 
-server.quit()
+
 #with smtplib.SMTP(smtp_server, port) as server:
 #    server.ehlo()  # Can be omitted
 #    server.starttls(context=context)
