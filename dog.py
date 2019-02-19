@@ -1009,15 +1009,7 @@ child.expect(">>")
 
 out = child.before
 print(out)
-#
-# child.interact()
-# child.expect(pexpect.EOF)
 
-# child.sendline("quit")
-# child.expect(">")
-
-# print("done")
-# child.sendline("bye")
 
 child.expect(">>")
 
