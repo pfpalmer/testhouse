@@ -10,8 +10,9 @@ class nvg599(gateway):
         rg599 = pexpect.spawn("telnet 192.168.1.254")
         sleep(1)
         self.name="abc"
+        airtiesIPList=[]
+        rgClientList=[]
 
-#this would include th 4920 IPs
     def getRGStatusInfo(self):
         pass
 
@@ -27,4 +28,8 @@ class nvg5268(gateway):
         self.name="abc"
         rg5268 = pexpect.spawn("telnet 192.168.1.254")
         sleep(1)
+
+
+class airTies4920():
+    pass
 
