@@ -202,7 +202,6 @@ for l2g in list2GLite:
         print("")
         sleep(2)
 
-
         airTiesTerm.sendline('wl -i wl1 chanspec')
         airTiesTerm.expect("#")
         airTies5GResult = airTiesTerm.before
@@ -217,11 +216,8 @@ for l2g in list2GLite:
         airTies5GBandWidth = airTies5GChannelInfo.split("/")[-1]  # type: object
         print("5G Bandwidth = ", airTies5GBandWidth)
 
-
         airTiesTerm.sendline('exit')
-    #    airTiesTerm.sendline("^]")
         airTiesTerm.sendline("\x1b\r")
-     #   airTiesTerm.send("close")
         airTiesTerm.terminate(force=True)
 
         sleep(10)
@@ -309,7 +305,7 @@ try:
     server.quit()
 
 except:
-    print ('Something went wrong')
+    print ('failed to send email')
 
 #sender_email = "leandertesthouse@gmail.com"  # Enter your address
 #receiver_email = "paul.palmer@arris.com"  # Enter recei
@@ -335,12 +331,6 @@ except:
 
 #exit()
 
-
-
-#print ("1-------------------")
-#print (Channel)
-#print("1----------------------")
-#exit()
 #resultFile.write(str(result))
 #rgTerm.sendline('exit')
 # driver.webdriver.quit()
@@ -397,8 +387,7 @@ from selenium.webdriver.common.keys import Keys
 
 import os
 import pexpect
-import re
-import serial
+
 
 # driver = webdriverhttps://www.waketech.edu/programs-courses/credit/electrical-systems-technology/degrees-pathways.Chrome('/usr/local/bin/chromedriver')
 driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
