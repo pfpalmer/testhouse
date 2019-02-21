@@ -271,20 +271,10 @@ email_text = """
 From:%s
 To:%s
 Subject:%s
+
 %s 
 """ %(sent_from,to,subject,body)
 
-#msg.attach(MIMEText(html,'html'))
-#msg = " test test"
-
-#msg = msg.as_string()
-
-#message = """\
-#From: "leandertesthouse"
-#To: "paul.palmer@arris.com"
-#
-#smtp_server = "smtp.gmail.com"
-###smtp_server = "smtp.gmail.com"
 
 try:
     server= smtplib.SMTP('smtp.gmail.com',587)
