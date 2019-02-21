@@ -245,17 +245,7 @@ for l2g in list2GLite:
         sleep(30)
 
 
-#
-#newlines=('/n')
-#channelResultContents = open('channelResult.txt').read().split('\n')
 
-# this next statement is sketchy
-
-#channelResultContents = channelResultFP.newlines
-
-#channelResultContents = channelResultFile.seek(0)
-
-#channelResultFP = open('channelResult.txt', 'w+')
 
 ### this used to work
 channelResultFP.seek(0)
@@ -270,9 +260,9 @@ print ("-channelResultContents:" + channelResultContents)
 gmail_password="arris123"
 gmail_user= 'leandertesthouse@gmail.com'
 
-#to = 'paul.palmer@arris.com'
-to = 'pfpalmer@gmail.com'
-sent_from = 'leandertesthouse'
+to = 'paul.palmer@arris.com'
+#to = 'pfpalmer@gmail.com'
+sent_from = 'leandertesthouse:'
 subject ='Test results'
 
 
@@ -282,7 +272,7 @@ From:%s
 To:%s
 Subject:%s
 %s 
-""" % (sent_from, " ,".join(to),subject,body)
+""" %(sent_from,to,subject,body)
 
 #msg.attach(MIMEText(html,'html'))
 #msg = " test test"
