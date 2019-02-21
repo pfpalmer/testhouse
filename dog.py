@@ -161,8 +161,8 @@ result=rgTerm.before
 
 list2G=[1,2,3,4,5,6,7,8,9,10,11]
 list5G=[36,40,44,48,52,56,60,64,100,104,108,112,116,1132,136,140,144,149,153,161]
-list2GLite=[1,2,3,9,11]
-list5GLite=[36,40,44,136]
+list2GLite=[1]
+list5GLite=[36]
 
 airTiesTerm = pexpect.spawn("telnet 192.168.1.67",encoding='utf-8')
 airTiesTerm.expect("ogin:")
@@ -270,9 +270,10 @@ print ("-channelResultContents:" + channelResultContents)
 gmail_password="arris123"
 gmail_user= 'leandertesthouse@gmail.com'
 
-to = "paul.palmer@arris.com"
-sent_from = 'gmail_user'
-subject ="Test results"
+#to = 'paul.palmer@arris.com'
+to = 'pfpalmer@gmail.com'
+sent_from = 'leandertesthouse'
+subject ='Test results'
 
 
 body = "Results:" + channelResultContents
@@ -303,9 +304,11 @@ try:
     server.sendmail(sent_from, to, email_text)
     sleep(2)
     server.quit()
-
+    print ("im the email section ====================")
 except:
     print ('failed to send email')
+
+exit()
 
 #sender_email = "leandertesthouse@gmail.com"  # Enter your address
 #receiver_email = "paul.palmer@arris.com"  # Enter recei
@@ -334,7 +337,7 @@ except:
 #resultFile.write(str(result))
 #rgTerm.sendline('exit')
 # driver.webdriver.quit()
-exit()
+#exit()
 # driver = webdriver.firefox('/home/palmer/.local/lib/python2.7/site-packages/chromedriver')
 # driver = webdriver.chrome()
 # browser.get('https://www.google.com')
