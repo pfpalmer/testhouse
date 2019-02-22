@@ -19,9 +19,10 @@ import re
 import sys
 
 
-nvg599Info = { "228946241148656" : {'dac':"*<#/53#1/2",'magic':"kjundhkdxlxr",'mac': 'D039B36056F1', 'wiFi': 'c2cmybt25dey'}}
+nvgInfo = { "228946241148656" : {'model':'nvg599','dac':"*<#/53#1/2", 'magic': 'kjundhkdxlxr','mac2g': 'd0:39:b3:60:56:f1','mac5g':'d0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey','ssid': 'ATTqbrAnYs'},
+               "277427577103760" : {'model':'nvg599','dac': '<<01%//4&/','magic': "ggtxstgwipcg", 'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid' : 'ATTqbrAnYs'}}
 
-
+#password= nvgInfo[serialnum][dac]#
 
 
 
@@ -103,9 +104,25 @@ nvg599Info = { "228946241148656" : {'dac':"*<#/53#1/2",'magic':"kjundhkdxlxr",'m
 
 #pfp
 
-rgTerm = pexpect.spawn("telnet 192.168.1.254")
+rgTerm = pexpect.spawn("telnet 192.168.1.254", encoding = 'utf-8')
 sleep(1)
+rgTerm.expect("ogin:")
+rgTerm.sendline('admin')
+rgTerm.expect("ord:")
+rgTerm.sendline('<<01%//4&/')
+rgTerm.expect(">")
+rgTerm.sendline('status')
+#rgTerm.expect('>')
+rgTerm.expect('>')
+py_bytes = rgTerm.before
+#special_py_bytes= py_bytes.decode('utf-8')
+#print(special_py_bytes)
 
+#m= re.search("Model (.*)",rgTerm.before)
+m = re.search("Model (.*)",py_bytes)
+print("m is:",m)
+sleep(1)
+exit()
 
 
 #airTiesTerm = pexpect.spawn("telnet 192.168.1.67")
@@ -171,9 +188,7 @@ airTiesTerm.expect("#")
 
 airTiesTerm.logfile= sys.stdout
 
-## new comment -pfp-
-#add another comment
-#channelResultFile = open('/tmp/channelResult.txt', "a+")
+
 channelResultFP = open('channelResult.txt', 'w+')
 
 
@@ -184,7 +199,7 @@ for l2g in list2GLite:
         rgTerm.expect("UNLOCKED>")
         # re-telnet into the airTies each time because the telnet session gets hung when channel is reset
         print("Checking airTies for channel match: "+str(i))
-        # i think we want to wait before trying to login to the airtiesssh-add ~/.ssh/id_rsa
+        # I think we want to wait before trying to login to the airtiesssh-add ~/.ssh/id_rsa
         sleep(200)
         airTiesTerm = pexpect.spawn("telnet 192.168.1.67", encoding='utf-8')
         sleep(1)
