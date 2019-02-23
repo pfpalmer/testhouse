@@ -114,7 +114,14 @@ rgTerm.expect(">")
 rgTerm.sendline('status')
 #rgTerm.expect('>')
 rgTerm.expect('>')
-py_bytes = rgTerm.before
+statusOutput = rgTerm.before
+
+statusInfoRegEx = re.compile(r'Model\s(\w+)')
+mo1 = statusInfoRegEx.search(statusOutput)
+print ('xxxxxx', mo1.group(1))
+
+exit()
+
 #special_py_bytes= py_bytes.decode('utf-8')
 #print(special_py_bytes)
 
