@@ -1,24 +1,14 @@
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
-import rgclass
-import time
-from time import sleep
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 
-from email.mime.text import MIMEText
-
-
-from email.message import EmailMessage
-
-import os
-import smtplib,ssl
-import pexpect
 import re
+import smtplib
 import sys
+from time import sleep
 
-
+import pexpect
+from rgclass import nvg599Class
 #password= nvgInfo[serialnum][dac]#
 
 
@@ -88,18 +78,7 @@ import sys
 
 # driver.implicitly_wait(20)
 
-# ENter device access code
 
-# sleep(30)
-# driver.quit()
-
-
-
-#channelResultFile.write("2G =  RG channel= + str(i) +  airTies5GChannel =  + airTies5GChannel  +  Passed + \n")
-
-#exit()
-
-#pfp
 
 rgTerm = pexpect.spawn("telnet 192.168.1.254", encoding = 'utf-8')
 sleep(1)
@@ -109,7 +88,6 @@ rgTerm.expect("ord:")
 rgTerm.sendline('<<01%//4&/')
 rgTerm.expect(">")
 rgTerm.sendline('status')
-#rgTerm.expect('>')
 rgTerm.expect('>')
 statusOutput = rgTerm.before
 
@@ -129,14 +107,15 @@ print ('Uptime ', mo1.group(3))
 
 #exit()
 
-
-
 rgModel=mo1.group(1)
 serialNumber=mo1.group(2)
 
 
 if rgModel=='NVG599':
     print('we are going to instantiate an NVG599')
+    nvg599DUT = nvg599Class()
+    nvg599DUT.printme()
+
 
 else:
     print('what  to instantiate an NVG599')
@@ -397,12 +376,9 @@ password = '<#/53#1/2'
 child = pexpect.spawn("telnet " "192.168.1.254")
 sleep(1)
 
-import time
 from time import sleep
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 
-import os
 import pexpect
 
 
@@ -443,12 +419,9 @@ child = pexpect.spawn("ssh root@192.168.1.254")
 sleep(1)
 # exit()
 
-import time
 from time import sleep
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 
-import os
 import pexpect
 import re
 #import serial
@@ -608,15 +581,11 @@ child.sendline('alcatel')
 # child.sendline('*<#/53#1/2')
 print("logged in to host")
 
-import time
 from time import sleep
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 
-import os
 import pexpect
 import re
-import serial
 
 # driver = webdriverhttps://www.waketech.edu/programs-courses/credit/electrical-systems-technology/degrees-pathways.Chrome('/usr/local/bin/chromedriver')
 driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
@@ -855,15 +824,11 @@ child.expect(" off | on ]:")
 
 child.sendline('off')
 
-import time
 from time import sleep
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 
-import os
 import pexpect
 import re
-import serial
 
 # driver = webdriverhttps://www.waketech.edu/programs-courses/credit/electrical-systems-technology/degrees-pathways.Chrome('/usr/local/bin/chromedriver')
 driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
