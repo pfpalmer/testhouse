@@ -19,9 +19,6 @@ import re
 import sys
 
 
-nvgInfo = { "228946241148656" : {'model':'nvg599','dac':"*<#/53#1/2", 'magic': 'kjundhkdxlxr','mac2g': 'd0:39:b3:60:56:f1','mac5g':'d0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey','ssid': 'ATTqbrAnYs'},
-               "277427577103760" : {'model':'nvg599','dac': '<<01%//4&/','magic': "ggtxstgwipcg", 'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid' : 'ATTqbrAnYs'}}
-
 #password= nvgInfo[serialnum][dac]#
 
 
@@ -116,19 +113,34 @@ rgTerm.sendline('status')
 rgTerm.expect('>')
 statusOutput = rgTerm.before
 
-statusInfoRegEx = re.compile(r'Model\s(\w+)')
+#statusInfoRegEx = re.compile(r'Model\s(\w+)\s+Serial\s+Number\s+(\d+)')
+#statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+\s+AnnexA\s+(\w+)',re.DOTALL)
+#statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*completed\s+(\w+)',re.DOTALL)
+statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
+#statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
+#statusInfoRegEx = re.compile(r'Model\s(\w+)')
 mo1 = statusInfoRegEx.search(statusOutput)
-print ('xxxxxx', mo1.group(1))
 
-exit()
+print(mo1)
+print ('model ', mo1.group(1))
 
-#special_py_bytes= py_bytes.decode('utf-8')
-#print(special_py_bytes)
+print ('Serial Number', mo1.group(2))
+print ('Uptime ', mo1.group(3))
 
-#m= re.search("Model (.*)",rgTerm.before)
-m = re.search("Model (.*)",py_bytes)
-print("m is:",m)
-sleep(1)
+#exit()
+
+
+
+rgModel=mo1.group(1)
+serialNumber=mo1.group(2)
+
+
+if rgModel=='NVG599':
+    print('we are going to instantiate an NVG599')
+
+else:
+    print('what  to instantiate an NVG599')
+
 exit()
 
 
