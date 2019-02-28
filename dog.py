@@ -78,6 +78,12 @@ from rgclass import nvg599Class
 
 # driver.implicitly_wait(20)
 
+print ('dppp')
+nvg599DUT = nvg599Class()
+print ('dpccccccpp')
+nvg599DUT.connect('192.168.1.254')
+nvg599DUT.printme()
+exit()
 
 
 rgTerm = pexpect.spawn("telnet 192.168.1.254", encoding = 'utf-8')
