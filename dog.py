@@ -12,6 +12,14 @@ from rgclass import nvg599Class
 #password= nvgInfo[serialnum][dac]#
 
 
+########################  this seems like what we want
+p = pexpect.spawn('adb connect 192.168.1.71')
+p.expect(pexpect.EOF)
+print(p.before)
+exit()
+###########################
+
+
 
 ###from email.MIMEMultipart import MIMEMultipart
 ###from email.MIMEText import MIMEText
@@ -78,24 +86,28 @@ from rgclass import nvg599Class
 
 # driver.implicitly_wait(20)
 
-print ('dppp')
 nvg599DUT = nvg599Class()
-print ('dpccccccpp')
-nvg599DUT.connect('192.168.1.254')
+#nvg599DUT.connectCLI('192.168.1.254')
 nvg599DUT.printme()
+rgSerialNumber = nvg599DUT.getRGSerialNumber()
+
+
+
+
+print ('rg serial number is',rgSerialNumber)
 exit()
 
 
-rgTerm = pexpect.spawn("telnet 192.168.1.254", encoding = 'utf-8')
-sleep(1)
-rgTerm.expect("ogin:")
-rgTerm.sendline('admin')
-rgTerm.expect("ord:")
-rgTerm.sendline('<<01%//4&/')
-rgTerm.expect(">")
-rgTerm.sendline('status')
-rgTerm.expect('>')
-statusOutput = rgTerm.before
+#rgTerm = pexpect.spawn("telnet 192.168.1.254", encoding = 'utf-8')
+#sleep(1)
+#rgTerm.expect("ogin:")
+#rgTerm.sendline('admin')
+#rgTerm.expect("ord:")
+#rgTerm.sendline('<<01%//4&/')
+#rgTerm.expect(">")
+#rgTerm.sendline('status')
+#rgTerm.expect('>')
+#statusOutput = rgTerm.before
 
 #statusInfoRegEx = re.compile(r'Model\s(\w+)\s+Serial\s+Number\s+(\d+)')
 #statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+\s+AnnexA\s+(\w+)',re.DOTALL)
