@@ -13,10 +13,10 @@ from rgclass import nvg599Class
 
 
 ########################  this seems like what we want
-p = pexpect.spawn('adb connect 192.168.1.71')
-p.expect(pexpect.EOF)
-print(p.before)
-exit()
+#p = pexpect.spawn('adb connect 192.168.1.71')
+#p.expect(pexpect.EOF)
+#print(p.before)
+#exit()
 ###########################
 
 
@@ -86,16 +86,24 @@ exit()
 
 # driver.implicitly_wait(20)
 
+
+
 nvg599DUT = nvg599Class()
 #nvg599DUT.connectCLI('192.168.1.254')
-nvg599DUT.printme()
-rgSerialNumber = nvg599DUT.getRGSerialNumber()
+#nvg599DUT.printme()
+#rgSerialNumber = nvg599DUT.getRGSerialNumber()
+nvg599DUT.loginNVG599()
+#nvg599DUT.connectCLI("1")
 
+nvg599DUT.turnOffSupplicant()
+
+print (' exit all loging in')
+
+exit()
 
 
 
 print ('rg serial number is',rgSerialNumber)
-exit()
 
 
 #rgTerm = pexpect.spawn("telnet 192.168.1.254", encoding = 'utf-8')
@@ -133,6 +141,7 @@ if rgModel=='NVG599':
     print('we are going to instantiate an NVG599')
     nvg599DUT = nvg599Class()
     nvg599DUT.printme()
+    nvg599DUT.turnOffSupplicant()
 
 
 else:
@@ -388,11 +397,15 @@ if 'min' in duration:
 # print('days, hours, minutes, users, cpu avg 1 min, cpu avg 5 min, cpu avg 15 min')
 # print('%s, %s, %s, %s, %s, %s, %s' % (days, hours, mins, users, av1, av5, av15))
 
-print("Turning off supplicant")
-ip = "192.168.1.254"
-password = '<#/53#1/2'
-child = pexpect.spawn("telnet " "192.168.1.254")
-sleep(1)
+#print("Turning off supplicant")
+#ip = "192.168.1.254"
+#password = '<#/53#1/2'
+#child = pexpect.spawn("telnet " "192.168.1.254")
+#sleep(1)
+
+
+
+exit()
 
 from time import sleep
 from selenium import webdriver
