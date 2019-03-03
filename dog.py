@@ -1,6 +1,15 @@
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
+import time
+#import requests
+
+from bs4 import BeautifulSoup
+
+import requests
+
+from selenium import webdriver
+#driver = webdriver.Chrome('asdfsdf')
 
 import re
 import smtplib
@@ -10,6 +19,8 @@ from time import sleep
 import pexpect
 from rgclass import nvg599Class
 #password= nvgInfo[serialnum][dac]#
+
+
 
 
 ########################  this seems like what we want
@@ -84,8 +95,66 @@ from rgclass import nvg599Class
 # driver.find_element_by_xpath("//button[@value='Submit']").click()
 # button.click()
 
-# driver.implicitly_wait(20)
 
+
+
+#pfp
+#page =requests.get('http://192.168.1.254/cgi-bin/sysinfo.ha')
+#soup = BeautifulSoup(page.text, 'html.parser')
+#-pfp
+
+url = 'http://192.168.1.254/cgi-bin/sysinfo.ha'
+#driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
+#browser = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
+
+browser = webdriver.Chrome()
+
+browser.get(url)
+
+soup = BeautifulSoup(browser.page_source, 'html.parser')
+
+this = soup.find_all('th')
+for th in this:
+    if th.text == "Serial Number":
+        print (th.next_sibling.next_sibling.text)
+ #       self.serialNumber = th.next_sibling.next_sibling.text
+
+
+
+
+
+
+data = soup.find
+
+time.sleep(5)
+
+browser.quit()
+
+time.sleep(5)
+print ('is it true')
+exit()
+
+
+#driver.implicitly_wait(20)
+#data = r.text
+
+
+#print(data)
+
+
+
+
+#exit()
+
+#driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
+#driver.implicitly_wait(20)
+# driver.get('http://www.google.com')
+#soup = driver.get('http://192.168.1.254/cgi-bin/sysinfo.ha')
+
+#serialNumber = soup.find(class_='col2')
+#print (serialNumber)
+
+#exit()
 
 nvg599DUT = nvg599Class()
 #nvg599DUT.connectCLI('192.168.1.254')
@@ -102,7 +171,7 @@ exit()
 
 
 
-print ('rg serial number is',rgSerialNumber)
+#print ('rg serial number is',rgSerialNumber)
 
 
 #rgTerm = pexpect.spawn("telnet 192.168.1.254", encoding = 'utf-8')
@@ -415,7 +484,7 @@ import pexpect
 # driver = webdriverhttps://www.waketech.edu/programs-courses/credit/electrical-systems-technology/degrees-pathways.Chrome('/usr/local/bin/chromedriver')
 driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
 # driver.get('http://www.google.com')
-driver.get('http://192.168.1.254')
+driver.get('http://192.168.1.254/cgi-bin/sysinfo.ha')
 driver.implicitly_wait(20)
 # driver.find_elements_by_tag_name("Settings") // this is for 599
 driver.find_element_by_link_text("Settings").click()
