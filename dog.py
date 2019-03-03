@@ -87,7 +87,6 @@ from rgclass import nvg599Class
 # driver.implicitly_wait(20)
 
 
-
 nvg599DUT = nvg599Class()
 #nvg599DUT.connectCLI('192.168.1.254')
 #nvg599DUT.printme()
