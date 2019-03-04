@@ -115,6 +115,8 @@ soup = BeautifulSoup(browser.page_source, 'html.parser')
 
 this = soup.find_all('th')
 for th in this:
+    if th.text == "Model Number":
+        print (th.next_sibling.next_sibling.text)
     if th.text == "Serial Number":
         print (th.next_sibling.next_sibling.text)
  #       self.serialNumber = th.next_sibling.next_sibling.text
