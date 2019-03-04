@@ -105,7 +105,7 @@ from rgclass import nvg599Class
 
 url = 'http://192.168.1.254/cgi-bin/sysinfo.ha'
 #driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
-browser = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
+#browser = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
 
 browser = webdriver.Chrome()
 
