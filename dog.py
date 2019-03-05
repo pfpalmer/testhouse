@@ -103,22 +103,22 @@ from rgclass import nvg599Class
 #soup = BeautifulSoup(page.text, 'html.parser')
 #-pfp
 
-url = 'http://192.168.1.254/cgi-bin/sysinfo.ha'
+#url = 'http://192.168.1.254/cgi-bin/sysinfo.ha'
 #driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
 #browser = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
 
-browser = webdriver.Chrome()
+#browser = webdriver.Chrome()
 
-browser.get(url)
+#browser.get(url)
 
-soup = BeautifulSoup(browser.page_source, 'html.parser')
+#soup = BeautifulSoup(browser.page_source, 'html.parser')
 
-this = soup.find_all('th')
-for th in this:
-    if th.text == "Model Number":
-        print (th.next_sibling.next_sibling.text)
-    if th.text == "Serial Number":
-        print (th.next_sibling.next_sibling.text)
+#this = soup.find_all('th')
+#for th in this:
+#    if th.text == "Model Number":
+#        print (th.next_sibling.next_sibling.text)
+#    if th.text == "Serial Number":
+ #       print (th.next_sibling.next_sibling.text)
  #       self.serialNumber = th.next_sibling.next_sibling.text
 
 
@@ -126,15 +126,15 @@ for th in this:
 
 
 
-data = soup.find
+#data = soup.find
 
-time.sleep(5)
+#time.sleep(5)
 
-browser.quit()
+#browser.quit()
 
-time.sleep(5)
-print ('is it true')
-exit()
+#time.sleep(5)
+#print ('is it true')
+#exit()
 
 
 #driver.implicitly_wait(20)
@@ -164,6 +164,9 @@ nvg599DUT = nvg599Class()
 #rgSerialNumber = nvg599DUT.getRGSerialNumber()
 nvg599DUT.loginNVG599()
 #nvg599DUT.connectCLI("1")
+nvg599DUT.get4920IPFromUI()
+exit()
+nvg599DUT.getdeviceInfoFromUI()
 
 nvg599DUT.turnOffSupplicant()
 
