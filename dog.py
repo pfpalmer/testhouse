@@ -146,7 +146,6 @@ from rgclass import nvg599Class
 
 
 
-#exit()
 
 #driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
 #driver.implicitly_wait(20)
@@ -158,7 +157,23 @@ from rgclass import nvg599Class
 
 #exit()
 
+
 nvg599DUT = nvg599Class()
+
+nvg599DUT.emailTestResults("dog")
+
+xb2G=["21","22","23"]
+xchannel=["c1","c2"]
+xb5G = ["54","55","56"]
+
+nvg599DUT.channelTest(xb2G,xchannel,xb5G)
+
+#def channelTest(self, b2G, channel, b5G):
+#    for channel in b2G:
+#        print(channel)
+
+
+exit()
 #nvg599DUT.connectCLI('192.168.1.254')
 #nvg599DUT.printme()
 #rgSerialNumber = nvg599DUT.getRGSerialNumber()
@@ -373,8 +388,8 @@ print ("-channelResultContents:" + channelResultContents)
 gmail_password="arris123"
 gmail_user= 'leandertesthouse@gmail.com'
 
-to = 'paul.palmer@arris.com'
-#to = 'pfpalmer@gmail.com'
+#to = 'paul.palmer@arris.com'
+to = 'pfpalmer@gmail.com'
 sent_from = 'leandertesthouse:'
 subject ='Test results'
 
