@@ -1,6 +1,15 @@
 import pexpect
 import re
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium import webdriver
+from bs4 import BeautifulSoup
+
+
+
+
+
 import sys
 from time import sleep
 
@@ -9,7 +18,7 @@ nvgInfo = { "228946241148656" : {'model':'nvg599','dac':"*<#/53#1/2", 'magic': '
 
 class  gatewayClass():
     def __init__(self):
-        self.serialNumer = None
+
         self.magic = None
         self.upTime = None
         self.IP = None
@@ -19,10 +28,7 @@ class nvg599Class(gatewayClass):
         #rg599 = pexpect.spawn("telnet 192.168.1.254")
         #sleep(1)
         self.IP ="192.168.1.254"
-
-
-        global nvgInfo
-
+        self.serialNumer = None
 
         self.session = None
 
@@ -42,11 +48,71 @@ class nvg599Class(gatewayClass):
         #self.webDriver.find_element_by_link_text("Settings").click()
 
 
-    def createWebdriver(self):
-        self.webDriver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
+    def getdeviceInfoFromUI(self):
+        global nvgInfo
+        url = 'http://192.168.1.254/cgi-bin/sysinfo.ha'
+
+        browser = webdriver.Chrome()
+
+        browser.get(url)
+        soup = BeautifulSoup(browser.page_source, 'html.parser')
+
+        this = soup.find_all('th')
+        for th in this:
+            if th.text == "Model Number":
+                print(th.next_sibling.next_sibling.text)
+                self.modelNumber = th.next_sibling.next_sibling.text
+            if th.text == "Serial Number":
+                print(th.next_sibling.next_sibling.text)
+                self.serialNumber = th.next_sibling.next_sibling.text
+
+                self.DAC= nvgInfo[self.serialNumber]['dac']
+                print("dac is:",self.DAC)
+            if th.text == "Software Version":
+                print(th.next_sibling.next_sibling.text)
+                self.softwareVersion = th.next_sibling.next_sibling.text
+            if th.text == "MAC Address":
+                print(th.next_sibling.next_sibling.text)
+                self.macAddress = th.next_sibling.next_sibling.text
+            if th.text == "Time Since Last Reboot":
+                print(th.next_sibling.next_sibling.text)
+                self.macAddress = th.next_sibling.next_sibling.text
+            if th.text == "Current Date/Time":
+                print(th.next_sibling.next_sibling.text)
+                self.macAddress = th.next_sibling.next_sibling.text
+            if th.text == "Hardware Version":
+                print(th.next_sibling.next_sibling.text)
+                self.macAddress = th.next_sibling.next_sibling.text
+
+        sleep(5)
+
+        browser.quit()
+
+
+    def get4920IPFromUI(self):
+        global nvgInfo
+        url = 'http://192.168.1.254/cgi-bin/devices.ha'
+
+        browser = webdriver.Chrome()
+
+        browser.get(url)
+        soup = BeautifulSoup(browser.page_source, 'html.parser')
+
+        this = soup.find_all('th')
+        for th in this:
+            if th.text == "IPv4 Address / Name":
+                #print(th.next_sibling.next_sibling.text)
+                #print("derp    ",th.text)
+
+        sleep(5)
+
+        browser.quit()
+
+    #   def createWebdriver(self):
+  #      self.webDriver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
         # driver.get('http://www.google.com')
-        self.webDriver.get('http://192.168.1.254')
-        self.webDriver.implicitly_wait(20)
+  #      self.webDriver.get('http://192.168.1.254')
+  #      self.webDriver.implicitly_wait(20)
         # driver.find_elements_by_tag_name("Settings") // this is for 599
 
     def getSNFromUI(self):
@@ -58,7 +124,7 @@ class nvg599Class(gatewayClass):
 
 
     def loginNVG599(self):
-        print('i am in login')
+        print('I am in login')
         self.session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
         self.session.expect("ogin:")
         self.session.sendline('admin')
@@ -110,6 +176,7 @@ class nvg599Class(gatewayClass):
         print('Uptime ', mo1.group(3))
         self.serialNumber =  mo1.group(2)
         self.upTime = mo1.group(1)
+        self.session.close()
 
 
 
