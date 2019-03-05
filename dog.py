@@ -1,6 +1,8 @@
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
+
+import itertools
 import time
 #import requests
 
@@ -162,9 +164,16 @@ nvg599DUT = nvg599Class()
 
 nvg599DUT.emailTestResults("dog")
 
-xb2G=["21","22","23"]
-xchannel=["c1","c2"]
-xb5G = ["54","55","56"]
+xa2Gch=["21","22","23"]
+xa2Gbw=["a20","a40"]
+xb5Gbw=["b20","b40","b80"]
+xb5Gch = ["54","55","56"]
+
+
+
+for element in itertools.product(xa2Gch,xa2Gbw,xb5Gch,xb5Gbw):
+    print(element)
+exit()
 
 nvg599DUT.channelTest(xb2G,xchannel,xb5G)
 
