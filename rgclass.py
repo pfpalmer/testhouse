@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium import webdriver
 from bs4 import BeautifulSoup
+import smtplib
 
 
 
@@ -18,10 +19,38 @@ nvgInfo = { "228946241148656" : {'model':'nvg599','dac':"*<#/53#1/2", 'magic': '
 
 class  gatewayClass():
     def __init__(self):
-
         self.magic = None
         self.upTime = None
         self.IP = None
+
+    def  emailTestResults(selfself,textFile):
+        gmail_password="arris123"
+        gmail_user= 'leandertesthouse@gmail.com'
+        to = 'pfpalmer@gmail.com'
+        sent_from = 'leandertesthouse:'
+        subject ='Test results'
+ #       body = "Results:" + channelResultContents
+        body = "Results:" + textFile
+        email_text = """
+        From:%s
+        To:%s
+        Subject:%s
+
+        %s 
+        """ % (sent_from, to, subject, body)
+
+        try:
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.ehlo()
+            server.starttls()
+            server.login(gmail_user, gmail_password)
+            server.sendmail(sent_from, to, email_text)
+            sleep(2)
+            server.quit()
+            print("im the email section ====================")
+        except:
+            print('failed to send email')
+
 
 class nvg599Class(gatewayClass):
     def __init__(self):
@@ -51,9 +80,7 @@ class nvg599Class(gatewayClass):
     def getdeviceInfoFromUI(self):
         global nvgInfo
         url = 'http://192.168.1.254/cgi-bin/sysinfo.ha'
-
         browser = webdriver.Chrome()
-
         browser.get(url)
         soup = BeautifulSoup(browser.page_source, 'html.parser')
 
@@ -88,6 +115,28 @@ class nvg599Class(gatewayClass):
 
         browser.quit()
 
+# 2.4 bw possibilities 20,40
+# 5 bw possibilities 20,40,80
+# InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.BSSID fc:51:a4:2f:25:94
+#  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.AutoChannelEnable 0
+#  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_BandLock X_0000   C5_5.0GHz
+
+
+#tr69 GetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth
+#tr69 SetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth=X_0000C5_80MHz
+    # tr69 SetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth=X_0000C5_40MHz
+
+    # InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth X_0000C5_80MHz
+
+
+
+
+    def channelTest(self,b2G,b5G,bw2G,bw5G):
+        for ib2G in b2G:
+            for ib5G in b5G:
+                for ibw in bw:
+                    print("2G:" + ib2G + " 5G:" + ib5G + "bandwidth" + ibw)
+
 
     def get4920IPFromUI(self):
         global nvgInfo
@@ -102,7 +151,10 @@ class nvg599Class(gatewayClass):
         for th in this:
             if th.text == "IPv4 Address / Name":
                 #print(th.next_sibling.next_sibling.text)
-                #print("derp    ",th.text)
+                print("derp    ",th.text)
+                print("derp1",th.next_sibling.text)
+            else:
+                print("no derp")
 
         sleep(5)
 
@@ -153,7 +205,19 @@ class nvg599Class(gatewayClass):
 
     #    @classmethod
 
+
+    def login4920(self,IP4920):
+        print('I am in login')
+        self.session = pexpect.spawn("telnet" + IP4920, encoding='utf-8')
+        self.session.expect("ogin:")
+        self.session.sendline('root')
+        self.session.expect("#")
+        self.session.sendline('<<01%//4&/')
+        self.session.expect(">")
+        return self.session
+    
     def connectCLI(self, ip):
+
         self.IP = ip
         #cls.ssh = pexpect.spawn('ssh ' + name)
         print('i am iconnect')
@@ -236,8 +300,15 @@ class nvg599Class(gatewayClass):
 
 
     def get4920Info(self):
-        sn4920=None
-        fw4920=None
+        session=self.loginNVG599()
+        session.sendline("show ip lan")
+        self.session.expect('>')
+        ipLanOutput = self.session.before
+        print('i am IPLANOutput ' + ipLanOutput)
+        IPLanInfoRegEx = re.compile(r'(ATT_4920.*)\s')
+        mo1 = IPLanInfoRegEx.search(ipLanOutput)
+        print(mo1)
+        self.session.close()
 
     def login(self):
         pass
