@@ -20,54 +20,13 @@ from time import sleep
 
 import pexpect
 from rgclass import nvg599Class
-#password= nvgInfo[serialnum][dac]#
-
-
 
 
 ########################  this seems like what we want
 #p = pexpect.spawn('adb connect 192.168.1.71')
 #p.expect(pexpect.EOF)
-#print(p.before)
-#exit()
-###########################
 
 
-
-###from email.MIMEMultipart import MIMEMultipart
-###from email.MIMEText import MIMEText
-
-
-###port = 587  # For SSL
-###smtp_server = "smtp.gmail.com"
-###sender_email = "leandertesthouse@gmail.com"  # Enter your address
-###receiver_email = "paul.palmer@arris.com"  # Enter receiver address
-#password = input("Type your password and press enter: ")
-#password = raw_input("type password and enter")
-###password = "arris123"
-
-##mybody ="These are the test results and they all look good. this includes the mybody"
-
-###msg = MIMEMultipart()
-
-###msg['From']="leandertesthouse@gmail.com"
-###msg['To']= "paul.palmer@arris.com"
-###msg['Subject']="Test results"
-
-#body = mybody
-###body = fpcontents
-
-###msg.attach(MIMEText(body,'plain'))
-
-###msg = msg.as_string()
-#context = ssl.create_default_context()
-#server = smtplib.SMTP_SSL(smtp_server,port,context)
-###server = smtplib.SMTP_SSL(smtp_server)
-###server.ehlo()
-#server.starttls()
-###server.login(sender_email,password)
-#server.sendmail(sender_email,msg,receiver_email)
-###server.sendmail(sender_email,receiver_email,msg)
 
 ###server.quit()
 
@@ -126,27 +85,8 @@ from rgclass import nvg599Class
 
 
 
-
-
-#data = soup.find
-
-#time.sleep(5)
-
-#browser.quit()
-
-#time.sleep(5)
-#print ('is it true')
-#exit()
-
-
 #driver.implicitly_wait(20)
 #data = r.text
-
-
-#print(data)
-
-
-
 
 
 #driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
@@ -162,6 +102,8 @@ from rgclass import nvg599Class
 
 nvg599DUT = nvg599Class()
 
+nvg599DUT.get4920Info()
+exit()
 nvg599DUT.emailTestResults("dog")
 
 xa2Gch=["21","22","23"]
@@ -174,8 +116,6 @@ xb5Gch = ["54","55","56"]
 for element in itertools.product(xa2Gch,xa2Gbw,xb5Gch,xb5Gbw):
     print(element)
 exit()
-
-nvg599DUT.channelTest(xb2G,xchannel,xb5G)
 
 #def channelTest(self, b2G, channel, b5G):
 #    for channel in b2G:
@@ -339,6 +279,7 @@ for l2g in list2GLite:
         print("")
         sleep(2)
 
+        # airTiesTerm.sendline('wl -i wl1 status')   // we want this
         airTiesTerm.sendline('wl -i wl1 chanspec')
         airTiesTerm.expect("#")
         airTies5GResult = airTiesTerm.before
