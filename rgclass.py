@@ -1,3 +1,5 @@
+from itertools import count
+
 import pexpect
 import re
 from selenium.webdriver.common.by import By
@@ -7,23 +9,22 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 import smtplib
 
-
-
-
-
 import sys
 from time import sleep
 
 nvgInfo = { "228946241148656" : {'model':'nvg599','dac':"*<#/53#1/2", 'magic': 'kjundhkdxlxr','mac2g': 'd0:39:b3:60:56:f1','mac5g':'d0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey','ssid': 'ATTqbrAnYs'},
                "277427577103760" : {'model':'nvg599','dac': '<<01%//4&/','magic': "ggtxstgwipcg", 'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid' : 'ATTqbrAnYs'}}
 
-class  gatewayClass():
+class gatewayClass():
+
+
     def __init__(self):
         self.magic = None
         self.upTime = None
         self.IP = None
 
-    def  emailTestResults(selfself,textFile):
+
+    def emailTestResults(selfself,textFile):
         gmail_password="arris123"
         gmail_user= 'leandertesthouse@gmail.com'
         to = 'pfpalmer@gmail.com'
@@ -50,6 +51,7 @@ class  gatewayClass():
             print("im the email section ====================")
         except:
             print('failed to send email')
+
 
 
 class nvg599Class(gatewayClass):
@@ -268,7 +270,7 @@ class nvg599Class(gatewayClass):
         print('hello from inside turn off supplicant')
         self.session.close()
 
-        exit()
+
 
         #cls.ssh.expect('password:')
         #.ssh.sendline('*****')
@@ -285,6 +287,8 @@ class nvg599Class(gatewayClass):
         self.session.sendline('status')
         self.session.expect('>')
         statusOutput = self.session.before
+
+
         print('i am getSerialnumber')
         statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',
                                      re.DOTALL)
@@ -304,6 +308,32 @@ class nvg599Class(gatewayClass):
         session.sendline("show ip lan")
         self.session.expect('>')
         ipLanOutput = self.session.before
+        print("type:",type(ipLanOutput))
+        ipLanOutputx = ipLanOutput.split('\n\r')
+        print("count:", len(ipLanOutputx))
+        dog =  ipLanOutputx
+
+        print("-------------------------------------")
+
+        count = len(dog)
+        print("count",count)
+        count = 2
+        print("count-(1)", count)
+
+        #for i  in range(count,len(dog)):
+        #    print(dog[i])
+
+         #print("-------------------------------------")
+
+        dog1 = dog[2:-1]
+
+        for i  in range(len(dog1)):
+            statusInfoRegEx = re.compile(r'\b(\w+)\b(\w+)')
+            #print(dog1[i])
+            mo1 = statusInfoRegEx.search(dog1[i])
+            print(mo1.group[0])
+            #print(mo1.group[1])
+        exit()
         print('i am IPLANOutput ' + ipLanOutput)
         IPLanInfoRegEx = re.compile(r'(ATT_4920.*)\s')
         mo1 = IPLanInfoRegEx.search(ipLanOutput)
