@@ -3,6 +3,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import itertools
+import pprint
 import time
 #import requests
 
@@ -102,7 +103,11 @@ from rgclass import nvg599Class
 
 nvg599DUT = nvg599Class()
 
-nvg599DUT.get4920Info()
+
+return_dict = nvg599DUT.get4920ShIPLanInfo()
+print("------------------------")
+dict_str = pprint.pformat(return_dict)
+print(dict_str)
 exit()
 nvg599DUT.emailTestResults("dog")
 
@@ -207,7 +212,7 @@ exit()
 #airTies5GChannelInfo = airTies5GResult.split()[-2]
 #print("5GInfo",airTies5GChannelInfo)
 #airTies5GChannel =airTies5GChannelInfo.split("/")[0]
-#print("5G Channel",airTies5GChannel)
+#print("5G Channel,airTies5GChannel)
 #airTies5GBandwidth =airTies5GChannelInfo.split("/")[1]
 #print("5G Bandwidth",airTies5GBandwidth)
 
