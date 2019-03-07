@@ -2,13 +2,15 @@ from itertools import count
 
 import pexpect
 import re
+import pprint
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium import webdriver
 from bs4 import BeautifulSoup
 import smtplib
-
+from collections import defaultdict
 import sys
 from time import sleep
 
@@ -56,28 +58,78 @@ class gatewayClass():
 
 class nvg599Class(gatewayClass):
     def __init__(self):
+        super(self.__class__,self).__init__()
         #rg599 = pexpect.spawn("telnet 192.168.1.254")
         #sleep(1)
         self.IP ="192.168.1.254"
         self.serialNumer = None
-
         self.session = None
+        self.showIPLanDict = {}
 
         airtiesIPList=[]
         rgClientList=[]
 
-        #self.session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
-        #self.session.expect("ogin:")
-        #self.session.sendline('admin')
-        #self.session.expect("ord:")
-        #self.session.sendline('<<01%//4&/')
-        #self.session.expect(">")
-        #print('i am init')
 
         # driver = webdriverhttps://www.waketech.edu/programs-courses/credit/electrical-systems-technology/degrees-pathways.Chrome('/usr/local/bin/chromedriver')
 
         #self.webDriver.find_element_by_link_text("Settings").click()
 
+    def get4920ShWiClients(self):
+        session = self.loginNVG599()
+        self.session.sendline("show wi clients")
+        self.session.expect('>')
+        shWiClientsOutput = self.session.before
+        print("-------------------------------------")
+        #shWifiClinetRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
+        shWifiClinetRegEx = re.compile(r'(^.*?)(Clients connected on 5.0 GHz.*)',re.DOTALL)
+        #print(shWiClientsOutput)
+        mo1 = shWifiClinetRegEx.search(shWiClientsOutput)
+        print(mo1)
+        #print('2.4G ', mo1.group(1))
+        print('------------------------------------------------------')
+
+        #print('5G ', mo1.group(2))
+        G2string = mo1.group(1)
+        #G2RegEx = re.compile(r'([0-9a-fA-F]{2}[:]{5}[0-9a-fA-F]{2})',re.DOTALL)
+        #G2RegEx = re.compile(r'([0-9a-fA-F]:?){12}', re.DOTALL)
+        G2RegEx = re.compile(r'(?:[0-9a-fA-F]:?){12}.*?\n.*\n.*\n.*\n')
+        #G2RegEx = re.compile(r'(\w\w:\w\w:\w\w:\w\w:\w\w:\w\w.*?)*', re.DOTALL)
+        #mo1 = G2RegEx.findall(G2string)
+        #mo1 = G2RegEx.findall(G2string)
+        G2stringlist = re.findall(G2RegEx,G2string)
+        first = G2stringlist[1]
+        second = G2stringlist[2]
+
+        re.sub("\s\s+","",first)
+        print("---------------------------------------------")
+        print ("first", first)
+        print ("second", second)
+
+        print(G2string)
+        print(G2stringlist)
+
+        #print(G2stringlist[1])
+
+        #print("-----------------------split----------------------------")
+
+        #print (re.split("[0-9a-fA-F]:?{12}",G2string),re.DOTALL)
+        #print (re.split("RSSI",G2string),re.DOTALL)
+
+
+        #print('-----------------------mo1-------------------------------')
+
+
+        exit()
+        G5string = mo1.group(2)
+
+        #print('Serial Number', mo1.group(2))
+        #print('Uptime ', mo1.group(3))
+
+
+        # discard first two lines of the outpu
+        exit()
+
+#------------------------------------
 
     def getdeviceInfoFromUI(self):
         global nvgInfo
@@ -176,7 +228,6 @@ class nvg599Class(gatewayClass):
         self.webDriver.implicitly_wait(20)
         # driver.find_elements_by_tag_name("Settings") // this is for 599
 
-
     def loginNVG599(self):
         print('I am in login')
         self.session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
@@ -186,27 +237,6 @@ class nvg599Class(gatewayClass):
         self.session.sendline('<<01%//4&/')
         self.session.expect(">")
         return self.session
- #       self.session.sendline('status')
- #       self.session.expect(">")
-
-  #      statusOutput = self.session.before
-  #      print(statusOutput)
-
-
-
-    #    statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
-        # statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
-        # statusInfoRegEx = re.compile(r'Model\s(\w+)')
-    #    mo1 = statusInfoRegEx.search(statusOutput)
-     #   print(mo1)
-    #    print('model ', mo1.group(1))
-    #    print('Serial Number', mo1.group(2))
-    #    print('Uptime ', mo1.group(3))
-    #    self.serialNumber = mo1.group(2)
-     #   self.upTime = mo1.group(1)
-
-    #    @classmethod
-
 
     def login4920(self,IP4920):
         print('I am in login')
@@ -271,15 +301,6 @@ class nvg599Class(gatewayClass):
         self.session.close()
 
 
-
-        #cls.ssh.expect('password:')
-        #.ssh.sendline('*****')
-        #cls.ssh.expect('> ')
-        #print
-        #.ssh.before, cls.ssh.after
-        #.Is_connected = True
-
-
     def printme(self):
         print('I am an NVG599 object')
 
@@ -303,36 +324,79 @@ class nvg599Class(gatewayClass):
         return mo1.group(2)
 
 
-    def get4920Info(self):
+    def get4920ShIPLanInfo(self):
         session=self.loginNVG599()
         session.sendline("show ip lan")
         self.session.expect('>')
         ipLanOutput = self.session.before
-        print("type:",type(ipLanOutput))
-        ipLanOutputx = ipLanOutput.split('\n\r')
-        print("count:", len(ipLanOutputx))
-        dog =  ipLanOutputx
-
+        ipLanOutput = ipLanOutput.split('\n\r')
         print("-------------------------------------")
-
-        count = len(dog)
+        count = len(ipLanOutput)
+        # discard first two lines of the output
         print("count",count)
-        count = 2
-        print("count-(1)", count)
 
-        #for i  in range(count,len(dog)):
-        #    print(dog[i])
+        ipLanOutput = ipLanOutput[2:-1]
+        for i  in range(len(ipLanOutput)):
+            print("-------------------")
+            print("input line:", ipLanOutput[i])
+            #mo1 = statusInfoRegEx.match(ipLanOutput[i])
+            ipLanOutputSplit = (ipLanOutput[i]).split()
+            print ("connectedDeviceName",ipLanOutputSplit[0])
+            #self.connectedDeviceName = ipLanOutputSplit[0]
+            connectedDeviceName = ipLanOutputSplit[0]
 
-         #print("-------------------------------------")
 
-        dog1 = dog[2:-1]
+            if "ATT_4920" in ipLanOutputSplit[0]:
+                print("this is an airties device!")
+            print ("connectedDeviceIP",ipLanOutputSplit[1])
+            connectedDeviceIP = ipLanOutputSplit[1]
 
-        for i  in range(len(dog1)):
-            statusInfoRegEx = re.compile(r'\b(\w+)\b(\w+)')
-            #print(dog1[i])
-            mo1 = statusInfoRegEx.search(dog1[i])
-            print(mo1.group[0])
-            #print(mo1.group[1])
+            print ("connectedDeviceMac",ipLanOutputSplit[2])
+            connectedDeviceMac = ipLanOutputSplit[2]
+            print ("connectedDeviceStatus",ipLanOutputSplit[3])
+            connectedDeviceStatus = ipLanOutputSplit[3]
+            print ("connectedDeviceDHCP",ipLanOutputSplit[4])
+            connectedDeviceDHCP = ipLanOutputSplit[4]
+            print ("connectedDeviceSSIDNumber",ipLanOutputSplit[5])
+            connectedDeviceSSIDNumber = ipLanOutputSplit[5]
+
+            #self.showIPLanDict[connectedDeviceName]: {}
+            #self.showIPLanDict = {connectedDeviceName : {}}
+            self.showIPLanDict[connectedDeviceName] = {}
+
+            print("-------------->",connectedDeviceName)
+            print("-------------->", connectedDeviceName)
+            print("-------------->", connectedDeviceName)
+            print("-------------->", connectedDeviceName)
+            print("-------------->",connectedDeviceName)
+
+            #self.showIPLanDict= {"connectedDeviceName"}
+            self.showIPLanDict[connectedDeviceName]["IP"] = connectedDeviceIP
+            self.showIPLanDict[connectedDeviceName]["MAC"] = connectedDeviceMac
+            self.showIPLanDict[connectedDeviceName]["Status"] = connectedDeviceStatus
+            self.showIPLanDict[connectedDeviceName]["DHCP"] = connectedDeviceDHCP
+            self.showIPLanDict[connectedDeviceName]["SSIDNumber"] = connectedDeviceSSIDNumber
+
+            #print("showIPLanDict", self.showIPLanDict)
+
+            print("---")
+            #self.showIPLanDict["dog"] = {}
+            #self.showIPLanDict["dog"]["IP"] = "a"
+            #self.showIPLanDict["dog"]["MAC"] = "a"
+            #self.showIPLanDict["dog"]["Status"] = "a"
+            #self.showIPLanDict["dog"]["DHCP"] = "a"
+            #self.showIPLanDict["dog"]["SSIDNumber"] = "a"
+
+
+        return self.showIPLanDict
+
+#pfp
+        print("-------------------")
+        print("-------------------")
+        print("-------------------")
+
+
+            #print("test dict",self.showIPLanDict[str(self.connectedDeviceName)]['connectedDeviceIP'])
         exit()
         print('i am IPLANOutput ' + ipLanOutput)
         IPLanInfoRegEx = re.compile(r'(ATT_4920.*)\s')
