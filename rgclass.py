@@ -81,14 +81,16 @@ class nvg599Class(gatewayClass):
         shWiClientsOutput = self.session.before
         print("-------------------------------------")
         #shWifiClinetRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
+        # need to consider the case where there is no entries either in the 2.$GHZ, the 5GHZ oe both
+        # the regex returns all the chars before the match and all the chars including the "CLients connected at 5GH" and after
         shWifiClinetRegEx = re.compile(r'(^.*?)(Clients connected on 5.0 GHz.*)',re.DOTALL)
-        #print(shWiClientsOutput)
+        print(shWiClientsOutput)
         mo1 = shWifiClinetRegEx.search(shWiClientsOutput)
         print(mo1)
-        #print('2.4G ', mo1.group(1))
+        print('2.4G ', mo1.group(1))
         print('------------------------------------------------------')
-
-        #print('5G ', mo1.group(2))
+        print('5G ', mo1.group(2))
+        G5String= mo1.group(2)
         G2string = mo1.group(1)
         #G2RegEx = re.compile(r'([0-9a-fA-F]{2}[:]{5}[0-9a-fA-F]{2})',re.DOTALL)
         #G2RegEx = re.compile(r'([0-9a-fA-F]:?){12}', re.DOTALL)
@@ -97,6 +99,69 @@ class nvg599Class(gatewayClass):
         #mo1 = G2RegEx.findall(G2string)
         #mo1 = G2RegEx.findall(G2string)
         G2stringlist = re.findall(G2RegEx,G2string)
+
+        numberOfG2Entries = len(G2stringlist)
+
+        print("--------------------------------------the 2g list has :",numberOfG2Entries)
+
+# do i have to subtract one
+        myRange = range(1,numberOfG2Entries -1)
+
+        for i in myRange:
+            print("entrie:",G2stringlist[i])
+            print("-------------------------")
+            #
+            #showWiClientsRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
+
+            #showWiClientsRegEx = re.compile(r'((:?[0-9a-fA-F]:?){12}).*State=(\w+)' , re.DOTALL)
+            #showWiClientsRegEx = re.compile(r'(([0-9a-fA-F]{2}:{5})([0-9a-fA-F]{2}))(.*State=(\w+))' , re.DOTALL)
+            #showWiClientsRegEx = re.compile(r'.*State=(\w+).*SSID=(\w+).*PSMod=(\w+).*NMode=(\w+).*Rate=(\w+\s\w+).*ON for (\w+).*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=(\w+\s\w+)',re.DOTALL)
+            #showWiClientsRegEx = re.compile(r'.*State=(\w+).*SSID=(\w+).*PSMod=(\w+).*NMode=(\w+).*Rate=(\w+\s\w+)',re.DOTALL)
+            showWiClientsRegEx = re.compile(r'.*State=(\w+).*SSID=(\w+).*PSMod=(\w+).*NMode=(\w+).*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+).*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)',re.DOTALL)
+
+                                       #     r'.*ON for (\w+).*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=(\w+\s\w+)',re.DOTALL)
+            #showWiClientsRegEx = re.compile((r'.*State=(\w+).*SSID=(\w+).*PSMOD=(\w+)'),re.DOTALL|re.DOTALL)
+
+
+            #showWiClientsRegEx = re.compile(r'(([0-9a-fA-F]:?){12})\s(.*)', re.DOTALL)
+
+            # statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
+            # statusInfoRegEx = re.compile(r'Model\s(\w+)')
+            print (G2stringlist[i])
+            G2stringlistSplit = G2stringlist[i].split()
+            print ("mac is ---------------------------------------------------------", G2stringlistSplit[0])
+
+
+            showWiClientGroupsroups = showWiClientsRegEx.search(G2stringlist[i])
+
+
+            #print(mo1)
+            print('state--------------------------------------------- ', showWiClientGroupsroups.group(1))
+            print('SSID--------------------------------------------- ', showWiClientGroupsroups.group(2))
+            print('PSMOD--------------------------------------------- ', showWiClientGroupsroups.group(3))
+            print('NMMOD--------------------------------------------- ', showWiClientGroupsroups.group(4))
+            print('Rate--------------------------------------------- ', showWiClientGroupsroups.group(5))
+            print('on--------------------------------------------- ', showWiClientGroupsroups.group(6))
+
+            print('txpkt--------------------------------------------- ', showWiClientGroupsroups.group(7))
+            print('txerr--------------------------------------------- ', showWiClientGroupsroups.group(8))
+            print('rxuni-------------------------------------------- ', showWiClientGroupsroups.group(9))
+            print('rxmul--------------------------------------------- ', showWiClientGroupsroups.group(10))
+            print('rxerr--------------------------------------------- ', showWiClientGroupsroups.group(11))
+            print('rssi--------------------------------------------- ', showWiClientGroupsroups.group(12))
+
+
+
+
+
+
+            print('-----------------------------------------end model')
+            #print('Serial Number', mo1.group(2))
+            #print('Uptime ', mo1.group(3))
+
+        exit()
+
+
         first = G2stringlist[1]
         second = G2stringlist[2]
 
@@ -110,23 +175,6 @@ class nvg599Class(gatewayClass):
 
         #print(G2stringlist[1])
 
-        #print("-----------------------split----------------------------")
-
-        #print (re.split("[0-9a-fA-F]:?{12}",G2string),re.DOTALL)
-        #print (re.split("RSSI",G2string),re.DOTALL)
-
-
-        #print('-----------------------mo1-------------------------------')
-
-
-        exit()
-        G5string = mo1.group(2)
-
-        #print('Serial Number', mo1.group(2))
-        #print('Uptime ', mo1.group(3))
-
-
-        # discard first two lines of the outpu
         exit()
 
 #------------------------------------
@@ -172,8 +220,8 @@ class nvg599Class(gatewayClass):
 # 2.4 bw possibilities 20,40
 # 5 bw possibilities 20,40,80
 # InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.BSSID fc:51:a4:2f:25:94
-#  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.AutoChannelEnable 0
-#  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_BandLock X_0000   C5_5.0GHz
+# InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.AutoChannelEnable 0
+# InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_BandLock X_0000   C5_5.0GHz
 
 
 #tr69 GetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth
@@ -181,8 +229,6 @@ class nvg599Class(gatewayClass):
     # tr69 SetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth=X_0000C5_40MHz
 
     # InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth X_0000C5_80MHz
-
-
 
 
     def channelTest(self,b2G,b5G,bw2G,bw5G):
@@ -214,12 +260,6 @@ class nvg599Class(gatewayClass):
 
         browser.quit()
 
-    #   def createWebdriver(self):
-  #      self.webDriver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
-        # driver.get('http://www.google.com')
-  #      self.webDriver.get('http://192.168.1.254')
-  #      self.webDriver.implicitly_wait(20)
-        # driver.find_elements_by_tag_name("Settings") // this is for 599
 
     def getSNFromUI(self):
         self.webDriver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
@@ -229,7 +269,7 @@ class nvg599Class(gatewayClass):
         # driver.find_elements_by_tag_name("Settings") // this is for 599
 
     def loginNVG599(self):
-        print('I am in login')
+        print('I am in 599 login')
         self.session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
         self.session.expect("ogin:")
         self.session.sendline('admin')
@@ -239,7 +279,7 @@ class nvg599Class(gatewayClass):
         return self.session
 
     def login4920(self,IP4920):
-        print('I am in login')
+        print('I am in 4920 login')
         self.session = pexpect.spawn("telnet" + IP4920, encoding='utf-8')
         self.session.expect("ogin:")
         self.session.sendline('root')
@@ -252,7 +292,7 @@ class nvg599Class(gatewayClass):
 
         self.IP = ip
         #cls.ssh = pexpect.spawn('ssh ' + name)
-        print('i am iconnect')
+        print('i am in connect cli')
         session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
         session.expect("ogin:")
         session.sendline('admin')
@@ -323,7 +363,7 @@ class nvg599Class(gatewayClass):
         #print('Uptime ', mo1.group(3))
         return mo1.group(2)
 
-
+#-pfp-
     def get4920ShIPLanInfo(self):
         session=self.loginNVG599()
         session.sendline("show ip lan")
@@ -336,7 +376,8 @@ class nvg599Class(gatewayClass):
         print("count",count)
 
         ipLanOutput = ipLanOutput[2:-1]
-        for i  in range(len(ipLanOutput)):
+        # I think the length minus 1 is what we want // need to check this
+        for i  in range(len(ipLanOutput-1)):
             print("-------------------")
             print("input line:", ipLanOutput[i])
             #mo1 = statusInfoRegEx.match(ipLanOutput[i])
@@ -390,9 +431,6 @@ class nvg599Class(gatewayClass):
 
         return self.showIPLanDict
 
-#pfp
-        print("-------------------")
-        print("-------------------")
         print("-------------------")
 
 
