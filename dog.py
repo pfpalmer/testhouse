@@ -65,9 +65,7 @@ from rgclass import nvg599Class
 #soup = BeautifulSoup(page.text, 'html.parser')
 #-pfp
 
-#url = 'http://192.168.1.254/cgi-bin/sysinfo.ha'
-#driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
-#browser = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
+
 
 #browser = webdriver.Chrome()
 
@@ -162,16 +160,16 @@ exit()
 #statusInfoRegEx = re.compile(r'Model\s(\w+)\s+Serial\s+Number\s+(\d+)')
 #statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+\s+AnnexA\s+(\w+)',re.DOTALL)
 #statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*completed\s+(\w+)',re.DOTALL)
-statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
+#statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
 #statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
 #statusInfoRegEx = re.compile(r'Model\s(\w+)')
-mo1 = statusInfoRegEx.search(statusOutput)
+#mo1 = statusInfoRegEx.search(statusOutput)
 
-print(mo1)
-print ('model ', mo1.group(1))
+#print(mo1)
+#print ('model ', mo1.group(1))
 
-print ('Serial Number', mo1.group(2))
-print ('Uptime ', mo1.group(3))
+#print ('Serial Number', mo1.group(2))
+#print ('Uptime ', mo1.group(3))
 
 #exit()
 
