@@ -64,7 +64,10 @@ class nvg599Class(gatewayClass):
         self.IP ="192.168.1.254"
         self.serialNumer = None
         self.session = None
+        # show IP Lan  dicitonary dicitionary
         self.showIPLanDict = {}
+        # show wi client dicitionary
+        self.showWiClientsDict = {}
 
         airtiesIPList=[]
         rgClientList=[]
@@ -92,7 +95,6 @@ class nvg599Class(gatewayClass):
         print('5G ', mo1.group(2))
         G5String= mo1.group(2)
         G2string = mo1.group(1)
-        #G2RegEx = re.compile(r'([0-9a-fA-F]{2}[:]{5}[0-9a-fA-F]{2})',re.DOTALL)
         #G2RegEx = re.compile(r'([0-9a-fA-F]:?){12}', re.DOTALL)
         G2RegEx = re.compile(r'(?:[0-9a-fA-F]:?){12}.*?\n.*\n.*\n.*\n')
         #G2RegEx = re.compile(r'(\w\w:\w\w:\w\w:\w\w:\w\w:\w\w.*?)*', re.DOTALL)
@@ -104,8 +106,8 @@ class nvg599Class(gatewayClass):
 
         print("--------------------------------------the 2g list has :",numberOfG2Entries)
 
-# do i have to subtract one
-        myRange = range(1,numberOfG2Entries -1)
+
+        myRange = range(0,numberOfG2Entries)
 
         for i in myRange:
             print("entrie:",G2stringlist[i])
@@ -122,35 +124,71 @@ class nvg599Class(gatewayClass):
                                        #     r'.*ON for (\w+).*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=(\w+\s\w+)',re.DOTALL)
             #showWiClientsRegEx = re.compile((r'.*State=(\w+).*SSID=(\w+).*PSMOD=(\w+)'),re.DOTALL|re.DOTALL)
 
-
-            #showWiClientsRegEx = re.compile(r'(([0-9a-fA-F]:?){12})\s(.*)', re.DOTALL)
-
-            # statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
-            # statusInfoRegEx = re.compile(r'Model\s(\w+)')
             print (G2stringlist[i])
             G2stringlistSplit = G2stringlist[i].split()
             print ("mac is ---------------------------------------------------------", G2stringlistSplit[0])
+            mac2G = G2stringlistSplit[0]
+
+            showWiClientGroups = showWiClientsRegEx.search(G2stringlist[i])
 
 
-            showWiClientGroupsroups = showWiClientsRegEx.search(G2stringlist[i])
+
+            #self.showWiClientsDict = {}
+
+            #self.showIPLanDict[connectedDeviceName]: {}
+            #self.showIPLanDict = {connectedDeviceName : {}}
+            #self.showIPLanDict[connectedDeviceName] = {}
+
+            #print("-------------->",connectedDeviceName)
+            #print("-------------->", connectedDeviceName)
+
+            #self.showIPLanDict= {"connectedDeviceName"}
+            #self.showIPLanDict[connectedDeviceName]["IP"] = connectedDeviceIP
+            #self.showIPLanDict[connectedDeviceName]["MAC"] = connectedDeviceMac
+            #self.showIPLanDict[connectedDeviceName]["Status"] = connectedDeviceStatus
+            #self.showIPLanDict[connectedDeviceName]["DHCP"] = connectedDeviceDHCP
+
 
 
             #print(mo1)
-            print('state--------------------------------------------- ', showWiClientGroupsroups.group(1))
-            print('SSID--------------------------------------------- ', showWiClientGroupsroups.group(2))
-            print('PSMOD--------------------------------------------- ', showWiClientGroupsroups.group(3))
-            print('NMMOD--------------------------------------------- ', showWiClientGroupsroups.group(4))
-            print('Rate--------------------------------------------- ', showWiClientGroupsroups.group(5))
-            print('on--------------------------------------------- ', showWiClientGroupsroups.group(6))
+            print('state--------------------------------------------- ', showWiClientGroups.group(1))
+            state2G = showWiClientGroups.group(1)
+            print('SSID--------------------------------------------- ', showWiClientGroups.group(2))
+            SSID2G = showWiClientGroups.group(2)
+            print('PSMOD--------------------------------------------- ', showWiClientGroups.group(3))
+            PSMOD2G = showWiClientGroups.group(3)
+            print('NMMOD--------------------------------------------- ', showWiClientGroups.group(4))
+            NMMOD2G = showWiClientGroups.group(4)
+            print('Rate--------------------------------------------- ', showWiClientGroups.group(5))
+            Rate2G= showWiClientGroups.group(5)
+            print('on--------------------------------------------- ', showWiClientGroups.group(6))
+            uptime2G = showWiClientGroups.group(6)
+            print('txpkt--------------------------------------------- ', showWiClientGroups.group(7))
+            txpkt2G= showWiClientGroups.group(7)
+            print('txerr--------------------------------------------- ', showWiClientGroups.group(8))
+            txerr2G= showWiClientGroups.group(8)
+            print('rxuni-------------------------------------------- ', showWiClientGroups.group(9))
+            rxuni2G = showWiClientGroups.group(9)
+            print('rxmul--------------------------------------------- ', showWiClientGroups.group(10))
+            rxmul2G= showWiClientGroups.group(10)
+            print('rxerr--------------------------------------------- ', showWiClientGroups.group(11))
+            rxerr2G = showWiClientGroups.group(11)
+            print('rssi--------------------------------------------- ', showWiClientGroups.group(12))
+            rssi2G = showWiClientGroups.group(12)
 
-            print('txpkt--------------------------------------------- ', showWiClientGroupsroups.group(7))
-            print('txerr--------------------------------------------- ', showWiClientGroupsroups.group(8))
-            print('rxuni-------------------------------------------- ', showWiClientGroupsroups.group(9))
-            print('rxmul--------------------------------------------- ', showWiClientGroupsroups.group(10))
-            print('rxerr--------------------------------------------- ', showWiClientGroupsroups.group(11))
-            print('rssi--------------------------------------------- ', showWiClientGroupsroups.group(12))
-
-
+            self.showWiClientsDict[mac2G]={}
+            self.showWiClientsDict[mac2G]["State"] = state2G
+            self.showWiClientsDict[mac2G]["SSID"] = SSID2G
+            self.showWiClientsDict[mac2G]["PSMOD"] = PSMOD2G
+            self.showWiClientsDict[mac2G]["NMMOD"] = NMMOD2G
+            self.showWiClientsDict[mac2G]["Rate"] = Rate2G
+            self.showWiClientsDict[mac2G]["Uptime"] = uptime2G
+            self.showWiClientsDict[mac2G]["txpkt"] = txpkt2G
+            self.showWiClientsDict[mac2G]["txerr"] = txerr2G
+            self.showWiClientsDict[mac2G]["rxuni"] = rxuni2G
+            self.showWiClientsDict[mac2G]["rxmul"] = rxmul2G
+            self.showWiClientsDict[mac2G]["rxerr"] = rxerr2G
+            self.showWiClientsDict[mac2G]["rssi"] = rssi2G
 
 
 
@@ -158,8 +196,9 @@ class nvg599Class(gatewayClass):
             print('-----------------------------------------end model')
             #print('Serial Number', mo1.group(2))
             #print('Uptime ', mo1.group(3))
+            # test
+        return self.showWiClientsDict
 
-        exit()
 
 
         first = G2stringlist[1]
@@ -363,7 +402,8 @@ class nvg599Class(gatewayClass):
         #print('Uptime ', mo1.group(3))
         return mo1.group(2)
 
-#-pfp-
+#-pfp-  this all has to change to ue the mac as the key
+
     def get4920ShIPLanInfo(self):
         session=self.loginNVG599()
         session.sendline("show ip lan")
@@ -407,9 +447,6 @@ class nvg599Class(gatewayClass):
 
             print("-------------->",connectedDeviceName)
             print("-------------->", connectedDeviceName)
-            print("-------------->", connectedDeviceName)
-            print("-------------->", connectedDeviceName)
-            print("-------------->",connectedDeviceName)
 
             #self.showIPLanDict= {"connectedDeviceName"}
             self.showIPLanDict[connectedDeviceName]["IP"] = connectedDeviceIP
