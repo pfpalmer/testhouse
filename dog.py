@@ -100,7 +100,10 @@ from rgclass import nvg599Class
 
 
 nvg599DUT = nvg599Class()
-nvg599DUT.get4920ShWiClients()
+return_dict1 = nvg599DUT.get4920ShWiClients()
+clientDictStr = pprint.pformat(return_dict1)
+print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+print(clientDictStr)
 exit()
 return_dict = nvg599DUT.get4920ShIPLanInfo()
 print("------------------------")
