@@ -15,7 +15,7 @@ import sys
 from time import sleep
 
 nvgInfo = { "228946241148656" : {'model':'nvg599','dac':"*<#/53#1/2", 'magic': 'kjundhkdxlxr','mac2g': 'd0:39:b3:60:56:f1','mac5g':'d0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey','ssid': 'ATTqbrAnYs'},
-               "277427577103760" : {'model':'nvg599','dac': '<<01%//4&/','magic': "ggtxstgwipcg", 'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid' : 'ATTqbrAnYs'}}
+              "277427577103760" : {'model':'nvg599','dac': '<<01%//4&/','magic': "ggtxstgwipcg", 'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid' : 'ATTqbrAnYs'}}
 
 class gatewayClass():
 
@@ -62,7 +62,6 @@ class nvg599Class(gatewayClass):
         #sleep(1)
         self.IP ="192.168.1.254"
 
-        # this is bogus, I have to get the serial number from the UI
 
         self.getdeviceInfoFromUI()
         print("self.serialNumer:",self.serialNumber)
@@ -74,12 +73,12 @@ class nvg599Class(gatewayClass):
                                        'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94',
                                        'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
 
-        # This is ifoemation that must be read from the actual device., so it is stored in a dicitonary of all the test house nvg599s
+        # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
 
         self.devAccessCode = self.nvgInfo[self.serialNumber]['dac']
-        print("dac",self.DAC)
+        print("dac",self.devAccessCode)
         print("in NVG599 init")
-        exit()
+        #exit()
         # show IP Lan  dicitonary dicitionary
         self.showIPLanDict = {}
         # show wi client dicitionary
@@ -90,7 +89,7 @@ class nvg599Class(gatewayClass):
 
         #self.webDriver.find_element_by_link_text("Settings").click()
 
-    def get4920ShWiClients(self):
+    def getShWiClients(self):
         session = self.loginNVG599()
         self.session.sendline("show wi clients")
         self.session.expect('>')
@@ -202,24 +201,33 @@ class nvg599Class(gatewayClass):
             self.session.close()
         return self.showWiClientsDict
 
+#-------pfp-----------------------------
+
+    def accessUIWiFiInfo(self):
+        global nvgInfo
+        self.getdeviceInfoFromUI()
+        print("self.serialNumer:",self.serialNumber)
+        # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
+        self.devAccessCode = self.nvgInfo[self.serialNumber]['dac']
+        print("dac",self.DAC)
+        print("in accessWiFiInfo ")
+        url = 'http://192.168.1.254/cgi-bin/wconfig.ha'
+        browser = webdriver.Chrome()
+        browser.get(url)
+        soup = BeautifulSoup(browser.page_source, 'html.parser')
+        print(" ------------access code ----------------")
+        print(soup.find(id="password"))
+        print(" ------------access code ----------------")
+        deviceAccessCode = browser.find_element_by_id("password")
+        deviceAccessCode .send_keys(self.devAccessCode)
+        submit = browser.find_element_by_name("Continue")
+        submit.click()
 
 
-        first = G2stringlist[1]
-        second = G2stringlist[2]
 
-        re.sub("\s\s+","",first)
-        print("---------------------------------------------")
-        print ("first", first)
-        print ("second", second)
-
-        print(G2string)
-        print(G2stringlist)
-
-        #print(G2stringlist[1])
-
+        sleep(5)
         exit()
 
-#------------------------------------
 
     def getdeviceInfoFromUI(self):
         global nvgInfo
