@@ -19,7 +19,6 @@ nvgInfo = { "228946241148656" : {'model':'nvg599','dac':"*<#/53#1/2", 'magic': '
 
 class gatewayClass():
 
-
     def __init__(self):
         self.magic = None
         self.upTime = None
@@ -32,7 +31,7 @@ class gatewayClass():
         to = 'pfpalmer@gmail.com'
         sent_from = 'leandertesthouse:'
         subject ='Test results'
- #       body = "Results:" + channelResultContents
+ #      body = "Results:" + channelResultContents
         body = "Results:" + textFile
         email_text = """
         From:%s
@@ -62,17 +61,31 @@ class nvg599Class(gatewayClass):
         #rg599 = pexpect.spawn("telnet 192.168.1.254")
         #sleep(1)
         self.IP ="192.168.1.254"
-        self.serialNumer = None
-        self.session = None
+
+        # this is bogus, I have to get the serial number from the UI
+
+        self.getdeviceInfoFromUI()
+        print("self.serialNumer:",self.serialNumber)
+
+        self.nvgInfo = {"228946241148656": {'model': 'nvg599', 'dac': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
+                                       'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4',
+                                       'wiFi': 'c2cmybt25dey', 'ssid': 'ATTqbrAnYs'},
+                   "277427577103760": {'model': 'nvg599', 'dac': '<<01%//4&/', 'magic': "ggtxstgwipcg",
+                                       'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94',
+                                       'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
+
+        # This is ifoemation that must be read from the actual device., so it is stored in a dicitonary of all the test house nvg599s
+
+        self.devAccessCode = self.nvgInfo[self.serialNumber]['dac']
+        print("dac",self.DAC)
+        print("in NVG599 init")
+        exit()
         # show IP Lan  dicitonary dicitionary
         self.showIPLanDict = {}
         # show wi client dicitionary
         self.showWiClientsDict = {}
-
         airtiesIPList=[]
         rgClientList=[]
-
-
         # driver = webdriverhttps://www.waketech.edu/programs-courses/credit/electrical-systems-technology/degrees-pathways.Chrome('/usr/local/bin/chromedriver')
 
         #self.webDriver.find_element_by_link_text("Settings").click()
@@ -106,7 +119,6 @@ class nvg599Class(gatewayClass):
 
         print("--------------------------------------the 2g list has :",numberOfG2Entries)
 
-
         myRange = range(0,numberOfG2Entries)
 
         for i in myRange:
@@ -131,9 +143,7 @@ class nvg599Class(gatewayClass):
 
             showWiClientGroups = showWiClientsRegEx.search(G2stringlist[i])
 
-
-
-            #self.showWiClientsDict = {}
+            self.showWiClientsDict = {}
 
             #self.showIPLanDict[connectedDeviceName]: {}
             #self.showIPLanDict = {connectedDeviceName : {}}
@@ -147,8 +157,6 @@ class nvg599Class(gatewayClass):
             #self.showIPLanDict[connectedDeviceName]["MAC"] = connectedDeviceMac
             #self.showIPLanDict[connectedDeviceName]["Status"] = connectedDeviceStatus
             #self.showIPLanDict[connectedDeviceName]["DHCP"] = connectedDeviceDHCP
-
-
 
             #print(mo1)
             print('state--------------------------------------------- ', showWiClientGroups.group(1))
@@ -190,13 +198,8 @@ class nvg599Class(gatewayClass):
             self.showWiClientsDict[mac2G]["rxerr"] = rxerr2G
             self.showWiClientsDict[mac2G]["rssi"] = rssi2G
 
-
-
-
-            print('-----------------------------------------end model')
-            #print('Serial Number', mo1.group(2))
-            #print('Uptime ', mo1.group(3))
-            # test
+            #print('-----------------------------------------end model')
+            self.session.close()
         return self.showWiClientsDict
 
 
@@ -265,10 +268,8 @@ class nvg599Class(gatewayClass):
 
 #tr69 GetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth
 #tr69 SetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth=X_0000C5_80MHz
-    # tr69 SetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth=X_0000C5_40MHz
-
-    # InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth X_0000C5_80MHz
-
+# tr69 SetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth=X_0000C5_40MHz
+# InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth X_0000C5_80MH
 
     def channelTest(self,b2G,b5G,bw2G,bw5G):
         for ib2G in b2G:
@@ -290,8 +291,8 @@ class nvg599Class(gatewayClass):
         for th in this:
             if th.text == "IPv4 Address / Name":
                 #print(th.next_sibling.next_sibling.text)
-                print("derp    ",th.text)
-                print("derp1",th.next_sibling.text)
+                print("Name    ",th.text)
+                print("Name1",th.next_sibling.text)
             else:
                 print("no derp")
 
@@ -353,8 +354,6 @@ class nvg599Class(gatewayClass):
         self.upTime = mo1.group(1)
         self.session.close()
 
-
-
     def turnOffSupplicant(self):
 
         self.session = self.loginNVG599()
@@ -379,17 +378,15 @@ class nvg599Class(gatewayClass):
         print('hello from inside turn off supplicant')
         self.session.close()
 
-
     def printme(self):
         print('I am an NVG599 object')
 
     def getRGSerialNumber(self):
+        self.loginNVG599()
         self.session.sendline('status')
         self.session.expect('>')
         statusOutput = self.session.before
-
-
-        print('i am getSerialnumber')
+        print('Getting getSerialnumber')
         statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',
                                      re.DOTALL)
         # statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
@@ -402,9 +399,7 @@ class nvg599Class(gatewayClass):
         #print('Uptime ', mo1.group(3))
         return mo1.group(2)
 
-#-pfp-  this all has to change to ue the mac as the key
-
-    def get4920ShIPLanInfo(self):
+    def getRGShIPLanInfo(self):
         session=self.loginNVG599()
         session.sendline("show ip lan")
         self.session.expect('>')
@@ -412,23 +407,21 @@ class nvg599Class(gatewayClass):
         ipLanOutput = ipLanOutput.split('\n\r')
         print("-------------------------------------")
         count = len(ipLanOutput)
+
         # discard first two lines of the output
         print("count",count)
-
         ipLanOutput = ipLanOutput[2:-1]
         # I think the length minus 1 is what we want // need to check this
-        for i  in range(len(ipLanOutput-1)):
-            print("-------------------")
-            print("input line:", ipLanOutput[i])
+        for i  in range(len(ipLanOutput)):
+            #print("input line:", ipLanOutput[i])
             #mo1 = statusInfoRegEx.match(ipLanOutput[i])
             ipLanOutputSplit = (ipLanOutput[i]).split()
-            print ("connectedDeviceName",ipLanOutputSplit[0])
+            #print ("connectedDeviceName",ipLanOutputSplit[0])
             #self.connectedDeviceName = ipLanOutputSplit[0]
             connectedDeviceName = ipLanOutputSplit[0]
 
-
-            if "ATT_4920" in ipLanOutputSplit[0]:
-                print("this is an airties device!")
+            #if "ATT_4920" in ipLanOutputSplit[0]:
+            #    print("this is an airties device!")
             print ("connectedDeviceIP",ipLanOutputSplit[1])
             connectedDeviceIP = ipLanOutputSplit[1]
 
@@ -440,44 +433,19 @@ class nvg599Class(gatewayClass):
             connectedDeviceDHCP = ipLanOutputSplit[4]
             print ("connectedDeviceSSIDNumber",ipLanOutputSplit[5])
             connectedDeviceSSIDNumber = ipLanOutputSplit[5]
+            #-----------------change to use mac as key instead of device name-------------------pfp
+            #self.showIPLanDict[connectedDeviceName] = {}
+            self.showIPLanDict[connectedDeviceMac] = {}
+            #-----------------end change here-------------------pfp
 
-            #self.showIPLanDict[connectedDeviceName]: {}
-            #self.showIPLanDict = {connectedDeviceName : {}}
-            self.showIPLanDict[connectedDeviceName] = {}
-
-            print("-------------->",connectedDeviceName)
-            print("-------------->", connectedDeviceName)
-
-            #self.showIPLanDict= {"connectedDeviceName"}
-            self.showIPLanDict[connectedDeviceName]["IP"] = connectedDeviceIP
-            self.showIPLanDict[connectedDeviceName]["MAC"] = connectedDeviceMac
-            self.showIPLanDict[connectedDeviceName]["Status"] = connectedDeviceStatus
-            self.showIPLanDict[connectedDeviceName]["DHCP"] = connectedDeviceDHCP
-            self.showIPLanDict[connectedDeviceName]["SSIDNumber"] = connectedDeviceSSIDNumber
-
-            #print("showIPLanDict", self.showIPLanDict)
-
-            print("---")
-            #self.showIPLanDict["dog"] = {}
-            #self.showIPLanDict["dog"]["IP"] = "a"
-            #self.showIPLanDict["dog"]["MAC"] = "a"
-            #self.showIPLanDict["dog"]["Status"] = "a"
-            #self.showIPLanDict["dog"]["DHCP"] = "a"
-            #self.showIPLanDict["dog"]["SSIDNumber"] = "a"
-
-
+            self.showIPLanDict[connectedDeviceMac]["IP"] = connectedDeviceIP
+            self.showIPLanDict[connectedDeviceMac]["Name"] = connectedDeviceName
+            self.showIPLanDict[connectedDeviceMac]["Status"] = connectedDeviceStatus
+            self.showIPLanDict[connectedDeviceMac]["DHCP"] = connectedDeviceDHCP
+            self.showIPLanDict[connectedDeviceMac]["SSIDNumber"] = connectedDeviceSSIDNumber
+            self.session.close()
         return self.showIPLanDict
 
-        print("-------------------")
-
-
-            #print("test dict",self.showIPLanDict[str(self.connectedDeviceName)]['connectedDeviceIP'])
-        exit()
-        print('i am IPLANOutput ' + ipLanOutput)
-        IPLanInfoRegEx = re.compile(r'(ATT_4920.*)\s')
-        mo1 = IPLanInfoRegEx.search(ipLanOutput)
-        print(mo1)
-        self.session.close()
 
     def login(self):
         pass
