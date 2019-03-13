@@ -14,8 +14,8 @@ from collections import defaultdict
 import sys
 from time import sleep
 
-nvgInfo = { "228946241148656" : {'model':'nvg599','dac':"*<#/53#1/2", 'magic': 'kjundhkdxlxr','mac2g': 'd0:39:b3:60:56:f1','mac5g':'d0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey','ssid': 'ATTqbrAnYs'},
-              "277427577103760" : {'model':'nvg599','dac': '<<01%//4&/','magic': "ggtxstgwipcg", 'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid' : 'ATTqbrAnYs'}}
+nvgInfo = { "228946241148656" : {'model':'nvg599','deviceAccessCode':"*<#/53#1/2", 'magic': 'kjundhkdxlxr','mac2g': 'd0:39:b3:60:56:f1','mac5g':'d0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey','ssid': 'ATTqbrAnYs'},
+              "277427577103760" : {'model':'nvg599','deviceAccessCode': '<<01%//4&/','magic': "ggtxstgwipcg", 'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid' : 'ATTqbrAnYs'}}
 
 class gatewayClass():
 
@@ -66,16 +66,16 @@ class nvg599Class(gatewayClass):
         self.getdeviceInfoFromUI()
         print("self.serialNumer:",self.serialNumber)
 
-        self.nvgInfo = {"228946241148656": {'model': 'nvg599', 'dac': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
+        self.nvgInfo = {"228946241148656": {'model': 'nvg599', 'deviceAccessCode': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
                                        'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4',
                                        'wiFi': 'c2cmybt25dey', 'ssid': 'ATTqbrAnYs'},
-                   "277427577103760": {'model': 'nvg599', 'dac': '<<01%//4&/', 'magic': "ggtxstgwipcg",
+                   "277427577103760": {'model': 'nvg599', 'deviceAccessCode': '<<01%//4&/', 'magic': "ggtxstgwipcg",
                                        'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94',
                                        'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
 
         # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
 
-        self.devAccessCode = self.nvgInfo[self.serialNumber]['dac']
+        self.devAccessCode = self.nvgInfo[self.serialNumber]['deviceAccessCode']
         print("dac",self.devAccessCode)
         print("in NVG599 init")
         #exit()
@@ -208,10 +208,15 @@ class nvg599Class(gatewayClass):
         self.getdeviceInfoFromUI()
         print("self.serialNumer:",self.serialNumber)
         # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
-        self.devAccessCode = self.nvgInfo[self.serialNumber]['dac']
-        print("dac",self.DAC)
+        self.deviceAccessCode = self.nvgInfo[self.serialNumber]['deviceAccessCode']
+        print("dac",self.deviceAccessCode)
         print("in accessWiFiInfo ")
         url = 'http://192.168.1.254/cgi-bin/wconfig.ha'
+
+        # we should be doing this
+        #url = 'http://192.168.1.254/cgi-bin/home.ha'
+
+
         browser = webdriver.Chrome()
         browser.get(url)
         soup = BeautifulSoup(browser.page_source, 'html.parser')
@@ -222,11 +227,11 @@ class nvg599Class(gatewayClass):
         deviceAccessCode .send_keys(self.devAccessCode)
         submit = browser.find_element_by_name("Continue")
         submit.click()
-
-
-
+        advancedOptionsLink = browser.find_element_by_link_text("Advanced Options")
         sleep(5)
-        exit()
+        advancedOptionsLink.click()
+        sleep(5)
+        browser.quit()
 
 
     def getdeviceInfoFromUI(self):
@@ -245,7 +250,7 @@ class nvg599Class(gatewayClass):
                 print(th.next_sibling.next_sibling.text)
                 self.serialNumber = th.next_sibling.next_sibling.text
 
-                self.DAC= nvgInfo[self.serialNumber]['dac']
+                self.DAC= nvgInfo[self.serialNumber]['deviceAccessCode']
                 print("dac is:",self.DAC)
             if th.text == "Software Version":
                 print(th.next_sibling.next_sibling.text)
