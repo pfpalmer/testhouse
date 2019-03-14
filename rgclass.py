@@ -226,6 +226,11 @@ class Nvg599Class(GatewayClass):
 
         browser = webdriver.Chrome()
         browser.get(url)
+#//*[@id="main-content"]/div[2]/div[2]/div/h1[text()='Access Code Required'
+        #was this
+        #browser.find_element_by_xpath("//*[@id='main-content']/div[2]/div[2]/div/h1")
+        browser.find_element_by_xpath("//*[@id='main-content']/div[2]/div[2]/div/h1.text")
+
 
         dianostics_link = browser.find_element_by_link_text("Diagnostics")
         dianostics_link.click()
