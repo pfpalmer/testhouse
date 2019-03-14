@@ -1,9 +1,10 @@
 from itertools import count
+from selenium.webdriver.common.by import By
 
 import pexpect
 import re
 import pprint
-
+import os
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import WebDriverWait
@@ -13,11 +14,18 @@ import smtplib
 from collections import defaultdict
 import sys
 from time import sleep
+import time
 
 nvgInfo = { "228946241148656" : {'model':'nvg599','deviceAccessCode':"*<#/53#1/2", 'magic': 'kjundhkdxlxr','mac2g': 'd0:39:b3:60:56:f1','mac5g':'d0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey','ssid': 'ATTqbrAnYs'},
               "277427577103760" : {'model':'nvg599','deviceAccessCode': '<<01%//4&/','magic': "ggtxstgwipcg", 'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid' : 'ATTqbrAnYs'}}
 
-class gatewayClass():
+NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
+DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
+
+#class GatewayClass():
+
+
+class GatewayClass:
 
     def __init__(self):
         self.magic = None
@@ -54,8 +62,7 @@ class gatewayClass():
             print('failed to send email')
 
 
-
-class nvg599Class(gatewayClass):
+class Nvg599Class(GatewayClass):
     def __init__(self):
         super(self.__class__,self).__init__()
         #rg599 = pexpect.spawn("telnet 192.168.1.254")
@@ -203,34 +210,143 @@ class nvg599Class(gatewayClass):
 
 #-------pfp-----------------------------
 
+    def factory_reset_rg(self):
+        global nvgInfo
+        #self.getdeviceInfoFromUI()
+        #print("self.serialNumer:",self.serialNumber)
+        # we need the serial number to refernce the DAC which is in our local dicitonary
+        # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
+        #self.deviceAccessCode = self.nvgInfo[self.serialNumber]['deviceAccessCode']
+        #print("dac",self.deviceAccessCode)
+        #print("in accessWiFiInfo ")
+        #url = 'http://192.168.1.254/cgi-bin/wconfig.ha'
+
+        # we should be doing this
+        url = 'http://192.168.1.254/'
+
+        browser = webdriver.Chrome()
+        browser.get(url)
+
+        dianostics_link = browser.find_element_by_link_text("Diagnostics")
+        dianostics_link.click()
+        sleep(2)
+
+        resets_link = browser.find_element_by_link_text("Resets")
+        resets_link.click()
+        sleep(2)
+
+        #device_access_link = browser.find_element_by_id("password")
+        #device_access_link.send_keys(self.devAccessCode)
+        #submit = browser.find_element_by_name("Continue")
+        #submit.click()
+        print('I01')
+        factory_reset = browser.find_element_by_name("Reset")
+        factory_reset.click()
+        sleep(5)
+        print('I1')
+        factory_reset = browser.find_element_by_name("Reset")
+        factory_reset.click()
+        sleep(12)
+
+        print('I am in factory reset ')
+
+        #result = os.system(cmd)
+        #print('result:', result)
+        start = time.time()
+        print("starting timer")
+
+        cmd = 'ping -c1 192.168.1.254'
+        result = os.system(cmd)
+        while result == 0:
+            print("waiting 10 for RG to reboot")
+            sleep(10)
+            result = os.system(cmd)
+
+        while  (result == 0):
+                print("waiting 10 for RG to come back into service")
+                sleep(10)
+                result = os.system(cmd)
+
+        end = time.time()
+        print("duration in seconds:", end - start)
+
+        sleep(2)
+
+
+
+    def enter_dac_convenience(self,sesion):
+        pass
+
     def accessUIWiFiInfo(self):
         global nvgInfo
-        self.getdeviceInfoFromUI()
+        #self.getdeviceInfoFromUI()
         print("self.serialNumer:",self.serialNumber)
+        # we need the serial number to refernce the DAC which is in our local dicitonary
         # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
         self.deviceAccessCode = self.nvgInfo[self.serialNumber]['deviceAccessCode']
         print("dac",self.deviceAccessCode)
         print("in accessWiFiInfo ")
-        url = 'http://192.168.1.254/cgi-bin/wconfig.ha'
+        #url = 'http://192.168.1.254/cgi-bin/wconfig.ha'
 
         # we should be doing this
-        #url = 'http://192.168.1.254/cgi-bin/home.ha'
-
+        url = 'http://192.168.1.254/'
 
         browser = webdriver.Chrome()
         browser.get(url)
+
+        status_link = browser.find_element_by_link_text("Home Network")
+        status_link.click()
+        sleep(2)
+
+        #status_link = browser.find_element_by_link_text("Status")
+        #status_link.click()
+        #sleep(2)
         soup = BeautifulSoup(browser.page_source, 'html.parser')
-        print(" ------------access code ----------------")
-        print(soup.find(id="password"))
-        print(" ------------access code ----------------")
+        tables = soup.findChildren('table')
+#five tables on this page
+        table = tables[4]
+        #table = soup.find("table100", {"class": "table100"})
+        print ("table is",table)
+        table_rows = table.find_all('tr')
+        for tr in table_rows:
+            td = tr.find_all('td')
+            row = [i.text for i in td]
+
+            print("length is:",len(row))
+            print("type",type(row))
+            exit()
+            print("----------------------------")
+            if len(row !=0 and row[0]=="Current Radio Channel"):
+                #print("2G channel:",row[1],"5G channel:,row[2]")
+                print("2G channel:]")
+
+                sleep(2)
+                browser.quit()
+                exit()
+
+
+        sleep(20)
+        browser.quit()
+        exit()
+        homeNetworkLink = browser.find_element_by_link_text("Home Network")
+        homeNetworkLink.click()
+        sleep(2)
+        homeNetworkLink = browser.find_element_by_link_text("Wi-Fi")
+        homeNetworkLink.click()
+        sleep(2)
+        #exit()
+        #soup = BeautifulSoup(browser.page_source, 'html.parser')
+        #print(" ------------access code ----------------")
+        #print(soup.find(id="password"))
+        #print(" ------------access code ----------------")
         deviceAccessCode = browser.find_element_by_id("password")
-        deviceAccessCode .send_keys(self.devAccessCode)
+        deviceAccessCode.send_keys(self.devAccessCode)
         submit = browser.find_element_by_name("Continue")
         submit.click()
         advancedOptionsLink = browser.find_element_by_link_text("Advanced Options")
-        sleep(5)
+        sleep(2)
         advancedOptionsLink.click()
-        sleep(5)
+        sleep(20)
         browser.quit()
 
 
@@ -268,7 +384,7 @@ class nvg599Class(gatewayClass):
                 print(th.next_sibling.next_sibling.text)
                 self.macAddress = th.next_sibling.next_sibling.text
 
-        sleep(5)
+        sleep(2)
 
         browser.quit()
 
@@ -287,8 +403,11 @@ class nvg599Class(gatewayClass):
     def channelTest(self,b2G,b5G,bw2G,bw5G):
         for ib2G in b2G:
             for ib5G in b5G:
-                for ibw in bw:
+                for ibw in b2G:
                     print("2G:" + ib2G + " 5G:" + ib5G + "bandwidth" + ibw)
+
+
+
 
 
     def get4920IPFromUI(self):
@@ -321,6 +440,22 @@ class nvg599Class(gatewayClass):
         self.webDriver.implicitly_wait(20)
         # driver.find_elements_by_tag_name("Settings") // this is for 599
 
+
+    def connect_to_console(self):
+        print('I am in console')
+        cmd='ping -c1 192.168.1.254'
+        result = os.system(cmd)
+        print ('result:',result)
+        start = time.time()
+        print("hello")
+        end = time.time()
+        print(end - start)
+
+        if (result != 0):
+            print("waiting 10 seconds")
+            sleep(10)
+        exit()
+
     def loginNVG599(self):
         print('I am in 599 login')
         self.session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
@@ -331,7 +466,7 @@ class nvg599Class(gatewayClass):
         self.session.expect(">")
         return self.session
 
-    def login4920(self,IP4920):
+    def login_4920(self,IP4920):
         print('I am in 4920 login')
         self.session = pexpect.spawn("telnet" + IP4920, encoding='utf-8')
         self.session.expect("ogin:")
@@ -463,7 +598,7 @@ class nvg599Class(gatewayClass):
     def login(self):
         pass
 
-class nvg5268Class(gatewayClass):
+class Nvg5268Class(GatewayClass):
     def __init__(self):
         self.name="abc"
         rg5268 = pexpect.spawn("telnet 192.168.1.254")
