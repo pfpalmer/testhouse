@@ -20,7 +20,7 @@ import sys
 from time import sleep
 
 import pexpect
-from rgclass import nvg599Class
+from rgclass import Nvg599Class
 
 
 ########################  this seems like what we want
@@ -98,9 +98,13 @@ from rgclass import nvg599Class
 
 #exit()
 
+def test1():
+    pass
 
-nvg599DUT = nvg599Class()
-return_dict1 = nvg599DUT.get4920ShWiClients()
+nvg599DUT = Nvg599Class()
+nvg599DUT.accessUIWiFiInfo()
+exit()
+return_dict1 = nvg599DUT.getShWiClients()
 clientDictStr = pprint.pformat(return_dict1)
 print("1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 print(clientDictStr)
@@ -181,7 +185,7 @@ serialNumber=mo1.group(2)
 
 if rgModel=='NVG599':
     print('we are going to instantiate an NVG599')
-    nvg599DUT = nvg599Class()
+    nvg599DUT = Nvg599Class()
     nvg599DUT.printme()
     nvg599DUT.turnOffSupplicant()
 
@@ -227,7 +231,7 @@ rgTerm.expect("ogin:")
 rgTerm.sendline('admin')
 
 rgTerm.expect("assword:")
-# child.sendline('alcatel')
+# child.sendline('al        print(" ------------access code ----------------")catel')
 rgTerm.sendline('*<#/53#1/2')
 
 rgTerm.expect("UNLOCKED>")
