@@ -16,8 +16,15 @@ import sys
 from time import sleep
 import time
 
-nvgInfo = { "228946241148656" : {'model':'nvg599','deviceAccessCode':"*<#/53#1/2", 'magic': 'kjundhkdxlxr','mac2g': 'd0:39:b3:60:56:f1','mac5g':'d0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey','ssid': 'ATTqbrAnYs'},
-              "277427577103760" : {'model':'nvg599','deviceAccessCode': '<<01%//4&/','magic': "ggtxstgwipcg", 'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid' : 'ATTqbrAnYs'}}
+#nvg_info = { "228946241148656" : {'model':'nvg599','deviceAccessCode':"*<#/53#1/2", 'magic': 'kjundhkdxlxr','mac2g': 'd0:39:b3:60:56:f1','mac5g':'d0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey','ssid': 'ATTqbrAnYs'},
+#"277427577103760" : {'model':'nvg599','deviceAccessCode': '<<01%//4&/','magic': "ggtxstgwipcg", 'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid' : 'ATTqbrAnYs'}}
+
+nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
+                                     'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4',
+                                     'wiFi': 'c2cmybt25dey', 'ssid': 'ATTqbrAnYs'},
+                 "277427577103760": {'model': 'nvg599', 'device_access_code': "<<01%//4&/", 'magic': 'ggtxstgwipcg',
+                                     'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94',
+                                     'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
 
 NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
 DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
@@ -29,18 +36,18 @@ class GatewayClass:
 
     def __init__(self):
         self.magic = None
-        self.upTime = None
-        self.IP = None
+        self.up_time = None
+        self.ip = None
+        self.serial_number = None
 
-
-    def emailTestResults(selfself,textFile):
+    def email_test_results(self, text_file):
         gmail_password="arris123"
         gmail_user= 'leandertesthouse@gmail.com'
         to = 'pfpalmer@gmail.com'
         sent_from = 'leandertesthouse:'
-        subject ='Test results'
- #      body = "Results:" + channelResultContents
-        body = "Results:" + textFile
+        subject = 'Test results'
+#      body = "Results:" + channelResultContents
+        body = "Results:" + text_file
         email_text = """
         From:%s
         To:%s
@@ -64,28 +71,30 @@ class GatewayClass:
 
 class Nvg599Class(GatewayClass):
     def __init__(self):
-        super(self.__class__,self).__init__()
+        super(self.__class__, self).__init__()
         #rg599 = pexpect.spawn("telnet 192.168.1.254")
         #sleep(1)
         self.IP ="192.168.1.254"
-
+        self.device_access_code = None
+        self.test = 41
+        global nvg_info
 
         self.getdeviceInfoFromUI()
         print("self.serialNumer:",self.serialNumber)
 
-        self.nvgInfo = {"228946241148656": {'model': 'nvg599', 'deviceAccessCode': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
-                                       'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4',
-                                       'wiFi': 'c2cmybt25dey', 'ssid': 'ATTqbrAnYs'},
-                   "277427577103760": {'model': 'nvg599', 'deviceAccessCode': '<<01%//4&/', 'magic': "ggtxstgwipcg",
-                                       'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94',
-                                       'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
+#       self.nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
+#                                       'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4',
+#                                       'wiFi': 'c2cmybt25dey', 'ssid': 'ATTqbrAnYs'},
+#                   "277427577103760": {'model': 'nvg599', 'device_access_code': "<<01%//4&/", 'magic': 'ggtxstgwipcg',
+#                                       'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94',
+#                                       'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
 
         # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
 
-        self.devAccessCode = self.nvgInfo[self.serialNumber]['deviceAccessCode']
-        print("dac",self.devAccessCode)
+        self.device_access_code = nvg_info[self.serialNumber]['device_access_code']
+        print("dac",self.device_access_code)
         print("in NVG599 init")
-        #exit()
+        exit()
         # show IP Lan  dicitonary dicitionary
         self.showIPLanDict = {}
         # show wi client dicitionary
@@ -119,16 +128,16 @@ class Nvg599Class(GatewayClass):
         #G2RegEx = re.compile(r'(\w\w:\w\w:\w\w:\w\w:\w\w:\w\w.*?)*', re.DOTALL)
         #mo1 = G2RegEx.findall(G2string)
         #mo1 = G2RegEx.findall(G2string)
-        G2stringlist = re.findall(G2RegEx,G2string)
+        g2_string_list = re.findall(G2RegEx,G2string)
 
-        numberOfG2Entries = len(G2stringlist)
+        number_of_g2_entries = len(g2_string_list)
 
-        print("--------------------------------------the 2g list has :",numberOfG2Entries)
+        print("--------------------------------------the 2g list has :",number_of_g2_entries)
 
-        myRange = range(0,numberOfG2Entries)
+        my_range = range(0,number_of_g2_entries)
 
-        for i in myRange:
-            print("entrie:",G2stringlist[i])
+        for i in my_range:
+            print("entrie:", g2_string_list[i])
             print("-------------------------")
             #
             #showWiClientsRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
@@ -142,29 +151,29 @@ class Nvg599Class(GatewayClass):
                                        #     r'.*ON for (\w+).*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=(\w+\s\w+)',re.DOTALL)
             #showWiClientsRegEx = re.compile((r'.*State=(\w+).*SSID=(\w+).*PSMOD=(\w+)'),re.DOTALL|re.DOTALL)
 
-            print (G2stringlist[i])
-            G2stringlistSplit = G2stringlist[i].split()
-            print ("mac is ---------------------------------------------------------", G2stringlistSplit[0])
-            mac2G = G2stringlistSplit[0]
+            print(g2_string_list[i])
+            g2_string_list_split = g2_string_list[i].split()
+            print("mac is ---------------------------------------------------------", g2_string_list_split[0])
+            mac_2g = g2_string_list_split[0]
 
-            showWiClientGroups = showWiClientsRegEx.search(G2stringlist[i])
+            showWiClientGroups = showWiClientsRegEx.search(g2_string_list[i])
 
             self.showWiClientsDict = {}
 
-            #self.showIPLanDict[connectedDeviceName]: {}
-            #self.showIPLanDict = {connectedDeviceName : {}}
-            #self.showIPLanDict[connectedDeviceName] = {}
+# #           #self.showIPLanDict[connectedDeviceName]: {}
+# #           #self.showIPLanDict = {connectedDeviceName : {}}
+# #           #self.showIPLanDict[connectedDeviceName] = {}
+#
+#            #print("-------------->",connectedDeviceName)
+#            #print("-------------->", connectedDeviceName)
 
-            #print("-------------->",connectedDeviceName)
-            #print("-------------->", connectedDeviceName)
+#            #self.showIPLanDict= {"connectedDeviceName"}
+#            #self.showIPLanDict[connectedDeviceName]["IP"] = connectedDeviceIP
+#            #self.showIPLanDict[connectedDeviceName]["MAC"] = connectedDeviceMac
+#            #self.showIPLanDict[connectedDeviceName]["Status"] = connectedDeviceStatus
+#            #self.showIPLanDict[connectedDeviceName]["DHCP"] = connectedDeviceDHCP
 
-            #self.showIPLanDict= {"connectedDeviceName"}
-            #self.showIPLanDict[connectedDeviceName]["IP"] = connectedDeviceIP
-            #self.showIPLanDict[connectedDeviceName]["MAC"] = connectedDeviceMac
-            #self.showIPLanDict[connectedDeviceName]["Status"] = connectedDeviceStatus
-            #self.showIPLanDict[connectedDeviceName]["DHCP"] = connectedDeviceDHCP
-
-            #print(mo1)
+#            #print(mo1)
             print('state--------------------------------------------- ', showWiClientGroups.group(1))
             state2G = showWiClientGroups.group(1)
             print('SSID--------------------------------------------- ', showWiClientGroups.group(2))
@@ -190,34 +199,37 @@ class Nvg599Class(GatewayClass):
             print('rssi--------------------------------------------- ', showWiClientGroups.group(12))
             rssi2G = showWiClientGroups.group(12)
 
-            self.showWiClientsDict[mac2G]={}
-            self.showWiClientsDict[mac2G]["State"] = state2G
-            self.showWiClientsDict[mac2G]["SSID"] = SSID2G
-            self.showWiClientsDict[mac2G]["PSMOD"] = PSMOD2G
-            self.showWiClientsDict[mac2G]["NMMOD"] = NMMOD2G
-            self.showWiClientsDict[mac2G]["Rate"] = Rate2G
-            self.showWiClientsDict[mac2G]["Uptime"] = uptime2G
-            self.showWiClientsDict[mac2G]["txpkt"] = txpkt2G
-            self.showWiClientsDict[mac2G]["txerr"] = txerr2G
-            self.showWiClientsDict[mac2G]["rxuni"] = rxuni2G
-            self.showWiClientsDict[mac2G]["rxmul"] = rxmul2G
-            self.showWiClientsDict[mac2G]["rxerr"] = rxerr2G
-            self.showWiClientsDict[mac2G]["rssi"] = rssi2G
+            self.showWiClientsDict[mac_2g]={}
+            self.showWiClientsDict[mac_2g]["State"] = state2G
+            self.showWiClientsDict[mac_2g]["SSID"] = SSID2G
+            self.showWiClientsDict[mac_2g]["PSMOD"] = PSMOD2G
+            self.showWiClientsDict[mac_2g]["NMMOD"] = NMMOD2G
+            self.showWiClientsDict[mac_2g]["Rate"] = Rate2G
+            self.showWiClientsDict[mac_2g]["Uptime"] = uptime2G
+            self.showWiClientsDict[mac_2g]["txpkt"] = txpkt2G
+            self.showWiClientsDict[mac_2g]["txerr"] = txerr2G
+            self.showWiClientsDict[mac_2g]["rxuni"] = rxuni2G
+            self.showWiClientsDict[mac_2g]["rxmul"] = rxmul2G
+            self.showWiClientsDict[mac_2g]["rxerr"] = rxerr2G
+            self.showWiClientsDict[mac_2g]["rssi"] = rssi2G
 
             #print('-----------------------------------------end model')
             self.session.close()
         return self.showWiClientsDict
 
-#-------pfp-----------------------------
+#-------pfp----------------------------- this request further testing
+
+
+
 
     def factory_reset_rg(self):
-        global nvgInfo
+        global nvg_info
         #self.getdeviceInfoFromUI()
         #print("self.serialNumer:",self.serialNumber)
         # we need the serial number to refernce the DAC which is in our local dicitonary
         # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
-        #self.deviceAccessCode = self.nvgInfo[self.serialNumber]['deviceAccessCode']
-        #print("dac",self.deviceAccessCode)
+        #self.device_access_code = self.nvgInfo[self.serialNumber]['device_ccess_code']
+        #print("dac",self.device_access_code)
         #print("in accessWiFiInfo ")
         #url = 'http://192.168.1.254/cgi-bin/wconfig.ha'
 
@@ -282,14 +294,16 @@ class Nvg599Class(GatewayClass):
     def enter_dac_convenience(self,sesion):
         pass
 
-    def accessUIWiFiInfo(self):
+    def accessUIWiFiInfo(self,value_requested):
         global nvgInfo
-        #self.getdeviceInfoFromUI()
-        print("self.serialNumer:",self.serialNumber)
+        ui_channel_5g = None
+        ui_channel_2g = None
+        self.getdeviceInfoFromUI()
+        print("self.serialNumer:", self.serialNumber)
         # we need the serial number to refernce the DAC which is in our local dicitonary
         # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
-        self.deviceAccessCode = self.nvgInfo[self.serialNumber]['deviceAccessCode']
-        print("dac",self.deviceAccessCode)
+        self.device_access_code = nvg_info[self.serialNumber]['device_access_code']
+        print("dac",self.device_access_code)
         print("in accessWiFiInfo ")
         #url = 'http://192.168.1.254/cgi-bin/wconfig.ha'
 
@@ -324,13 +338,17 @@ class Nvg599Class(GatewayClass):
             if len(row !=0 and row[0]=="Current Radio Channel"):
                 #print("2G channel:",row[1],"5G channel:,row[2]")
                 print("2G channel:]")
+                ui_channel_2g = row[1]
+                ui_channel_5g = row[2]
 
                 sleep(2)
+             #   browser.quit()
+             #   exit()
+            if value_requested == "ui_channel_5g":
                 browser.quit()
-                exit()
+                return ui_channel_5g
 
-
-        sleep(20)
+        sleep(5)
         browser.quit()
         exit()
         homeNetworkLink = browser.find_element_by_link_text("Home Network")
@@ -344,8 +362,8 @@ class Nvg599Class(GatewayClass):
         #print(" ------------access code ----------------")
         #print(soup.find(id="password"))
         #print(" ------------access code ----------------")
-        deviceAccessCode = browser.find_element_by_id("password")
-        deviceAccessCode.send_keys(self.devAccessCode)
+        device_access_code = browser.find_element_by_id("password")
+        device_access_code.send_keys(self.device_access_code)
         submit = browser.find_element_by_name("Continue")
         submit.click()
         advancedOptionsLink = browser.find_element_by_link_text("Advanced Options")
@@ -356,12 +374,14 @@ class Nvg599Class(GatewayClass):
 
 
     def getdeviceInfoFromUI(self):
-        global nvgInfo
+        #global nvgInfo
         url = 'http://192.168.1.254/cgi-bin/sysinfo.ha'
+        print("derp----------cccc----------------------------------")
+
         browser = webdriver.Chrome()
         browser.get(url)
         soup = BeautifulSoup(browser.page_source, 'html.parser')
-
+        sleep(5)
         this = soup.find_all('th')
         for th in this:
             if th.text == "Model Number":
@@ -369,10 +389,17 @@ class Nvg599Class(GatewayClass):
                 self.modelNumber = th.next_sibling.next_sibling.text
             if th.text == "Serial Number":
                 print(th.next_sibling.next_sibling.text)
-                self.serialNumber = th.next_sibling.next_sibling.text
+                self.serial_number = th.next_sibling.next_sibling.text
 
-                self.DAC= nvgInfo[self.serialNumber]['deviceAccessCode']
-                print("dac is:",self.DAC)
+                print ("serial Number is:",self.serial_number)
+                print('test is:', self.test)
+                print (nvg_info[self.serial_number])
+                exit()
+                self.device_access_code = nvg_info[self.serial_number][self.device_access_code]
+                print("dac is:",self.device_access_code)
+                exit()
+
+
             if th.text == "Software Version":
                 print(th.next_sibling.next_sibling.text)
                 self.softwareVersion = th.next_sibling.next_sibling.text
