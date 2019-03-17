@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import itertools
 import pprint
 import time
+
 #import requests
 
 from bs4 import BeautifulSoup
@@ -98,22 +99,41 @@ from rgclass import Nvg599Class
 
 #exit()
 
-def test1():
-    pass
 
-nvg599DUT = Nvg599Class()
-nvg599DUT.accessUIWiFiInfo()
+# Find the current channel used for 5G
+# Check the 5G cahhen used. If noner DFS , set to DFS and note the setting
+# enter the command to simulate radar detection
+# verify that the channel changes to
+# a non DFS channel
+
+def test_dfs():
+    nvg_599_dut = Nvg599Class()
+    #current_radio_channel_5g = nvg_599_dut.accessUIWiFiInfo("ui_channel_5g")
+    current_radio_channel_5g = 5
+    return current_radio_channel_5g
+
+
+tst = test_dfs()
+print (tst)
 exit()
-return_dict1 = nvg599DUT.getShWiClients()
+
+nvg_599_dut = Nvg599Class()
+#nvg_599_dut.turnOffSupplicant()
+#nvg_599_dut.factory_reset_rg()
+#nvg_599_dut.connect_to_console()
+exit()
+nvg_599_dut.accessUIWiFiInfo()
+exit()
+return_dict1 = nvg_599_dut.getShWiClients()
 clientDictStr = pprint.pformat(return_dict1)
 print("1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 print(clientDictStr)
 print("2xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-return_dict = nvg599DUT.getRGShIPLanInfo()
+return_dict = nvg_599_dut.getRGShIPLanInfo()
 dict_str = pprint.pformat(return_dict)
 print(dict_str)
 exit()
-nvg599DUT.emailTestResults("dog")
+nvg_599_dut.email_test_results("dog")
 
 xa2Gch=["21","22","23"]
 xa2Gbw=["a20","a40"]
