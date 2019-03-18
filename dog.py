@@ -109,15 +109,17 @@ from rgclass import Nvg599Class
 def test_dfs():
     nvg_599_dut = Nvg599Class()
     #current_radio_channel_5g = nvg_599_dut.accessUIWiFiInfo("ui_channel_5g")
-    current_radio_channel_5g = 5
+    current_radio_channel_5g = nvg_599_dut.ui_get_home_network_information("ui_channel_5g")
+    #current_radio_channel_5g = 5
     return current_radio_channel_5g
 
 
 tst = test_dfs()
-print (tst)
+print ('5g channel is:',tst)
 exit()
 
 nvg_599_dut = Nvg599Class()
+exit()
 #nvg_599_dut.turnOffSupplicant()
 #nvg_599_dut.factory_reset_rg()
 #nvg_599_dut.connect_to_console()
@@ -155,13 +157,13 @@ exit()
 #nvg599DUT.connectCLI('192.168.1.254')
 #nvg599DUT.printme()
 #rgSerialNumber = nvg599DUT.getRGSerialNumber()
-nvg599DUT.loginNVG599()
+nvg_599_dut.loginNVG599()
 #nvg599DUT.connectCLI("1")
-nvg599DUT.get4920IPFromUI()
+nvg_599_dut.get4920IPFromUI()
 exit()
-nvg599DUT.getdeviceInfoFromUI()
+nvg_599_dut.getdeviceInfoFromUI()
 
-nvg599DUT.turnOffSupplicant()
+nvg_599_dut.turnOffSupplicant()
 
 print (' exit all loging in')
 
@@ -199,21 +201,21 @@ exit()
 
 #exit()
 
-rgModel=mo1.group(1)
-serialNumber=mo1.group(2)
+#rgModel= mo1.group(1)
+#serialNumber= mo1.group(2)
 
 
-if rgModel=='NVG599':
-    print('we are going to instantiate an NVG599')
-    nvg599DUT = Nvg599Class()
-    nvg599DUT.printme()
-    nvg599DUT.turnOffSupplicant()
+#if rgModel=='NVG599':
+#    print('we are going to instantiate an NVG599')
+#    nvg599DUT = Nvg599Class()
+#    nvg599DUT.printme()
+#    nvg599DUT.turnOffSupplicant()
 
 
-else:
-    print('what  to instantiate an NVG599')
-
-exit()
+#else:
+#    print('what  to instantiate an NVG599')
+#
+#exit()
 
 
 #airTiesTerm = pexpect.spawn("telnet 192.168.1.67")
