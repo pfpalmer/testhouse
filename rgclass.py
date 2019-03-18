@@ -1,4 +1,6 @@
 from itertools import count
+from typing import Dict
+
 from selenium.webdriver.common.by import By
 
 import pexpect
@@ -19,12 +21,15 @@ import time
 #nvg_info = { "228946241148656" : {'model':'nvg599','deviceAccessCode':"*<#/53#1/2", 'magic': 'kjundhkdxlxr','mac2g': 'd0:39:b3:60:56:f1','mac5g':'d0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey','ssid': 'ATTqbrAnYs'},
 #"277427577103760" : {'model':'nvg599','deviceAccessCode': '<<01%//4&/','magic': "ggtxstgwipcg", 'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid' : 'ATTqbrAnYs'}}
 
-nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
+nvg_info: Dict[str, Dict[str, str]] = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
                                      'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4',
                                      'wiFi': 'c2cmybt25dey', 'ssid': 'ATTqbrAnYs'},
-                 "277427577103760": {'model': 'nvg599', 'device_access_code': "<<01%//4&/", 'magic': 'ggtxstgwipcg',
+            "277427577103760": {'model': 'nvg599', 'device_access_code': '<<01%//4&/', 'magic': 'ggtxstgwipcg',
                                      'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94',
                                      'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
+
+
+test_dict:{'e':{'e1':'1','e1':'2','e1':'e3'},'f':{'f1':'1','f1':'2','f1':'3'}}
 
 NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
 DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
@@ -79,8 +84,9 @@ class Nvg599Class(GatewayClass):
         self.test = 41
         global nvg_info
 
-        self.getdeviceInfoFromUI()
-        print("self.serialNumer:",self.serialNumber)
+        self.ui_system_information()
+# serial number set by prior call to ui_system_info
+        print("self.serialNumer:",self.serial_number)
 
 #       self.nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
 #                                       'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4',
@@ -91,16 +97,16 @@ class Nvg599Class(GatewayClass):
 
         # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
 
-        self.device_access_code = nvg_info[self.serialNumber]['device_access_code']
+        self.device_access_code = nvg_info[self.serial_number]['device_access_code']
         print("dac",self.device_access_code)
         print("in NVG599 init")
-        exit()
+        #exit()
         # show IP Lan  dicitonary dicitionary
-        self.showIPLanDict = {}
+        #self.showIPLanDict = {}
         # show wi client dicitionary
-        self.showWiClientsDict = {}
-        airtiesIPList=[]
-        rgClientList=[]
+        #self.showWiClientsDict = {}
+        #airtiesIPList=[]
+        #rgClientList=[]
         # driver = webdriverhttps://www.waketech.edu/programs-courses/credit/electrical-systems-technology/degrees-pathways.Chrome('/usr/local/bin/chromedriver')
 
         #self.webDriver.find_element_by_link_text("Settings").click()
@@ -294,17 +300,17 @@ class Nvg599Class(GatewayClass):
     def enter_dac_convenience(self,sesion):
         pass
 
-    def accessUIWiFiInfo(self,value_requested):
+    def ui_get_home_network_information(self,value_requested):
         global nvgInfo
         ui_channel_5g = None
         ui_channel_2g = None
-        self.getdeviceInfoFromUI()
-        print("self.serialNumer:", self.serialNumber)
+        self.ui_system_information()
+        print("self.serialNumer:", self.serial_number)
         # we need the serial number to refernce the DAC which is in our local dicitonary
         # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
-        self.device_access_code = nvg_info[self.serialNumber]['device_access_code']
+        self.device_access_code = nvg_info[self.serial_number]['device_access_code']
         print("dac",self.device_access_code)
-        print("in accessWiFiInfo ")
+        print("in ui_get_home_network_information ")
         #url = 'http://192.168.1.254/cgi-bin/wconfig.ha'
 
         # we should be doing this
@@ -325,7 +331,7 @@ class Nvg599Class(GatewayClass):
 #five tables on this page
         table = tables[4]
         #table = soup.find("table100", {"class": "table100"})
-        print ("table is",table)
+        #print ("table is",table)
         table_rows = table.find_all('tr')
         for tr in table_rows:
             td = tr.find_all('td')
@@ -333,30 +339,33 @@ class Nvg599Class(GatewayClass):
 
             print("length is:",len(row))
             print("type",type(row))
-            exit()
+            print("row text",row)
             print("----------------------------")
-            if len(row !=0 and row[0]=="Current Radio Channel"):
+            #continue
+            if (len(row)==0):
+                continue
+            if (row[0]=="Current Radio Channel"):
                 #print("2G channel:",row[1],"5G channel:,row[2]")
-                print("2G channel:]")
+                print("2G channel:",row[1])
                 ui_channel_2g = row[1]
+                print("25 channel:",row[2])
                 ui_channel_5g = row[2]
 
                 sleep(2)
              #   browser.quit()
              #   exit()
-            if value_requested == "ui_channel_5g":
-                browser.quit()
-                return ui_channel_5g
+                if value_requested == "ui_channel_5g":
+                    browser.quit()
+                    return ui_channel_5g
 
-        sleep(5)
+        sleep(2)
         browser.quit()
-        exit()
-        homeNetworkLink = browser.find_element_by_link_text("Home Network")
-        homeNetworkLink.click()
-        sleep(2)
-        homeNetworkLink = browser.find_element_by_link_text("Wi-Fi")
-        homeNetworkLink.click()
-        sleep(2)
+#        homeNetworkLink = browser.find_element_by_link_text("Home Network")
+#        homeNetworkLink.click()
+#        sleep(2)
+#        homeNetworkLink = browser.find_element_by_link_text("Wi-Fi")
+#        homeNetworkLink.click()
+#        sleep(2)
         #exit()
         #soup = BeautifulSoup(browser.page_source, 'html.parser')
         #print(" ------------access code ----------------")
@@ -373,11 +382,13 @@ class Nvg599Class(GatewayClass):
         browser.quit()
 
 
-    def getdeviceInfoFromUI(self):
-        #global nvgInfo
+    def ui_system_information(self):
+        global nvg_info
         url = 'http://192.168.1.254/cgi-bin/sysinfo.ha'
         print("derp----------cccc----------------------------------")
-
+        test_dict = {'e': {'e1': '1', 'e2': '2', 'e3': 'e3'}, 'f': {'f1': '1', 'f2': '2', 'f3': '3'}}
+        print("test_dict",test_dict['e']['e1'])
+#       exit()
         browser = webdriver.Chrome()
         browser.get(url)
         soup = BeautifulSoup(browser.page_source, 'html.parser')
@@ -385,19 +396,25 @@ class Nvg599Class(GatewayClass):
         this = soup.find_all('th')
         for th in this:
             if th.text == "Model Number":
-                print(th.next_sibling.next_sibling.text)
+                print("model:",th.next_sibling.next_sibling.text)
                 self.modelNumber = th.next_sibling.next_sibling.text
             if th.text == "Serial Number":
-                print(th.next_sibling.next_sibling.text)
+                print("serial number:",th.next_sibling.next_sibling.text)
                 self.serial_number = th.next_sibling.next_sibling.text
 
                 print ("serial Number is:",self.serial_number)
                 print('test is:', self.test)
-                print (nvg_info[self.serial_number])
-                exit()
-                self.device_access_code = nvg_info[self.serial_number][self.device_access_code]
+                print ("nvg serial number dict",nvg_info[self.serial_number])
+                print("nvg access code", nvg_info[self.serial_number]['device_access_code'])
+                tmp_dac = nvg_info[self.serial_number]['device_access_code']
+                print('tmp_dac:',tmp_dac)
+                self.device_access_code = tmp_dac
+
+                #tmp_serial_number = nvg_info[self.serial_number]
+                #self.device_access_code = nvg_info[self.serial_number][self.device_access_code]
+                #mp_device_access_code = nvg_info[tmp_serial_number]['device_access_code']
+
                 print("dac is:",self.device_access_code)
-                exit()
 
 
             if th.text == "Software Version":
@@ -532,6 +549,47 @@ class Nvg599Class(GatewayClass):
         print('Uptime ', mo1.group(3))
         self.serialNumber =  mo1.group(2)
         self.upTime = mo1.group(1)
+        self.session.close()
+
+
+    def setup_tr69_url(self):
+
+        self.session = self.loginNVG599()
+        self.session.sendline('magic')
+        self.session.expect("UNLOCKED>")
+        self.session.sendline('conf')
+        self.session.expect("top\)>>")
+        self.session.sendline('manage cwmp')
+        self.session.expect(")>>")
+        self.session.sendline('set')
+        self.session.expect("enable.*]:")
+        self.session.sendline('on')
+        self.session.expect("):")
+        self.session.sendline('http://arris1.arriseco.com')
+        self.session.expect("acs-username.*):")
+        self.session.sendline()
+        self.session.expect("acs-password.*):")
+        self.session.sendline()
+        self.session.expect("cr-url.*):")
+        self.session.sendline()
+        self.session.expect("cr-port.*]:")
+        self.session.sendline()
+        self.session.expect("cr-ip.*:")
+        self.session.sendline()
+        self.session.expect("prov-code.*):")
+        self.session.sendline()
+        self.session.expect("qos-tos.*):")
+        self.session.sendline()
+        self.session.expect("qos-p.*):")
+        self.session.sendline()
+        self.session.expect("qos-marker.*):")
+        self.session.sendline()
+        self.session.expect("prefer.*):")
+        self.session.sendline()
+        self.session.expect("tr69.*]:")
+        self.session.sendline()
+        self.session.expect("log-spv.*]:")
+        print('hello from turn on tr069')
         self.session.close()
 
     def turnOffSupplicant(self):
