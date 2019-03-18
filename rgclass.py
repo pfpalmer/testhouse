@@ -81,7 +81,8 @@ class Nvg599Class(GatewayClass):
         #sleep(1)
         self.IP ="192.168.1.254"
         self.device_access_code = None
-        self.test = 41
+        #self.test = 41
+        self.init_info = False
         global nvg_info
 
         self.ui_system_information()
@@ -100,6 +101,7 @@ class Nvg599Class(GatewayClass):
         self.device_access_code = nvg_info[self.serial_number]['device_access_code']
         print("dac",self.device_access_code)
         print("in NVG599 init")
+        self.init_info= True
         #exit()
         # show IP Lan  dicitonary dicitionary
         #self.showIPLanDict = {}
@@ -344,6 +346,14 @@ class Nvg599Class(GatewayClass):
             #continue
             if (len(row)==0):
                 continue
+
+            if (row[0] == "Bandwidth"):
+                # print("Bandwidth:",row[1],"5G channel:,row[2]")
+                print("2G Bandwidth:", row[1])
+                ui_bandwidth_2g = row[1]
+                print("5G bandwidth:", row[2])
+                ui_bandwidth_5g = row[2]
+
             if (row[0]=="Current Radio Channel"):
                 #print("2G channel:",row[1],"5G channel:,row[2]")
                 print("2G channel:",row[1])
@@ -356,7 +366,12 @@ class Nvg599Class(GatewayClass):
              #   exit()
                 if value_requested == "ui_channel_5g":
                     browser.quit()
-                    return ui_channel_5g
+                    return ui_channel_5g,ui_bandwidth_2g
+
+                if value_requested == "ui_channel_2g":
+                    browser.quit()
+                    return ui_channel_2g,ui_bandwidth_5g
+
 
         sleep(2)
         browser.quit()
@@ -381,6 +396,23 @@ class Nvg599Class(GatewayClass):
         sleep(20)
         browser.quit()
 
+    def ui_set_bw_channel(self, value_requested):
+        global nvgInfo
+        ui_channel_5g = None
+        ui_channel_2g = None
+        self.ui_system_information()
+        print("self.serialNumer:", self.serial_number)
+        # we need the serial number to refernce the DAC which is in our local dicitonary
+        # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
+        self.device_access_code = nvg_info[self.serial_number]['device_access_code']
+        print("dac", self.device_access_code)
+        print("in ui_get_home_network_information ")
+        # url = 'http://192.168.1.254/cgi-bin/wconfig.ha'
+
+        # we should be doing this
+        url = 'http://192.168.1.254/'
+
+        browser = webdriver.Chrome()
 
     def ui_system_information(self):
         global nvg_info
