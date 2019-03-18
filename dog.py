@@ -203,7 +203,7 @@ exit()
 
 #rgModel= mo1.group(1)
 #serialNumber= mo1.group(2)
-
+#addition
 
 #if rgModel=='NVG599':
 #    print('we are going to instantiate an NVG599')
