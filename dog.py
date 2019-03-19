@@ -106,16 +106,26 @@ from rgclass import Nvg599Class
 # verify that the channel changes to
 # a non DFS channel
 
+#NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
+#DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
+
+
+
 def test_dfs():
     nvg_599_dut = Nvg599Class()
     #current_radio_channel_5g = nvg_599_dut.accessUIWiFiInfo("ui_channel_5g")
-    current_radio_channel_5g = nvg_599_dut.ui_get_home_network_information("ui_channel_5g")
+    current_5g_channel,current_5g_bandwidth = nvg_599_dut.ui_get_home_network_information("ui_channel_5g")
     #current_radio_channel_5g = 5
-    return current_radio_channel_5g
+    if (current_5g_channel in set('DFS_CHANNELS')):
+        print('this is a Dfs channel')
+    else:
+        print('this is a none dfs we need to change it')
+        nvg_599_dut.ui_set_bw_channel('g5', 40, 80)
+    return current_5g_channel,current_5g_bandwidth
 
 
-tst = test_dfs()
-print ('5g channel is:',tst)
+tst,bw = test_dfs()
+print ('5g channel is:',tst,'bw is:',bw)
 exit()
 
 nvg_599_dut = Nvg599Class()
