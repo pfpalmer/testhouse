@@ -114,7 +114,7 @@ class Nvg599Class(GatewayClass):
         #self.webDriver.find_element_by_link_text("Settings").click()
 
     def getShWiClients(self):
-        session = self.loginNVG599()
+        session = self.login_nvg_599()
         self.session.sendline("show wi clients")
         self.session.expect('>')
         shWiClientsOutput = self.session.before
@@ -302,7 +302,7 @@ class Nvg599Class(GatewayClass):
     def enter_dac_convenience(self,sesion):
         pass
 
-    def ui_get_home_network_information(self,value_requested):
+    def ui_home_network_status(self,value_requested):
         global nvgInfo
         ui_channel_5g = None
         ui_channel_2g = None
@@ -312,7 +312,7 @@ class Nvg599Class(GatewayClass):
         # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
         self.device_access_code = nvg_info[self.serial_number]['device_access_code']
         print("dac",self.device_access_code)
-        print("in ui_get_home_network_information ")
+        print("in ui_home_network_status ")
         #url = 'http://192.168.1.254/cgi-bin/wconfig.ha'
 
         # we should be doing this
@@ -349,10 +349,17 @@ class Nvg599Class(GatewayClass):
 
             if (row[0] == "Bandwidth"):
                 # print("Bandwidth:",row[1],"5G channel:,row[2]")
-                print("2G Bandwidth:", row[1])
-                ui_bandwidth_2g = row[1]
+                if (value_requested == 'ui_bandwidth_2g'):
+                    print("2G Bandwidth:", row[1])
+                    ui_bandwidth_2g = row[1]
+                    return ui_bandwidth_2g
+
                 print("5G bandwidth:", row[2])
                 ui_bandwidth_5g = row[2]
+                if (value_requested == 'ui_bandwidth_5g'):
+                    print("2G Bandwidth:", row[1])
+                    ui_bandwidth_2g = row[1]
+                    return ui_bandwidth_2g
 
             if (row[0]=="Current Radio Channel"):
                 #print("2G channel:",row[1],"5G channel:,row[2]")
@@ -386,40 +393,116 @@ class Nvg599Class(GatewayClass):
         #print(" ------------access code ----------------")
         #print(soup.find(id="password"))
         #print(" ------------access code ----------------")
-        device_access_code = browser.find_element_by_id("password")
-        device_access_code.send_keys(self.device_access_code)
-        submit = browser.find_element_by_name("Continue")
-        submit.click()
-        advancedOptionsLink = browser.find_element_by_link_text("Advanced Options")
-        sleep(2)
-        advancedOptionsLink.click()
-        sleep(20)
-        browser.quit()
-
-    def ui_set_bw_channel(self, value_requested):
+#        device_access_code = browser.find_element_by_id("password")
+ #       device_access_code.send_keys(self.device_access_code)
+#        submit = browser.find_element_by_name("Continue")
+#        submit.click()
+#        advancedOptionsLink = browser.find_element_by_link_text("Advanced Options")
+#        sleep(2)
+#       advancedOptionsLink.click()
+ #       sleep(20)
+ #       browser.quit()
+# we need the band (2g or 5g) because both bands could be automatic which would be ambiguous
+    #nvg_599_dut.ui_set_bw_channel('g2', 40, 2)
+    def ui_set_bw_channel(self,band,bandwidth,channel):
         global nvgInfo
-        ui_channel_5g = None
-        ui_channel_2g = None
-        self.ui_system_information()
-        print("self.serialNumer:", self.serial_number)
-        # we need the serial number to refernce the DAC which is in our local dicitonary
-        # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
-        self.device_access_code = nvg_info[self.serial_number]['device_access_code']
-        print("dac", self.device_access_code)
-        print("in ui_get_home_network_information ")
-        # url = 'http://192.168.1.254/cgi-bin/wconfig.ha'
 
-        # we should be doing this
+        band_selected = band
+        channel_selected = channel
+        bandwidth_selected = bandwidth
+        if (not self.init_info):
+            self.ui_system_information()
+            print("self.serialNumer:", self.serial_number)
+            # we need the serial number to refernce the DAC which is in our local dicitonary
+            # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
+            self.device_access_code = nvg_info[self.serial_number]['device_access_code']
+            print("dac", self.device_access_code)
+            print("in ui_home_network_status  init if")
+
+        print("in ui_set_home_network_information ")
         url = 'http://192.168.1.254/'
-
         browser = webdriver.Chrome()
+        browser.get(url)
+        status_link = browser.find_element_by_link_text("Home Network")
+        status_link.click()
+        sleep(2)
+        homeNetworkLink = browser.find_element_by_link_text("Wi-Fi")
+        homeNetworkLink.click()
+
+
+# we may or may not get asked for the password Something wrong hereh
+        dac_entry = browser.find_element_by_id("password")
+        dac_entry = 0
+        if dac_entry:
+            print('we found the request for password screen')
+            print('sending dac',self.device_access_code)
+            dac_entry.send_keys(self.device_access_code)
+            submit = browser.find_element_by_name("Continue")
+            submit.click()
+
+        advanced_options_link = browser.find_element_by_link_text("Advanced Options")
+        advanced_options_link.click()
+        sleep(2)
+#more stuff in here
+
+#nvg_599_dut.ui_set_bw_channel('g2', 40, 2)
+        if band_selected == 'g2' :
+            bandwidth_select = browser.find_element_by_id("obandwidth")
+            print('found obandwidth')
+            print('bandwidth',bandwidth)
+            #bandwidth_select.select_by_value(bandwidth)
+            for option in bandwidth_select.find_elements_by_tag_name('option'):
+                if option.text == bandwidth:
+                   option.click()
+
+            channel_select = browser.find_element_by_id("ochannelplusauto")
+            print('found ochannel')
+            print('channel',channel)
+            #bandwidth_select.select_by_value(bandwidth)
+            for option in bandwidth_select.find_elements_by_tag_name('option'):
+                if option.text == channel:
+                   option.click()
+# which it always would be for dfs
+        if band_selected == 'g5':
+            bandwidth_select = browser.find_element_by_id("tbandwidth")
+            print('found obandwidth')
+            print('bandwidth', bandwidth)
+            # bandwidth_select.select_by_value(bandwidth)
+            for option in bandwidth_select.find_elements_by_tag_name('option'):
+                if option.text == bandwidth:
+                    option.click()
+
+                channel_select = browser.find_element_by_id("tchannelplusauto")
+            print('found tchannel')
+            print('tchannel 5g', channel)
+            # bandwidth_select.select_by_value(bandwidth)
+            for option in bandwidth_select.find_elements_by_tag_name('option'):
+                if option.text == channel:
+                    option.click()
+# allow time for the channel change to propage
+            sleep(60)
+            session = self.login_nvg_599()
+            self.session.sendline("telnet 192.168.1.1")
+            self.session.expect("#")
+            self.session.sendline("wl -i eth1 radar 2")
+            sleep(60)
+
+
+
+            exit()
+  #          channel_select = browser.find_element_by_id("ochannelplusauto")
+  #          channel_select.select_by_value(channel)
+    #        browser.find_element_by_name("Save").click()
+    #        print("end of this test")
+
+#--------------pfp
 
     def ui_system_information(self):
         global nvg_info
         url = 'http://192.168.1.254/cgi-bin/sysinfo.ha'
-        print("derp----------cccc----------------------------------")
-        test_dict = {'e': {'e1': '1', 'e2': '2', 'e3': 'e3'}, 'f': {'f1': '1', 'f2': '2', 'f3': '3'}}
-        print("test_dict",test_dict['e']['e1'])
+        #print("derp----------cccc----------------------------------")
+        #test_dict = {'e': {'e1': '1', 'e2': '2', 'e3': 'e3'}, 'f': {'f1': '1', 'f2': '2', 'f3': '3'}}
+        #print("test_dict",test_dict['e']['e1'])
 #       exit()
         browser = webdriver.Chrome()
         browser.get(url)
@@ -435,7 +518,7 @@ class Nvg599Class(GatewayClass):
                 self.serial_number = th.next_sibling.next_sibling.text
 
                 print ("serial Number is:",self.serial_number)
-                print('test is:', self.test)
+                #print('test is:', self.test)
                 print ("nvg serial number dict",nvg_info[self.serial_number])
                 print("nvg access code", nvg_info[self.serial_number]['device_access_code'])
                 tmp_dac = nvg_info[self.serial_number]['device_access_code']
@@ -451,19 +534,19 @@ class Nvg599Class(GatewayClass):
 
             if th.text == "Software Version":
                 print(th.next_sibling.next_sibling.text)
-                self.softwareVersion = th.next_sibling.next_sibling.text
+                self.software_version = th.next_sibling.next_sibling.text
             if th.text == "MAC Address":
                 print(th.next_sibling.next_sibling.text)
-                self.macAddress = th.next_sibling.next_sibling.text
+                self.mac_address = th.next_sibling.next_sibling.text
             if th.text == "Time Since Last Reboot":
                 print(th.next_sibling.next_sibling.text)
-                self.macAddress = th.next_sibling.next_sibling.text
+                self.last_reboot_time = th.next_sibling.next_sibling.text
             if th.text == "Current Date/Time":
                 print(th.next_sibling.next_sibling.text)
-                self.macAddress = th.next_sibling.next_sibling.text
+                self.current_date = th.next_sibling.next_sibling.text
             if th.text == "Hardware Version":
                 print(th.next_sibling.next_sibling.text)
-                self.macAddress = th.next_sibling.next_sibling.text
+                self.hardware_version = th.next_sibling.next_sibling.text
 
         sleep(2)
 
@@ -537,7 +620,7 @@ class Nvg599Class(GatewayClass):
             sleep(10)
         exit()
 
-    def loginNVG599(self):
+    def login_nvg_599(self):
         print('I am in 599 login')
         self.session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
         self.session.expect("ogin:")
@@ -545,6 +628,16 @@ class Nvg599Class(GatewayClass):
         self.session.expect("ord:")
         self.session.sendline('<<01%//4&/')
         self.session.expect(">")
+        self.session.sendline('magic')
+        self.session.expect(">")
+        self.session.sendline('nsh')
+        self.session.expect("(nsh)")
+        self.session.sendline('set security.ext-wifi-protection off')
+        self.session.expect("(nsh)")
+        self.session.sendline('save')
+        self.session.expect("(nsh)")
+        self.session.sendline('apply')
+        self.session.expect("(nsh)")
         return self.session
 
     def login_4920(self,IP4920):
@@ -624,7 +717,7 @@ class Nvg599Class(GatewayClass):
         print('hello from turn on tr069')
         self.session.close()
 
-    def turnOffSupplicant(self):
+    def turn_off_supplicant(self):
 
         self.session = self.loginNVG599()
         self.session.sendline('magic')
@@ -648,7 +741,7 @@ class Nvg599Class(GatewayClass):
         print('hello from inside turn off supplicant')
         self.session.close()
 
-    def printme(self):
+    def print_me(self):
         print('I am an NVG599 object')
 
     def getRGSerialNumber(self):
