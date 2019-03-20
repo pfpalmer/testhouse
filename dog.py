@@ -106,36 +106,62 @@ from rgclass import Nvg599Class
 # verify that the channel changes to
 # a non DFS channel
 
+def test_ping():
+    nvg_599_dut = Nvg599Class()
+
+
 #NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
 #DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
-
-
-
+# we could add optional parameters to change to a specific channel , maybe
 def test_dfs():
     nvg_599_dut = Nvg599Class()
     #current_radio_channel_5g = nvg_599_dut.accessUIWiFiInfo("ui_channel_5g")
-    current_5g_channel,current_5g_bandwidth = nvg_599_dut.ui_get_home_network_information("ui_channel_5g")
+    current_5g_channel,current_5g_bandwidth = nvg_599_dut.ui_home_network_status("ui_channel_5g")
     #current_radio_channel_5g = 5
+
+
     if (current_5g_channel in set('DFS_CHANNELS')):
         print('this is a Dfs channel')
     else:
-        print('this is a none dfs we need to change it')
-        nvg_599_dut.ui_set_bw_channel('g5', 40, 80)
-    return current_5g_channel,current_5g_bandwidth
+        print('this is a non dfs we need to change it to a DFS for the test')
 
+        #def ui_set_bw_channel(self, band, bandwidth, channel):
+        # for this test we only use 5g
+        nvg_599_dut.ui_set_bw_channel('g5', 80, 100)
+        print('setting channel to DFS channel 100')
 
-tst,bw = test_dfs()
-print ('5g channel is:',tst,'bw is:',bw)
-exit()
+    session = nvg_599_dut.login_nvg_599()
+    session.sendline()
+    session.expect(">")
+    session.sendline("telnet 192.168.1.1")
+    session.expect("#")
+    session.sendline("wl -i eth1 radar 2")
+    sleep(60)
+
+    current_5g_channel = nvg_599_dut.ui_home_network_status("ui_channel_5g")
+
+    if (current_5g_channel in set('NON_DFS_CHANNELS')):
+        print('test passed')
+
+    #return current_5g_channel,current_5g_bandwidth
+
+#nvg_599_dut = Nvg599Class()
+#nvg_599_dut.login_nvg_599()
+#exit()
+
+#tst_bw = test_dfs()
+#print ('5g channel is:',tst,'bw is:',bw)
+#exit()
 
 nvg_599_dut = Nvg599Class()
-exit()
-#nvg_599_dut.turnOffSupplicant()
+nvg_599_dut.ui_get_wifi_info()
 #nvg_599_dut.factory_reset_rg()
 #nvg_599_dut.connect_to_console()
+#nvg_599_dut.accessUIWiFiInfo()
 exit()
-nvg_599_dut.accessUIWiFiInfo()
-exit()
+
+
+
 return_dict1 = nvg_599_dut.getShWiClients()
 clientDictStr = pprint.pformat(return_dict1)
 print("1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
@@ -169,8 +195,14 @@ exit()
 #rgSerialNumber = nvg599DUT.getRGSerialNumber()
 nvg_599_dut.loginNVG599()
 #nvg599DUT.connectCLI("1")
-nvg_599_dut.get4920IPFromUI()
+#nvg_599_dut.get4920IPFromUI()
 exit()
+
+
+
+
+
+
 nvg_599_dut.getdeviceInfoFromUI()
 
 nvg_599_dut.turnOffSupplicant()
