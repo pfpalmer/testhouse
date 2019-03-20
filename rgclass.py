@@ -3,6 +3,9 @@ from typing import Dict
 
 from selenium.webdriver.common.by import By
 
+from selenium.common.exceptions import NoSuchElementException
+
+
 import pexpect
 import re
 import pprint
@@ -29,7 +32,7 @@ nvg_info: Dict[str, Dict[str, str]] = {"228946241148656": {'model': 'nvg599', 'd
                                      'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
 
 
-test_dict:{'e':{'e1':'1','e1':'2','e1':'e3'},'f':{'f1':'1','f1':'2','f1':'3'}}
+#test_dict:{'e':{'e1':'1','e1':'2','e1':'e3'},'f':{'f1':'1','f1':'2','f1':'3'}}
 
 NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
 DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
@@ -112,6 +115,22 @@ class Nvg599Class(GatewayClass):
         # driver = webdriverhttps://www.waketech.edu/programs-courses/credit/electrical-systems-technology/degrees-pathways.Chrome('/usr/local/bin/chromedriver')
 
         #self.webDriver.find_element_by_link_text("Settings").click()
+
+    def check_if_password_required(self,session):
+        try:
+            #Select(browser.find_element_by_id("selectMonth")).select_by_visible_text("%s" % (month))
+            dac_access_challenge = session.find_element_by_link_text("Forgot your Access Code")
+            print('we found the request for password screen')
+            print('sending dac',self.device_access_code)
+            dac_entry = session.find_element_by_id("password")
+            dac_entry.send_keys(self.device_access_code)
+            submit = session.find_element_by_name("Continue")
+            submit.click()
+
+        except NoSuchElementException:
+            pass
+
+        return session
 
     def getShWiClients(self):
         session = self.login_nvg_599()
@@ -357,28 +376,26 @@ class Nvg599Class(GatewayClass):
                 print("5G bandwidth:", row[2])
                 ui_bandwidth_5g = row[2]
                 if (value_requested == 'ui_bandwidth_5g'):
-                    print("2G Bandwidth:", row[1])
-                    ui_bandwidth_2g = row[1]
+                    print("2G Bandwidth:", row[2])
+                    ui_bandwidth_2g = row[2]
                     return ui_bandwidth_2g
 
             if (row[0]=="Current Radio Channel"):
                 #print("2G channel:",row[1],"5G channel:,row[2]")
-                print("2G channel:",row[1])
-                ui_channel_2g = row[1]
-                print("25 channel:",row[2])
-                ui_channel_5g = row[2]
+                #print("2G channel:",row[1])
+                #ui_channel_2g = row[1]
+                # print("Bandwidth:",row[1],"5G channel:,row[2]")
+                if (value_requested == 'ui_channel_2g'):
+                    print("2G Channel:", row[1])
+                    ui_channel_2g = row[1]
+                    return ui_channel_2g
 
-                sleep(2)
-             #   browser.quit()
-             #   exit()
-                if value_requested == "ui_channel_5g":
-                    browser.quit()
-                    return ui_channel_5g,ui_bandwidth_2g
-
-                if value_requested == "ui_channel_2g":
-                    browser.quit()
-                    return ui_channel_2g,ui_bandwidth_5g
-
+                print("5g channel:",row[2])
+                #ui_channel_5g = row[2]
+                if (value_requested == 'ui_channel_5g'):
+                    print("2G Channel:", row[2])
+                    ui_channel_5g = row[2]
+                    return ui_channel_5g
 
         sleep(2)
         browser.quit()
@@ -430,15 +447,36 @@ class Nvg599Class(GatewayClass):
         homeNetworkLink.click()
 
 
-# we may or may not get asked for the password Something wrong hereh
-        dac_entry = browser.find_element_by_id("password")
-        dac_entry = 0
-        if dac_entry:
+# we may or may not get asked for the password Something wrong here
+
+
+
+        #browser.find_element_by_link_text("Forgot your Access Code")
+
+        self.check_if_password_required(session)
+
+        try:
+            #Select(browser.find_element_by_id("selectMonth")).select_by_visible_text("%s" % (month))
+            dac_access_challenge =browser.find_element_by_link_text("Forgot your Access Code")
             print('we found the request for password screen')
             print('sending dac',self.device_access_code)
+            dac_entry = browser.find_element_by_id("password")
             dac_entry.send_keys(self.device_access_code)
             submit = browser.find_element_by_name("Continue")
             submit.click()
+
+        except NoSuchElementException:
+            pass
+
+
+        #dac_entry = browser.find_element_by_id("password")
+        #dac_entry = 0
+        #if dac_entry:
+            #print('we found the request for password screen')
+            #print('sending dac',self.device_access_code)
+            #dac_entry.send_keys(self.device_access_code)
+            #submit = browser.find_element_by_name("Continue")
+            #submit.click()
 
         advanced_options_link = browser.find_element_by_link_text("Advanced Options")
         advanced_options_link.click()
@@ -462,7 +500,7 @@ class Nvg599Class(GatewayClass):
             for option in bandwidth_select.find_elements_by_tag_name('option'):
                 if option.text == channel:
                    option.click()
-# which it always would be for dfs
+# which it  would be for dfs
         if band_selected == 'g5':
             bandwidth_select = browser.find_element_by_id("tbandwidth")
             print('found obandwidth')
@@ -480,16 +518,18 @@ class Nvg599Class(GatewayClass):
                 if option.text == channel:
                     option.click()
 # allow time for the channel change to propage
-            sleep(60)
-            session = self.login_nvg_599()
-            self.session.sendline("telnet 192.168.1.1")
-            self.session.expect("#")
-            self.session.sendline("wl -i eth1 radar 2")
-            sleep(60)
+            sleep(30)
+  #          self.session = self.login_nvg_599()
+  #          self.session.sendline()
+   #         self.session.expect(">")
+   #         self.session.sendline("telnet 192.168.1.1")
+ #           self.session.expect("#")
+   #         self.session.sendline("wl -i eth1 radar 2")
+   #         sleep(60)
 
 
 
-            exit()
+
   #          channel_select = browser.find_element_by_id("ochannelplusauto")
   #          channel_select.select_by_value(channel)
     #        browser.find_element_by_name("Save").click()
@@ -506,6 +546,48 @@ class Nvg599Class(GatewayClass):
 #       exit()
         browser = webdriver.Chrome()
         browser.get(url)
+
+
+        status_link = browser.find_element_by_link_text("Home Network")
+        status_link.click()
+        sleep(2)
+
+        homeNetworkLink = browser.find_element_by_link_text("Wi-Fi")
+        homeNetworkLink.click()
+        sleep(20)
+        handles = browser.window_handles;
+        size = len(handles);
+        print('size:',size)
+        for x in range(size):
+            browser.switch_to.window(handles[x]);
+            print ("title",browser.title)
+            print ("handle",handles[x])
+
+        try:
+            #dac_access_challenge = browser.find_element_by_link_text("Forgot your Access Code")
+            dac_access_challenge = browser.find_element_by_xpath("Forgot your Access Code")
+
+        except NoSuchElementException:
+            pass
+
+        #def check_if_password_required(self, session):
+        #try:
+                # Select(browser.find_element_by_id("selectMonth")).select_by_visible_text("%s" % (month))
+            dac_access_challenge = browser.find_element_by_link_text("Forgot your Access Code")
+        #    print('we found the request for password screen')
+       #     print('sending dac', self.device_access_code)
+        #    exit()
+            #dac_entry = session.find_element_by_id("password")
+            #dac_entry.send_keys(self.device_access_code)
+            #submit = session.find_element_by_name("Continue")
+            #submit.click()
+
+            #except NoSuchElementException:
+            #    pass
+
+            #return session
+
+
         soup = BeautifulSoup(browser.page_source, 'html.parser')
         sleep(5)
         this = soup.find_all('th')
@@ -638,6 +720,8 @@ class Nvg599Class(GatewayClass):
         self.session.expect("(nsh)")
         self.session.sendline('apply')
         self.session.expect("(nsh)")
+        self.session.sendline('exit')
+        self.session.expect(">")
         return self.session
 
     def login_4920(self,IP4920):
@@ -679,7 +763,7 @@ class Nvg599Class(GatewayClass):
 
     def setup_tr69_url(self):
 
-        self.session = self.loginNVG599()
+        self.session = self.login_nvg_599()
         self.session.sendline('magic')
         self.session.expect("UNLOCKED>")
         self.session.sendline('conf')
@@ -719,7 +803,7 @@ class Nvg599Class(GatewayClass):
 
     def turn_off_supplicant(self):
 
-        self.session = self.loginNVG599()
+        self.session = self.login_nvg_599()
         self.session.sendline('magic')
         self.session.expect("UNLOCKED>")
         self.session.sendline('conf')
@@ -745,7 +829,7 @@ class Nvg599Class(GatewayClass):
         print('I am an NVG599 object')
 
     def getRGSerialNumber(self):
-        self.loginNVG599()
+        self.login_nvg_599()
         self.session.sendline('status')
         self.session.expect('>')
         statusOutput = self.session.before
@@ -763,7 +847,7 @@ class Nvg599Class(GatewayClass):
         return mo1.group(2)
 
     def getRGShIPLanInfo(self):
-        session=self.loginNVG599()
+        session=self.login_nvg_599()
         session.sendline("show ip lan")
         self.session.expect('>')
         ipLanOutput = self.session.before
