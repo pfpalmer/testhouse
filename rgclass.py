@@ -486,11 +486,12 @@ class Nvg599Class(GatewayClass):
             print('found ochannel')
             print('channel',channel)
             #bandwidth_select.select_by_value(bandwidth)
-            for option in bandwidth_select.find_elements_by_tag_name('option'):
+            for option in channel_select.find_elements_by_tag_name('option'):
+
                 if option.text == channel:
                    option.click()
 
-         if band == '5g':
+        if band == '5g':
             bandwidth_select = session.find_element_by_id("tbandwidth")
             print('found obandwidth')
             print('bandwidth', bandwidth)
