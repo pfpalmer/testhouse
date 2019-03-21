@@ -84,13 +84,12 @@ class Nvg599Class(GatewayClass):
         #sleep(1)
         self.IP ="192.168.1.254"
         self.device_access_code = None
+        self.session = None
         #self.test = 41
         self.init_info = False
         global nvg_info
 
-        self.ui_system_information()
-# serial number set by prior call to ui_system_info
-        print("self.serialNumer:",self.serial_number)
+
 
 #       self.nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
 #                                       'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4',
@@ -100,9 +99,10 @@ class Nvg599Class(GatewayClass):
 #                                       'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
 
         # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
-
+        self.ui_system_information()
         self.device_access_code = nvg_info[self.serial_number]['device_access_code']
         print("dac",self.device_access_code)
+
         print("in NVG599 init")
         self.init_info= True
         #exit()
@@ -251,16 +251,6 @@ class Nvg599Class(GatewayClass):
 
     def factory_reset_rg(self):
         global nvg_info
-        #self.getdeviceInfoFromUI()
-        #print("self.serialNumer:",self.serialNumber)
-        # we need the serial number to refernce the DAC which is in our local dicitonary
-        # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
-        #self.device_access_code = self.nvgInfo[self.serialNumber]['device_ccess_code']
-        #print("dac",self.device_access_code)
-        #print("in accessWiFiInfo ")
-        #url = 'http://192.168.1.254/cgi-bin/wconfig.ha'
-
-        # we should be doing this
         url = 'http://192.168.1.254/'
 
         browser = webdriver.Chrome()
@@ -274,7 +264,6 @@ class Nvg599Class(GatewayClass):
         dianostics_link = browser.find_element_by_link_text("Diagnostics")
         dianostics_link.click()
         sleep(2)
-
         resets_link = browser.find_element_by_link_text("Resets")
         resets_link.click()
         sleep(2)
@@ -307,7 +296,7 @@ class Nvg599Class(GatewayClass):
             result = os.system(cmd)
 
         while  (result == 0):
-                print("waiting 10 for RG to come back into service")
+                print("waiting 10 seconds for RG to come back into service")
                 sleep(10)
                 result = os.system(cmd)
 
@@ -318,10 +307,10 @@ class Nvg599Class(GatewayClass):
 
 
 
-    def enter_dac_convenience(self,sesion):
-        pass
+ #   def enter_dac_convenience(self,sesion):
+ #       pass
 
-    def ui_home_network_status(self,value_requested):
+    def get_ui_home_network_status_value(self,session,value_requested):
         global nvgInfo
         ui_channel_5g = None
         ui_channel_2g = None
@@ -334,20 +323,18 @@ class Nvg599Class(GatewayClass):
         print("in ui_home_network_status ")
         #url = 'http://192.168.1.254/cgi-bin/wconfig.ha'
 
-        # we should be doing this
-        url = 'http://192.168.1.254/'
+        #url = 'http://192.168.1.254/'
+        #session = webdriver.Chrome()
+        #session.get(url)
 
-        browser = webdriver.Chrome()
-        browser.get(url)
-
-        status_link = browser.find_element_by_link_text("Home Network")
+        status_link = session.find_element_by_link_text("Home Network")
         status_link.click()
         sleep(2)
 
         #status_link = browser.find_element_by_link_text("Status")
         #status_link.click()
         #sleep(2)
-        soup = BeautifulSoup(browser.page_source, 'html.parser')
+        soup = BeautifulSoup(session.page_source, 'html.parser')
         tables = soup.findChildren('table')
 #five tables on this page
         table = tables[4]
@@ -397,8 +384,8 @@ class Nvg599Class(GatewayClass):
                     ui_channel_5g = row[2]
                     return ui_channel_5g
 
-        sleep(2)
-        browser.quit()
+#        sleep(2)
+#       session.quit()
 #        homeNetworkLink = browser.find_element_by_link_text("Home Network")
 #        homeNetworkLink.click()
 #        sleep(2)
@@ -421,71 +408,73 @@ class Nvg599Class(GatewayClass):
  #       browser.quit()
 # we need the band (2g or 5g) because both bands could be automatic which would be ambiguous
     #nvg_599_dut.ui_set_bw_channel('g2', 40, 2)
-    def ui_set_bw_channel(self,band,bandwidth,channel):
+
+ #   def check_if_password_required(self, session):
+  #      try:
+ #           #Select(browser.find_element_by_id("selectMonth")).select_by_visible_text("%s" % (month))
+#            dac_access_challenge =session.find_element_by_link_text("Forgot your Access Code")
+#            print('we found the request for password screen')
+##            print('sending dac',self.device_access_code)
+#            dac_entry = session.find_element_by_id("password")
+#            dac_entry.send_keys(self.device_access_code)
+ #           submit = session.find_element_by_name("Continue")
+ #           submit.click()
+#
+ #       except NoSuchElementException:
+ #           pass
+#
+ #       return session
+
+
+    def ui_set_band_bandwith_channel(self,band,bandwidth,channel):
         global nvgInfo
 
-        band_selected = band
-        channel_selected = channel
-        bandwidth_selected = bandwidth
-        if (not self.init_info):
-            self.ui_system_information()
-            print("self.serialNumer:", self.serial_number)
+        #band_selected = band
+        #channel_selected = channel
+        #bandwidth_selected = bandwidth
+        #if (not self.init_info):
+         #   self.ui_system_information()
+         #   print("self.serialNumer:", self.serial_number)
             # we need the serial number to refernce the DAC which is in our local dicitonary
             # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
-            self.device_access_code = nvg_info[self.serial_number]['device_access_code']
-            print("dac", self.device_access_code)
-            print("in ui_home_network_status  init if")
+        #    self.device_access_code = nvg_info[self.serial_number]['device_access_code']
+        #    print("dac", self.device_access_code)
+         #   print("in ui_home_network_status  init if")
 
         print("in ui_set_home_network_information ")
         url = 'http://192.168.1.254/'
-        browser = webdriver.Chrome()
-        browser.get(url)
-        status_link = browser.find_element_by_link_text("Home Network")
+        session = webdriver.Chrome()
+        session.get(url)
+        status_link = session.find_element_by_link_text("Home Network")
         status_link.click()
         sleep(2)
-        homeNetworkLink = browser.find_element_by_link_text("Wi-Fi")
+        homeNetworkLink = session.find_element_by_link_text("Wi-Fi")
         homeNetworkLink.click()
 
+        # handle being asked for password
+        session = self.check_if_password_required(session)
 
-# we may or may not get asked for the password Something wrong here
-
-
-
-        #browser.find_element_by_link_text("Forgot your Access Code")
-
-        self.check_if_password_required(session)
-
-        try:
+        #try:
             #Select(browser.find_element_by_id("selectMonth")).select_by_visible_text("%s" % (month))
-            dac_access_challenge =browser.find_element_by_link_text("Forgot your Access Code")
-            print('we found the request for password screen')
-            print('sending dac',self.device_access_code)
-            dac_entry = browser.find_element_by_id("password")
-            dac_entry.send_keys(self.device_access_code)
-            submit = browser.find_element_by_name("Continue")
-            submit.click()
-
-        except NoSuchElementException:
-            pass
-
-
-        #dac_entry = browser.find_element_by_id("password")
-        #dac_entry = 0
-        #if dac_entry:
-            #print('we found the request for password screen')
-            #print('sending dac',self.device_access_code)
-            #dac_entry.send_keys(self.device_access_code)
-            #submit = browser.find_element_by_name("Continue")
-            #submit.click()
-
-        advanced_options_link = browser.find_element_by_link_text("Advanced Options")
+        #    dac_access_challenge =session.find_element_by_link_text("Forgot your Access Code")
+        #    print('we found the request for password screen')
+        #    print('sending dac',self.device_access_code)
+        #    dac_entry = session.find_element_by_id("password")
+         #   dac_entry.send_keys(self.device_access_code)
+         #   submit = session.find_element_by_name("Continue")
+         #   submit.click()
+#
+        #except NoSuchElementException:
+         #   pass
+        advanced_options_link = session.find_element_by_link_text("Advanced Options")
         advanced_options_link.click()
         sleep(2)
-#more stuff in here
-
 #nvg_599_dut.ui_set_bw_channel('g2', 40, 2)
-        if band_selected == 'g2' :
-            bandwidth_select = browser.find_element_by_id("obandwidth")
+#        if band_selected == '2g' :
+        if band == '2g':
+
+            bandwidth_select = session.find_element_by_id("obandwidth")
+
             print('found obandwidth')
             print('bandwidth',bandwidth)
             #bandwidth_select.select_by_value(bandwidth)
@@ -493,16 +482,16 @@ class Nvg599Class(GatewayClass):
                 if option.text == bandwidth:
                    option.click()
 
-            channel_select = browser.find_element_by_id("ochannelplusauto")
+            channel_select = session.find_element_by_id("ochannelplusauto")
             print('found ochannel')
             print('channel',channel)
             #bandwidth_select.select_by_value(bandwidth)
             for option in bandwidth_select.find_elements_by_tag_name('option'):
                 if option.text == channel:
                    option.click()
-# which it  would be for dfs
-        if band_selected == 'g5':
-            bandwidth_select = browser.find_element_by_id("tbandwidth")
+
+         if band == '5g':
+            bandwidth_select = session.find_element_by_id("tbandwidth")
             print('found obandwidth')
             print('bandwidth', bandwidth)
             # bandwidth_select.select_by_value(bandwidth)
@@ -510,84 +499,68 @@ class Nvg599Class(GatewayClass):
                 if option.text == bandwidth:
                     option.click()
 
-                channel_select = browser.find_element_by_id("tchannelplusauto")
+            channel_select = session.find_element_by_id("tchannelplusauto")
             print('found tchannel')
             print('tchannel 5g', channel)
             # bandwidth_select.select_by_value(bandwidth)
-            for option in bandwidth_select.find_elements_by_tag_name('option'):
+            for option in channel_select.find_elements_by_tag_name('option'):
                 if option.text == channel:
                     option.click()
-# allow time for the channel change to propage
-            sleep(30)
-  #          self.session = self.login_nvg_599()
-  #          self.session.sendline()
-   #         self.session.expect(">")
-   #         self.session.sendline("telnet 192.168.1.1")
- #           self.session.expect("#")
-   #         self.session.sendline("wl -i eth1 radar 2")
-   #         sleep(60)
+                    print('5g channel changed to channel:', channel)
+
+            sleep(2)
 
 
+    def ui_get_wifi_info(self):
+        url = 'http://192.168.1.254/'
+        session = webdriver.Chrome()
+        session.get(url)
 
-
-  #          channel_select = browser.find_element_by_id("ochannelplusauto")
-  #          channel_select.select_by_value(channel)
-    #        browser.find_element_by_name("Save").click()
-    #        print("end of this test")
-
-#--------------pfp
-
-    def ui_system_information(self):
-        global nvg_info
-        url = 'http://192.168.1.254/cgi-bin/sysinfo.ha'
-        #print("derp----------cccc----------------------------------")
-        #test_dict = {'e': {'e1': '1', 'e2': '2', 'e3': 'e3'}, 'f': {'f1': '1', 'f2': '2', 'f3': '3'}}
-        #print("test_dict",test_dict['e']['e1'])
-#       exit()
-        browser = webdriver.Chrome()
-        browser.get(url)
-
-
-        status_link = browser.find_element_by_link_text("Home Network")
+        status_link = session.find_element_by_link_text("Home Network")
         status_link.click()
         sleep(2)
 
-        homeNetworkLink = browser.find_element_by_link_text("Wi-Fi")
+        homeNetworkLink = session.find_element_by_link_text("Wi-Fi")
         homeNetworkLink.click()
-        sleep(20)
-        handles = browser.window_handles;
+        sleep(2)
+
+        handles = session.window_handles;
         size = len(handles);
         print('size:',size)
+
         for x in range(size):
-            browser.switch_to.window(handles[x]);
-            print ("title",browser.title)
+            session.switch_to.window(handles[x]);
+            print ("title",session.title)
             print ("handle",handles[x])
 
-        try:
-            #dac_access_challenge = browser.find_element_by_link_text("Forgot your Access Code")
-            dac_access_challenge = browser.find_element_by_xpath("Forgot your Access Code")
+        session = self.check_if_password_required(session)
+        print('tada2)')
 
-        except NoSuchElementException:
-            pass
-
-        #def check_if_password_required(self, session):
         #try:
-                # Select(browser.find_element_by_id("selectMonth")).select_by_visible_text("%s" % (month))
-            dac_access_challenge = browser.find_element_by_link_text("Forgot your Access Code")
-        #    print('we found the request for password screen')
-       #     print('sending dac', self.device_access_code)
-        #    exit()
-            #dac_entry = session.find_element_by_id("password")
-            #dac_entry.send_keys(self.device_access_code)
-            #submit = session.find_element_by_name("Continue")
-            #submit.click()
+        #    #dac_access_challenge = browser.find_element_by_link_text("Forgot your Access Code")
+        #    dac_access_challenge = session.find_element_by_xpath('//*[@id="main-content"]/div[2]/div[2]/div/h1').text
+         #   print('dac challenge',dac_access_challenge)
+        # #   dac_entry = session.find_element_by_id("password")
+          #  print('dac_access',self.device_access_code)
+         #   dac_entry.send_keys(self.device_access_code)
+         #   submit = session.find_element_by_name("Continue")
+         #   submit.click()
+         #   sleep(20)
 
-            #except NoSuchElementException:
-            #    pass
+        #except NoSuchElementException:
+         #   pass
 
-            #return session
+        #print('ta-da')
+        #exit()
 
-
+    def ui_system_information(self):
+        global nvg_info
+        url = 'http://192.168.1.254/'
+        browser = webdriver.Chrome()
+        browser.get(url)
+        status_link = browser.find_element_by_link_text("System Information")
+        status_link.click()
+        sleep(2)
         soup = BeautifulSoup(browser.page_source, 'html.parser')
         sleep(5)
         this = soup.find_all('th')
@@ -598,22 +571,13 @@ class Nvg599Class(GatewayClass):
             if th.text == "Serial Number":
                 print("serial number:",th.next_sibling.next_sibling.text)
                 self.serial_number = th.next_sibling.next_sibling.text
-
                 print ("serial Number is:",self.serial_number)
-                #print('test is:', self.test)
                 print ("nvg serial number dict",nvg_info[self.serial_number])
                 print("nvg access code", nvg_info[self.serial_number]['device_access_code'])
                 tmp_dac = nvg_info[self.serial_number]['device_access_code']
                 print('tmp_dac:',tmp_dac)
                 self.device_access_code = tmp_dac
-
-                #tmp_serial_number = nvg_info[self.serial_number]
-                #self.device_access_code = nvg_info[self.serial_number][self.device_access_code]
-                #mp_device_access_code = nvg_info[tmp_serial_number]['device_access_code']
-
                 print("dac is:",self.device_access_code)
-
-
             if th.text == "Software Version":
                 print(th.next_sibling.next_sibling.text)
                 self.software_version = th.next_sibling.next_sibling.text
@@ -654,9 +618,7 @@ class Nvg599Class(GatewayClass):
 
 
 
-
-
-    def get4920IPFromUI(self):
+    def get_4920_inf_from_ui(self):
         global nvgInfo
         url = 'http://192.168.1.254/cgi-bin/devices.ha'
 
@@ -734,7 +696,7 @@ class Nvg599Class(GatewayClass):
         self.session.expect(">")
         return self.session
     
-    def connectCLI(self, ip):
+    def connect_cli(self, ip):
 
         self.IP = ip
         #cls.ssh = pexpect.spawn('ssh ' + name)
