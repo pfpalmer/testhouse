@@ -126,10 +126,9 @@ def test_dfs(nvg_599_dut):
    # exit()
 
     if (current_5g_channel in set('DFS_CHANNELS')):
-        print('this is a Dfs channel')
+        print('this is a DFS channel')
     else:
-        print('this is a non dfs we need to change it to a DFS for the test')
-
+        print('this is a non DFS Changing to DFS channel 100')
         #def ui_set_bw_channel(self, band, bandwidth, channel):
         # for this test we only use 5g
         nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, 100)
@@ -138,21 +137,22 @@ def test_dfs(nvg_599_dut):
     nvg_599_dut.login_nvg_599_cli()
     #nvg_599_dut.telnet_cli.session.sendline()
     nvg_599_dut.telnet_cli.sendline()
-    exit()
-    session.expect(">")
-    session.sendline("telnet 192.168.1.1")
-    session.expect("#")
-    session.sendline("wl -i eth1 radar 2")
-    sleep(60)
-
-    #ui_channel_5g
+    nvg_599_dut.telnet_cli.expect(">")
+    nvg_599_dut.telnet_cli.sendline("telnet 192.168.1.1")
+    nvg_599_dut.telnet_cli.expect("#")
+    nvg_599_dut.telnet_cli.sendline("wl -i eth1 radar 2")
+    sleep(10)
 
     current_5g_channel = nvg_599_dut.get_ui_home_network_status_value("ui_channel_5g")
 
-    if (current_5g_channel in set('NON_DFS_CHANNELS')):
-        print('test passed')
+    current_5g_channel = int(current_5g_channel)
 
-    #return current_5g_channel,current_5g_bandwidth
+    if (current_5g_channel in set('NON_DFS_CHANNELS')):
+        print('test passed: Channel changed from 100 to channel:',current_5g_channel)
+    else:
+        print('test failed:Channel found:',current_5g_channel,' expected non DFS channel')
+
+#return current_5g_channel,current_5g_bandwidth
 
 #nvg_599_dut = Nvg599Class()
 #nvg_599_dut.login_nvg_599()
@@ -171,6 +171,15 @@ def test_599_nvg_init():
 
 
 #nvg_599_dut = Nvg599Class()
+
+
+NON_DFS_CHANNELS1 = {'36','40'}
+result =  '36' in set('NON_DFS_CHANNELS1')
+
+print(result)
+
+exit()
+
 nvg_599_dut = test_599_nvg_init()
 
 test_dfs(nvg_599_dut)
@@ -233,19 +242,6 @@ exit()
 
 
 
-#print ('rg serial number is',rgSerialNumber)
-
-
-#rgTerm = pexpect.spawn("telnet 192.168.1.254", encoding = 'utf-8')
-#sleep(1)
-#rgTerm.expect("ogin:")
-#rgTerm.sendline('admin')
-#rgTerm.expect("ord:")
-#rgTerm.sendline('<<01%//4&/')
-#rgTerm.expect(">")
-#rgTerm.sendline('status')
-#rgTerm.expect('>')
-#statusOutput = rgTerm.before
 
 #statusInfoRegEx = re.compile(r'Model\s(\w+)\s+Serial\s+Number\s+(\d+)')
 #statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+\s+AnnexA\s+(\w+)',re.DOTALL)
