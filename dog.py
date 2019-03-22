@@ -23,49 +23,11 @@ from time import sleep
 import pexpect
 from rgclass import Nvg599Class
 
-
+from rgclass import  NON_DFS_CHANNELS
+from rgclass import  DFS_CHANNELS
 ########################  this seems like what we want
 #p = pexpect.spawn('adb connect 192.168.1.71')
 #p.expect(pexpect.EOF)
-
-
-
-###server.quit()
-
-# driver = webdriverhttps://www.waketech.edu/programs-courses/credit/electrical-systems-technology/degrees-pathways.Chrome('/usr/local/bin/chromedriver')
-# driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
-# driver.get('http://www.google.com')
-# driver.get('http://192.168.1.254')
-# .implicitly_wait(20)
-# driver.find_elements_by_tag_name("Settings") // this is for 599
-# driver.find_element_by_link_text("Settings").click()
-
-# driver.findElement(By.linkText("Home Network")).click()
-# driver.implicitly_wait(20)
-
-# driver.find_element_by_link_text("LAN").click()
-# driver.implicitly_wait(20)
-# driver.maximize_window()
-
-# driver.find_element_by_link_text("Wi-Fi").click()
-# .implicitly_wait(20)
-
-# password = driver.find_element_by_id("ADM_PASSWORD")
-
-# password.send_keys("8>1769&295")
-
-# driver.find_element_by_class_name('button').click()
-# driver.find_element_by_xpath("//button[@value='Submit']").click()
-# button.click()
-
-
-
-
-#pfp
-#page =requests.get('http://192.168.1.254/cgi-bin/sysinfo.ha')
-#soup = BeautifulSoup(page.text, 'html.parser')
-#-pfp
-
 
 
 #browser = webdriver.Chrome()
@@ -113,7 +75,12 @@ def test_ping(session):
 #NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
 #DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
 # we could add optional parameters to change to a specific channel , maybe
-def test_dfs(nvg_599_dut):
+def test_dfs(nvg_599_dut,results_file):
+    print('in test_dfs')
+    results_file.write("this is an inside dog test\n")
+    return
+    global NON_DFS_CHANNELS
+    global DFS_CHANNELS
     session = nvg_599_dut.session
     #nvg_599_dut = Nvg599Class()
     #current_radio_channel_5g = nvg_599_dut.accessUIWiFiInfo("ui_channel_5g")
@@ -147,7 +114,7 @@ def test_dfs(nvg_599_dut):
 
     current_5g_channel = int(current_5g_channel)
 
-    if (current_5g_channel in set('NON_DFS_CHANNELS')):
+    if (current_5g_channel in NON_DFS_CHANNELS):
         print('test passed: Channel changed from 100 to channel:',current_5g_channel)
     else:
         print('test failed:Channel found:',current_5g_channel,' expected non DFS channel')
@@ -170,24 +137,27 @@ def test_599_nvg_init():
     return nvg_599_dut
 
 
-#nvg_599_dut = Nvg599Class()
+results_file = open('results_file.txt', 'w+')
 
-
-NON_DFS_CHANNELS1 = {'36','40'}
-result =  '36' in set('NON_DFS_CHANNELS1')
-
-print(result)
-
-exit()
-
+results_file.write(" this is a  outside dog test\n")
 nvg_599_dut = test_599_nvg_init()
 
-test_dfs(nvg_599_dut)
+test_dfs(nvg_599_dut,results_file)
+#def email_test_results(self, text_file):
+
+
+results_file.close()
+
+results_str = open('results_file.txt','r').read()
+
+nvg_599_dut.email_test_results(results_str)
+
+exit()
 #nvg_599_dut.ui_get_wifi_info()
 #nvg_599_dut.factory_reset_rg()
 #nvg_599_dut.connect_to_console()f
 #nvg_599_dut.accessUIWiFiInfo()
-exit()
+#exit()
 
 
 
@@ -340,7 +310,7 @@ airTiesTerm.expect("#")
 airTiesTerm.logfile= sys.stdout
 
 
-channelResultFP = open('channelResult.txt', 'w+')
+#channelResultFP = open('channelResult.txt', 'w+')
 
 
 for l2g in list2GLite:
