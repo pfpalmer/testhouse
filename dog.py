@@ -19,6 +19,7 @@ import re
 import smtplib
 import sys
 from time import sleep
+from datetime import datetime
 
 import pexpect
 from rgclass import Nvg599Class
@@ -77,8 +78,11 @@ def test_ping(session):
 # we could add optional parameters to change to a specific channel , maybe
 def test_dfs(nvg_599_dut,results_file):
     print('in test_dfs')
-    results_file.write("this is an inside dog test\n")
-    return
+    now = datetime.today().isoformat()
+    results_file.write("Test Title:tst_dfs Execution time:")
+    results_file.write(now)
+    results_file.write("\n")
+
     global NON_DFS_CHANNELS
     global DFS_CHANNELS
     session = nvg_599_dut.session
@@ -92,12 +96,23 @@ def test_dfs(nvg_599_dut,results_file):
     #current_radio_channel_5g = 5
    # exit()
 
-    if (current_5g_channel in set('DFS_CHANNELS')):
+    if current_5g_channel in DFS_CHANNELS:
+        result = "Current 5G:" + current_5g_channel + " is a DFS channel\n"
+        result_str = str(result)
+
+        #results_file.write("Current 5G:",current_5g_channel," is a DFS channel\n")
+        results_file.write(result_str)
         print('this is a DFS channel')
     else:
         print('this is a non DFS Changing to DFS channel 100')
         #def ui_set_bw_channel(self, band, bandwidth, channel):
-        # for this test we only use 5g
+        result = "Current 5G:" + current_5g_channel + " is not a DFS channel\n"
+        result_str = str(result)
+        #results_file.write("Current 5G:" ,current_5g_channel," is not a DFS channel\n")
+        #results_file.write(result_str)
+
+        results_file.write("Changing to DFS channel 100, bandwidth 80\n")
+
         nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, 100)
         print('setting channel to DFS channel 100')
 
@@ -114,10 +129,35 @@ def test_dfs(nvg_599_dut,results_file):
 
     current_5g_channel = int(current_5g_channel)
 
-    if (current_5g_channel in NON_DFS_CHANNELS):
-        print('test passed: Channel changed from 100 to channel:',current_5g_channel)
+    print('current_5g_channel',current_5g_channel)
+# after the test we expect the channel to have been changed to a non DFS channel
+
+    if current_5g_channel in NON_DFS_CHANNELS:
+        #results_str = "5G channel:" + current_5g_channel + " is a non DFS channel\n"
+        #result = str(results_str)
+        #results_file.write(result)
+        results_file.write("5G channel changed to non DFS channel: ")
+        results_file.write(str(current_5g_channel))
+        results_file.write("\n")
+
+
+        print("Test Passed\n")
+        results_file.write("Test Passed\n")
     else:
         print('test failed:Channel found:',current_5g_channel,' expected non DFS channel')
+        print('current_5g_channel', current_5g_channel)
+        #exit()
+        result = "Current 5G:" + str(current_5g_channel) + " is a DFS channel\n"
+        #result_str = str(result)
+
+        print("result string  -dbg",result)
+        #results_file.write("Current 5G:" ,current_5g_channel," is not a DFS channel\n")
+        results_file.write(result)
+
+        #results_file.write("5G channel:", current_5g_channel, " is a DFS channel\n")
+        #results_file.write("Test failed: Expected 5G channel to be a non-DFS channel\n")
+        #result = "Test failed: expected 5G channel to be a non-DFS channel\n"
+
 
 #return current_5g_channel,current_5g_bandwidth
 
@@ -136,10 +176,8 @@ def test_599_nvg_init():
     nvg_599_dut.session.get(url)
     return nvg_599_dut
 
-
 results_file = open('results_file.txt', 'w+')
 
-results_file.write(" this is a  outside dog test\n")
 nvg_599_dut = test_599_nvg_init()
 
 test_dfs(nvg_599_dut,results_file)
@@ -149,10 +187,10 @@ test_dfs(nvg_599_dut,results_file)
 results_file.close()
 
 results_str = open('results_file.txt','r').read()
-
-nvg_599_dut.email_test_results(results_str)
-
+nvg_599_dut.email_test_results1(results_str)
 exit()
+
+
 #nvg_599_dut.ui_get_wifi_info()
 #nvg_599_dut.factory_reset_rg()
 #nvg_599_dut.connect_to_console()f
