@@ -31,38 +31,6 @@ from rgclass import  DFS_CHANNELS
 #p.expect(pexpect.EOF)
 
 
-#browser = webdriver.Chrome()
-
-#browser.get(url)
-
-#soup = BeautifulSoup(browser.page_source, 'html.parser')
-
-#this = soup.find_all('th')
-#for th in this:
-#    if th.text == "Model Number":
-#        print (th.next_sibling.next_sibling.text)
-#    if th.text == "Serial Number":
- #       print (th.next_sibling.next_sibling.text)
- #       self.serialNumber = th.next_sibling.next_sibling.text
-
-
-
-
-#driver.implicitly_wait(20)
-#data = r.text
-
-
-#driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
-#driver.implicitly_wait(20)
-# driver.get('http://www.google.com')
-#soup = driver.get('http://192.168.1.254/cgi-bin/sysinfo.ha')
-
-#serialNumber = soup.find(class_='col2')
-#print (serialNumber)
-
-#exit()
-
-
 # Find the current channel used for 5G
 # Check the 5G cahhen used. If noner DFS , set to DFS and note the setting
 # enter the command to simulate radar detection
@@ -154,21 +122,6 @@ def test_dfs(nvg_599_dut,results_file):
         #results_file.write("Current 5G:" ,current_5g_channel," is not a DFS channel\n")
         results_file.write(result)
 
-        #results_file.write("5G channel:", current_5g_channel, " is a DFS channel\n")
-        #results_file.write("Test failed: Expected 5G channel to be a non-DFS channel\n")
-        #result = "Test failed: expected 5G channel to be a non-DFS channel\n"
-
-
-#return current_5g_channel,current_5g_bandwidth
-
-#nvg_599_dut = Nvg599Class()
-#nvg_599_dut.login_nvg_599()
-#exit()
-
-#tst_bw = test_dfs()
-#print ('5g channel is:',tst,'bw is:',bw)
-#exit()
-
 def test_599_nvg_init():
     nvg_599_dut = Nvg599Class()
     url = 'http://192.168.1.254/'
@@ -176,14 +129,16 @@ def test_599_nvg_init():
     nvg_599_dut.session.get(url)
     return nvg_599_dut
 
-results_file = open('results_file.txt', 'w+')
 
+
+#--------------------------------------------------------------------
+#results_file = open('results_file.txt', 'w+')
 nvg_599_dut = test_599_nvg_init()
+nvg_599_dut.run_speed_test_cli("192.168.1.239")
 
+sleep(10)
+exit()
 test_dfs(nvg_599_dut,results_file)
-#def email_test_results(self, text_file):
-
-
 results_file.close()
 
 results_str = open('results_file.txt','r').read()
@@ -465,37 +420,7 @@ except:
 
 exit()
 
-#sender_email = "leandertesthouse@gmail.com"  # Enter your address
-#receiver_email = "paul.palmer@arris.com"  # Enter recei
-#smtp_server = "smtp.gmail.com"
-#context = ssl.create_default_context()
-#server = smtplib.SMTP_SSL(smtp_server,port,context)
-##server = smtplib.SMTP_SSL(smtp_server)
-#server = smtp_server
-
-#server.ehlo()
-#server.starttls()
-
-#server.sendmail(sender_email,receiver_email,msg)
-#server.send_msg(msg)
-
-
-#with smtplib.SMTP(smtp_server, port) as server:
-#    server.ehlo()  # Can be omitted
-#    server.starttls(context=context)
-#    server.ehlo()  # Can be omitted
-#    server.login(sender_email, password)
-#    server.sendmail(sender_email, receiver_email, message)
-
-#exit()
-
-#resultFile.write(str(result))
-#rgTerm.sendline('exit')
-# driver.webdriver.quit()
-#exit()
-# driver = webdriver.firefox('/home/palmer/.local/lib/python2.7/site-packages/chromedriver')
-# driver = webdriver.chrome()
-# browser.get('https://www.google.com')
+#
 
 #resultFile.close()
 #sleep(1)
@@ -532,11 +457,7 @@ if 'min' in duration:
 # print('days, hours, minutes, users, cpu avg 1 min, cpu avg 5 min, cpu avg 15 min')
 # print('%s, %s, %s, %s, %s, %s, %s' % (days, hours, mins, users, av1, av5, av15))
 
-#print("Turning off supplicant")
-#ip = "192.168.1.254"
-#password = '<#/53#1/2'
-#child = pexpect.spawn("telnet " "192.168.1.254")
-#sleep(1)
+
 
 
 
@@ -643,38 +564,7 @@ exit()
 # driver = webdriver.chrome()
 # browser.get('https://www.google.com')
 
-# different styles of uptime results. I try to parse them all. Yeee!
-# Examples from different machines:
-# [x86] Linux 2.4 (Redhat 7.3)
-#  2:06pm  up 63 days, 18 min,  3 users,  load average: 0.32, 0.08, 0.02
-# [x86] Linux 2.4.18-14 (Redhat 8.0)
-#  3:07pm  up 29 min,  1 user,  load average: 2.44, 2.51, 1.57
-# [PPC - G4] MacOS X 10.1 SERVER Edition
-# 2:11PM  up 3 days, 13:50, 3 users, load averages: 0.01, 0.00, 0.00
-# [powerpc] Darwin v1-58.corefa.com 8.2.0 Darwin Kernel Version 8.2.0
-# 10:35  up 18:06, 4 users, load averages: 0.52 0.47 0.36
-# [Sparc - R220] Sun Solaris (8)
-#  2:13pm  up 22 min(s),  1 user,  load average: 0.02, 0.01, 0.01
-# [x86] Linux 2.4.18-14 (Redhat 8)
-# 11:36pm  up 4 days, 17:58,  1 user,  load average: 0.03, 0.01, 0.00
-# AIX jwdir 2 5 0001DBFA4C00
-#  09:43AM   up  23:27,  1 user,  load average: 0.49, 0.32, 0.23
-# OpenBSD box3 2.9 GENERIC#653 i386
-#  6:08PM  up 4 days, 22:26, 1 user, load averages: 0.13, 0.09, 0.08
-
-# Note that, for Python 3 compatibility reasons, we are using spawnu and
-# importing unicode_literals (above). spawnu accepts Unicode input and
-# unicode_literals makes all string literals in this script Unicode by default.
-p = pexpect.spawnu('uptime')
-
-# This parses uptime output into the major groups using regex group matching.
-p.expect(
-    r'up\s+(.*?),\s+([0-9]+) users?,\s+load averages?: ([0-9]+\.[0-9][0-9]),?\s+([0-9]+\.[0-9][0-9]),?\s+([0-9]+\.[0-9][0-9])')
-duration, users, av1, av5, av15 = p.match.groups()
-
-# The duration is a little harder to parse because of all the different
-# styles of uptime. I'm sure there is a way to do this all at once with
-# one single regex, but I bet it would be hard to read and maintain.
+#ain.
 # If anyone wants to send me a version using a single regex I'd be happy to see it.
 days = '0'
 hours = '0'
@@ -732,14 +622,7 @@ child.expect(">>")
 out = child.before
 print(out)
 #
-# child.interact()
-# child.expect(pexpect.EOF)
-
-# child.sendline("quit")
-# child.expect(">")
-
-# print("done")
-# child.sendline("bye")
+#
 
 
 child.expect("assword:")
@@ -804,26 +687,7 @@ exit()
 # driver = webdriver.chrome()
 # browser.get('https://www.google.com')
 
-# different styles of uptime results. I try to parse them all. Yeee!
-# Examples from different machines:
-# [x86] Linux 2.4 (Redhat 7.3)
-#  2:06pm  up 63 days, 18 min,  3 users,  load average: 0.32, 0.08, 0.02
-# [x86] Linux 2.4.18-14 (Redhat 8.0)
-#  3:07pm  up 29 min,  1 user,  load average: 2.44, 2.51, 1.57
-# [PPC - G4] MacOS X 10.1 SERVER Edition
-# 2:11PM  up 3 days, 13:50, 3 users, load averages: 0.01, 0.00, 0.00
-# [powerpc] Darwin v1-58.corefa.com 8.2.0 Darwin Kernel Version 8.2.0
-# 10:35  up 18:06, 4 users, load averages: 0.52 0.47 0.36
-# [Sparc - R220] Sun Solaris (8)
-#  2:13pm  up 22 min(s),  1 user,  load average: 0.02, 0.01, 0.01
-# [x86] Linux 2.4.18-14 (Redhat 8)
-# 11:36pm  up 4 days, 17:58,  1 user,  load average: 0.03, 0.01, 0.00
-# AIX jwdir 2 5 0001DBFA4C00
-#  09:43AM   up  23:27,  1 user,  load average: 0.49, 0.32, 0.23
-# OpenBSD box3 2.9 GENERIC#653 i386
-#  6:08PM  up 4 days, 22:26, 1 user, load averages: 0.13, 0.09, 0.08
-
-# Note that, for Python 3 compatibility reasons, we are using spawnu and
+#
 # importing unicode_literals (above). spawnu accepts Unicode input and
 # unicode_literals makes all string literals in this script Unicode by default.
 p = pexpect.spawnu('uptime')
@@ -833,9 +697,7 @@ p.expect(
     r'up\s+(.*?),\s+([0-9]+) users?,\s+load averages?: ([0-9]+\.[0-9][0-9]),?\s+([0-9]+\.[0-9][0-9]),?\s+([0-9]+\.[0-9][0-9])')
 duration, users, av1, av5, av15 = p.match.groups()
 
-# The duration is a little harder to parse because of all the different
-# styles of uptime. I'm sure there is a way to do this all at once with
-# one single regex, but I bet it would be hard to read and maintain.
+
 # If anyone wants to send me a version using a single regex I'd be happy to see it.
 days = '0'
 hours = '0'
@@ -893,14 +755,6 @@ child.expect(">>")
 out = child.before
 print(out)
 #
-# child.interact()
-# child.expect(pexpect.EOF)
-
-# child.sendline("quit")
-# child.expect(">")
-
-# print("done")
-# child.sendline("bye")
 
 child.expect("#")
 child.sendline('exit')
@@ -911,24 +765,7 @@ exit()
 # driver = webdriver.chrome()
 # browser.get('https://www.google.com')
 
-# different styles of uptime results. I try to parse them all. Yeee!
-# Examples from different machines:
-# [x86] Linux 2.4 (Redhat 7.3)
-#  2:06pm  up 63 days, 18 min,  3 users,  load average: 0.32, 0.08, 0.02
-# [x86] Linux 2.4.18-14 (Redhat 8.0)
-#  3:07pm  up 29 min,  1 user,  load average: 2.44, 2.51, 1.57
-# [PPC - G4] MacOS X 10.1 SERVER Edition
-# 2:11PM  up 3 days, 13:50, 3 users, load averages: 0.01, 0.00, 0.00
-# [powerpc] Darwin v1-58.corefa.com 8.2.0 Darwin Kernel Version 8.2.0
-# 10:35  up 18:06, 4 users, load averages: 0.52 0.47 0.36
-# [Sparc - R220] Sun Solaris (8)
-#  2:13pm  up 22 min(s),  1 user,  load average: 0.02, 0.01, 0.01
-# [x86] Linux 2.4.18-14 (Redhat 8)
-# 11:36pm  up 4 days, 17:58,  1 user,  load average: 0.03, 0.01, 0.00
-# AIX jwdir 2 5 0001DBFA4C00
-#  09:43AM   up  23:27,  1 user,  load average: 0.49, 0.32, 0.23
-# OpenBSD box3 2.9 GENERIC#653 i386
-#  6:08PM  up 4 days, 22:26, 1 user, load averages: 0.13, 0.09, 0.08
+
 
 # Note that, for Python 3 compatibility reasons, we are using spawnu and
 # importing unicode_literals (above). spawnu accepts Unicode input and
@@ -1046,30 +883,7 @@ sleep(5)
 # driver.webdriver.quit()
 exit()
 # driver = webdriver.firefox('/home/palmer/.local/lib/python2.7/site-packages/chromedriver')
-# driver = webdriver.chrome()
-# browser.get('https://www.google.com')
-
-# different styles of uptime results. I try to parse them all. Yeee!
-# Examples from different machines:
-# [x86] Linux 2.4 (Redhat 7.3)
-#  2:06pm  up 63 days, 18 min,  3 users,  load average: 0.32, 0.08, 0.02
-# [x86] Linux 2.4.18-14 (Redhat 8.0)
-#  3:07pm  up 29 min,  1 user,  load average: 2.44, 2.51, 1.57
-# [PPC - G4] MacOS X 10.1 SERVER Edition
-# 2:11PM  up 3 days, 13:50, 3 users, load averages: 0.01, 0.00, 0.00
-# [powerpc] Darwin v1-58.corefa.com 8.2.0 Darwin Kernel Version 8.2.0
-# 10:35  up 18:06, 4 users, load averages: 0.52 0.47 0.36
-# [Sparc - R220] Sun Solaris (8)
-#  2:13pm  up 22 min(s),  1 user,  load average: 0.02, 0.01, 0.01
-# [x86] Linux 2.4.18-14 (Redhat 8)
-# 11:36pm  up 4 days, 17:58,  1 user,  load average: 0.03, 0.01, 0.00
-# AIX jwdir 2 5 0001DBFA4C00
-#  09:43AM   up  23:27,  1 user,  load average: 0.49, 0.32, 0.23
-# OpenBSD box3 2.9 GENERIC#653 i386
-#  6:08PM  up 4 days, 22:26, 1 user, load averages: 0.13, 0.09, 0.08
-
-# Note that, for Python 3 compatibility reasons, we are using spawnu and
-# importing unicode_literals (above). spawnu accepts Unicode input and
+#
 # unicode_literals makes all string literals in this script Unicode by default.
 p = pexpect.spawnu('uptime')
 
@@ -1160,42 +974,3 @@ print(out)
 # child.sendline("bye")
 
 # exit()
-child.expect("ogin:")
-child.sendline("admin")
-
-child.expect("assword:")
-child.sendline('*<#/53#1/2')
-child.expect(">")
-
-child.sendline('magic')
-child.expect(">")
-
-child.sendline('conf')
-child.expect(">>")
-
-child.sendline('system supplicant')
-child.expect(">>")
-
-child.sendline('set')
-child.expect(" off | on ]:")
-
-child.sendline('off')
-child.expect(">>")
-
-child.sendline('save')
-child.expect(">>")
-
-child.sendline("view")
-child.expect(">>")
-
-out = child.before
-print(out)
-#
-# child.interact()
-# child.expect(pexpect.EOF)
-
-# child.sendline("quit")
-# child.expect(">")
-
-# print("done")
-# child.sendline("bye")
