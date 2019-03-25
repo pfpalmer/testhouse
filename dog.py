@@ -122,25 +122,75 @@ def test_dfs(nvg_599_dut,results_file):
         #results_file.write("Current 5G:" ,current_5g_channel," is not a DFS channel\n")
         results_file.write(result)
 
-def test_599_nvg_init():
+def tst_599_nvg_init():
     nvg_599_dut = Nvg599Class()
     url = 'http://192.168.1.254/'
     nvg_599_dut.session = webdriver.Chrome()
     nvg_599_dut.session.get(url)
     return nvg_599_dut
 
+def tst_speed_test(nvg_599_dut,results_file,test_ip):
+    print('in tst_speed_test')
+    now = datetime.today().isoformat()
+    results_file.write("Test Title:tst_speed_tst Execution time:")
+    results_file.write(now)
+    results_file.write("\n")
+    down_load_speed,up_load_speed = nvg_599_dut.speed_test_cli(test_ip)
+    print('Download speed:', down_load_speed, 'Upload speed:', up_load_speed)
+    speed = 'Download speed:' + down_load_speed + ' Upload speed:' + up_load_speed
+    results_file.write(speed)
+    results_file.write("\n")
+
+    gw_serial_number = nvg_599_dut.serial_number
+    gw_info = 'NVG 599 serial number:' + gw_serial_number
+    results_file.write(gw_info)
+    results_file.write("\n")
+    software_version = 'Software Version:' + nvg_599_dut.software_version
+    results_file.write(software_version)
+    results_file.write("\n")
+    results_file.write("\n")
+    results_file.write("\n")
+
+def tst_ping(nvg_599_dut,results_file, test_ip):
+    print('in tst_ping')
+    now = datetime.today().isoformat()
+    results_file.write("Test Title:tst_ping Execution time:")
+    results_file.write(now)
+    results_file.write("\n")
+    min,avg,max,mdev = nvg_599_dut.ping_test(test_ip)
+    min_str = 'Min time: '+ min
+    results_file.write(min_str)
+
+    results_file.write("\n")
+    avg_str = 'Avg time: '+ avg
+    results_file.write(avg_str)
+
+    results_file.write("\n")
+    max_str = 'Max time:'+ max
+    results_file.write(max_str)
+
+    results_file.write("\n")
+    mdev_str = 'mdev time:'+ mdev
+    results_file.write(mdev_str)
+
+    results_file.write("\n")
+    print('min: ', min)
+    print('avg: ', avg)
+    print('max: ', max)
+    print('mdev:',mdev)
+
 
 
 #--------------------------------------------------------------------
-#results_file = open('results_file.txt', 'w+')
-nvg_599_dut = test_599_nvg_init()
-nvg_599_dut.run_speed_test_cli("192.168.1.239")
+results_file = open('results_file.txt', 'w+')
+nvg_599_dut = tst_599_nvg_init()
+#test_ip = "192.168.1.239"
 
-sleep(10)
-exit()
-test_dfs(nvg_599_dut,results_file)
+#down_load_speed, up_load_speed = nvg_599_dut.run_speed_test_cli(test_ip)
+tst_ping(nvg_599_dut,results_file,"192.168.1.239")
+#tst_speed_test(nvg_599_dut,results_file,"192.168.1.239")
+#test_dfs(nvg_599_dut,results_file)
 results_file.close()
-
 results_str = open('results_file.txt','r').read()
 nvg_599_dut.email_test_results1(results_str)
 exit()
