@@ -13,7 +13,6 @@ from bs4 import BeautifulSoup
 import requests
 
 from selenium import webdriver
-#driver = webdriver.Chrome('asdfsdf')
 
 import re
 import smtplib
@@ -75,17 +74,13 @@ def test_dfs(nvg_599_dut,results_file):
         print('this is a non DFS Changing to DFS channel 100')
         #def ui_set_bw_channel(self, band, bandwidth, channel):
         result = "Current 5G:" + current_5g_channel + " is not a DFS channel\n"
-        result_str = str(result)
-        #results_file.write("Current 5G:" ,current_5g_channel," is not a DFS channel\n")
-        #results_file.write(result_str)
-
+        #result_str = str(result)
         results_file.write("Changing to DFS channel 100, bandwidth 80\n")
 
         nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, 100)
         print('setting channel to DFS channel 100')
 
     nvg_599_dut.login_nvg_599_cli()
-    #nvg_599_dut.telnet_cli.session.sendline()
     nvg_599_dut.telnet_cli.sendline()
     nvg_599_dut.telnet_cli.expect(">")
     nvg_599_dut.telnet_cli.sendline("telnet 192.168.1.1")
