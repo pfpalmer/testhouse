@@ -1,5 +1,7 @@
 from itertools import count
 from typing import Dict
+import subprocess
+from subprocess import check_output
 
 from selenium.webdriver.common.by import By
 
@@ -23,8 +25,6 @@ import time
 from email.message import EmailMessage
 from datetime import datetime
 
-#nvg_info = { "228946241148656" : {'model':'nvg599','deviceAccessCode':"*<#/53#1/2", 'magic': 'kjundhkdxlxr','mac2g': 'd0:39:b3:60:56:f1','mac5g':'d0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey','ssid': 'ATTqbrAnYs'},
-#"277427577103760" : {'model':'nvg599','deviceAccessCode': '<<01%//4&/','magic': "ggtxstgwipcg", 'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid' : 'ATTqbrAnYs'}}
 
 nvg_info: Dict[str, Dict[str, str]] = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
                                      'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4',
@@ -34,12 +34,9 @@ nvg_info: Dict[str, Dict[str, str]] = {"228946241148656": {'model': 'nvg599', 'd
                                      'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
 
 
-#test_dict:{'e':{'e1':'1','e1':'2','e1':'e3'},'f':{'f1':'1','f1':'2','f1':'3'}}
-#NON_DFS_CHANNELS = {"36","40"}
 NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
 DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
 
-#class GatewayClass():
 
 
 class GatewayClass:
@@ -50,37 +47,37 @@ class GatewayClass:
         self.ip = None
         self.serial_number = None
 
-    def email_test_results1(self, text_file):
+    #def email_test_results1(self, text_file):
+#
+     #   now = datetime.today().isoformat()
+     #   print('now')
+      #  subject_title = 'Test results:' + str(now)
+      #  print('subject title',subject_title)
 
-        now = datetime.today().isoformat()
-        print('now')
-        subject_title = 'Test results:' + str(now)
-        print('subject title',subject_title)
+      #  with open("results_file.txt") as fp:
+       #     # Create a text/plain message
+       ##     msg = EmailMessage()
+       #     msg.set_content(fp.read())
 
-        with open("results_file.txt") as fp:
-            # Create a text/plain message
-            msg = EmailMessage()
-            msg.set_content(fp.read())
-
-        print('in email_test_results1')
+     #   print('in email_test_results1')
 
         # me == the sender's email address
         # you == the recipient's email address
         #msg['Subject'] = 'Test results'
-        msg['Subject'] = subject_title
+      #  msg['Subject'] = subject_title
 
-        msg['From'] = 'leandertesthouse@gmail.com'
-        msg['To'] = 'pfpalmer@gmail.com'
-        gmail_password = "1329brome"
-        gmail_user = 'leandertesthouse@gmail.com'
+     #   msg['From'] = 'leandertesthouse@gmail.com'
+    #    msg['To'] = 'pfpalmer@gmail.com'
+      #  gmail_password = "1329brome"
+     #   gmail_user = 'leandertesthouse@gmail.com'
 
-        with smtplib.SMTP('smtp.gmail.com', 587) as smtp_server:
-            smtp_server.ehlo()
-            smtp_server.starttls()
-            smtp_server.login(gmail_user, gmail_password)
-            smtp_server.send_message(msg)
+      #  with smtplib.SMTP('smtp.gmail.com', 587) as smtp_server:
+      #      smtp_server.ehlo()
+       #     smtp_server.starttls()
+       #     smtp_server.login(gmail_user, gmail_password)
+       #     smtp_server.send_message(msg)
 
-        print('message sent successfully')
+       # print('message sent successfully')
 
     def email_test_results(self, text_file):
         print('in email_test_results')
@@ -118,8 +115,6 @@ class GatewayClass:
 class Nvg599Class(GatewayClass):
     def __init__(self):
         super(self.__class__, self).__init__()
-        #rg599 = pexpect.spawn("telnet 192.168.1.254")
-        #sleep(1)
         self.IP ="192.168.1.254"
         self.device_access_code = None
         self.session = None
@@ -127,12 +122,6 @@ class Nvg599Class(GatewayClass):
         self.init_info = False
         self.telnet_cli = None
         global nvg_info
-#       self.nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
-#                                       'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4',
-#                                       'wiFi': 'c2cmybt25dey', 'ssid': 'ATTqbrAnYs'},
-#                   "277427577103760": {'model': 'nvg599', 'device_access_code': "<<01%//4&/", 'magic': 'ggtxstgwipcg',
-#                                       'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94',
-#                                       'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
 
         # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
         self.get_ui_system_information()
@@ -694,6 +683,38 @@ class Nvg599Class(GatewayClass):
         #end = time.time()
         #print(end - start)
 
+    def ping_test(self,IP):
+        print('in ping_test')
+        #out = subprocess.Popen("ping  -c3 localhost",stdout=subprocess.PIPE,stderr=subprocess.STDOUT, shell=True)
+        #out = subprocess.Popen(["ping ", "-c3"," localhost"], stdout=subprocess.PIPE)
+        #out, err = out.communicate()
+        #out = check_output(["ping ", "-c3 ", "localhost"]).decode("utf-8")
+        #out = check_output(["ls -la"].decode("utf-8").shell=True)
+        out = subprocess.check_output("ping -c3 localhost",shell = True).decode("utf-8")
+        #cmd = 'ping -c1 192.168.1.254'
+        #result = os.system(cmd)
+        #pprint('resut from ping pipe',(out.communicate()))
+        print('out===========\n',out)
+        print('endout1===========\n')
+       # exit()
+        #pingInfoRegEx = re.compile(r'.*=\s(\w+)/(\w+)/(\w+)/(\w+)',re.DOTALL)
+        pingInfoRegEx = re.compile(r'.*(rtt.*)',re.DOTALL)
+
+        mo1 = pingInfoRegEx.search(out)
+        #print('mo1',mo1)
+        min = mo1.group(1)
+        print('min--just a value'
+              ';',min)
+        #min = mo1.group(2)
+        print('mnext--just a value',min)
+        exit()
+        min = mo1.group(1)
+        avg = mo1.group(2)
+        max = mo1.group(3)
+        mdev = mo1.group(4)
+
+        return min,avg,max.mdev
+
 
     def connect_to_console(self):
         print('I am in console')
@@ -743,10 +764,9 @@ class Nvg599Class(GatewayClass):
         return self.session
     
     def connect_cli(self, ip):
-
         self.IP = ip
         #cls.ssh = pexpect.spawn('ssh ' + name)
-        print('i am in connect cli')
+        print('in connect_cli')
         session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
         session.expect("ogin:")
         session.sendline('admin')
