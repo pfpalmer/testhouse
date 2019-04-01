@@ -146,13 +146,13 @@ def tst_speed_test(nvg_599_dut,results_file,test_ip):
     results_file.write("\n")
     results_file.write("\n")
 
-def tst_ping(nvg_599_dut,results_file, test_ip):
+def tst_ping(nvg_599_dut,results_file, remote_ip):
     print('in tst_ping')
     now = datetime.today().isoformat()
     results_file.write("Test Title:tst_ping Execution time:")
     results_file.write(now)
     results_file.write("\n")
-    min,avg,max,mdev = nvg_599_dut.ping_test(test_ip)
+    min,avg,max,mdev = nvg_599_dut.ping_from_local_host(remote_ip)
     min_str = 'Min time: '+ min
     results_file.write(min_str)
 
@@ -177,17 +177,37 @@ def tst_ping(nvg_599_dut,results_file, test_ip):
 
 
 #--------------------------------------------------------------------
+
+#statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)', re.DOTALL)
+
+#out = "rtt min/avg/max/mdev = 0.035/0.044/0.050/0.010 ms"
+#pingInfoRegEx = re.compile(r'.*?rtt/s+.*?/s+=(/d+/./d+)', re.DOTALL)
+#pingInfoRegEx = re.compile(r'rtt.*?=\s(.*)')
+#pingInfoRegEx = re.compile(r'rtt.*?=\s(\d+\.\d+)/(\d+\.\d+)/(\d+\.\d+)/(\d+\.\d+)')
+
+
+#mo1 = pingInfoRegEx.search(out)
+
+
+
+#min = mo1.group(1)
+#exit()
+
 results_file = open('results_file.txt', 'w+')
-nvg_599_dut = tst_599_nvg_init()
+#nvg_599_dut = 599_nvg_init()
+nvg_599_dut = Nvg599Class()
 #test_ip = "192.168.1.239"
 
 #down_load_speed, up_load_speed = nvg_599_dut.run_speed_test_cli(test_ip)
+#exit()
+nvg_599_dut.ui_get_device_list()
+exit()
 tst_ping(nvg_599_dut,results_file,"192.168.1.239")
 #tst_speed_test(nvg_599_dut,results_file,"192.168.1.239")
 #test_dfs(nvg_599_dut,results_file)
 results_file.close()
 results_str = open('results_file.txt','r').read()
-nvg_599_dut.email_test_results1(results_str)
+nvg_599_dut.email_test_results(results_str)
 exit()
 
 
