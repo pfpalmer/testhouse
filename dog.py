@@ -146,34 +146,35 @@ def tst_speed_test(nvg_599_dut,results_file,test_ip):
     results_file.write("\n")
     results_file.write("\n")
 
-def tst_ping(nvg_599_dut,results_file, remote_ip):
+def tst_ping(nvg_599_dut,ping_history_file, remote_ip):
     print('in tst_ping')
+    ping_history_file  = open('ping_history_file.txt', 'a+')
+
     now = datetime.today().isoformat()
-    results_file.write("Test Title:tst_ping Execution time:")
-    results_file.write(now)
-    results_file.write("\n")
+    ping_history_file.write("Test Title:tst_ping Execution time:")
+    ping_history_file.write(now)
+    ping_history_file.write("\n")
     min,avg,max,mdev = nvg_599_dut.ping_from_local_host(remote_ip)
     min_str = 'Min time: '+ min
-    results_file.write(min_str)
+    ping_history_file.write(min_str)
 
-    results_file.write("\n")
+    ping_history_file.write("\n")
     avg_str = 'Avg time: '+ avg
-    results_file.write(avg_str)
+    ping_history_file.write(avg_str)
 
-    results_file.write("\n")
+    ping_history_file.write("\n")
     max_str = 'Max time:'+ max
-    results_file.write(max_str)
+    ping_history_file.write(max_str)
 
-    results_file.write("\n")
+    ping_history_file.write("\n")
     mdev_str = 'mdev time:'+ mdev
-    results_file.write(mdev_str)
+    ping_history_file.write(mdev_str)
 
-    results_file.write("\n")
+    ping_history_file.write("\n")
     print('min: ', min)
     print('avg: ', avg)
     print('max: ', max)
     print('mdev:',mdev)
-
 
 
 #--------------------------------------------------------------------
@@ -189,41 +190,41 @@ def tst_ping(nvg_599_dut,results_file, remote_ip):
 #mo1 = pingInfoRegEx.search(out)
 
 
+#results_file = open('results_file.txt', 'w+')
 
-#min = mo1.group(1)
-#exit()
 
-results_file = open('results_file.txt', 'w+')
-#nvg_599_dut = 599_nvg_init()
+# for now we are ssuming thatthe dut is a 599
 nvg_599_dut = Nvg599Class()
+
+nvg_599_dut.turn_off_supplicant_cli()
 #test_ip = "192.168.1.239"
+exit()
 
 #down_load_speed, up_load_speed = nvg_599_dut.run_speed_test_cli(test_ip)
-#exit()
+
 nvg_599_dut.ui_get_device_list()
 exit()
-tst_ping(nvg_599_dut,results_file,"192.168.1.239")
+
+
+#tst_ping(nvg_599_dut,results_file,"192.168.1.239")
 #tst_speed_test(nvg_599_dut,results_file,"192.168.1.239")
 #test_dfs(nvg_599_dut,results_file)
-results_file.close()
-results_str = open('results_file.txt','r').read()
-nvg_599_dut.email_test_results(results_str)
-exit()
-
-
-#nvg_599_dut.ui_get_wifi_info()
-#nvg_599_dut.factory_reset_rg()
-#nvg_599_dut.connect_to_console()f
-#nvg_599_dut.accessUIWiFiInfo()
+#results_file.close()
+#results_str = open('results_file.txt','r').read()
+#nvg_599_dut.email_test_results(results_str)
 #exit()
 
 
 
-return_dict1 = nvg_599_dut.getShWiClients()
+
+
+return_dict1 = nvg_599_dut.get_sh_wi_clients_cli()
 clientDictStr = pprint.pformat(return_dict1)
 print("1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 print(clientDictStr)
 print("2xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+
+exit()
 return_dict = nvg_599_dut.getRGShIPLanInfo()
 dict_str = pprint.pformat(return_dict)
 print(dict_str)
@@ -250,23 +251,21 @@ exit()
 #nvg599DUT.connectCLI('192.168.1.254')
 #nvg599DUT.printme()
 #rgSerialNumber = nvg599DUT.getRGSerialNumber()
-nvg_599_dut.loginNVG599()
+#nvg_599_dut.loginNVG599()
 #nvg599DUT.connectCLI("1")
 #nvg_599_dut.get4920IPFromUI()
-exit()
+#exit()
 
 
 
 
 
 
-nvg_599_dut.getdeviceInfoFromUI()
+#nvg_599_dut.getdeviceInfoFromUI()
 
-nvg_599_dut.turnOffSupplicant()
-
-print (' exit all loging in')
-
-exit()
+#nvg_599_dut.turn_off_supplicant_cli()
+#print (' exit all loging in')
+#exit()
 
 
 
