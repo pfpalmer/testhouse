@@ -26,6 +26,9 @@ from email.message import EmailMessage
 from datetime import datetime
 
 
+#  Apple path for wifi info
+#/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I
+
 nvg_info: Dict[str, Dict[str, str]] = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
                                      'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4',
                                      'wiFi': 'c2cmybt25dey', 'ssid': 'ATTqbrAnYs'},
@@ -34,13 +37,11 @@ nvg_info: Dict[str, Dict[str, str]] = {"228946241148656": {'model': 'nvg599', 'd
                                      'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
 
 
-NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
-DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
-
+NON_DFS_CHANNELS = {36, 40, 44, 48, 149, 153, 157, 161, 165}
+DFS_CHANNELS     = {52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144}
 
 
 class GatewayClass:
-
     def __init__(self):
         self.magic = None
         self.up_time = None
@@ -124,7 +125,7 @@ class Nvg599Class(GatewayClass):
         self.get_ui_system_information()
         self.device_access_code = nvg_info[self.serial_number]['device_access_code']
         print("in Nvg599Class__init")
-        self.init_info= True
+        self.init_info = True
         # self.webDriver.find_element_by_link_text("Settings").click()
 
     def ui_get_device_list(self):
@@ -141,9 +142,9 @@ class Nvg599Class(GatewayClass):
             try:
                 # header_text = table_row.th.text
                 # print("table_row header:" +  table_row.th.text + " table_td_text:" + table_row.td.text, end='')
-                print("table_row header:", end='')
+                print("table_row header:", end ='')
                 print(table_row.th.text, end='')
-                print( " table_td_text:", end='')
+                print(" table_td_text:", end='')
                 print(table_row.td.text, end='')
             # except NoSuchElementException:
             except AttributeError:
@@ -153,7 +154,7 @@ class Nvg599Class(GatewayClass):
         for table_rows in table.find_all("tr"):
             for row_header in table_rows:
                 td = row_header.find_all('td')
-                print("Name    ",td.text)
+                print("Name    ", td.text)
 
         exit()
 
@@ -196,11 +197,11 @@ class Nvg599Class(GatewayClass):
 
     def check_if_password_required(self):
         try:
-            #Select(browser.find_element_by_id("selectMonth")).select_by_visible_text("%s" % (month))
+            # Select(browser.find_element_by_id("selectMonth")).select_by_visible_text("%s" % (month))
             sleep(5)
             dac_access_challenge = self.session.find_element_by_link_text("Forgot your Access Code?")
             print('we found the request for password screen')
-            print('sending dac',self.device_access_code)
+            print('sending dac', self.device_access_code)
             dac_entry = self.session.find_element_by_id("password")
             dac_entry.send_keys(self.device_access_code)
             submit = self.session.find_element_by_name("Continue")
@@ -275,9 +276,9 @@ class Nvg599Class(GatewayClass):
 
 #            #print(mo1)
             print('state--------------------------------------------- ', show_wi_client_groups.group(1))
-            state2G = show_wi_client_groups.group(1)
+            state_2g = show_wi_client_groups.group(1)
             print('SSID--------------------------------------------- ', show_wi_client_groups.group(2))
-            SSID2G = show_wi_client_groups.group(2)
+            ssid_2g = show_wi_client_groups.group(2)
             print('PSMOD--------------------------------------------- ', show_wi_client_groups.group(3))
             PSMOD2G = show_wi_client_groups.group(3)
             print('NMMOD--------------------------------------------- ', show_wi_client_groups.group(4))
@@ -300,8 +301,8 @@ class Nvg599Class(GatewayClass):
             rssi2G = show_wi_client_groups.group(12)
 
             self.showWiClientsDict[mac_2g] = {}
-            self.showWiClientsDict[mac_2g]["State"] = state2G
-            self.showWiClientsDict[mac_2g]["SSID"] = SSID2G
+            self.showWiClientsDict[mac_2g]["State"] = state_2g
+            self.showWiClientsDict[mac_2g]["SSID"] = ssid_2g
             self.showWiClientsDict[mac_2g]["PSMOD"] = PSMOD2G
             self.showWiClientsDict[mac_2g]["NMMOD"] = NMMOD2G
             self.showWiClientsDict[mac_2g]["Rate"] = Rate2G
@@ -347,7 +348,7 @@ class Nvg599Class(GatewayClass):
         print("duration in seconds:", end - start)
         sleep(2)
 
-    def get_ui_home_network_status_value(self,value_requested):
+    def get_ui_home_network_status_value(self, value_requested):
         print('in get_ui_home_network_status_value)')
         global nvg_info
         # ui_channel_5g = None
@@ -357,7 +358,7 @@ class Nvg599Class(GatewayClass):
         # we need the serial number to refernce the DAC which is in our local dicitonary
         # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
         self.device_access_code = nvg_info[self.serial_number]['device_access_code']
-        print("dac",self.device_access_code)
+        print("dac", self.device_access_code)
         # url = 'http://192.168.1.254/cgi-bin/wconfig.ha'
         # url = 'http://192.168.1.254/'
         # session = webdriver.Chrome()
@@ -366,10 +367,10 @@ class Nvg599Class(GatewayClass):
         status_link = self.session.find_element_by_link_text("Home Network")
         status_link.click()
         sleep(2)
-        #self.session = session
-        #status_link = browser.find_element_by_link_text("Status")
-        #status_link.click()
-        #sleep(2)
+        # self.session = session
+        # status_link = browser.find_element_by_link_text("Status")
+        # status_link.click()
+        # sleep(2)
         soup = BeautifulSoup(self.session.page_source, 'html.parser')
         tables = soup.findChildren('table')
 # five tables on this page
@@ -769,15 +770,15 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.expect(">")
         return self.telnet_cli_session
 
-    def login_4920(self,ip_4920):
-        print('In  login_4920')
-        self.telnet_cli_session = pexpect.spawn("telnet" + ip_4920, encoding='utf-8')
-        self.telnet_cli_session.expect("ogin:")
-        self.telnet_cli_session.sendline('root')
-        self.telnet_cli_session.expect("#")
-        self.telnet_cli_session.sendline('<<01%//4&/')
-        self.telnet_cli_session.expect(">")
-        return telnet_cli_session.session
+#    def login_4920(self,ip_4920):
+#        print('In login_4920')
+#        self.telnet_cli_session = pexpect.spawn("telnet" + ip_4920, encoding='utf-8')
+#        self.telnet_cli_session.expect("ogin:")
+#        self.telnet_cli_session.sendline('root')
+#        self.telnet_cli_session.expect("#")
+#        self.telnet_cli_session.sendline('<<01%//4&/')
+#        self.telnet_cli_session.expect(">")
+#        return telnet_cli_session
     
     def connect_cli(self, ip):
         self.IP = ip
@@ -804,9 +805,7 @@ class Nvg599Class(GatewayClass):
         self.upTime = mo1.group(1)
         self.session.close()
 
-
     def setup_tr69_url(self):
-
         self.session = self.login_nvg_599_cli()
         self.session.sendline('magic')
         self.session.expect("UNLOCKED>")
