@@ -118,17 +118,25 @@ class Nvg599Class(GatewayClass):
         super(self.__class__, self).__init__()
         self.ip = "192.168.1.254"
         self.device_access_code = None
-        self.model_number = None
+        self.model = None
         self.session = None
         self.init_info = False
         self.telnet_cli_session = None
         global nvg_info
         # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
+        print("Device Access Code:", self.device_access_code)
+        self.software_version = None
+        self.mac_address = None
+        self.last_reboot_time = None
+        self.current_date = None
+        self.hardware_version = None
+        self.serial_number = None
+        self.ip_lan_connections_dict_cli = {}
+
         self.get_ui_system_information()
         self.device_access_code = nvg_info[self.serial_number]['device_access_code']
         print("in Nvg599Class__init")
         self.init_info = True
-        # self.webDriver.find_element_by_link_text("Settings").click()
 
     def ui_get_device_list(self):
         global nvg_info
@@ -144,10 +152,10 @@ class Nvg599Class(GatewayClass):
             try:
                 # header_text = table_row.th.text
                 # print("table_row header:" +  table_row.th.text + " table_td_text:" + table_row.td.text, end='')
-                print("table_row header:",end ='')
-                print(table_row.th.text,end= '')
-                print(" table_td_text:",end= '')
-                print(table_row.td.text,end='')
+                print("table_row header:", end='')
+                print(table_row.th.text, end='')
+                print(" table_td_text:", end='')
+                print(table_row.td.text, end='')
             # except NoSuchElementException:
             except AttributeError:
                 print('--------------------------------\n')
@@ -214,22 +222,25 @@ class Nvg599Class(GatewayClass):
             pass
 
     def get_sh_wi_clients_cli(self):
-        session = self.login_nvg_599_cli()
+        self.session = self.login_nvg_599_cli()
         self.session.sendline("show wi clients")
         self.session.expect('>')
-        shWiClientsOutput = self.session.before
+        sh_wi_clients_output = self.session.before
+        # shWiClientsOutput = self.session.before
+
         print("-------------------------------------")
-        #shWifiClinetRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
+        # shWifiClinetRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
         # need to consider the case where there is no entries either in the 2.$GHZ, the 5GHZ oe both
         # the regex returns all the chars before the match and all the chars including the "CLients connected at 5GH" and after
-        shWifiClinetRegEx = re.compile(r'(^.*?)(Clients connected on 5.0 GHz.*)',re.DOTALL)
-        print(shWiClientsOutput)
-        mo1 = shWifiClinetRegEx.search(shWiClientsOutput)
+        # shWifiClinetRegEx = re.compile(r'(^.*?)(Clients connected on 5.0 GHz.*)',re.DOTALL)
+        sh_wifi_client_reg_ex = re.compile(r'(^.*?)(Clients connected on 5.0 GHz.*)',re.DOTALL)
+        print(sh_wi_clients_output)
+        mo1 = sh_wifi_client_reg_ex.search(sh_wi_clients_output)
         print(mo1)
         print('2.4G ', mo1.group(1))
         print('------------------------------------------------------')
         print('5G ', mo1.group(2))
-        g5_string= mo1.group(2)
+        g5_string = mo1.group(2)
         g2_string = mo1.group(1)
         # G2RegEx = re.compile(r'([0-9a-fA-F]:?){12}', re.DOTALL)
         g2_reg_ex = re.compile(r'(?:[0-9a-fA-F]:?){12}.*?\n.*\n.*\n.*\n')
@@ -239,7 +250,7 @@ class Nvg599Class(GatewayClass):
 
         number_of_g2_entries = len(g2_string_list)
         print("--------------------------------------the 2g list has :", number_of_g2_entries)
-        my_range = range(0,number_of_g2_entries)
+        my_range = range(0, number_of_g2_entries)
 
         for i in my_range:
             print("entrie:", g2_string_list[i])
@@ -580,10 +591,10 @@ class Nvg599Class(GatewayClass):
         for th in this:
             if th.text == "Model Number":
                 print("model:", th.next_sibling.next_sibling.text)
-                self.model_number = th.next_sibling.next_sibling.text
+                self.model = th.next_sibling.next_sibling.text
             if th.text == "Serial Number":
                 self.serial_number = th.next_sibling.next_sibling.text
-                print ("serial Number is:", self.serial_number)
+                print("serial Number is:", self.serial_number)
                 # print ("nvg serial number dict",nvg_info[self.serial_number])
                 # print("nvg access code", nvg_info[self.serial_number]['device_access_code'])
                 # tmp_dac = nvg_info[self.serial_number]['device_access_code']
@@ -613,21 +624,20 @@ class Nvg599Class(GatewayClass):
 # InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.BSSID fc:51:a4:2f:25:94
 # InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.AutoChannelEnable 0
 # InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_BandLock X_0000   C5_5.0GHz
-
-
 # tr69 GetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth
 # tr69 SetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth=X_0000C5_80MHz
 # tr69 SetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth=X_0000C5_40MHz
 # InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth X_0000C5_80MH
 
-    def channelTest(self,b2G,b5G,bw2G,bw5G):
-        for ib2G in b2G:
-            for ib5G in b5G:
-                for ibw in b2G:
-                    print("2G:" + ib2G + " 5G:" + ib5G + "bandwidth" + ibw)
+    def channel_test(self, b2g, b5g, bw2g, bw5g):
+        for ib2g in b2g:
+            for ib5G in b5g:
+                for ibw in b2g:
+                    print("2G:" + ib2g + " 5G:" + ib5G + "bandwidth" + ibw)
 
+# not sure we want to open a new session
     def get_4920_inf_from_ui(self):
-        global nvgInfo
+        global nvg_info
         url = 'http://192.168.1.254/cgi-bin/devices.ha'
         browser = webdriver.Chrome()
         browser.get(url)
@@ -637,15 +647,13 @@ class Nvg599Class(GatewayClass):
         for th in this:
             if th.text == "IPv4 Address / Name":
                 # print(th.next_sibling.next_sibling.text)
-                print("Name    ",th.text)
-                print("Name1",th.next_sibling.text)
+                print("Name    ", th.text)
+                print("Name1", th.next_sibling.text)
             else:
                 print("no derp")
 
-        sleep(5)
-
-        browser.quit()
-
+        # sleep(5)
+        # browser.quit()
 
 #    def get_sn_from_ui(self):
 #         self.webDriver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
@@ -654,7 +662,7 @@ class Nvg599Class(GatewayClass):
 #        self.webDriver.implicitly_wait(20)
         # driver.find_elements_by_tag_name("Settings") // this is for 599
 
-    def run_speed_test_cli(self,speed_test_ip):
+    def run_speed_test_cli(self, speed_test_ip):
 
         print('in run_speedtest_cli')
         # speed_test_ip = "192.168.1.255"
@@ -662,17 +670,19 @@ class Nvg599Class(GatewayClass):
         # print (ddd)
         # exit()
         # ssh_session = pexpect.spawn("ssh arris@192.168.1.239", encoding='utf-8',timeout=120)
-        ssh_session = pexpect.spawn("ssh arris@" + speed_test_ip, encoding='utf-8',timeout=120)
+        ssh_session = pexpect.spawn("ssh arris@" + speed_test_ip, encoding='utf-8', timeout=120)
 
         ssh_session.expect("ord:")
         ssh_session.sendline('arris123')
         print('after sendline\n')
-        ssh_session.expect("\$")
-        print('1',ssh_session.before)
+        ssh_session.expect("$")
+        print('1', ssh_session.before)
         sleep(2)
 
         ssh_session.sendline('date')
-        ssh_session.expect("\$")
+        self.device_access_code = None
+
+        ssh_session.expect("$")
         print('2', ssh_session.before)
 
         ssh_session.sendline('speedtest-cli')
@@ -688,9 +698,8 @@ class Nvg599Class(GatewayClass):
         print(speed_test_groups.group(1))
         print(speed_test_groups.group(2))
         down_load_speed = speed_test_groups.group(1)
-        up_load_speed  = speed_test_groups.group(2)
-        return down_load_speed,up_load_speed
-
+        up_load_speed = speed_test_groups.group(2)
+        return down_load_speed, up_load_speed
         # exit()
         # statusInfoRegEx = re.compile(r'Model\s(\w+)')
         # mo1 = statusInfoRegEx.search(statusOutput)
@@ -703,38 +712,36 @@ class Nvg599Class(GatewayClass):
         # end = time.time()
         # print(end - start)
 
-    def ping_from_local_host(self,remote_ip):
+    def ping_from_local_host(self, remote_ip):
         print('in ping_test')
         # out = subprocess.Popen("ping  -c3 localhost",stdout=subprocess.PIPE,stderr=subprocess.STDOUT, shell=True)
         # out = subprocess.Popen(["ping ", "-c3"," localhost"], stdout=subprocess.PIPE)
         # out, err = out.communicate()
         # out = check_output(["ping ", "-c3 ", "localhost"]).decode("utf-8")
         # out = check_output(["ls -la"].decode("utf-8").shell=True)
-        out = subprocess.check_output("ping -c10 " + remote_ip ,shell = True).decode("utf-8")
+        out = subprocess.check_output("ping -c10 " + remote_ip, shell=True).decode("utf-8")
         # cmd = 'ping -c1 192.168.1.254'
         # result = os.system(cmd)
         # pprint('resut from ping pipe',(out.communicate()))
-        print('out===========\n',out)
+        print('out===========\n', out)
         print('endout1===========\n')
         # exit()
         # pingInfoRegEx = re.compile(r'.*=\s(\w+)/(\w+)/(\w+)/(\w+)',re.DOTALL)
-        pingInfoRegEx = re.compile(r'rtt.*?=\s(\d+\.\d+)/(\d+\.\d+)/(\d+\.\d+)/(\d+\.\d+)')
-
-        #pingInfoRegEx = re.compile(r'.*?rtt/s+=/s+(/d+/./d+)',re.DOTALL)
-
-        mo1 = pingInfoRegEx.search(out)
+        ping_info_reg_ex = re.compile(r'rtt.*?=\s(\d+\.\d+)/(\d+\.\d+)/(\d+\.\d+)/(\d+\.\d+)')
+        # pingInfoRegEx = re.compile(r'.*?rtt/s+=/s+(/d+/./d+)',re.DOTALL)
+        mo1 = ping_info_reg_ex.search(out)
         # print('mo1',mo1)
         minimum = mo1.group(1)
-        print('mnext--just a value', min)
-        minimum = mo1.group(1)
-        avg = mo1.group(2)
-        max = mo1.group(3)
-        mdev = mo1.group(4)
-        return minimum,avg, max, mdev
+        print('mnext--just a value', minimum)
+        min_ping = mo1.group(1)
+        avg_ping = mo1.group(2)
+        max_ping = mo1.group(3)
+        mdev_ping = mo1.group(4)
+        return min_ping, avg_ping, max_ping, mdev_ping
 
     def connect_to_console(self):
         print('in connect_to_console')
-        cmd =' ping -c1 192.168.1.254'
+        cmd = ' ping -c1 192.168.1.254'
         result = os.system(cmd)
         print('result:', result)
         start = time.time()
@@ -775,8 +782,8 @@ class Nvg599Class(GatewayClass):
 #        return telnet_cli_session
     
     def connect_cli(self, ip):
-        self.IP = ip
-        #cls.ssh = pexpect.spawn('ssh ' + name)
+        self.ip = ip
+        # cls.ssh = pexpect.spawn('ssh ' + name)
         print('in connect_cli')
         session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
         session.expect("ogin:")
@@ -786,17 +793,18 @@ class Nvg599Class(GatewayClass):
         session.expect(">")
         session.sendline('status')
         session.expect('>')
-        statusOutput = session.before
-        statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
-            # statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
-            # statusInfoRegEx = re.compile(r'Model\s(\w+)')
-        mo1 = statusInfoRegEx.search(statusOutput)
+        status_output = session.before
+        status_info_reg_ex = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)', re.DOTALL)
+        # statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
+        # statusInfoRegEx = re.compile(r'Model\s(\w+)')
+        mo1 = status_info_reg_ex.search(status_output)
         print(mo1)
-        print('model ', mo1.group(1))
-        print('Serial Number', mo1.group(2))
-        print('Uptime ', mo1.group(3))
-        self.serialNumber =  mo1.group(2)
-        self.upTime = mo1.group(1)
+        print('Model: ', mo1.group(1))
+        print('Serial Number:', mo1.group(2))
+        print('Uptime: ', mo1.group(3))
+        self.model = mo1.group(1)
+        self.serial_number = mo1.group(2)
+        self.up_time = mo1.group(3)
         self.session.close()
 
     def setup_tr69_url(self):
@@ -804,7 +812,7 @@ class Nvg599Class(GatewayClass):
         self.session.sendline('magic')
         self.session.expect("UNLOCKED>")
         self.session.sendline('conf')
-        self.session.expect("top\)>>")
+        self.session.expect("top)>>")
         self.session.sendline('manage cwmp')
         self.session.expect(")>>")
         self.session.sendline('set')
@@ -842,105 +850,93 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect("UNLOCKED>")
-        print('turning on ssh')
+        print('turning on ssh via tr69 cli command')
         self.telnet_cli_session.sendline('tr69 set InternetGatewayDevice.X_0000C5_Debug.SshdEnabled=1')
         self.telnet_cli_session.expect("successful.*>")
         self.telnet_cli_session.sendline('conf')
-        self.telnet_cli_session.expect("top\)>>")
+        self.telnet_cli_session.expect("top)>>")
         self.telnet_cli_session.sendline('system supplicant')
         self.telnet_cli_session.expect("\(system supplicant\)>>")
-        #self.session.expect(">>")
+        # self.session.expect(">>")
         self.telnet_cli_session.sendline('set')
         self.telnet_cli_session.expect("]:")
         self.telnet_cli_session.sendline('off')
         self.telnet_cli_session.expect("\(system supplicant\)>>")
         self.telnet_cli_session.sendline('save')
-            # should check for "Configuration data saved.  as well
-            # NOS/277427577103760 (system supplicant)>>
-        self.telnet_cli_session.expect("\(system supplicant\)>>")
+        # should check for "Configuration data saved.  as well
+        # NOS/277427577103760 (system supplicant)>>
+        self.telnet_cli_session.expect("(system supplicant)>>")
         self.telnet_cli_session.sendline('exit')
         self.telnet_cli_session.expect("UNLOCKED>")
         self.telnet_cli_session.sendline('exit all')
         print('telnet_cli turned off system supplicant')
-        self.telnet_cli_session.close()
-
-    def print_me(self):
-        print('I am an NVG599 object')
+        # self.telnet_cli_session.close()
 
     def get_rg_serial_number_cli(self):
         self.login_nvg_599_cli()
-        self.telnet_cli.sendline('status')
-        self.telnet_cli.expect('>')
-        statusOutput = self.session.before
+        self.telnet_cli_session.sendline('status')
+        self.telnet_cli_session.expect('>')
+        status_output = self.session.before
         print('Getting getSerialnumber')
-        statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',
-                                     re.DOTALL)
+        status_info_reg_ex = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)', re.DOTALL)
         # statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
         # statusInfoRegEx = re.compile(r'Model\s(\w+)')
-        mo1 = statusInfoRegEx.search(statusOutput)
-        # print(mo1)
+        mo1 = status_info_reg_ex.search(status_output)
         # print('model ', mo1.group(1))
-
         # print('Serial Number', mo1.group(2))
         # print('Uptime ', mo1.group(3))
         return mo1.group(2)
 
     def get_rg_sh_ip_lan_info_cli(self):
         # session=self.login_nvg_599_cli()
-        self.telnet_cli.sendline("show ip lan")
+        self.telnet_cli_session. sendline("show ip lan")
         self.session.expect('>')
-        ipLanOutput = self.session.before
-        ipLanOutput = ipLanOutput.split('\n\r')
+        ip_lan_output = self.session.before
+        ip_lan_output = ip_lan_output.split('\n\r')
         print("-------------------------------------")
-        count = len(ipLanOutput)
+        lan_output_count = len(ip_lan_output)
 
         # discard first two lines of the output
-        print("count",count)
-        ipLanOutput = ipLanOutput[2:-1]
+        print("count", lan_output_count)
+        ip_lan_output = ip_lan_output[2:-1]
         # I think the length minus 1 is what we want // need to check this
-        for i  in range(len(ipLanOutput)):
+        for i in range(len(ip_lan_output)):
             # print("input line:", ipLanOutput[i])
             # mo1 = statusInfoRegEx.match(ipLanOutput[i])
-            ipLanOutputSplit = (ipLanOutput[i]). split()
+            ip_lan_output_split = (ip_lan_output[i]).split()
             # print ("connectedDeviceName",ipLanOutputSplit[0])
             # self.connectedDeviceName = ipLanOutputSplit[0]
-            connectedDeviceName = ipLanOutputSplit[0]
-
+            connected_device_name = ip_lan_output_split[0]
             # if "ATT_4920" in ipLanOutputSplit[0]:
             #    print("this is an airties device!")
-            print ("connectedDeviceIP", ipLanOutputSplit[1])
-            connectedDeviceIP = ipLanOutputSplit[1]
-
-            print ("connectedDeviceMac",ipLanOutputSplit[2])
-            connectedDeviceMac = ipLanOutputSplit[2]
-            print ("connectedDeviceStatus",ipLanOutputSplit[3])
-            connectedDeviceStatus = ipLanOutputSplit[3]
-            print ("connectedDeviceDHCP",ipLanOutputSplit[4])
-            connectedDeviceDHCP = ipLanOutputSplit[4]
-            print ("connectedDeviceSSIDNumber",ipLanOutputSplit[5])
-            connectedDeviceSSIDNumber = ipLanOutputSplit[5]
-            #self.showIPLanDict[connectedDeviceName] = {}
-            self.showIPLanDict[connectedDeviceMac] = {}
-
-            self.showIPLanDict[connectedDeviceMac]["IP"] = connectedDeviceIP
-            self.showIPLanDict[connectedDeviceMac]["Name"] = connectedDeviceName
-            self.showIPLanDict[connectedDeviceMac]["Status"] = connectedDeviceStatus
-            self.showIPLanDict[connectedDeviceMac]["DHCP"] = connectedDeviceDHCP
-            self.showIPLanDict[connectedDeviceMac]["SSIDNumber"] = connectedDeviceSSIDNumber
+            print("connectedDeviceIP", ip_lan_output_split[1])
+            connected_device_ip = ip_lan_output_split[1]
+            print("connected_device_mac", ip_lan_output_split[2])
+            connected_device_mac = ip_lan_output_split[2]
+            print("connectedDeviceStatus", ip_lan_output_split[3])
+            connected_device_status = ip_lan_output_split[3]
+            print("connectedDeviceDHCP", ip_lan_output_split[4])
+            connected_device_dhcp = ip_lan_output_split[4]
+            print("connectedDeviceSSIDNumber", ip_lan_output_split[5])
+            connected_device_ssid_number = ip_lan_output_split[5]
+            # This dict uses the mac as the primary key
+            self.ip_lan_connections_dict_cli[connected_device_mac] = {}
+            self.ip_lan_connections_dict_cli[connected_device_mac]["IP"] = connected_device_ip
+            self.ip_lan_connections_dict_cli[connected_device_mac]["Name"] = connected_device_name
+            self.ip_lan_connections_dict_cli[connected_device_mac]["Status"] = connected_device_status
+            self.ip_lan_connections_dict_cli[connected_device_mac]["DHCP"] = connected_device_dhcp
+            self.ip_lan_connections_dict_cli[connected_device_mac]["SSIDNumber"] = connected_device_ssid_number
             self.session.close()
-        return self.showIPLanDict
-
+        return self.ip_lan_connections_dict_cli
 
     def login(self):
         pass
 
-class Nvg5268Class(GatewayClass):
+class Nvg_5268_Class(GatewayClass):
     def __init__(self):
-        self.name="abc"
-        rg5268 = pexpect.spawn("telnet 192.168.1.254")
+        self.name = "Nvg_5268"
+        # rg5268 = pexpect.spawn("telnet 192.168.1.254")
         sleep(1)
 
 
-class airTies4920():
-    pass
 
