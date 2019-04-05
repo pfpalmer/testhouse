@@ -229,7 +229,7 @@ class Nvg599Class(GatewayClass):
         print('2.4G ', mo1.group(1))
         print('------------------------------------------------------')
         print('5G ', mo1.group(2))
-        G5String= mo1.group(2)
+        g5_string= mo1.group(2)
         g2_string = mo1.group(1)
         # G2RegEx = re.compile(r'([0-9a-fA-F]:?){12}', re.DOTALL)
         g2_reg_ex = re.compile(r'(?:[0-9a-fA-F]:?){12}.*?\n.*\n.*\n.*\n')
@@ -238,7 +238,7 @@ class Nvg599Class(GatewayClass):
         g2_string_list = re.findall(g2_reg_ex, g2_string)
 
         number_of_g2_entries = len(g2_string_list)
-        print("--------------------------------------the 2g list has :",number_of_g2_entries)
+        print("--------------------------------------the 2g list has :", number_of_g2_entries)
         my_range = range(0,number_of_g2_entries)
 
         for i in my_range:
@@ -445,11 +445,10 @@ class Nvg599Class(GatewayClass):
 #       advancedOptionsLink.click()
 #       sleep(20)
 #       browser.quit()
-# we need the band (2g or 5g) because both bands could be automatic which would be ambiguous
-#nvg_599_dut.ui_set_bw_channel('g2', 40, 2)
+#        we need the band (2g or 5g) because both bands could be automatic which would be ambiguous
+#        nvg_599_dut.ui_set_bw_channel('g2', 40, 2)
 
-
-    def ui_set_band_bandwith_channel(self,band,bandwidth,channel):
+    def ui_set_band_bandwith_channel(self, band, bandwidth, channel):
         global nvg_info
 
         # band_selected = band
@@ -478,7 +477,7 @@ class Nvg599Class(GatewayClass):
         wifi_link.click()
 
         # handle being asked for password
-        #self.session = self.check_if_password_required()
+        # self.session = self.check_if_password_required()
         self.check_if_password_required()
 
         sleep(10)
@@ -490,19 +489,19 @@ class Nvg599Class(GatewayClass):
         if band == '2g':
             bandwidth_select = self.session.find_element_by_id("obandwidth")
             print('found obandwidth')
-            print('bandwidth',bandwidth)
-            #bandwidth_select.select_by_value(bandwidth)
+            print('bandwidth', bandwidth)
+            # bandwidth_select.select_by_value(bandwidth)
             for option in bandwidth_select.find_elements_by_tag_name('option'):
                 if option.text == bandwidth:
-                   option.click()
+                    option.click()
 
             channel_select = self.session.find_element_by_id("ochannelplusauto")
             print('found ochannel')
-            print('channel',channel)
-            #bandwidth_select.select_by_value(bandwidth)
+            print('channel', channel)
+            # bandwidth_select.select_by_value(bandwidth)
             for option in channel_select.find_elements_by_tag_name('option'):
                 if option.text == channel:
-                   option.click()
+                    option.click()
 
         if band == '5g':
             bandwidth_select = self.session.find_element_by_id("tbandwidth")
@@ -542,7 +541,7 @@ class Nvg599Class(GatewayClass):
 
         handles = session.window_handles
         size = len(handles)
-        print('size:',size)
+        print('size:', size)
 
         for x in range(size):
             session.switch_to.window(handles[x])
@@ -565,7 +564,6 @@ class Nvg599Class(GatewayClass):
         # except NoSuchElementException:
         #   pass
 
-
     def get_ui_system_information(self):
         print('in get_ui_system_information)')
         global nvg_info
@@ -585,13 +583,13 @@ class Nvg599Class(GatewayClass):
                 self.model_number = th.next_sibling.next_sibling.text
             if th.text == "Serial Number":
                 self.serial_number = th.next_sibling.next_sibling.text
-                print ("serial Number is:",self.serial_number)
+                print ("serial Number is:", self.serial_number)
                 # print ("nvg serial number dict",nvg_info[self.serial_number])
                 # print("nvg access code", nvg_info[self.serial_number]['device_access_code'])
                 # tmp_dac = nvg_info[self.serial_number]['device_access_code']
                 # self.device_access_code = tmp_dac
                 self.device_access_code = nvg_info[self.serial_number]['device_access_code']
-                print("dac is:",self.device_access_code)
+                print("dac is:", self.device_access_code)
             if th.text == "Software Version":
                 print(th.next_sibling.next_sibling.text)
                 self.software_version = th.next_sibling.next_sibling.text
@@ -638,7 +636,7 @@ class Nvg599Class(GatewayClass):
         this = soup.find_all('th')
         for th in this:
             if th.text == "IPv4 Address / Name":
-                #print(th.next_sibling.next_sibling.text)
+                # print(th.next_sibling.next_sibling.text)
                 print("Name    ",th.text)
                 print("Name1",th.next_sibling.text)
             else:
@@ -659,11 +657,11 @@ class Nvg599Class(GatewayClass):
     def run_speed_test_cli(self,speed_test_ip):
 
         print('in run_speedtest_cli')
-        #speed_test_ip = "192.168.1.255"
-        #ddd = f"{speed_test_ip} is a test"
-        #print (ddd)
-        #exit()
-        #ssh_session = pexpect.spawn("ssh arris@192.168.1.239", encoding='utf-8',timeout=120)
+        # speed_test_ip = "192.168.1.255"
+        # ddd = f"{speed_test_ip} is a test"
+        # print (ddd)
+        # exit()
+        # ssh_session = pexpect.spawn("ssh arris@192.168.1.239", encoding='utf-8',timeout=120)
         ssh_session = pexpect.spawn("ssh arris@" + speed_test_ip, encoding='utf-8',timeout=120)
 
         ssh_session.expect("ord:")
@@ -681,27 +679,21 @@ class Nvg599Class(GatewayClass):
         sleep(10)
         # ssh_session.expect(".*Mbits.*Mbits\/s")
         ssh_session.sendline()
-        ssh_session.expect("\$")
-        print('3',ssh_session.before)
-
+        ssh_session.expect("$")
+        print('3', ssh_session.before)
         speed_test_ouput = ssh_session.before
-
         # speed_test_regex = re.compile(r'.*Download:\s+(\w+)\s+.*Upload:\s+(\w+)',re.DOTALL)
-        speed_test_regex = re.compile(r'(Download:\s+\w+\.\w+\s+\w+).*(Upload:\s+\w+\.\w+\s+\w+)',re.DOTALL)
-
+        speed_test_regex = re.compile(r'(Download:\s+\w+\.\w+\s+\w+).*(Upload:\s+\w+\.\w+\s+\w+)', re.DOTALL)
         speed_test_groups = speed_test_regex.search(speed_test_ouput)
         print(speed_test_groups.group(1))
         print(speed_test_groups.group(2))
         down_load_speed = speed_test_groups.group(1)
         up_load_speed  = speed_test_groups.group(2)
-
         return down_load_speed,up_load_speed
 
         # exit()
         # statusInfoRegEx = re.compile(r'Model\s(\w+)')
         # mo1 = statusInfoRegEx.search(statusOutput)
-
-
         # print('in_speedtest_cli')
         # cmd='ping -c1 192.168.1.254'
         # result = os.system(cmd)
@@ -738,13 +730,13 @@ class Nvg599Class(GatewayClass):
         avg = mo1.group(2)
         max = mo1.group(3)
         mdev = mo1.group(4)
-        return minimum,avg,max,mdev
+        return minimum,avg, max, mdev
 
     def connect_to_console(self):
-        print('I am in console')
+        print('in connect_to_console')
         cmd =' ping -c1 192.168.1.254'
         result = os.system(cmd)
-        print ('result:',result)
+        print('result:', result)
         start = time.time()
         print("hello")
         end = time.time()
@@ -886,16 +878,15 @@ class Nvg599Class(GatewayClass):
         # statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
         # statusInfoRegEx = re.compile(r'Model\s(\w+)')
         mo1 = statusInfoRegEx.search(statusOutput)
-        #print(mo1)
-        #print('model ', mo1.group(1))
+        # print(mo1)
+        # print('model ', mo1.group(1))
 
-        #print('Serial Number', mo1.group(2))
-        #print('Uptime ', mo1.group(3))
+        # print('Serial Number', mo1.group(2))
+        # print('Uptime ', mo1.group(3))
         return mo1.group(2)
 
     def get_rg_sh_ip_lan_info_cli(self):
-        #session=self.login_nvg_599_cli()
-        # I think these should all be telnet cli
+        # session=self.login_nvg_599_cli()
         self.telnet_cli.sendline("show ip lan")
         self.session.expect('>')
         ipLanOutput = self.session.before
