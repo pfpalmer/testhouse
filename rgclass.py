@@ -27,7 +27,7 @@ from datetime import datetime
 
 
 #  Apple path for wifi info
-#/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I
+# /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I
 
 nvg_info: Dict[str, Dict[str, str]] = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
                                      'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4',
@@ -112,11 +112,13 @@ class GatewayClass:
         except:
             print('failed to send email')
 
+
 class Nvg599Class(GatewayClass):
     def __init__(self):
         super(self.__class__, self).__init__()
         self.ip = "192.168.1.254"
         self.device_access_code = None
+        self.model_number = None
         self.session = None
         self.init_info = False
         self.telnet_cli_session = None
@@ -142,10 +144,10 @@ class Nvg599Class(GatewayClass):
             try:
                 # header_text = table_row.th.text
                 # print("table_row header:" +  table_row.th.text + " table_td_text:" + table_row.td.text, end='')
-                print("table_row header:", end ='')
-                print(table_row.th.text, end='')
-                print(" table_td_text:", end='')
-                print(table_row.td.text, end='')
+                print("table_row header:",end ='')
+                print(table_row.th.text,end= '')
+                print(" table_td_text:",end= '')
+                print(table_row.td.text,end='')
             # except NoSuchElementException:
             except AttributeError:
                 print('--------------------------------\n')
@@ -228,12 +230,12 @@ class Nvg599Class(GatewayClass):
         print('------------------------------------------------------')
         print('5G ', mo1.group(2))
         G5String= mo1.group(2)
-        G2string = mo1.group(1)
+        g2_string = mo1.group(1)
         # G2RegEx = re.compile(r'([0-9a-fA-F]:?){12}', re.DOTALL)
-        G2RegEx = re.compile(r'(?:[0-9a-fA-F]:?){12}.*?\n.*\n.*\n.*\n')
+        g2_reg_ex = re.compile(r'(?:[0-9a-fA-F]:?){12}.*?\n.*\n.*\n.*\n')
         # G2RegEx = re.compile(r'(\w\w:\w\w:\w\w:\w\w:\w\w:\w\w.*?)*', re.DOTALL)
         # mo1 = G2RegEx.findall(G2string)
-        g2_string_list = re.findall(G2RegEx,G2string)
+        g2_string_list = re.findall(g2_reg_ex, g2_string)
 
         number_of_g2_entries = len(g2_string_list)
         print("--------------------------------------the 2g list has :",number_of_g2_entries)
@@ -250,7 +252,7 @@ class Nvg599Class(GatewayClass):
 # showWiClientsRegEx = re.compile(r'.*State=(\w+).*SSID=(\w+).*PSMod=(\w+).*NMode=(\w+).*Rate=(\w+\s\w+)',re.DOTALL)
             showWiClientsRegEx = re.compile(r'.*State=(\w+).*SSID=(\w+).*PSMod=(\w+).*NMode=(\w+).*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+).*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)',re.DOTALL)
 #     r'.*ON for (\w+).*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=(\w+\s\w+)',re.DOTALL)
-#showWiClientsRegEx = re.compile((r'.*State=(\w+).*SSID=(\w+).*PSMOD=(\w+)'),re.DOTALL|re.DOTALL)
+# showWiClientsRegEx = re.compile((r'.*State=(\w+).*SSID=(\w+).*PSMOD=(\w+)'),re.DOTALL|re.DOTALL)
 
             print(g2_string_list[i])
             g2_string_list_split = g2_string_list[i].split()
@@ -280,39 +282,39 @@ class Nvg599Class(GatewayClass):
             print('SSID--------------------------------------------- ', show_wi_client_groups.group(2))
             ssid_2g = show_wi_client_groups.group(2)
             print('PSMOD--------------------------------------------- ', show_wi_client_groups.group(3))
-            PSMOD2G = show_wi_client_groups.group(3)
+            psmod_2g = show_wi_client_groups.group(3)
             print('NMMOD--------------------------------------------- ', show_wi_client_groups.group(4))
-            NMMOD2G = show_wi_client_groups.group(4)
+            nmmod_2g = show_wi_client_groups.group(4)
             print('Rate--------------------------------------------- ', show_wi_client_groups.group(5))
-            Rate2G= show_wi_client_groups.group(5)
+            rate_2g = show_wi_client_groups.group(5)
             print('on--------------------------------------------- ', show_wi_client_groups.group(6))
-            uptime2G = show_wi_client_groups.group(6)
+            uptime_2g = show_wi_client_groups.group(6)
             print('txpkt--------------------------------------------- ', show_wi_client_groups.group(7))
-            txpkt2G = show_wi_client_groups.group(7)
+            txpkt_2g = show_wi_client_groups.group(7)
             print('txerr--------------------------------------------- ', show_wi_client_groups.group(8))
-            txerr2G = show_wi_client_groups.group(8)
+            txerr_2g = show_wi_client_groups.group(8)
             print('rxuni-------------------------------------------- ', show_wi_client_groups.group(9))
-            rxuni2G  = show_wi_client_groups.group(9)
+            rxuni_2g = show_wi_client_groups.group(9)
             print('rxmul--------------------------------------------- ', show_wi_client_groups.group(10))
-            rxmul2G = show_wi_client_groups.group(10)
+            rxmul_2g = show_wi_client_groups.group(10)
             print('rxerr--------------------------------------------- ', show_wi_client_groups.group(11))
-            rxerr2G = show_wi_client_groups.group(11)
+            rxerr_2g = show_wi_client_groups.group(11)
             print('rssi--------------------------------------------- ', show_wi_client_groups.group(12))
-            rssi2G = show_wi_client_groups.group(12)
+            rssi_2g = show_wi_client_groups.group(12)
 
             self.showWiClientsDict[mac_2g] = {}
             self.showWiClientsDict[mac_2g]["State"] = state_2g
             self.showWiClientsDict[mac_2g]["SSID"] = ssid_2g
-            self.showWiClientsDict[mac_2g]["PSMOD"] = PSMOD2G
-            self.showWiClientsDict[mac_2g]["NMMOD"] = NMMOD2G
-            self.showWiClientsDict[mac_2g]["Rate"] = Rate2G
-            self.showWiClientsDict[mac_2g]["Uptime"] = uptime2G
-            self.showWiClientsDict[mac_2g]["txpkt"] = txpkt2G
-            self.showWiClientsDict[mac_2g]["txerr"] = txerr2G
-            self.showWiClientsDict[mac_2g]["rxuni"] = rxuni2G
-            self.showWiClientsDict[mac_2g]["rxmul"] = rxmul2G
-            self.showWiClientsDict[mac_2g]["rxerr"] = rxerr2G
-            self.showWiClientsDict[mac_2g]["rssi"] = rssi2G
+            self.showWiClientsDict[mac_2g]["PSMOD"] = psmod_2g
+            self.showWiClientsDict[mac_2g]["NMMOD"] = nmmod_2g
+            self.showWiClientsDict[mac_2g]["Rate"] = rate_2g
+            self.showWiClientsDict[mac_2g]["Uptime"] = uptime_2g
+            self.showWiClientsDict[mac_2g]["txpkt"] = txpkt_2g
+            self.showWiClientsDict[mac_2g]["txerr"] = txerr_2g
+            self.showWiClientsDict[mac_2g]["rxuni"] = rxuni_2g
+            self.showWiClientsDict[mac_2g]["rxmul"] = rxmul_2g
+            self.showWiClientsDict[mac_2g]["rxerr"] = rxerr_2g
+            self.showWiClientsDict[mac_2g]["rssi"] = rssi_2g
 
             self.session.close()
         return self.showWiClientsDict
@@ -384,12 +386,12 @@ class Nvg599Class(GatewayClass):
 
             # print("length is:",len(row))
             # print("type",type(row))
-            print("row text",row)
+            print("row text", row)
 
-            if len(row)==0:
+            if len(row) == 0:
                 continue
 
-            if  row[0] == "Bandwidth":
+            if row[0] == "Bandwidth":
                 # print("Bandwidth:",row[1],"5G channel:,row[2]")
                 if value_requested == 'ui_bandwidth_2g':
                     print("2G Bandwidth:", row[1])
@@ -397,24 +399,24 @@ class Nvg599Class(GatewayClass):
                     return ui_bandwidth_2g
 
                 # print("5G bandwidth:", row[2])
-                #ui_bandwidth_5g = row[2]
+                # ui_bandwidth_5g = row[2]
                 if value_requested == 'ui_bandwidth_5g':
                     print("5G Bandwidth:", row[2])
                     ui_bandwidth_5g = row[2]
                     return ui_bandwidth_5g
 
-            if  row[0]=="Current Radio Channel":
+            if row[0] == "Current Radio Channel":
                 # print("2G channel:",row[1],"5G channel:,row[2]")
                 # print("2G channel:",row[1])
                 # ui_channel_2g = row[1]
-                # print("Bandwidth:",row[1],"5G channel:,row[2]")
-                print("2G -dbg channel:",row[1])
+                # print("Ban dwidth:",row[1],"5G channel:,row[2]")
+                print("2G -dbg channel:", row[1])
                 if value_requested == 'ui_channel_2g':
                     print("2G Channel:", row[1])
                     ui_channel_2g = row[1]
                     return ui_channel_2g
 
-                print("5G -dbg channel:",row[2])
+                print("5G -dbg channel:", row[2])
 #                # ui_channel_5g = row[2]
                 if value_requested == 'ui_channel_5g':
                     print("5G Channel:", row[2])
@@ -435,38 +437,38 @@ class Nvg599Class(GatewayClass):
         # print(soup.find(id="password"))
         # print(" ------------access code ----------------")
 #        device_access_code = browser.find_element_by_id("password")
- #       device_access_code.send_keys(self.device_access_code)
+#       device_access_code.send_keys(self.device_access_code)
 #        submit = browser.find_element_by_name("Continue")
 #        submit.click()
 #        advancedOptionsLink = browser.find_element_by_link_text("Advanced Options")
 #        sleep(2)
 #       advancedOptionsLink.click()
- #       sleep(20)
- #       browser.quit()
+#       sleep(20)
+#       browser.quit()
 # we need the band (2g or 5g) because both bands could be automatic which would be ambiguous
-    #nvg_599_dut.ui_set_bw_channel('g2', 40, 2)
+#nvg_599_dut.ui_set_bw_channel('g2', 40, 2)
 
 
     def ui_set_band_bandwith_channel(self,band,bandwidth,channel):
         global nvg_info
 
-        #band_selected = band
-        #channel_selected = channel
-        #bandwidth_selected = bandwidth
-        #if (not self.init_info):
-         #   self.ui_system_information()
-         #   print("self.serialNumer:", self.serial_number)
-            # we need the serial number to refernce the DAC which is in our local dicitonary
-            # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
+        # band_selected = band
+        # channel_selected = channel
+        # bandwidth_selected = bandwidth
+        # if (not self.init_info):
+        #   self.ui_system_information()
+        #   print("self.serialNumer:", self.serial_number)
+        # we need the serial number to refernce the DAC which is in our local dicitonary
+        # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
         #    self.device_access_code = nvg_info[self.serial_number]['device_access_code']
         #    print("dac", self.device_access_code)
-         #   print("in ui_home_network_status  init if")
+        #   print("in ui_home_network_status  init if")
 
         print("in ui_set_band_bandwith_channel ")
-        #url = 'http://192.168.1.254/'
-        #session = webdriver.Chrome()
-        #session.get(url)
-        #session = self.session
+        # url = 'http://192.168.1.254/'
+        # session = webdriver.Chrome()
+        # session.get(url)
+        # session = self.session
         home_link = self.session.find_element_by_link_text("Device")
         home_link.click()
         status_link = self.session.find_element_by_link_text("Home Network")
@@ -544,8 +546,8 @@ class Nvg599Class(GatewayClass):
 
         for x in range(size):
             session.switch_to.window(handles[x])
-            print ("title", session.title)
-            print ("handle", handles[x])
+            print("title", session.title)
+            print("handle", handles[x])
 
         self.check_if_password_required()
         print('tada2)')
@@ -579,8 +581,8 @@ class Nvg599Class(GatewayClass):
         this = soup.find_all('th')
         for th in this:
             if th.text == "Model Number":
-                print("model:",th.next_sibling.next_sibling.text)
-                self.modelNumber = th.next_sibling.next_sibling.text
+                print("model:", th.next_sibling.next_sibling.text)
+                self.model_number = th.next_sibling.next_sibling.text
             if th.text == "Serial Number":
                 self.serial_number = th.next_sibling.next_sibling.text
                 print ("serial Number is:",self.serial_number)
@@ -908,14 +910,14 @@ class Nvg599Class(GatewayClass):
         for i  in range(len(ipLanOutput)):
             # print("input line:", ipLanOutput[i])
             # mo1 = statusInfoRegEx.match(ipLanOutput[i])
-            ipLanOutputSplit = (ipLanOutput[i]).split()
+            ipLanOutputSplit = (ipLanOutput[i]). split()
             # print ("connectedDeviceName",ipLanOutputSplit[0])
             # self.connectedDeviceName = ipLanOutputSplit[0]
             connectedDeviceName = ipLanOutputSplit[0]
 
             # if "ATT_4920" in ipLanOutputSplit[0]:
             #    print("this is an airties device!")
-            print ("connectedDeviceIP",ipLanOutputSplit[1])
+            print ("connectedDeviceIP", ipLanOutputSplit[1])
             connectedDeviceIP = ipLanOutputSplit[1]
 
             print ("connectedDeviceMac",ipLanOutputSplit[2])
