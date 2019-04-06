@@ -196,15 +196,14 @@ def tst_ping(nvg_599_dut,ping_history_file, remote_ip):
 # for now we are ssuming thatthe dut is a 599
 nvg_599_dut = Nvg599Class()
 
-nvg_599_dut.turn_off_supplicant_cli()
-#test_ip = "192.168.1.239"
-exit()
+# nvg_599_dut.turn_off_supplicant_cli()
+# test_ip = "192.168.1.239"
+# exit()
 
 #down_load_speed, up_load_speed = nvg_599_dut.run_speed_test_cli(test_ip)
-
-nvg_599_dut.ui_get_device_list()
+nvg_599_dut.cli_sh_wi_clients()
+#nvg_599_dut.ui_get_device_list()
 exit()
-
 
 #tst_ping(nvg_599_dut,results_file,"192.168.1.239")
 #tst_speed_test(nvg_599_dut,results_file,"192.168.1.239")
@@ -213,7 +212,6 @@ exit()
 #results_str = open('results_file.txt','r').read()
 #nvg_599_dut.email_test_results(results_str)
 #exit()
-
 
 
 
