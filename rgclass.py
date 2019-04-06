@@ -29,16 +29,25 @@ from datetime import datetime
 #  Apple path for wifi info
 # /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I
 
-nvg_info: Dict[str, Dict[str, str]] = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
+# nvg_info: Dict[str, Dict[str, str]] = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
+nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
+
                                      'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4',
                                      'wiFi': 'c2cmybt25dey', 'ssid': 'ATTqbrAnYs'},
             "277427577103760": {'model': 'nvg599', 'device_access_code': '<<01%//4&/', 'magic': 'ggtxstgwipcg',
                                      'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94',
                                      'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
 
+lab_dev_info = {
+    '88:41:fc:86:64:d7':{'device_type':'airties4920','radio':'abg','state':'None','type':'None','port':'None','ssid':'None','rssi':'None','ip':'None','test_name':'airties_1','host_name':'ATT_4920_8664D4'},
+    '88:41:fc:c3:56:c3':{'device_type':'airties4920','radio':'abg','state':'None','type':'None','port':'None','ssid':'None','rssi':'None','ip':'None','test_name':'airties_2','host_name':'ATT_4920_C356C0'},
+    '4c:bb:58:68:bd:f6':{'device_type':'ubuntu_laptop','radio':'bg','state':'None','type':'None','port':'None','ssid':'None','rssi':'None','ip':'None','test_name':'ubuntu_1', 'host_name':'arris-Latitude-MBR'},
+    'f4:5c:89:9d:f1:4f':{'device_type':'macbook_pro','radio':'abg','state':'None','type': 'None','port':'None','ssid':'None','rssi':'None','ip':'None','test_name':'mac_book_1','host_name': 'macbook-mbr'},
+}
+
 
 NON_DFS_CHANNELS = {36, 40, 44, 48, 149, 153, 157, 161, 165}
-DFS_CHANNELS     = {52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144}
+DFS_CHANNELS = {52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144}
 
 
 class GatewayClass:
@@ -49,7 +58,6 @@ class GatewayClass:
         self.serial_number = None
 
     def email_test_results(self, text_file):
-
         now = datetime.today().isoformat()
         print('now')
         subject_title = 'Test results:' + str(now)
@@ -131,6 +139,9 @@ class Nvg599Class(GatewayClass):
         self.current_date = None
         self.hardware_version = None
         self.serial_number = None
+        self.factory_reset = None
+        self.cli_sh_wi_clients_dict = {}
+
         self.ip_lan_connections_dict_cli = {}
 
         self.get_ui_system_information()
@@ -152,9 +163,13 @@ class Nvg599Class(GatewayClass):
             try:
                 # header_text = table_row.th.text
                 # print("table_row header:" +  table_row.th.text + " table_td_text:" + table_row.td.text, end='')
+                print("table_row:",table_row, end='')
                 print("table_row header:", end='')
                 print(table_row.th.text, end='')
+                ui_device_list_mac_title = table_row.th.text
                 print(" table_td_text:", end='')
+                ui_device_list_mac = table_row.th.text
+
                 print(table_row.td.text, end='')
             # except NoSuchElementException:
             except AttributeError:
@@ -165,7 +180,6 @@ class Nvg599Class(GatewayClass):
             for row_header in table_rows:
                 td = row_header.find_all('td')
                 print("Name    ", td.text)
-
         exit()
 
         soup = BeautifulSoup(self.session.page_source, 'html.parser')
@@ -207,9 +221,8 @@ class Nvg599Class(GatewayClass):
 
     def check_if_password_required(self):
         try:
-            # Select(browser.find_element_by_id("selectMonth")).select_by_visible_text("%s" % (month))
-            sleep(5)
-            dac_access_challenge = self.session.find_element_by_link_text("Forgot your Access Code?")
+            #dac_access_challenge = self.session.find_element_by_link_text("Forgot your Access Code?")
+            self.session.find_element_by_link_text("Forgot your Access Code?")
             print('we found the request for password screen')
             print('sending dac', self.device_access_code)
             dac_entry = self.session.find_element_by_id("password")
@@ -218,28 +231,48 @@ class Nvg599Class(GatewayClass):
             submit.click()
             sleep(5)
         except NoSuchElementException:
-            print('we are not seeing the password screen')
-            pass
+            print('password challenge screen not displayed- OK')
+            #pass
 
-    def get_sh_wi_clients_cli(self):
-        self.session = self.login_nvg_599_cli()
-        self.session.sendline("show wi clients")
-        self.session.expect('>')
-        sh_wi_clients_output = self.session.before
-        # shWiClientsOutput = self.session.before
+    def cli_sh_wi_clients(self):
+        print("in cli_sh_wi_clients")
+        self.telnet_cli_session = self.login_nvg_599_cli()
+        # print('-----------------------------------------------------\n')
 
-        print("-------------------------------------")
+        self.telnet_cli_session.sendline("show wi clients")
+        self.telnet_cli_session.expect('OCKED>')
+        #print("sh_wi_clients_before:",self.telnet_cli_session.before)
+        show_wi_client_str = self.telnet_cli_session.before
+        # g2_g5_list = show_wl_client_str.split("5.0")
+        # print("2g-------------------\n",g2_g5_list[0])
+        # print("5g---------------\n-",g2_g5_list[1])
+        # sh_wi_clients_output = self.telnet_cli_session.after
+
+
+
+
         # shWifiClinetRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
         # need to consider the case where there is no entries either in the 2.$GHZ, the 5GHZ oe both
         # the regex returns all the chars before the match and all the chars including the "CLients connected at 5GH" and after
         # shWifiClinetRegEx = re.compile(r'(^.*?)(Clients connected on 5.0 GHz.*)',re.DOTALL)
-        sh_wifi_client_reg_ex = re.compile(r'(^.*?)(Clients connected on 5.0 GHz.*)',re.DOTALL)
-        print(sh_wi_clients_output)
-        mo1 = sh_wifi_client_reg_ex.search(sh_wi_clients_output)
-        print(mo1)
+        sh_wifi_client_reg_ex = re.compile(r'(^.*?)(Clients connected on 5.0 GHz.*)', re.DOTALL)
+        # print("show client str", show_wi_client_str)
+        mo1 = sh_wifi_client_reg_ex.search(show_wi_client_str)
+        print('------------------------------------------------------\n')
+
+        # print("mo1--------->>>>",mo1.group(1))
+        print('------------------------------------------------------\n')
+        print('------------------------------------------------------\n')
+
         print('2.4G ', mo1.group(1))
-        print('------------------------------------------------------')
+
+        # print("mo2--------->>>>",mo1.group(2))
+        print('------------------------------------------------------\n')
         print('5G ', mo1.group(2))
+        print('------------------------------------------------------\n')
+        print('------------------------------------------------------\n')
+        # print("mo1--------->>>>",mo1.group(1))
+        # print('------------------------------------------------------\n')
         g5_string = mo1.group(2)
         g2_string = mo1.group(1)
         # G2RegEx = re.compile(r'([0-9a-fA-F]:?){12}', re.DOTALL)
@@ -255,13 +288,13 @@ class Nvg599Class(GatewayClass):
         for i in my_range:
             print("entrie:", g2_string_list[i])
             print("-------------------------")
-#
+            continue
 # showWiClientsRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
 # showWiClientsRegEx = re.compile(r'((:?[0-9a-fA-F]:?){12}).*State=(\w+)' , re.DOTALL)
 # showWiClientsRegEx = re.compile(r'(([0-9a-fA-F]{2}:{5})([0-9a-fA-F]{2}))(.*State=(\w+))' , re.DOTALL)
 # showWiClientsRegEx = re.compile(r'.*State=(\w+).*SSID=(\w+).*PSMod=(\w+).*NMode=(\w+).*Rate=(\w+\s\w+).*ON for (\w+).*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=(\w+\s\w+)',re.DOTALL)
 # showWiClientsRegEx = re.compile(r'.*State=(\w+).*SSID=(\w+).*PSMod=(\w+).*NMode=(\w+).*Rate=(\w+\s\w+)',re.DOTALL)
-            showWiClientsRegEx = re.compile(r'.*State=(\w+).*SSID=(\w+).*PSMod=(\w+).*NMode=(\w+).*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+).*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)',re.DOTALL)
+            show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*SSID=(\w+).*PSMod=(\w+).*NMode=(\w+).*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+).*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)', re.DOTALL)
 #     r'.*ON for (\w+).*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=(\w+\s\w+)',re.DOTALL)
 # showWiClientsRegEx = re.compile((r'.*State=(\w+).*SSID=(\w+).*PSMOD=(\w+)'),re.DOTALL|re.DOTALL)
 
@@ -270,17 +303,15 @@ class Nvg599Class(GatewayClass):
             print("mac is ---------------------------------------------------------", g2_string_list_split[0])
             mac_2g = g2_string_list_split[0]
 
-            show_wi_client_groups = showWiClientsRegEx.search(g2_string_list[i])
+            show_wi_client_groups = show_wi_clients_reg_ex.search(g2_string_list[i])
 
-            self.showWiClientsDict = {}
-
+            self.cli_sh_wi_clients_dict = {}
 # #           #self.showIPLanDict[connectedDeviceName]: {}
 # #           #self.showIPLanDict = {connectedDeviceName : {}}
 # #           #self.showIPLanDict[connectedDeviceName] = {}
 #
 #            #print("-------------->",connectedDeviceName)
 #            #print("-------------->", connectedDeviceName)
-
 #            #self.showIPLanDict= {"connectedDeviceName"}
 #            #self.showIPLanDict[connectedDeviceName]["IP"] = connectedDeviceIP
 #            #self.showIPLanDict[connectedDeviceName]["MAC"] = connectedDeviceMac
@@ -312,26 +343,27 @@ class Nvg599Class(GatewayClass):
             rxerr_2g = show_wi_client_groups.group(11)
             print('rssi--------------------------------------------- ', show_wi_client_groups.group(12))
             rssi_2g = show_wi_client_groups.group(12)
+            # cli_sh_wi_clients_dict
+            self.cli_sh_wi_clients_dict[mac_2g] = {}
+            self.cli_sh_wi_clients_dict[mac_2g]["State"] = state_2g
+            self.cli_sh_wi_clients_dict[mac_2g]["SSID"] = ssid_2g
+            self.cli_sh_wi_clients_dict[mac_2g]["PSMOD"] = psmod_2g
+            self.cli_sh_wi_clients_dict[mac_2g]["NMMOD"] = nmmod_2g
+            self.cli_sh_wi_clients_dict[mac_2g]["Rate"] = rate_2g
+            self.cli_sh_wi_clients_dict[mac_2g]["Uptime"] = uptime_2g
+            self.cli_sh_wi_clients_dict[mac_2g]["txpkt"] = txpkt_2g
+            self.cli_sh_wi_clients_dict[mac_2g]["txerr"] = txerr_2g
+            self.cli_sh_wi_clients_dict[mac_2g]["rxuni"] = rxuni_2g
+            self.cli_sh_wi_clients_dict[mac_2g]["rxmul"] = rxmul_2g
+            self.cli_sh_wi_clients_dict[mac_2g]["rxerr"] = rxerr_2g
+            self.cli_sh_wi_clients_dict[mac_2g]["rssi"] = rssi_2g
 
-            self.showWiClientsDict[mac_2g] = {}
-            self.showWiClientsDict[mac_2g]["State"] = state_2g
-            self.showWiClientsDict[mac_2g]["SSID"] = ssid_2g
-            self.showWiClientsDict[mac_2g]["PSMOD"] = psmod_2g
-            self.showWiClientsDict[mac_2g]["NMMOD"] = nmmod_2g
-            self.showWiClientsDict[mac_2g]["Rate"] = rate_2g
-            self.showWiClientsDict[mac_2g]["Uptime"] = uptime_2g
-            self.showWiClientsDict[mac_2g]["txpkt"] = txpkt_2g
-            self.showWiClientsDict[mac_2g]["txerr"] = txerr_2g
-            self.showWiClientsDict[mac_2g]["rxuni"] = rxuni_2g
-            self.showWiClientsDict[mac_2g]["rxmul"] = rxmul_2g
-            self.showWiClientsDict[mac_2g]["rxerr"] = rxerr_2g
-            self.showWiClientsDict[mac_2g]["rssi"] = rssi_2g
-
-            self.session.close()
-        return self.showWiClientsDict
+            #self.cli_sh_wi_clients_dict.close()
+        return self.cli_sh_wi_clients_dict
 
     def factory_reset_rg(self):
         global nvg_info
+        self.factory_reset = 1
         url = 'http://192.168.1.254/'
         browser = webdriver.Chrome()
         browser.get(url)
@@ -360,6 +392,8 @@ class Nvg599Class(GatewayClass):
         end = time.time()
         print("duration in seconds:", end - start)
         sleep(2)
+
+        self.turn_off_supplicant_cli()
 
     def get_ui_home_network_status_value(self, value_requested):
         print('in get_ui_home_network_status_value)')
@@ -759,16 +793,17 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.expect(">")
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect(">")
-        self.telnet_cli_session.sendline('nsh')
-        self.telnet_cli_session.expect("(nsh)")
-        self.telnet_cli_session.sendline('set security.ext-wifi-protection off')
-        self.telnet_cli_session.expect("(nsh)")
-        self.telnet_cli_session.sendline('save')
-        self.telnet_cli_session.expect("(nsh)")
-        self.telnet_cli_session.sendline('apply')
-        self.telnet_cli_session.expect("(nsh)")
-        self.telnet_cli_session.sendline('exit')
-        self.telnet_cli_session.expect(">")
+        # put this stuff us a soearate factory defaults routine
+        # self.telnet_cli_session.sendline('nsh')
+        # self.telnet_cli_session.expect("(nsh)")
+        # self.telnet_cli_session.sendline('set security.ext-wifi-protection off')
+        # self.telnet_cli_session.expect("(nsh)")
+        # self.telnet_cli_session.sendline('save')
+        # self.telnet_cli_session.expect("(nsh)")
+        # self.telnet_cli_session.sendline('apply')
+        # self.telnet_cli_session.expect("(nsh)")
+        # self.telnet_cli_session.sendline('quit')
+        # self.telnet_cli_session.expect(">")
         return self.telnet_cli_session
 
 #    def login_4920(self,ip_4920):
