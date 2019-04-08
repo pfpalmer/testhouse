@@ -1,9 +1,9 @@
-from itertools import count
-from typing import Dict
+# from itertools import count
+# from typing import Dict
 import subprocess
-from subprocess import check_output
+# from subprocess import check_output
 
-from selenium.webdriver.common.by import By
+# from selenium.webdriver.common.by import By
 
 from selenium.common.exceptions import NoSuchElementException
 
@@ -31,20 +31,27 @@ from datetime import datetime
 
 # nvg_info: Dict[str, Dict[str, str]] = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
 nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
-
                                      'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4',
                                      'wiFi': 'c2cmybt25dey', 'ssid': 'ATTqbrAnYs'},
             "277427577103760": {'model': 'nvg599', 'device_access_code': '<<01%//4&/', 'magic': 'ggtxstgwipcg',
                                      'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94',
                                      'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
 
-lab_dev_info = {
-    '88:41:fc:86:64:d7':{'device_type':'airties4920','radio':'abg','state':'None','type':'None','port':'None','ssid':'None','rssi':'None','ip':'None','test_name':'airties_1','host_name':'ATT_4920_8664D4'},
-    '88:41:fc:c3:56:c3':{'device_type':'airties4920','radio':'abg','state':'None','type':'None','port':'None','ssid':'None','rssi':'None','ip':'None','test_name':'airties_2','host_name':'ATT_4920_C356C0'},
-    '4c:bb:58:68:bd:f6':{'device_type':'ubuntu_laptop','radio':'bg','state':'None','type':'None','port':'None','ssid':'None','rssi':'None','ip':'None','test_name':'ubuntu_1', 'host_name':'arris-Latitude-MBR'},
-    'f4:5c:89:9d:f1:4f':{'device_type':'macbook_pro','radio':'abg','state':'None','type': 'None','port':'None','ssid':'None','rssi':'None','ip':'None','test_name':'mac_book_1','host_name': 'macbook-mbr'},
+test_house_devices_static_info = {
+    '88:41:FC:86:64:D7':{'device_type':'airties4920','radio':'abg','band' :'5g','state':'None','address_type':'None','port':'None',
+                         'ssid':'None','rssi':'None','ip':'None','test_name':'airties_1','host_name':'ATT_4920_8664D4'},
+    '88:41:FC:c3:56:C3':{'device_type':'airties4920','radio':'abg','band' :'5g','state':'None','address_type':'None','port':'None',
+                         'ssid':'None','rssi': 'None','ip': 'None',' test_name': 'airties_2', 'host_name': 'ATT_4920_C356C0'},
+    '4C:BB:58:68:BD:F6':{'device_type':'ubuntu_laptop','radio':'bg','band' :'5g','state':'None','address_type':'None','port':'None',
+                         'ssid':'None','rssi':'None','ip':'None','test_name':'ubuntu_1', 'host_name':'arris-Latitude-MBR'},
+    'F4:5C:89:9D:F1:4F':{'device_type':'macbook_pro','radio':'abg','band' :'5g','state':'None','address_type': 'None','port':'None',
+                         'ssid':'None','rssi':'None','ip':'None','test_name':'mac_book_1','host_name': 'macbook-mbr'},
+    '5C:E0:C5:89:8E:BF': {'device_type': 'ubuntu_laptop', 'radio': 'abg', 'band' :'5g', 'state': 'None', 'address_type': 'None',
+                          'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None', 'test_name': 'mac_book_1','host_name': 'palmer_Latitude-E5450'},
+
 }
 
+# 5c:e0:c5:d9:8e:bf
 
 NON_DFS_CHANNELS = {36, 40, 44, 48, 149, 153, 157, 161, 165}
 DFS_CHANNELS = {52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144}
@@ -140,7 +147,7 @@ class Nvg599Class(GatewayClass):
         self.hardware_version = None
         self.serial_number = None
         self.factory_reset = None
-        self.cli_sh_wi_clients_dict = {}
+        self.rg_connected_clients_dict = {}
 
         self.ip_lan_connections_dict_cli = {}
 
@@ -148,6 +155,8 @@ class Nvg599Class(GatewayClass):
         self.device_access_code = nvg_info[self.serial_number]['device_access_code']
         print("in Nvg599Class__init")
         self.init_info = True
+
+        self.mesh_connected_clents = {}
 
     def ui_get_device_list(self):
         global nvg_info
@@ -235,131 +244,288 @@ class Nvg599Class(GatewayClass):
             #pass
 
     def cli_sh_wi_clients(self):
+        global test_house_devices_static_info
         print("in cli_sh_wi_clients")
         self.telnet_cli_session = self.login_nvg_599_cli()
-        # print('-----------------------------------------------------\n')
-
         self.telnet_cli_session.sendline("show wi clients")
         self.telnet_cli_session.expect('OCKED>')
-        #print("sh_wi_clients_before:",self.telnet_cli_session.before)
         show_wi_client_str = self.telnet_cli_session.before
-        # g2_g5_list = show_wl_client_str.split("5.0")
-        # print("2g-------------------\n",g2_g5_list[0])
-        # print("5g---------------\n-",g2_g5_list[1])
-        # sh_wi_clients_output = self.telnet_cli_session.after
+        self.telnet_cli_session.close()
 
-
-
-
-        # shWifiClinetRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
-        # need to consider the case where there is no entries either in the 2.$GHZ, the 5GHZ oe both
-        # the regex returns all the chars before the match and all the chars including the "CLients connected at 5GH" and after
-        # shWifiClinetRegEx = re.compile(r'(^.*?)(Clients connected on 5.0 GHz.*)',re.DOTALL)
         sh_wifi_client_reg_ex = re.compile(r'(^.*?)(Clients connected on 5.0 GHz.*)', re.DOTALL)
         # print("show client str", show_wi_client_str)
         mo1 = sh_wifi_client_reg_ex.search(show_wi_client_str)
         print('------------------------------------------------------\n')
-
-        # print("mo1--------->>>>",mo1.group(1))
-        print('------------------------------------------------------\n')
-        print('------------------------------------------------------\n')
-
-        print('2.4G ', mo1.group(1))
-
-        # print("mo2--------->>>>",mo1.group(2))
-        print('------------------------------------------------------\n')
-        print('5G ', mo1.group(2))
-        print('------------------------------------------------------\n')
+        #print('2.4G ', mo1.group(1))
+        #print('5G ', mo1.group(2))
         print('------------------------------------------------------\n')
         # print("mo1--------->>>>",mo1.group(1))
-        # print('------------------------------------------------------\n')
         g5_string = mo1.group(2)
         g2_string = mo1.group(1)
         # G2RegEx = re.compile(r'([0-9a-fA-F]:?){12}', re.DOTALL)
-        g2_reg_ex = re.compile(r'(?:[0-9a-fA-F]:?){12}.*?\n.*\n.*\n.*\n')
-        # G2RegEx = re.compile(r'(\w\w:\w\w:\w\w:\w\w:\w\w:\w\w.*?)*', re.DOTALL)
-        # mo1 = G2RegEx.findall(G2string)
-        g2_string_list = re.findall(g2_reg_ex, g2_string)
+        wi_reg_ex = re.compile(r'(?:[0-9a-fA-F]:?){12}.*?\n.*\n.*\n.*\n')
+        g2_string_list = re.findall(wi_reg_ex, g2_string)
+        g5_string_list = re.findall(wi_reg_ex, g5_string)
 
         number_of_g2_entries = len(g2_string_list)
         print("--------------------------------------the 2g list has :", number_of_g2_entries)
-        my_range = range(0, number_of_g2_entries)
 
-        for i in my_range:
-            print("entrie:", g2_string_list[i])
+        g2_entries = range(0, number_of_g2_entries)
+        for g2_list_entry in g2_entries:
+            print("entrie:", g2_string_list[g2_list_entry])
             print("-------------------------")
-            continue
-# showWiClientsRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
-# showWiClientsRegEx = re.compile(r'((:?[0-9a-fA-F]:?){12}).*State=(\w+)' , re.DOTALL)
-# showWiClientsRegEx = re.compile(r'(([0-9a-fA-F]{2}:{5})([0-9a-fA-F]{2}))(.*State=(\w+))' , re.DOTALL)
-# showWiClientsRegEx = re.compile(r'.*State=(\w+).*SSID=(\w+).*PSMod=(\w+).*NMode=(\w+).*Rate=(\w+\s\w+).*ON for (\w+).*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=(\w+\s\w+)',re.DOTALL)
-# showWiClientsRegEx = re.compile(r'.*State=(\w+).*SSID=(\w+).*PSMod=(\w+).*NMode=(\w+).*Rate=(\w+\s\w+)',re.DOTALL)
-            show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*SSID=(\w+).*PSMod=(\w+).*NMode=(\w+).*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+).*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)', re.DOTALL)
-#     r'.*ON for (\w+).*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=(\w+\s\w+)',re.DOTALL)
-# showWiClientsRegEx = re.compile((r'.*State=(\w+).*SSID=(\w+).*PSMOD=(\w+)'),re.DOTALL|re.DOTALL)
+ #           show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*SSID=(\w+).*PSMod=(\w+).*NMode=(\w+).*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+).*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)', re.DOTALL)
 
-            print(g2_string_list[i])
-            g2_string_list_split = g2_string_list[i].split()
-            print("mac is ---------------------------------------------------------", g2_string_list_split[0])
+
+
+            show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:(\w+).*SSID=(\w+).*PSMod=(\w+).*NMode=(\w+).*WMMEn=(\w+).*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+).*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)', re.DOTALL)
+            show_wi_client_groups = show_wi_clients_reg_ex.search(g2_string_list[g2_list_entry])
+
+            # print(g2_string_list[i])
+            g2_string_list_split = g2_string_list[g2_list_entry].split()
+
             mac_2g = g2_string_list_split[0]
+            print('mac2g is',mac_2g)
+            # sh wi client macs have a ":" on the end of the mac
+            # this has to be removed and the mac changed to up so that it can be used as a dictionary key
+            print('mac2g  upper s',mac_2g.upper())
+            mac_2g = mac_2g.upper()
+            mac_2g = mac_2g[:-1]
+            print('modified 2g mac', mac_2g)
 
-            show_wi_client_groups = show_wi_clients_reg_ex.search(g2_string_list[i])
+            if mac_2g in test_house_devices_static_info:
+                print('********************************mac is in 2g dicitonary',mac_2g)
+                print('state--------------------------------------------- ', show_wi_client_groups.group(1))
+                self.rg_connected_clients_dict['mac'] = mac_2g
 
-            self.cli_sh_wi_clients_dict = {}
-# #           #self.showIPLanDict[connectedDeviceName]: {}
-# #           #self.showIPLanDict = {connectedDeviceName : {}}
-# #           #self.showIPLanDict[connectedDeviceName] = {}
-#
-#            #print("-------------->",connectedDeviceName)
-#            #print("-------------->", connectedDeviceName)
-#            #self.showIPLanDict= {"connectedDeviceName"}
-#            #self.showIPLanDict[connectedDeviceName]["IP"] = connectedDeviceIP
-#            #self.showIPLanDict[connectedDeviceName]["MAC"] = connectedDeviceMac
-#            #self.showIPLanDict[connectedDeviceName]["Status"] = connectedDeviceStatus
-#            #self.showIPLanDict[connectedDeviceName]["DHCP"] = connectedDeviceDHCP
+                wi_state = show_wi_client_groups.group(1)
+                self.rg_connected_clients_dict[mac]['wi_state'] = wi_state
 
-#            #print(mo1)
-            print('state--------------------------------------------- ', show_wi_client_groups.group(1))
-            state_2g = show_wi_client_groups.group(1)
-            print('SSID--------------------------------------------- ', show_wi_client_groups.group(2))
-            ssid_2g = show_wi_client_groups.group(2)
-            print('PSMOD--------------------------------------------- ', show_wi_client_groups.group(3))
-            psmod_2g = show_wi_client_groups.group(3)
-            print('NMMOD--------------------------------------------- ', show_wi_client_groups.group(4))
-            nmmod_2g = show_wi_client_groups.group(4)
-            print('Rate--------------------------------------------- ', show_wi_client_groups.group(5))
-            rate_2g = show_wi_client_groups.group(5)
-            print('on--------------------------------------------- ', show_wi_client_groups.group(6))
-            uptime_2g = show_wi_client_groups.group(6)
-            print('txpkt--------------------------------------------- ', show_wi_client_groups.group(7))
-            txpkt_2g = show_wi_client_groups.group(7)
-            print('txerr--------------------------------------------- ', show_wi_client_groups.group(8))
-            txerr_2g = show_wi_client_groups.group(8)
-            print('rxuni-------------------------------------------- ', show_wi_client_groups.group(9))
-            rxuni_2g = show_wi_client_groups.group(9)
-            print('rxmul--------------------------------------------- ', show_wi_client_groups.group(10))
-            rxmul_2g = show_wi_client_groups.group(10)
-            print('rxerr--------------------------------------------- ', show_wi_client_groups.group(11))
-            rxerr_2g = show_wi_client_groups.group(11)
-            print('rssi--------------------------------------------- ', show_wi_client_groups.group(12))
-            rssi_2g = show_wi_client_groups.group(12)
+
+ #               self.mesh_connected_clients[mac_2g:mac_2g]['wi_state':wi_state]
+                self.rg_connected_clients_dict[mac]['wi_state'] = wi_state
+
+                wi_ip = show_wi_client_groups.group(2)
+                self.rg_connected_clients_dict[mac]['ip'] = wi_ip
+                print('wi ip **********************************' + wi_ip + '\n')
+
+                wi_ssid = show_wi_client_groups.group(3)
+                self.rg_connected_clients_dict[mac]['ssid'] = wi_ssid
+                print('wi ssid **********************************' + wi_ssid + '\n')
+
+                wi_psmod = show_wi_client_groups.group(4)
+                self.rg_connected_clients_dict[mac]['psmod'] = wi_psmod
+                print('wi psmod **********************************' +  wi_psmod + '\n')
+
+                wi_nmod = show_wi_client_groups.group(5)
+                self.rg_connected_clients_dict[mac]['nmod'] = wi_nmod
+                print('wi nmod **********************************' +  wi_nmod + '\n')
+
+                wi_wmmen = show_wi_client_groups.group(6)
+                self.rg_connected_clients_dict[mac]['wmmen'] = wi_wmmen
+                print('wi nmod **********************************' +  wi_wmmen +'\n')
+
+                wi_rate = show_wi_client_groups.group(7)
+                self.rg_connected_clients_dict[mac]['rate'] = wi_rate
+                print('wi rate **********************************' +  wi_rate +'\n')
+
+                wi_on_time = show_wi_client_groups.group(8)
+                self.rg_connected_clients_dict[mac]['on_time'] = wi_on_time
+                print('wi on_time **********************************' +  wi_ront_time +'\n')
+
+                wi_tx_pkt = show_wi_client_groups.group(9)
+                self.rg_connected_clients_dict[mac]['tx_pkt'] = wi_tx_pkt
+                print('wi tx_pkt **********************************' +  wi_rtxpkt +'\n')
+
+                wi_tx_err = show_wi_client_groups.group(10)
+                self.rg_connected_clients_dict[mac]['tx_err' ] =  wi_tx_err
+                print('wi rate **********************************' +  wi_rate +'\n')
+
+                wi_rx_uni = show_wi_client_groups.group(11)
+                self.rg_connected_clients_dict[mac]['rate'] = wi_rx_uni
+                print('wi rate **********************************' +  wi_rx_uni +'\n')
+
+                wi_rx_mul = show_wi_client_groups.group(12)
+                self.rg_connected_clients_dict[mac]['rx_mul'] = wi_rx_mul
+                print('wi rx_mul **********************************' +  wi_rx_mul +'\n')
+
+                wi_rx_err = show_wi_client_groups.group(13)
+                self.rg_connected_clients_dict[mac]['rx_err'] = wi_rx_err
+                print('wi rx_mul **********************************' +  wi_rx_err +'\n')
+                print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n')
+
+                wi_rssi = show_wi_client_groups.group(14)
+                self.rg_connected_clients_dict[mac]['rx_err'] = wi_rssi
+                print('wi rssi **********************************' +  wi_rssi +'\n')
+                print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n')
+
+            else:
+                print('No information for this 2g mac',mac_2g)
+            continue
+            #show_wi_client_groups = show_wi_clients_reg_ex.search(g2_string_list[i])
+
+            #self.cli_sh_wi_clients_dict = {}
+            #print('state--------------------------------------------- ', show_wi_client_groups.group(1))
+            #state_2g = show_wi_client_groups.group(1)
+
+            #print('ip --------------------------------------------- ', show_wi_client_groups.group(2))
+            #ip_2g = show_wi_client_groups.group(2)
+
+            #print('SSID--------------------------------------------- ', show_wi_client_groups.group(3))
+            #ssid_2g = show_wi_client_groups.group(3)
+
+            #print('PSMOD--------------------------------------------- ', show_wi_client_groups.group(4))
+            #psmod_2g = show_wi_client_groups.group(3)
+
+            #print('NMMOD--------------------------------------------- ', show_wi_client_groups.group(5))
+            #nmmod_2g = show_wi_client_groups.group(4)
+            #print('Rate--------------------------------------------- ', show_wi_client_groups.group(6))
+            #rate_2g = show_wi_client_groups.group(5)
+            #print('on--------------------------------------------- ', show_wi_client_groups.group(7))
+            #uptime_2g = show_wi_client_groups.group(6)
+            #print('txpkt--------------------------------------------- ', show_wi_client_groups.group(8))
+            #txpkt_2g = show_wi_client_groups.group(7)
+            #print('txerr--------------------------------------------- ', show_wi_client_groups.group(9))
+            #txerr_2g = show_wi_client_groups.group(8)
+            #print('rxuni-------------------------------------------- ', show_wi_client_groups.group(10))
+            #rxuni_2g = show_wi_client_groups.group(9)
+            #print('rxmul--------------------------------------------- ', show_wi_client_groups.group(11))
+            #rxmul_2g = show_wi_client_groups.group(10)
+            #print('rxerr--------------------------------------------- ', show_wi_client_groups.group(12))
+            #rxerr_2g = show_wi_client_groups.group(11)
+            #print('rssi--------------------------------------------- ', show_wi_client_groups.group(13))
+            #rssi_2g = show_wi_client_groups.group(12)
             # cli_sh_wi_clients_dict
-            self.cli_sh_wi_clients_dict[mac_2g] = {}
-            self.cli_sh_wi_clients_dict[mac_2g]["State"] = state_2g
-            self.cli_sh_wi_clients_dict[mac_2g]["SSID"] = ssid_2g
-            self.cli_sh_wi_clients_dict[mac_2g]["PSMOD"] = psmod_2g
-            self.cli_sh_wi_clients_dict[mac_2g]["NMMOD"] = nmmod_2g
-            self.cli_sh_wi_clients_dict[mac_2g]["Rate"] = rate_2g
-            self.cli_sh_wi_clients_dict[mac_2g]["Uptime"] = uptime_2g
-            self.cli_sh_wi_clients_dict[mac_2g]["txpkt"] = txpkt_2g
-            self.cli_sh_wi_clients_dict[mac_2g]["txerr"] = txerr_2g
-            self.cli_sh_wi_clients_dict[mac_2g]["rxuni"] = rxuni_2g
-            self.cli_sh_wi_clients_dict[mac_2g]["rxmul"] = rxmul_2g
-            self.cli_sh_wi_clients_dict[mac_2g]["rxerr"] = rxerr_2g
-            self.cli_sh_wi_clients_dict[mac_2g]["rssi"] = rssi_2g
+            # this has to change so that the  mac is the key
+            #self.cli_sh_wi_clients_dict[mac_2g] = {}
+            #self.cli_sh_wi_clients_dict[mac_2g]["State"] = state_2g
+            #self.cli_sh_wi_clients_dict[mac_2g]["SSID"] = ssid_2g
+            #self.cli_sh_wi_clients_dict[mac_2g]["PSMOD"] = psmod_2g
+            #self.cli_sh_wi_clients_dict[mac_2g]["NMMOD"] = nmmod_2g
+            #self.cli_sh_wi_clients_dict[mac_2g]["Rate"] = rate_2g
+            #self.cli_sh_wi_clients_dict[mac_2g]["Uptime"] = uptime_2g
+            #self.cli_sh_wi_clients_dict[mac_2g]["txpkt"] = txpkt_2g
+            #self.cli_sh_wi_clients_dict[mac_2g]["txerr"] = txerr_2g
+            #self.cli_sh_wi_clients_dict[mac_2g]["rxuni"] = rxuni_2g
+            #self.cli_sh_wi_clients_dict[mac_2g]["rxmul"] = rxmul_2g
+            #self.cli_sh_wi_clients_dict[mac_2g]["rxerr"] = rxerr_2g
+            s#elf.cli_sh_wi_clients_dict[mac_2g]["rssi"] = rssi_2g
 
-            #self.cli_sh_wi_clients_dict.close()
-        return self.cli_sh_wi_clients_dict
+        number_of_g5_entries = len(g5_string_list)
+        g5_entries = range(0, number_of_g5_entries)
+        for g5_list_entry in g5_entries:
+            print("entrie:", g5_string_list[g5_list_entry])
+            print("-------------------------")
+            # looks like we neeed 2 patterns his is a work around because the IP should always be there.
+            # First see if there is an IP: in the string
+            if "IP:" in g5_string_list[g5_list_entry]:
+                skip_ip = 1
+                print('we found the IP')
+                show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:(\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*SSID=(\w+).*PSMod=(\w+).*NMode=(\w+).*WMMEn=(\w+).*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+).*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)', re.DOTALL)
+            else:
+                print('we did not find the IP  the IP')
+                show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*SSID=(\w+).*PSMod=(\w+).*NMode=(\w+).*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+).*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)',re.DOTALL)
+
+            #show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*(?:(IP))', re.DOTALL)
+            #show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', re.DOTALL)
+
+            #show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:(\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*SSID=(\w+).*PSMod=(\w+).*NMode=(\w+).*WMMEn=(\w+).*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+).*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)', re.DOTALL)
+            #show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*SSID=(\w+).*PSMod=(\w+).*NMode=(\w+).*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+).*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)',re.DOTALL)
+            show_wi_client_groups = show_wi_clients_reg_ex.search(g5_string_list[g5_list_entry])
+            # print(g5_string_list[g5_list_entry])
+
+            g5_string_list_split = g5_string_list[g5_list_entry].split()
+            #print("mac is ---------------------------------------------------------", g5_string_list_split[0])
+            mac_5g = g5_string_list_split[0]
+            print('mac5g is', mac_5g)
+
+            # sh wi client macs have a ":" on the end of the mac
+            # this has to be removed and the mac changed to up so that it can be used as a dictionary key
+            #print('mac5g  upper', mac_5g.upper())
+            mac_5g = mac_5g.upper()
+            mac_5g = mac_5g[:-1]
+            print('modified 5g mac', mac_5g)
+            print('##############################################')
+
+
+            if mac_5g in test_house_devices_static_info:
+
+                print('this is the initial string', g5_string_list[g5_list_entry])
+
+                self.rg_connected_clients_dict[mac_5g] = {}
+                print('mac  **********************************' + mac_5g + '\n')
+
+                wi_state = show_wi_client_groups.group(1)
+                self.rg_connected_clients_dict[mac_5g]['wi_state'] = wi_state
+                print('wi state **********************************' + wi_state + '\n')
+                continue
+                # a new problem now all the naming offsets are wrong
+                # maybe I should get them one at a time.
+                #  a solution might be to add one to the offset if it is found
+                # need a found index and a not found index
+                wi_ip = show_wi_client_groups.group(2)
+                self.rg_connected_clients_dict[mac_5g]['ip'] = wi_ip
+                print('wi ip **********************************' + wi_ip + '\n')
+                continue
+
+
+                wi_ssid = show_wi_client_groups.group(3)
+                self.rg_connected_clients_dict[mac_5g]['ssid'] = wi_ssid
+                print('wi ssid **********************************' + wi_ssid + '\n')
+
+                wi_psmod = show_wi_client_groups.group(4)
+                self.rg_connected_clients_dict[mac_5g]['psmod'] = wi_psmod
+                print('wi psmod **********************************' + wi_psmod + '\n')
+
+                wi_nmod = show_wi_client_groups.group(5)
+                self.rg_connected_clients_dict[mac_5g]['nmod'] = wi_nmod
+                print('wi nmod **********************************' + wi_nmod + '\n')
+
+                wi_wmmen = show_wi_client_groups.group(6)
+                self.rg_connected_clients_dict[mac_5g]['wmmen'] = wi_wmmen
+                print('wi nmod **********************************' + wi_wmmen + '\n')
+
+                wi_rate = show_wi_client_groups.group(7)
+                self.rg_connected_clients_dict[mac_5g]['rate'] = wi_rate
+                print('wi rate **********************************' + wi_rate + '\n')
+
+                wi_on_time = show_wi_client_groups.group(8)
+                self.rg_connected_clients_dict[mac_5g]['on_time'] = wi_on_time
+                print('wi on_time **********************************' + wi_ront_time + '\n')
+
+                wi_tx_pkt = show_wi_client_groups.group(9)
+                self.rg_connected_clients_dict[mac_5g]['tx_pkt'] = wi_tx_pkt
+                print('wi tx_pkt **********************************' + wi_rtxpkt + '\n')
+
+                wi_tx_err = show_wi_client_groups.group(10)
+                self.rg_connected_clients_dict[mac_5g]['tx_err'] = wi_tx_err
+                print('wi rate **********************************' + wi_rate + '\n')
+
+                wi_rx_uni = show_wi_client_groups.group(11)
+                self.rg_connected_clients_dict[mac_5g]['rate'] = wi_rx_uni
+                print('wi rate **********************************' + wi_rx_uni + '\n')
+
+                wi_rx_mul = show_wi_client_groups.group(12)
+                self.rg_connected_clients_dict[mac_5g]['rx_mul'] = wi_rx_mul
+                print('wi rx_mul **********************************' + wi_rx_mul + '\n')
+
+                wi_rx_err = show_wi_client_groups.group(13)
+                self.rg_connected_clients_dict[mac_5g]['rx_err'] = wi_rx_err
+                print('wi rx_mul **********************************' + wi_rx_err + '\n')
+                print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n')
+
+                wi_rssi = show_wi_client_groups.group(14)
+                self.rg_connected_clients_dict[mac_5g]['rssi'] = wi_rssi
+                print('wi rssi **********************************' + wi_rssi + '\n')
+                print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n')
+
+                print('************************************************mac is in dicitonary', mac_5g)
+            else:
+                print('No information for this 5g  mac', mac_5g)
+            continue
+            # show_wi_client_groups = show_wi_clients_reg_ex.search(g2_string_list[i])
+
+        return self.rg_connected_clients_dict
 
     def factory_reset_rg(self):
         global nvg_info
