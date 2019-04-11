@@ -6,13 +6,10 @@ import itertools
 import pprint
 import time
 
-#import requests
-
-from bs4 import BeautifulSoup
-
-import requests
-
-from selenium import webdriver
+# import requests
+# from bs4 import BeautifulSoup
+# import requests
+# from selenium import webdriver
 
 import re
 import smtplib
@@ -23,22 +20,20 @@ from datetime import datetime
 import pexpect
 from rgclass import Nvg599Class
 
-from rgclass import  NON_DFS_CHANNELS
-from rgclass import  DFS_CHANNELS
+# from rgclass import  NON_DFS_CHANNELS
+# from rgclass import  DFS_CHANNELS
 ########################  this seems like what we want
-#p = pexpect.spawn('adb connect 192.168.1.71')
-#p.expect(pexpect.EOF)
+# p = pexpect.spawn('adb connect 192.168.1.71')
+# p.expect(pexpect.EOF)
 
 
 # Find the current channel used for 5G
-# Check the 5G cahhen used. If noner DFS , set to DFS and note the setting
+# Check the 5G channel used. If none DFS , set to DFS and note the setting
 # enter the command to simulate radar detection
-# verify that the channel changes to
-# a non DFS channel
+# verify that the channel changes to a non DFS channel
 
 def test_ping(session):
     nvg_599_dut = Nvg599Class()
-
 
 #NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
 #DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
@@ -53,16 +48,11 @@ def test_dfs(nvg_599_dut,results_file):
     global NON_DFS_CHANNELS
     global DFS_CHANNELS
     session = nvg_599_dut.session
-    #nvg_599_dut = Nvg599Class()
-    #current_radio_channel_5g = nvg_599_dut.accessUIWiFiInfo("ui_channel_5g")
     home_link = session.find_element_by_link_text("Device")
     home_link.click()
     #nvg_599_dut.session = home_link
 
     current_5g_channel = nvg_599_dut.get_ui_home_network_status_value("ui_channel_5g")
-    #current_radio_channel_5g = 5
-   # exit()
-
     if current_5g_channel in DFS_CHANNELS:
         result = "Current 5G:" + current_5g_channel + " is a DFS channel\n"
         result_str = str(result)
@@ -89,16 +79,12 @@ def test_dfs(nvg_599_dut,results_file):
     sleep(10)
 
     current_5g_channel = nvg_599_dut.get_ui_home_network_status_value("ui_channel_5g")
-
     current_5g_channel = int(current_5g_channel)
 
     print('current_5g_channel',current_5g_channel)
-# after the test we expect the channel to have been changed to a non DFS channel
+    # after the test we expect the channel to have been changed to a non DFS channel
 
     if current_5g_channel in NON_DFS_CHANNELS:
-        #results_str = "5G channel:" + current_5g_channel + " is a non DFS channel\n"
-        #result = str(results_str)
-        #results_file.write(result)
         results_file.write("5G channel changed to non DFS channel: ")
         results_file.write(str(current_5g_channel))
         results_file.write("\n")
@@ -201,8 +187,12 @@ nvg_599_dut = Nvg599Class()
 # exit()
 
 #down_load_speed, up_load_speed = nvg_599_dut.run_speed_test_cli(test_ip)
-nvg_599_dut.cli_sh_wi_clients()
-#nvg_599_dut.ui_get_device_list()
+
+
+# seems basically ok nvg_599_dut.cli_sh_wi_clients()
+nvg_599_dut.ui_get_device_list()
+
+
 exit()
 
 #tst_ping(nvg_599_dut,results_file,"192.168.1.239")
