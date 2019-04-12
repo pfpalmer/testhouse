@@ -595,6 +595,7 @@ class Nvg599Class(GatewayClass):
         sleep(2)
         self.turn_off_supplicant_cli()
         self.enable_sshd_ssh_cli()
+        self.conf_tr69_eco_url()
 
     def get_ui_home_network_status_value(self, value_requested):
         print('in get_ui_home_network_status_value)')
