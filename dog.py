@@ -35,18 +35,19 @@ from rgclass import Nvg599Class
 def test_ping(session):
     nvg_599_dut = Nvg599Class()
 
-#NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
-#DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
+NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
+DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
 # we could add optional parameters to change to a specific channel , maybe
 def test_dfs(nvg_599_dut,results_file):
+
+    global NON_DFS_CHANNELS
+    global DFS_CHANNELS
     print('in test_dfs')
     now = datetime.today().isoformat()
     results_file.write("Test Title:tst_dfs Execution time:")
     results_file.write(now)
     results_file.write("\n")
 
-    global NON_DFS_CHANNELS
-    global DFS_CHANNELS
     session = nvg_599_dut.session
     home_link = session.find_element_by_link_text("Device")
     home_link.click()
@@ -71,11 +72,11 @@ def test_dfs(nvg_599_dut,results_file):
         print('setting channel to DFS channel 100')
 
     nvg_599_dut.login_nvg_599_cli()
-    nvg_599_dut.telnet_cli.sendline()
-    nvg_599_dut.telnet_cli.expect(">")
-    nvg_599_dut.telnet_cli.sendline("telnet 192.168.1.1")
-    nvg_599_dut.telnet_cli.expect("#")
-    nvg_599_dut.telnet_cli.sendline("wl -i eth1 radar 2")
+    nvg_599_dut.telnet_cli_session.sendline()
+    nvg_599_dut.telnet_cli_session.expect(">")
+    nvg_599_dut.telnet_cli_session.sendline("telnet 192.168.1.1")
+    nvg_599_dut.telnet_cli_session.expect("#")
+    nvg_599_dut.telnet_cli_session.sendline("wl -i eth1 radar 2")
     sleep(10)
 
     current_5g_channel = nvg_599_dut.get_ui_home_network_status_value("ui_channel_5g")
@@ -89,8 +90,15 @@ def test_dfs(nvg_599_dut,results_file):
         results_file.write(str(current_5g_channel))
         results_file.write("\n")
 
+        print("Channel change to non DFS  Passed\n")
+        print("Setting back to DFS\n")
+        nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, 100)
 
-        print("Test Passed\n")
+        current_5g_channel = nvg_599_dut.get_ui_home_network_status_value("ui_channel_5g")
+        if current_5g_channel in DFS_CHANNELS:
+            result = "Current 5G:" + current_5g_channel + " is a DFS channel\n"
+            print("Setting back to DFS passed\n")
+
         results_file.write("Test Passed\n")
     else:
         print('test failed:Channel found:',current_5g_channel,' expected non DFS channel')
@@ -134,8 +142,8 @@ def tst_speed_test(nvg_599_dut,results_file,test_ip):
 
 def tst_ping(nvg_599_dut,ping_history_file, remote_ip):
     print('in tst_ping')
-    ping_history_file  = open('ping_history_file.txt', 'a+')
-
+    #ping_history_file  = open('ping_history_file.txt', 'a+')
+    ping_history_file  = open(ping_history_file, 'a+')
     now = datetime.today().isoformat()
     ping_history_file.write("Test Title:tst_ping Execution time:")
     ping_history_file.write(now)
@@ -162,7 +170,6 @@ def tst_ping(nvg_599_dut,ping_history_file, remote_ip):
     print('max: ', max)
     print('mdev:',mdev)
 
-
 #--------------------------------------------------------------------
 
 #statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)', re.DOTALL)
@@ -173,37 +180,33 @@ def tst_ping(nvg_599_dut,ping_history_file, remote_ip):
 #pingInfoRegEx = re.compile(r'rtt.*?=\s(\d+\.\d+)/(\d+\.\d+)/(\d+\.\d+)/(\d+\.\d+)')
 
 
-#mo1 = pingInfoRegEx.search(out)
-
-
-#results_file = open('results_file.txt', 'w+')
 
 
 # for now we are ssuming thatthe dut is a 599
+
+
 nvg_599_dut = Nvg599Class()
-
-# nvg_599_dut.turn_off_supplicant_cli()
-# test_ip = "192.168.1.239"
-# exit()
-
 #down_load_speed, up_load_speed = nvg_599_dut.run_speed_test_cli(test_ip)
 
-
-# seems basically ok nvg_599_dut.cli_sh_wi_clients()
-nvg_599_dut.ui_get_device_list()
-
-
-exit()
-
+url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
+#nvg_599_dut.factory_reset_rg(url_to_check)
+#nvg_599_dut.enable_sshd_ssh_cli()
+#nvg_599_dut.conf_tr69_eco_url()
+#nvg_599_dut.turn_off_supplicant_cli()
+#nvg_599_dut.ping_from_local_host('192.1681.228')
+#nvg_599_dut.ui_get_device_list()
 #tst_ping(nvg_599_dut,results_file,"192.168.1.239")
 #tst_speed_test(nvg_599_dut,results_file,"192.168.1.239")
-#test_dfs(nvg_599_dut,results_file)
-#results_file.close()
-#results_str = open('results_file.txt','r').read()
-#nvg_599_dut.email_test_results(results_str)
-#exit()
 
 
+dfs_file = open('dfs_file.txt','a')
+test_dfs(nvg_599_dut,dfs_file)
+dfs_file.close()
+# results_str = open('results_file.txt','r').read()
+# nvg_599_dut.email_test_results(results_str)
+# exit()
+
+exit()
 
 
 return_dict1 = nvg_599_dut.get_sh_wi_clients_cli()
@@ -518,7 +521,8 @@ exit()
 from time import sleep
 from selenium import webdriver
 
-import pexpect
+# import
+
 
 
 # driver = webdriverhttps://www.waketech.edu/programs-courses/credit/electrical-systems-technology/degrees-pathways.Chrome('/usr/local/bin/chromedriver')
