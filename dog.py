@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 import itertools
 import pprint
+#import global
 import time
 
 # import requests
@@ -20,26 +21,20 @@ from datetime import datetime
 import pexpect
 from rgclass import Nvg599Class
 
+#from rgclass import NON_DFS_CHANNELS This stuff should be in a global module, once I figure out how to do it
+
+
+NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
+DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
+
 # from rgclass import  NON_DFS_CHANNELS
 # from rgclass import  DFS_CHANNELS
-########################  this seems like what we want
-# p = pexpect.spawn('adb connect 192.168.1.71')
-# p.expect(pexpect.EOF)
-
 
 # Find the current channel used for 5G
 # Check the 5G channel used. If none DFS , set to DFS and note the setting
 # enter the command to simulate radar detection
 # verify that the channel changes to a non DFS channel
-
-def test_ping(session):
-    nvg_599_dut = Nvg599Class()
-
-NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
-DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
-# we could add optional parameters to change to a specific channel , maybe
 def test_dfs(nvg_599_dut,results_file):
-
     global NON_DFS_CHANNELS
     global DFS_CHANNELS
     print('in test_dfs')
@@ -140,7 +135,7 @@ def tst_speed_test(nvg_599_dut,results_file,test_ip):
     results_file.write("\n")
     results_file.write("\n")
 
-def tst_ping(nvg_599_dut,ping_history_file, remote_ip):
+def tst_ping_ip(nvg_599_dut,ping_history_file, remote_ip):
     print('in tst_ping')
     #ping_history_file  = open('ping_history_file.txt', 'a+')
     ping_history_file  = open(ping_history_file, 'a+')
@@ -170,6 +165,21 @@ def tst_ping(nvg_599_dut,ping_history_file, remote_ip):
     print('max: ', max)
     print('mdev:',mdev)
 
+
+
+def test_ping_device_name(device_name_to_ping):
+    sh_ip_lan_dict = Nvg599Class.get_rg_sh_ip_lan_info_cli('arris-Latitude-MBR')
+    print('dict type' + str(type(sh_ip_lan_dict)))
+    for key in sh_ip_lan_dict:
+        #print('key----------------------------------------------' + key)
+        if sh_ip_lan_dict[key]['Name']== device_name_to_ping:
+            print('found it ' + sh_ip_lan_dict[key]['Name'])
+            print('IP is: ' + sh_ip_lan_dict[key]['IP'])
+
+
+    print('dict is ' + str(sh_ip_lan_dict))
+
+
 #--------------------------------------------------------------------
 
 #statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)', re.DOTALL)
@@ -185,32 +195,38 @@ def tst_ping(nvg_599_dut,ping_history_file, remote_ip):
 # for now we are ssuming thatthe dut is a 599
 
 
-nvg_599_dut = Nvg599Class()
+#nvg_599_dut = Nvg599Class()
 #down_load_speed, up_load_speed = nvg_599_dut.run_speed_test_cli(test_ip)
 
-url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
-#nvg_599_dut.factory_reset_rg(url_to_check)
-#nvg_599_dut.enable_sshd_ssh_cli()
-#nvg_599_dut.conf_tr69_eco_url()
-#nvg_599_dut.turn_off_supplicant_cli()
-#nvg_599_dut.ping_from_local_host('192.1681.228')
-#nvg_599_dut.ui_get_device_list()
-#tst_ping(nvg_599_dut,results_file,"192.168.1.239")
-#tst_speed_test(nvg_599_dut,results_file,"192.168.1.239")
+#url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
+# nvg_599_dut.factory_reset_rg(url_to_check)
+# nvg_599_dut.enable_sshd_ssh_cli()
+# nvg_599_dut.conf_tr69_eco_url()
+# nvg_599_dut.turn_off_supplicant_cli()
+# nvg_599_dut.ping_from_local_host('192.1681.228')
+# nvg_599_dut.ui_get_device_list()
+# tst_ping(nvg_599_dut,results_file,"192.168.1.239")
+# tst_speed_test(nvg_599_dut,results_file,"192.168.1.239")
+# dfs_file = open('dfs_file.txt','a')
+# test_dfs(nvg_599_dut,dfs_file)
+# dfs_file.close()
 
+#nvg_599_dut.get_rg_sh_ip_lan_info_cli()
 
-dfs_file = open('dfs_file.txt','a')
-test_dfs(nvg_599_dut,dfs_file)
-dfs_file.close()
+# Nvg599Class.get_rg_sh_ip_lan_info_cli('arris-Latitude-MBR')
+
 # results_str = open('results_file.txt','r').read()
 # nvg_599_dut.email_test_results(results_str)
 # exit()
 
+
+test_ping_device_name('arris-Latitude-MBR')
+
 exit()
 
 
-return_dict1 = nvg_599_dut.get_sh_wi_clients_cli()
-clientDictStr = pprint.pformat(return_dict1)
+#return_dict1 = nvg_599_dut.get_sh_wi_clients_cli()
+c#lientDictStr = pprint.pformat(return_dict1)
 print("1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 print(clientDictStr)
 print("2xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
