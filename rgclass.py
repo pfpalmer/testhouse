@@ -69,6 +69,7 @@ test_house_devices_static_info = {
 NON_DFS_CHANNELS = {36, 40, 44, 48, 149, 153, 157, 161, 165}
 DFS_CHANNELS = {52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144}
 
+
 class GatewayClass:
     def __init__(self):
         self.magic = None
@@ -158,7 +159,7 @@ class Nvg599Class(GatewayClass):
         self.hardware_version = None
         self.serial_number = None
         self.factory_reset = None
-        self.cli_rg_connected_clients_dict = {}
+        # self.cli_rg_connected_clients_dict = {}
         self.ui_rg_connected_clients_dict = {}
         self.ip_lan_connections_dict_cli = {}
         self.get_ui_system_information()
@@ -378,173 +379,208 @@ class Nvg599Class(GatewayClass):
         except NoSuchElementException:
             print('Password challenge not displayed- Continuing')
 
-    def cli_sh_wi_clients(self):
-        global test_house_devices_static_info
-        print("in cli_sh_wi_clients")
-        self.telnet_cli_session = self.login_nvg_599_cli()
-        self.telnet_cli_session.sendline("show wi clients")
-        self.telnet_cli_session.expect('OCKED>')
-        show_wi_client_str = self.telnet_cli_session.before
-        self.telnet_cli_session.close()
-        print('------------------------------------------------------\n')
-        print('------------------------------------------------------\n')
-        # dividing on macs
-        wi_reg_ex = re.compile(r'(?:[0-9a-fA-F]:?){12}.*?\n.*\n.*\n.*\n')
-        client_string_list = re.findall(wi_reg_ex, show_wi_client_str)
-
-        number_of_entries = len(client_string_list)
-        print("The list has :", number_of_entries)
-
-        client_entries = range(0, number_of_entries)
-
-        for client_list_entry in client_entries:
-            print("entry:", client_string_list[client_list_entry])
-            print("-------------------------")
-
-            client_string_list_split = client_string_list[client_list_entry].split()
-
-            mac = client_string_list_split[0]
-            mac = mac.upper()
-            mac = mac[:-1]
-            print('modified 2g mac', mac)
-
-            if mac in test_house_devices_static_info:
-                self.cli_rg_connected_clients_dict[mac] = {}
-                print('mac found in lab dict', mac)
-
-                self.cli_rg_connected_clients_dict[mac]['band'] = test_house_devices_static_info[mac]['band']
-                print('setting band to:',  self.cli_rg_connected_clients_dict[mac]['band'])
-
-                if re.search(r'.*State=(\w+),', client_string_list[client_list_entry]) is not None:
-                    wi_state_search = re.search(r'.*State=(\w+)', client_string_list[client_list_entry])
-                    self.cli_rg_connected_clients_dict[mac]['wi_state'] = wi_state_search.group(1)
-                    print('Seting wi_state to ', wi_state_search.group(1))
-                else:
-                    self.cli_rg_connected_clients_dict[mac]['wi_state'] = "Not found or State value missing"
-                    print('Seting wi_state to Not Found or value missing ')
-
-                if re.search(r'.*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})',
-                    client_string_list[client_list_entry]) is not None:
-                    wi_state_search = re.search(r'.*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})',
-                    client_string_list[client_list_entry])
-                    self.cli_rg_connected_clients_dict[mac]['ip'] = wi_state_search.group(1)
-                    print('Seting ip to ', wi_state_search.group(1))
-                else:
-                    self.cli_rg_connected_clients_dict[mac]['ip'] = "Not found or State value missing"
-                    print('Seting ip to Not Found or value missing ')
-
-                if re.search(r'.*SSID=(\w+)', client_string_list[client_list_entry]) is not None:
-                    wi_state_search = re.search(r'.*SSID=(\w+)', client_string_list[client_list_entry])
-                    self.cli_rg_connected_clients_dict[mac]['ip'] = wi_state_search.group(1)
-                    print('Seting SSID to ', wi_state_search.group(1))
-                else:
-                    self.cli_rg_connected_clients_dict[mac]['ssid'] = "Not found or State value missing"
-                    print('Seting ssid to Not Found or value missing ')
-
-                if re.search(r'.*PSMod=(\w+)', client_string_list[client_list_entry]) is not None:
-                    wi_state_search = re.search(r'.*PSMod=(\w+)', client_string_list[client_list_entry])
-                    self.cli_rg_connected_clients_dict[mac]['psmod'] = wi_state_search.group(1)
-                    print('Seting psmod to ', wi_state_search.group(1))
-                else:
-                    self.cli_rg_connected_clients_dict[mac]['psmod'] = "Not found or value missing"
-                    print('Seting psmod to Not Found or value missing ')
-
-                if re.search(r'.*NMod=(\w+)', client_string_list[client_list_entry]) is not None:
-                    wi_state_search = re.search(r'.*NMod=(\w+)', client_string_list[client_list_entry])
-                    self.cli_rg_connected_clients_dict[mac]['nmod'] = wi_state_search.group(1)
-                    print('Seting psmod to ', wi_state_search.group(1))
-                else:
-                    self.cli_rg_connected_clients_dict[mac]['nmod'] = "Not found or value missing"
-                    print('Seting nmmod to Not Found or value missing ')
-
-                if re.search(r'.*WMMEn=(\w+)', client_string_list[client_list_entry]) is not None:
-                    wi_state_search = re.search(r'.*WMMEn=(\w+)', client_string_list[client_list_entry])
-                    self.cli_rg_connected_clients_dict[mac]['wmmen'] = wi_state_search.group(1)
-                    print('Seting psmod to ', wi_state_search.group(1))
-                else:
-                    self.cli_rg_connected_clients_dict[mac]['wmmen'] = "Not found or value missing"
-                    print('Seting wmmen to Not Found or value missing ')
-
-                if re.search(r'.*Rate=(\w+\s\w+)', client_string_list[client_list_entry]) is not None:
-                    wi_state_search = re.search(r'.*Rate=(\w+\s\w+)', client_string_list[client_list_entry])
-                    self.cli_rg_connected_clients_dict[mac]['wmmen'] = wi_state_search.group(1)
-                    print('Seting rate to ', wi_state_search.group(1))
-                else:
-                    self.cli_rg_connected_clients_dict[mac]['rate'] = "Not found or value missing"
-                    print('Seting rate to Not Found or value missing ')
-
-                if re.search(r'.*ON\sfor\s(\w+\s\w+)', client_string_list[client_list_entry]) is not None:
-                    wi_state_search = re.search(r'.*ON\sfor\s(\w+\s\w+)', client_string_list[client_list_entry])
-                    self.cli_rg_connected_clients_dict[mac]['ontime'] = wi_state_search.group(1)
-                    print('Seting ontime to ', wi_state_search.group(1))
-                else:
-                    self.cli_rg_connected_clients_dict[mac]['ontime'] = "Not found or value missing"
-                    print('Seting On Time to Not Found or value missing ')
-
-                if re.search(r'.*TxPkt=(\w+)', client_string_list[client_list_entry]) is not None:
-                    wi_state_search = re.search(r'.*TxPkt=(\w+)', client_string_list[client_list_entry])
-                    self.cli_rg_connected_clients_dict[mac]['txpkt'] = wi_state_search.group(1)
-                    print('Seting txpkt to ', wi_state_search.group(1))
-                else:
-                    self.cli_rg_connected_clients_dict[mac]['txpkt'] = "Not found or value missing"
-                    print('Seting txpkt to Not Found or value missing ')
-
-                if re.search(r'.*TxErr=(\w+)', client_string_list[client_list_entry]) is not None:
-                    wi_state_search = re.search(r'.*TxErr=(\w+)', client_string_list[client_list_entry])
-                    self.cli_rg_connected_clients_dict[mac]['txerr'] = wi_state_search.group(1)
-                    print('Seting txerr to ', wi_state_search.group(1))
-                else:
-                    self.cli_rg_connected_clients_dict[mac]['txerr'] = "Not found or value missing"
-                    print('Seting txerr to Not Found or value missing ')
-
-                if re.search(r'.*RxUni=(\w+)', client_string_list[client_list_entry]) is not None:
-                    wi_state_search = re.search(r'.*RxUni=(\w+)', client_string_list[client_list_entry])
-                    self.cli_rg_connected_clients_dict[mac]['rxuni'] = wi_state_search.group(1)
-                    print('Seting rxuni to ', wi_state_search.group(1))
-                else:
-                    self.cli_rg_connected_clients_dict[mac]['rxuni'] = "Not found or value missing"
-                    print('Seting rxuni to Not Found or value missing ')
-
-                if re.search(r'.*RxMul=(\w+)', client_string_list[client_list_entry]) is not None:
-                    wi_state_search = re.search(r'.*RxMul=(\w+)', client_string_list[client_list_entry])
-                    self.cli_rg_connected_clients_dict[mac]['rxmul'] = wi_state_search.group(1)
-                    print('Seting rxmul to ', wi_state_search.group(1))
-                else:
-                    self.cli_rg_connected_clients_dict[mac]['rxuni'] = "Not found or value missing"
-                    print('Seting rxmul to Not Found or value missing ')
-
-                if re.search(r'.*RxErr=(\w+)', client_string_list[client_list_entry]) is not None:
-                    wi_state_search = re.search(r'.*RxErr=(\w+)', client_string_list[client_list_entry])
-                    self.cli_rg_connected_clients_dict[mac]['rxerr'] = wi_state_search.group(1)
-                    print('Seting rxerr to ', wi_state_search.group(1))
-                else:
-                    self.cli_rg_connected_clients_dict[mac]['rxerr'] = "Not found or value missing"
-                    print('Seting rxerr to Not Found or value missing ')
-
-                if re.search(r'.*RSSI=-(\w+)', client_string_list[client_list_entry]) is not None:
-                    wi_state_search = re.search(r'.*RSSI=-(\w+)', client_string_list[client_list_entry])
-                    self.cli_rg_connected_clients_dict[mac]['rxerr'] = wi_state_search.group(1)
-                    print('Seting rssi to ', wi_state_search.group(1))
-                else:
-                    self.cli_rg_connected_clients_dict[mac]['rssi'] = "Not found or value missing"
-                    print('Seting rssi to Not Found or value missing ')
-            print("x-------------------------")
-            ###########################################################
-
-        # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*SSID=(\w+).*PSMod=(\w+)?,.*NMode=(\w+)?,.*WMMEn=(\w+)?,.*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+)?.*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)?', re.DOTALL)
-        # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:(\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)', re.DOTALL)
-        # not sure if I need to return this if the dictionary is alread bound to the instance
-        return self.cli_rg_connected_clients_dict
-
-
-    def cli_sh_wi_all_clients(self):
+# # All temporal methods should be static
+#     def cli_sh_wi_clients(self):
+#         global test_house_devices_static_info
+#         print("in cli_sh_wi_clients")
+#         self.telnet_cli_session = self.login_nvg_599_cli()
+#         self.telnet_cli_session.sendline("show wi clients")
+#         self.telnet_cli_session.expect('OCKED>')
+#         show_wi_client_str = self.telnet_cli_session.before
+#         self.telnet_cli_session.close()
+#         print('------------------------------------------------------\n')
+#         print('------------------------------------------------------\n')
+#         # dividing on macs
+#         wi_reg_ex = re.compile(r'(?:[0-9a-fA-F]:?){12}.*?\n.*\n.*\n.*\n')
+#         client_string_list = re.findall(wi_reg_ex, show_wi_client_str)
+#
+#         number_of_entries = len(client_string_list)
+#         print("The list has :", number_of_entries)
+#
+#         client_entries = range(0, number_of_entries)
+#
+#         for client_list_entry in client_entries:
+#             print("entry:", client_string_list[client_list_entry])
+#             print("-------------------------")
+#
+#             client_string_list_split = client_string_list[client_list_entry].split()
+#
+#             mac = client_string_list_split[0]
+#             mac = mac.upper()
+#             mac = mac[:-1]
+#             print('modified 2g mac', mac)
+#             cli_rg_connected_clients_dict = {}
+#             if mac in test_house_devices_static_info:
+#                 # self.cli_rg_connected_clients_dict[mac] = {}
+#                 cli_rg_connected_clients_dict[mac] = {}
+#
+#                 print('mac found in lab dict', mac)
+#
+#                 # self.cli_rg_connected_clients_dict[mac]['band'] = test_house_devices_static_info[mac]['band']
+#                 # print('setting band to:',  self.cli_rg_connected_clients_dict[mac]['band'])
+#
+#                 cli_rg_connected_clients_dict[mac]['band'] = test_house_devices_static_info[mac]['band']
+#                 print('setting band to:', cli_rg_connected_clients_dict[mac]['band'])
+#
+#
+#                 if re.search(r'.*State=(\w+),', client_string_list[client_list_entry]) is not None:
+#                     wi_state_search = re.search(r'.*State=(\w+)', client_string_list[client_list_entry])
+#                     # self.cli_rg_connected_clients_dict[mac]['wi_state'] = wi_state_search.group(1)
+#                     cli_rg_connected_clients_dict[mac]['wi_state'] = wi_state_search.group(1)
+#                     print('Seting wi_state to ', wi_state_search.group(1))
+#                 else:
+#                     # self.cli_rg_connected_clients_dict[mac]['wi_state'] = "Not found or State value missing"
+#                     cli_rg_connected_clients_dict[mac]['wi_state'] = "Not found or State value missing"
+#                     print('Seting wi_state to Not Found or value missing ')
+#
+#                 if re.search(r'.*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})',
+#                     client_string_list[client_list_entry]) is not None:
+#                     wi_state_search = re.search(r'.*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})',
+#                     client_string_list[client_list_entry])
+#                     # self.cli_rg_connected_clients_dict[mac]['ip'] = wi_state_search.group(1)
+#                     cli_rg_connected_clients_dict[mac]['ip'] = wi_state_search.group(1)
+#                     print('Seting ip to ', wi_state_search.group(1))
+#                 else:
+#                     #self.cli_rg_connected_clients_dict[mac]['ip'] = "Not found or State value missing"
+#                     cli_rg_connected_clients_dict[mac]['ip'] = "Not found or State value missing"
+#                     print('Seting ip to Not Found or value missing ')
+#
+#                 if re.search(r'.*SSID=(\w+)', client_string_list[client_list_entry]) is not None:
+#                     wi_state_search = re.search(r'.*SSID=(\w+)', client_string_list[client_list_entry])
+#                     #self.cli_rg_connected_clients_dict[mac]['ip'] = wi_state_search.group(1)
+#                     cli_rg_connected_clients_dict[mac]['ip'] = wi_state_search.group(1)
+#                     print('Seting SSID to ', wi_state_search.group(1))
+#                 else:
+#                     # self.cli_rg_connected_clients_dict[mac]['ssid'] = "Not found or State value missing"
+#                     cli_rg_connected_clients_dict[mac]['ssid'] = "Not found or State value missing"
+#                     print('Seting ssid to Not Found or value missing ')
+#
+#                 if re.search(r'.*PSMod=(\w+)', client_string_list[client_list_entry]) is not None:
+#                     wi_state_search = re.search(r'.*PSMod=(\w+)', client_string_list[client_list_entry])
+#                     # self.cli_rg_connected_clients_dict[mac]['psmod'] = wi_state_search.group(1)
+#                     cli_rg_connected_clients_dict[mac]['psmod'] = wi_state_search.group(1)
+#                     print('Seting psmod to ', wi_state_search.group(1))
+#                 else:
+#                     # self.cli_rg_connected_clients_dict[mac]['psmod'] = "Not found or value missing"
+#                     cli_rg_connected_clients_dict[mac]['psmod'] = "Not found or value missing"
+#                     print('Seting psmod to Not Found or value missing ')
+#
+#                 if re.search(r'.*NMod=(\w+)', client_string_list[client_list_entry]) is not None:
+#                     wi_state_search = re.search(r'.*NMod=(\w+)', client_string_list[client_list_entry])
+#                     # self.cli_rg_connected_clients_dict[mac]['nmod'] = wi_state_search.group(1)
+#                     cli_rg_connected_clients_dict[mac]['nmod'] = wi_state_search.group(1)
+#                     print('Seting psmod to ', wi_state_search.group(1))
+#                 else:
+#                     # self.cli_rg_connected_clients_dict[mac]['nmod'] = "Not found or value missing"
+#                     cli_rg_connected_clients_dict[mac]['nmod'] = "Not found or value missing"
+#                     print('Seting nmmod to Not Found or value missing ')
+#
+#                 if re.search(r'.*WMMEn=(\w+)', client_string_list[client_list_entry]) is not None:
+#                     wi_state_search = re.search(r'.*WMMEn=(\w+)', client_string_list[client_list_entry])
+#                     # self.cli_rg_connected_clients_dict[mac]['wmmen'] = wi_state_search.group(1)
+#                     self.cli_rg_connected_clients_dict[mac]['wmmen'] = wi_state_search.group(1)
+#                     print('Seting psmod to ', wi_state_search.group(1))
+#                 else:
+#                     # self.cli_rg_connected_clients_dict[mac]['wmmen'] = "Not found or value missing"
+#                     cli_rg_connected_clients_dict[mac]['wmmen'] = "Not found or value missing"
+#                     print('Seting wmmen to Not Found or value missing ')
+#
+#                 if re.search(r'.*Rate=(\w+\s\w+)', client_string_list[client_list_entry]) is not None:
+#                     wi_state_search = re.search(r'.*Rate=(\w+\s\w+)', client_string_list[client_list_entry])
+#                     # self.cli_rg_connected_clients_dict[mac]['wmmen'] = wi_state_search.group(1)
+#                     cli_rg_connected_clients_dict[mac]['wmmen'] = wi_state_search.group(1)
+#                     print('Seting rate to ', wi_state_search.group(1))
+#                 else:
+#                     # self.cli_rg_connected_clients_dict[mac]['rate'] = "Not found or value missing"
+#                     self.cli_rg_connected_clients_dict[mac]['rate'] = "Not found or value missing"
+#                     print('Seting rate to Not Found or value missing ')
+#
+#                 if re.search(r'.*ON\sfor\s(\w+\s\w+)', client_string_list[client_list_entry]) is not None:
+#                     wi_state_search = re.search(r'.*ON\sfor\s(\w+\s\w+)', client_string_list[client_list_entry])
+#                     # self.cli_rg_connected_clients_dict[mac]['ontime'] = wi_state_search.group(1)
+#                     cli_rg_connected_clients_dict[mac]['ontime'] = wi_state_search.group(1)
+#                     print('Seting ontime to ', wi_state_search.group(1))
+#                 else:
+#                     # self.cli_rg_connected_clients_dict[mac]['ontime'] = "Not found or value missing"
+#                     cli_rg_connected_clients_dict[mac]['ontime'] = "Not found or value missing"
+#
+#                     print('Seting On Time to Not Found or value missing ')
+#
+#                 if re.search(r'.*TxPkt=(\w+)', client_string_list[client_list_entry]) is not None:
+#                     wi_state_search = re.search(r'.*TxPkt=(\w+)', client_string_list[client_list_entry])
+#                     # self.cli_rg_connected_clients_dict[mac]['txpkt'] = wi_state_search.group(1)
+#                     cli_rg_connected_clients_dict[mac]['txpkt'] = wi_state_search.group(1)
+#                     print('Seting txpkt to ', wi_state_search.group(1))
+#                 else:
+#                     # self.cli_rg_connected_clients_dict[mac]['txpkt'] = "Not found or value missing"
+#                     cli_rg_connected_clients_dict[mac]['txpkt'] = "Not found or value missing"
+#                     print('Seting txpkt to Not Found or value missing ')
+#
+#                 if re.search(r'.*TxErr=(\w+)', client_string_list[client_list_entry]) is not None:
+#                     wi_state_search = re.search(r'.*TxErr=(\w+)', client_string_list[client_list_entry])
+#                     # self.cli_rg_connected_clients_dict[mac]['txerr'] = wi_state_search.group(1)
+#                     cli_rg_connected_clients_dict[mac]['txerr'] = wi_state_search.group(1)
+#                     print('Seting txerr to ', wi_state_search.group(1))
+#                 else:
+#                     # self.cli_rg_connected_clients_dict[mac]['txerr'] = "Not found or value missing"
+#                     cli_rg_connected_clients_dict[mac]['txerr'] = "Not found or value missing"
+#                     print('Seting txerr to Not Found or value missing ')
+#
+#                 if re.search(r'.*RxUni=(\w+)', client_string_list[client_list_entry]) is not None:
+#                     wi_state_search = re.search(r'.*RxUni=(\w+)', client_string_list[client_list_entry])
+#                     # self.cli_rg_connected_clients_dict[mac]['rxuni'] = wi_state_search.group(1)
+#                     cli_rg_connected_clients_dict[mac]['rxuni'] = wi_state_search.group(1)
+#                     print('Seting rxuni to ', wi_state_search.group(1))
+#                 else:
+#                     # self.cli_rg_connected_clients_dict[mac]['rxuni'] = "Not found or value missing"
+#                     cli_rg_connected_clients_dict[mac]['rxuni'] = "Not found or value missing"
+#                     print('Seting rxuni to Not Found or value missing ')
+#
+#                 if re.search(r'.*RxMul=(\w+)', client_string_list[client_list_entry]) is not None:
+#                     wi_state_search = re.search(r'.*RxMul=(\w+)', client_string_list[client_list_entry])
+#                     # self.cli_rg_connected_clients_dict[mac]['rxmul'] = wi_state_search.group(1)
+#                     cli_rg_connected_clients_dict[mac]['rxmul'] = wi_state_search.group(1)
+#                     print('Seting rxmul to ', wi_state_search.group(1))
+#                 else:
+#                     # self.cli_rg_connected_clients_dict[mac]['rxuni'] = "Not found or value missing"
+#                     cli_rg_connected_clients_dict[mac]['rxuni'] = "Not found or value missing"
+#                     print('Seting rxmul to Not Found or value missing ')
+#
+#                 if re.search(r'.*RxErr=(\w+)', client_string_list[client_list_entry]) is not None:
+#                     wi_state_search = re.search(r'.*RxErr=(\w+)', client_string_list[client_list_entry])
+#                     # self.cli_rg_connected_clients_dict[mac]['rxerr'] = wi_state_search.group(1)
+#                     cli_rg_connected_clients_dict[mac]['rxerr'] = wi_state_search.group(1)
+#                     print('Seting rxerr to ', wi_state_search.group(1))
+#                 else:
+#                     # self.cli_rg_connected_clients_dict[mac]['rxerr'] = "Not found or value missing"
+#                     cli_rg_connected_clients_dict[mac]['rxerr'] = "Not found or value missing"
+#                     print('Seting rxerr to Not Found or value missing ')
+#
+#                 if re.search(r'.*RSSI=-(\w+)', client_string_list[client_list_entry]) is not None:
+#                     wi_state_search = re.search(r'.*RSSI=-(\w+)', client_string_list[client_list_entry])
+#                     # self.cli_rg_connected_clients_dict[mac]['rxerr'] = wi_state_search.group(1)
+#                     cli_rg_connected_clients_dict[mac]['rxerr'] = wi_state_search.group(1)
+#                     print('Seting rssi to ', wi_state_search.group(1))
+#                 else:
+#                     # self.cli_rg_connected_clients_dict[mac]['rssi'] = "Not found or value missing"
+#                     cli_rg_connected_clients_dict[mac]['rssi'] = "Not found or value missing"
+#                     print('Seting rssi to Not Found or value missing ')
+#
+#         return cli_rg_connected_clients_dict
+#
+#         # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*SSID=(\w+).*PSMod=(\w+)?,.*NMode=(\w+)?,.*WMMEn=(\w+)?,.*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+)?.*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)?', re.DOTALL)
+#         # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:(\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)', re.DOTALL)
+#         # not sure if I need to return this if the dictionary is alread bound to the instance
+#         return cli_rg_connected_clients_dict
+    @staticmethod
+    def cli_sh_wi_all_clients():
         global test_house_devices_static_info
         print("In cli_sh_wi_all_clients")
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline("show wi clients")
         self.telnet_cli_session.expect('OCKED>')
         show_wi_client_str = self.telnet_cli_session.before
-
+        cli_rg_connected_clients_dict = {}
         g2_and_g5_list = show_wi_client_str.split('5.0 GHz')
         print('g2_list:' + g2_and_g5_list[0])
         print('g5_list:' + g2_and_g5_list[1])
@@ -558,19 +594,18 @@ class Nvg599Class(GatewayClass):
         total_number_of_entries = len(client_string_list)
         print("The  whole list has :", total_number_of_entries)
 
-
         g2_client_string_list = re.findall(wi_reg_ex, g2_and_g5_list[0])
         g5_client_string_list = re.findall(wi_reg_ex, g2_and_g5_list[1])
 
-        number_of_entries_2G = len(g2_client_string_list)
-        print("The 2G list has :", number_of_entries_2G)
+        number_of_entries_2g = len(g2_client_string_list)
+        print("The 2G list has :", number_of_entries_2g)
 
-        number_of_entries_5G = len(g5_client_string_list)
-        print("The 5G list has :", number_of_entries_5G)
+        number_of_entries_5g = len(g5_client_string_list)
+        print("The 5G list has :", number_of_entries_5g)
 
-        #client_entries_2G = range(0, number_of_entries_2G)
+        # client_entries_2G = range(0, number_of_entries_2G)
         client_entries = range(0, total_number_of_entries)
-        #client_string_list = re.findall(wi_reg_ex, g2_and_g5_list[0])
+        # client_string_list = re.findall(wi_reg_ex, g2_and_g5_list[0])
 
         for client_list_entry in client_entries:
             print("entry:", client_string_list[client_list_entry])
@@ -583,151 +618,139 @@ class Nvg599Class(GatewayClass):
             mac = mac[:-1]
             print('modified 2g mac', mac)
 
-            self.cli_rg_connected_clients_dict[mac] = {}
+            cli_rg_connected_clients_dict[mac] = {}
             print('mac:', mac)
-
-
             print('g2_client_str_list:' + str(g2_client_string_list))
             print('client_list_entry' + str(client_string_list[client_list_entry]))
-            #exit()
             if client_string_list[client_list_entry] in g2_client_string_list:
-                self.cli_rg_connected_clients_dict[mac]['connected_band'] = '2.4 HGz'
+                cli_rg_connected_clients_dict[mac]['connected_band'] = '2.4 HGz'
                 print('setting band to 2.4GHz')
             else:
-                self.cli_rg_connected_clients_dict[mac]['connected_band'] = '5.0 HGz'
+                cli_rg_connected_clients_dict[mac]['connected_band'] = '5.0 HGz'
                 print('setting band to 5.0 GHz')
 
             if re.search(r'.*State=(\w+),', client_string_list[client_list_entry]) is not None:
                 wi_state_search = re.search(r'.*State=(\w+)', client_string_list[client_list_entry])
-                self.cli_rg_connected_clients_dict[mac]['wi_state'] = wi_state_search.group(1)
+                cli_rg_connected_clients_dict[mac]['wi_state'] = wi_state_search.group(1)
                 print('Seting wi_state to ', wi_state_search.group(1))
             else:
-                self.cli_rg_connected_clients_dict[mac]['wi_state'] = "Not found or State value missing"
+                cli_rg_connected_clients_dict[mac]['wi_state'] = "Not found or State value missing"
                 print('Seting wi_state to Not Found or value missing ')
 
             if re.search(r'.*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})',
                 client_string_list[client_list_entry]) is not None:
                 wi_state_search = re.search(r'.*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})',
                 client_string_list[client_list_entry])
-                self.cli_rg_connected_clients_dict[mac]['ip'] = wi_state_search.group(1)
+                cli_rg_connected_clients_dict[mac]['ip'] = wi_state_search.group(1)
                 print('Seting ip to ', wi_state_search.group(1))
             else:
-                self.cli_rg_connected_clients_dict[mac]['ip'] = "Not found or State value missing"
+                cli_rg_connected_clients_dict[mac]['ip'] = "Not found or State value missing"
                 print('Seting ip to Not Found or value missing ')
 
             if re.search(r'.*SSID=(\w+)', client_string_list[client_list_entry]) is not None:
                 wi_state_search = re.search(r'.*SSID=(\w+)', client_string_list[client_list_entry])
-                self.cli_rg_connected_clients_dict[mac]['ip'] = wi_state_search.group(1)
+                cli_rg_connected_clients_dict[mac]['ip'] = wi_state_search.group(1)
                 print('Seting SSID to ', wi_state_search.group(1))
             else:
-                self.cli_rg_connected_clients_dict[mac]['ssid'] = "Not found or State value missing"
+                cli_rg_connected_clients_dict[mac]['ssid'] = "Not found or State value missing"
                 print('Seting ssid to Not Found or value missing ')
 
             if re.search(r'.*PSMod=(\w+)', client_string_list[client_list_entry]) is not None:
                 wi_state_search = re.search(r'.*PSMod=(\w+)', client_string_list[client_list_entry])
-                self.cli_rg_connected_clients_dict[mac]['psmod'] = wi_state_search.group(1)
+                cli_rg_connected_clients_dict[mac]['psmod'] = wi_state_search.group(1)
                 print('Seting psmod to ', wi_state_search.group(1))
             else:
-                self.cli_rg_connected_clients_dict[mac]['psmod'] = "Not found or value missing"
+                cli_rg_connected_clients_dict[mac]['psmod'] = "Not found or value missing"
                 print('Seting psmod to Not Found or value missing ')
 
             if re.search(r'.*NMod=(\w+)', client_string_list[client_list_entry]) is not None:
                 wi_state_search = re.search(r'.*NMod=(\w+)', client_string_list[client_list_entry])
-                self.cli_rg_connected_clients_dict[mac]['nmod'] = wi_state_search.group(1)
+                cli_rg_connected_clients_dict[mac]['nmod'] = wi_state_search.group(1)
                 print('Seting psmod to ', wi_state_search.group(1))
             else:
-                self.cli_rg_connected_clients_dict[mac]['nmod'] = "Not found or value missing"
+                cli_rg_connected_clients_dict[mac]['nmod'] = "Not found or value missing"
                 print('Seting nmmod to Not Found or value missing ')
 
             if re.search(r'.*WMMEn=(\w+)', client_string_list[client_list_entry]) is not None:
                 wi_state_search = re.search(r'.*WMMEn=(\w+)', client_string_list[client_list_entry])
-                self.cli_rg_connected_clients_dict[mac]['wmmen'] = wi_state_search.group(1)
+                cli_rg_connected_clients_dict[mac]['wmmen'] = wi_state_search.group(1)
                 print('Seting psmod to ', wi_state_search.group(1))
             else:
-                self.cli_rg_connected_clients_dict[mac]['wmmen'] = "Not found or value missing"
+                cli_rg_connected_clients_dict[mac]['wmmen'] = "Not found or value missing"
                 print('Seting wmmen to Not Found or value missing ')
 
             if re.search(r'.*Rate=(\w+\s\w+)', client_string_list[client_list_entry]) is not None:
                 wi_state_search = re.search(r'.*Rate=(\w+\s\w+)', client_string_list[client_list_entry])
-                self.cli_rg_connected_clients_dict[mac]['wmmen'] = wi_state_search.group(1)
+                cli_rg_connected_clients_dict[mac]['wmmen'] = wi_state_search.group(1)
                 print('Seting rate to ', wi_state_search.group(1))
             else:
-                self.cli_rg_connected_clients_dict[mac]['rate'] = "Not found or value missing"
+                cli_rg_connected_clients_dict[mac]['rate'] = "Not found or value missing"
                 print('Seting rate to Not Found or value missing ')
 
             if re.search(r'.*ON\sfor\s(\w+\s\w+)', client_string_list[client_list_entry]) is not None:
                 wi_state_search = re.search(r'.*ON\sfor\s(\w+\s\w+)', client_string_list[client_list_entry])
-                self.cli_rg_connected_clients_dict[mac]['ontime'] = wi_state_search.group(1)
+                cli_rg_connected_clients_dict[mac]['ontime'] = wi_state_search.group(1)
                 print('Seting ontime to ', wi_state_search.group(1))
             else:
-                self.cli_rg_connected_clients_dict[mac]['ontime'] = "Not found or value missing"
+                cli_rg_connected_clients_dict[mac]['ontime'] = "Not found or value missing"
                 print('Seting On Time to Not Found or value missing ')
 
             if re.search(r'.*TxPkt=(\w+)', client_string_list[client_list_entry]) is not None:
                 wi_state_search = re.search(r'.*TxPkt=(\w+)', client_string_list[client_list_entry])
-                self.cli_rg_connected_clients_dict[mac]['txpkt'] = wi_state_search.group(1)
+                cli_rg_connected_clients_dict[mac]['txpkt'] = wi_state_search.group(1)
                 print('Seting txpkt to ', wi_state_search.group(1))
             else:
-                self.cli_rg_connected_clients_dict[mac]['txpkt'] = "Not found or value missing"
+                cli_rg_connected_clients_dict[mac]['txpkt'] = "Not found or value missing"
                 print('Seting txpkt to Not Found or value missing ')
 
             if re.search(r'.*TxErr=(\w+)', client_string_list[client_list_entry]) is not None:
                 wi_state_search = re.search(r'.*TxErr=(\w+)', client_string_list[client_list_entry])
-                self.cli_rg_connected_clients_dict[mac]['txerr'] = wi_state_search.group(1)
+                cli_rg_connected_clients_dict[mac]['txerr'] = wi_state_search.group(1)
                 print('Seting txerr to ', wi_state_search.group(1))
             else:
-                self.cli_rg_connected_clients_dict[mac]['txerr'] = "Not found or value missing"
+                cli_rg_connected_clients_dict[mac]['txerr'] = "Not found or value missing"
                 print('Seting txerr to Not Found or value missing ')
 
             if re.search(r'.*RxUni=(\w+)', client_string_list[client_list_entry]) is not None:
                 wi_state_search = re.search(r'.*RxUni=(\w+)', client_string_list[client_list_entry])
-                self.cli_rg_connected_clients_dict[mac]['rxuni'] = wi_state_search.group(1)
+                cli_rg_connected_clients_dict[mac]['rxuni'] = wi_state_search.group(1)
                 print('Seting rxuni to ', wi_state_search.group(1))
             else:
-                self.cli_rg_connected_clients_dict[mac]['rxuni'] = "Not found or value missing"
+                cli_rg_connected_clients_dict[mac]['rxuni'] = "Not found or value missing"
                 print('Seting rxuni to Not Found or value missing ')
 
             if re.search(r'.*RxMul=(\w+)', client_string_list[client_list_entry]) is not None:
                 wi_state_search = re.search(r'.*RxMul=(\w+)', client_string_list[client_list_entry])
-                self.cli_rg_connected_clients_dict[mac]['rxmul'] = wi_state_search.group(1)
+                cli_rg_connected_clients_dict[mac]['rxmul'] = wi_state_search.group(1)
                 print('Seting rxmul to ', wi_state_search.group(1))
             else:
-                self.cli_rg_connected_clients_dict[mac]['rxuni'] = "Not found or value missing"
+                cli_rg_connected_clients_dict[mac]['rxuni'] = "Not found or value missing"
                 print('Seting rxmul to Not Found or value missing ')
 
             if re.search(r'.*RxErr=(\w+)', client_string_list[client_list_entry]) is not None:
                 wi_state_search = re.search(r'.*RxErr=(\w+)', client_string_list[client_list_entry])
-                self.cli_rg_connected_clients_dict[mac]['rxerr'] = wi_state_search.group(1)
+                cli_rg_connected_clients_dict[mac]['rxerr'] = wi_state_search.group(1)
                 print('Seting rxerr to ', wi_state_search.group(1))
             else:
-                self.cli_rg_connected_clients_dict[mac]['rxerr'] = "Not found or value missing"
+                cli_rg_connected_clients_dict[mac]['rxerr'] = "Not found or value missing"
                 print('Seting rxerr to Not Found or value missing ')
 
             if re.search(r'.*RSSI=-(\w+)', client_string_list[client_list_entry]) is not None:
                 wi_state_search = re.search(r'.*RSSI=-(\w+)', client_string_list[client_list_entry])
-                self.cli_rg_connected_clients_dict[mac]['rxerr'] = wi_state_search.group(1)
+                cli_rg_connected_clients_dict[mac]['rxerr'] = wi_state_search.group(1)
                 print('Seting rssi to ', wi_state_search.group(1))
             else:
-                self.cli_rg_connected_clients_dict[mac]['rssi'] = "Not found or value missing"
+                cli_rg_connected_clients_dict[mac]['rssi'] = "Not found or value missing"
                 print('Seting rssi to Not Found or value missing ')
         print("-------------------------")
-            ###########################################################
-
         # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*SSID=(\w+).*PSMod=(\w+)?,.*NMode=(\w+)?,.*WMMEn=(\w+)?,.*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+)?.*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)?', re.DOTALL)
         # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:(\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)', re.DOTALL)
-
-
-
-
-
         # not sure if I need to return this if the dictionary is alread bound to the instance
-        return self.cli_rg_connected_clients_dict
+        return cli_rg_connected_clients_dict
 
-
-
-    #@staticmethod
+    # @staticmethod
     def factory_reset_rg(self,rg_url):
-        #global nvg_info
+        # global nvg_info
         self.factory_reset = 1
         # url = 'http://192.168.1.254/'
         # browser = webdriver.Chrome()
@@ -763,7 +786,7 @@ class Nvg599Class(GatewayClass):
             except:
                 print('Not ready, sleeping 10 seconds')
                 sleep(10)
-                print('time'+ str(time.time()))
+                print('time' + str(time.time()))
                 continue
 
         end = time.time()
@@ -1047,13 +1070,13 @@ class Nvg599Class(GatewayClass):
                     print("2G:" + ib2g + " 5G:" + ib5G + "bandwidth" + ibw)
 
 # not sure we want to open a new session
+# this is not correct, I have to get the IP of the 4920s before calling this
     def get_4920_inf_from_ui(self):
         global nvg_info
-        url = 'http://192.168.1.254/cgi-bin/devices.ha'
+        url_4920 = 'http://192.168.1.254/cgi-bin/devices.ha'
         browser = webdriver.Chrome()
-        browser.get(url)
+        browser.get(url_4920)
         soup = BeautifulSoup(browser.page_source, 'html.parser')
-
         this = soup.find_all('th')
         for th in this:
             if th.text == "IPv4 Address / Name":
@@ -1061,7 +1084,7 @@ class Nvg599Class(GatewayClass):
                 print("Name    ", th.text)
                 print("Name1", th.next_sibling.text)
             else:
-                print("no derp")
+                print("")
 
     def run_speed_test_cli(self, speed_test_ip):
         print('in run_speedtest_cli')
@@ -1112,11 +1135,11 @@ class Nvg599Class(GatewayClass):
         # end = time.time()
         # print(end - start)
 
-    #@staticmethod
+    # @staticmethod
     def ping_from_local_host(self, remote_ip):
-    #def ping_from_local_host(remote_ip):
+    # def ping_from_local_host(remote_ip):
 
-        print('In ping_test')
+        print('In ping_from_local_host')
         ping_file = open('ping_file.txt','a')
         # pfp
         # out = subprocess.Popen("ping  -c3 localhost",stdout=subprocess.PIPE,stderr=subprocess.STDOUT, shell=True)
@@ -1149,7 +1172,7 @@ class Nvg599Class(GatewayClass):
         return min_ping, avg_ping, max_ping, mdev_ping
 
     def connect_to_console(self):
-        print('in connect_to_console')
+        print('Method: connect_to_console')
         cmd = ' ping -c1 192.168.1.254'
         result = os.system(cmd)
         print('result:', result)
@@ -1206,7 +1229,8 @@ class Nvg599Class(GatewayClass):
         session.sendline('status')
         session.expect('>')
         status_output = session.before
-        status_info_reg_ex = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)', re.DOTALL)
+        status_info_reg_ex = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',
+            re.DOTALL)
         # statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
         # statusInfoRegEx = re.compile(r'Model\s(\w+)')
         mo1 = status_info_reg_ex.search(status_output)
@@ -1274,7 +1298,7 @@ class Nvg599Class(GatewayClass):
         loop = 1
         while loop == 1:
             try:
-                urllib.request.urlopen(url_to_check,timeout=3)
+                urllib.request.urlopen(url_to_check, timeout=3)
                 end = time.time()
                 print("Duration timer:", str(end - start))
                 return
@@ -1297,7 +1321,8 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.sendline('on')
         self.telnet_cli_session.expect("\\):")
         self.telnet_cli_session.sendline('http://arris1.arriseco.com')
-        self.telnet_cli_session.expect("\\):") # this has some numbers
+        # this has some numbers
+        self.telnet_cli_session.expect("\\):")
         self.telnet_cli_session.sendline()
         self.telnet_cli_session.expect("\\): ")
         self.telnet_cli_session.sendline()
@@ -1369,7 +1394,8 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.expect('>')
         status_output = self.session.before
         print('Getting getSerialnumber')
-        status_info_reg_ex = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)', re.DOTALL)
+        status_info_reg_ex = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',
+                re.DOTALL)
         # statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
         # statusInfoRegEx = re.compile(r'Model\s(\w+)')
         mo1 = status_info_reg_ex.search(status_output)
@@ -1379,20 +1405,16 @@ class Nvg599Class(GatewayClass):
         return mo1.group(2)
 
     @staticmethod
-    def get_rg_sh_ip_lan_info_cli(self):
+    def get_rg_sh_ip_lan_info_cli():
         # telnet_cli_session =self.login_nvg_599_cli()
         telnet_cli_session = Nvg599Class.static_login_nvg_599_cli()
-
-        #self.telnet_cli_session. sendline("show ip lan")
+        # self.telnet_cli_session. sendline("show ip lan")
         telnet_cli_session. sendline("show ip lan")
-
-        #self.telnet_cli_session.expect('>')
+        # self.telnet_cli_session.expect('>')
         telnet_cli_session.expect('>')
-        #ip_lan_output = self.telnet_cli_session.before
+        # ip_lan_output = self.telnet_cli_session.before
         ip_lan_output = telnet_cli_session.before
-
         ip_lan_output = ip_lan_output.split('\n\r')
-        #print("-------------------------------------")
         lan_output_count = len(ip_lan_output)
         # discard first two lines of the output
         print("count", lan_output_count)
@@ -1434,12 +1456,11 @@ class Nvg599Class(GatewayClass):
             ip_lan_connections_dict_cli[connected_device_mac]["Status"] = connected_device_status
             ip_lan_connections_dict_cli[connected_device_mac]["DHCP"] = connected_device_dhcp
             ip_lan_connections_dict_cli[connected_device_mac]["SSIDNumber"] = connected_device_ssid_number
-            #self.telnet_cli_session.close()
-
+            # self.telnet_cli_session.close()
         telnet_cli_session.close()
         return ip_lan_connections_dict_cli
 
-        #return self.ip_lan_connections_dict_cli
+        # return self.ip_lan_connections_dict_cli
 
     # class Nvg_5268_Class(GatewayClass):
     #     def __init__(self):
@@ -1447,5 +1468,3 @@ class Nvg599Class(GatewayClass):
     #      # rg5268 = pexpect.spawn("telnet 192.168.1.254")
     #         sleep(1)
     #
-
-

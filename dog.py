@@ -167,8 +167,6 @@ def tst_ping_ip(nvg_599_dut,ping_history_file, remote_ip):
     print('max: ', max)
     print('mdev:',mdev)
 
-
-
 def test_ping_device_name(device_name_to_ping):
     sh_ip_lan_dict = Nvg599Class.get_rg_sh_ip_lan_info_cli('arris-Latitude-MBR')
     print('dict type' + str(type(sh_ip_lan_dict)))
@@ -177,11 +175,16 @@ def test_ping_device_name(device_name_to_ping):
         if sh_ip_lan_dict[key]['Name']== device_name_to_ping:
             print('found it ' + sh_ip_lan_dict[key]['Name'])
             print('IP is: ' + sh_ip_lan_dict[key]['IP'])
+
+            # we have the IP now we want the radio band
+            # we use the  mac from the IP table to get the radio band
+            sh_wi_cl_dict = Nvg599Class.cli_sh_wi_all_clients()
+
             nvg_599_dut.ping_from_local_host(sh_ip_lan_dict[key]['IP'])
-            nvg_599_dut.cli_sh_wi_clients()
 
+            # nvg_599_dut.cli_sh_wi_clients()
+    # def cli_sh_wi_clients(self):
     # print('dict is ' + str(sh_ip_lan_dict))
-
 
 nvg_599_dut = Nvg599Class()
 #down_load_speed, up_load_speed = nvg_599_dut.run_speed_test_cli(test_ip)
@@ -217,6 +220,10 @@ nvg_599_dut.cli_sh_wi_all_clients()
 exit()
 
 test_ping_device_name('arris-Latitude-MBR')
+
+
+
+
 
 exit()
 
@@ -852,178 +859,178 @@ if 'min' in duration:
 # print('days, hours, minutes, users, cpu avg 1 min, cpu avg 5 min, cpu avg 15 min')
 # print('%s, %s, %s, %s, %s, %s, %s' % (days, hours, mins, users, av1, av5, av15))
 
-
-print("Turning off supplicant")
-ip = "192.168.1.254"
-password = '<#/53#1/2'
-child = pexpect.spawn("telnet " "192.168.1.254")
-sleep(1)
-# exit()
-child.expect("ogin:")
-child.sendline("admin")
-
-child.expect("assword:")
-child.sendline('*<#/53#1/2')
-child.expect(">")
-
-child.sendline('magic')
-child.expect(">")
-
-child.sendline('conf')
-child.expect(">>")
-
-child.sendline('system supplicant')
-child.expect(">>")
-
-child.sendline('set')
-child.expect(" off | on ]:")
-
-child.sendline('off')
-
-from time import sleep
-from selenium import webdriver
-
-import pexpect
-import re
-
-# driver = webdriverhttps://www.waketech.edu/programs-courses/credit/electrical-systems-technology/degrees-pathways.Chrome('/usr/local/bin/chromedriver')
-driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
-# driver.get('http://www.google.com')
-driver.get('http://192.168.1.254')
-driver.implicitly_wait(20)
-# driver.find_elements_by_tag_name("Settings") // this is for 599
-driver.find_element_by_link_text("Settings").click()
-
-# driver.findElement(By.linkText("Home Network")).click()
-driver.implicitly_wait(20)
-
-driver.find_element_by_link_text("LAN").click()
-driver.implicitly_wait(20)
-# driver.maximize_window()
-
-driver.find_element_by_link_text("Wi-Fi").click()
-driver.implicitly_wait(20)
-
-password = driver.find_element_by_id("ADM_PASSWORD")
-
-password.send_keys("8>1769&295")
-
-driver.find_element_by_class_name('button').click()
-# driver.find_element_by_xpath("//button[@value='Submit']").click()
-# button.click()
-
-driver.implicitly_wait(20)
-
-# ENter device access code
-
-sleep(30)
-driver.quit()
-
-exit()
-
-child = pexpect.spawn("ssh root@192.168.1.254")
-sleep(1)
-# exit()
-
-
-child.expect("assword:")
-child.sendline('alcatel')
+#
+# print("Turning off supplicant")
+# ip = "192.168.1.254"
+# password = '<#/53#1/2'
+# child = pexpect.spawn("telnet " "192.168.1.254")
+# sleep(1)
+# # exit()
+# child.expect("ogin:")
+# child.sendline("admin")
+#
+# child.expect("assword:")
 # child.sendline('*<#/53#1/2')
-print("logged in to host")
-child.expect("#")
-child.sendline('exit')
-sleep(5)
-# driver.webdriver.quit()
-exit()
-# driver = webdriver.firefox('/home/palmer/.local/lib/python2.7/site-packages/chromedriver')
-#
-# unicode_literals makes all string literals in this script Unicode by default.
-p = pexpect.spawnu('uptime')
-
-# This parses uptime output into the major groups using regex group matching.
-p.expect(
-    r'up\s+(.*?),\s+([0-9]+) users?,\s+load averages?: ([0-9]+\.[0-9][0-9]),?\s+([0-9]+\.[0-9][0-9]),?\s+([0-9]+\.[0-9][0-9])')
-duration, users, av1, av5, av15 = p.match.groups()
-
-# The duration is a little harder to parse because of all the different
-# styles of uptime. I'm sure there is a way to do this all at once with
-# one single regex, but I bet it would be hard to read and maintain.
-# If anyone wants to send me a version using a single regex I'd be happy to see it.
-days = '0'
-hours = '0'
-mins = '0'
-if 'day' in duration:
-    p.match = re.search(r'([0-9]+)\s+day', duration)
-    days = str(int(p.match.group(1)))
-if ':' in duration:
-    p.match = re.search('([0-9]+):([0-9]+)', duration)
-    hours = str(int(p.match.group(1)))
-    mins = str(int(p.match.group(2)))
-if 'min' in duration:
-    p.match = re.search(r'([0-9]+)\s+min', duration)
-    mins = str(int(p.match.group(1)))
-
-# Print the parsed fields in CSV format.
-# print('days, hours, minutes, users, cpu avg 1 min, cpu avg 5 min, cpu avg 15 min')
-# print('%s, %s, %s, %s, %s, %s, %s' % (days, hours, mins, users, av1, av5, av15))
-
-
-print("Turning off supplicant")
-ip = "192.168.1.254"
-password = '<#/53#1/2'
-child = pexpect.spawn("telnet " "192.168.1.254")
-sleep(1)
-# exit()
-child.expect("ogin:")
-child.sendline("admin")
-
-child.expect("assword:")
-child.sendline('*<#/53#1/2')
-child.expect(">")
-
-child.sendline('magic')
-child.expect(">")
-
-child.sendline('conf')
-child.expect(">>")
-
-child.sendline('system supplicant')
-child.expect(">>")
-
-child.sendline('set')
-child.expect(" off | on ]:")
-
-child.sendline('off')
-child.expect(">>")
-
-child.sendline('save')
-child.expect(">>")
-
-child.sendline("view")
-child.expect(">>")
-
-out = child.before
-print(out)
-
-
-child.expect(">>")
-
-child.sendline('save')
-child.expect(">>")
-
-child.sendline("view")
-child.expect(">>")
-
-out = child.before
-print(out)
-#
-# child.interact()
-# child.expect(pexpect.EOF)
-
-# child.sendline("quit")
 # child.expect(">")
-
-# print("done")
-# child.sendline("bye")
-
+#
+# child.sendline('magic')
+# child.expect(">")
+#
+# child.sendline('conf')
+# child.expect(">>")
+#
+# child.sendline('system supplicant')
+# child.expect(">>")
+#
+# child.sendline('set')
+# child.expect(" off | on ]:")
+#
+# child.sendline('off')
+#
+# from time import sleep
+# from selenium import webdriver
+#
+# import pexpect
+# import re
+#
+# # driver = webdriverhttps://www.waketech.edu/programs-courses/credit/electrical-systems-technology/degrees-pathways.Chrome('/usr/local/bin/chromedriver')
+# driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
+# # driver.get('http://www.google.com')
+# driver.get('http://192.168.1.254')
+# driver.implicitly_wait(20)
+# # driver.find_elements_by_tag_name("Settings") // this is for 599
+# driver.find_element_by_link_text("Settings").click()
+#
+# # driver.findElement(By.linkText("Home Network")).click()
+# driver.implicitly_wait(20)
+#
+# driver.find_element_by_link_text("LAN").click()
+# driver.implicitly_wait(20)
+# # driver.maximize_window()
+#
+# driver.find_element_by_link_text("Wi-Fi").click()
+# driver.implicitly_wait(20)
+#
+# password = driver.find_element_by_id("ADM_PASSWORD")
+#
+# password.send_keys("8>1769&295")
+#
+# driver.find_element_by_class_name('button').click()
+# # driver.find_element_by_xpath("//button[@value='Submit']").click()
+# # button.click()
+#
+# driver.implicitly_wait(20)
+#
+# # ENter device access code
+#
+# sleep(30)
+# driver.quit()
+#
 # exit()
+#
+# # child = pexpect.spawn("ssh root@192.168.1.254")
+# sleep(1)
+# # exit()
+#
+#
+# child.expect("assword:")
+# child.sendline('alcatel')
+# # child.sendline('*<#/53#1/2')
+# print("logged in to host")
+# child.expect("#")
+# child.sendline('exit')
+# sleep(5)
+# # driver.webdriver.quit()
+# exit()
+# # driver = webdriver.firefox('/home/palmer/.local/lib/python2.7/site-packages/chromedriver')
+# #
+# # unicode_literals makes all string literals in this script Unicode by default.
+# p = pexpect.spawnu('uptime')
+#
+# # This parses uptime output into the major groups using regex group matching.
+# p.expect(
+#     r'up\s+(.*?),\s+([0-9]+) users?,\s+load averages?: ([0-9]+\.[0-9][0-9]),?\s+([0-9]+\.[0-9][0-9]),?\s+([0-9]+\.[0-9][0-9])')
+# duration, users, av1, av5, av15 = p.match.groups()
+#
+# # The duration is a little harder to parse because of all the different
+# # styles of uptime. I'm sure there is a way to do this all at once with
+# # one single regex, but I bet it would be hard to read and maintain.
+# # # If anyone wants to send me a version using a single regex I'd be happy to see it.
+# # days = '0'
+# # hours = '0'
+# # mins = '0'
+# # if 'day' in duration:
+# #     p.match = re.search(r'([0-9]+)\s+day', duration)
+# #     days = str(int(p.match.group(1)))
+# # if ':' in duration:
+#     p.match = re.search('([0-9]+):([0-9]+)', duration)
+#     hours = str(int(p.match.group(1)))
+#     mins = str(int(p.match.group(2)))
+# if 'min' in duration:
+#     p.match = re.search(r'([0-9]+)\s+min', duration)
+#     mins = str(int(p.match.group(1)))
+#
+# # Print the parsed fields in CSV format.
+# # print('days, hours, minutes, users, cpu avg 1 min, cpu avg 5 min, cpu avg 15 min')
+# # print('%s, %s, %s, %s, %s, %s, %s' % (days, hours, mins, users, av1, av5, av15))
+
+
+# print("Turning off supplicant")
+# ip = "192.168.1.254"
+# password = '<#/53#1/2'
+# child = pexpect.spawn("telnet " "192.168.1.254")
+# sleep(1)
+# # exit()
+# child.expect("ogin:")
+# child.sendline("admin")
+#
+# child.expect("assword:")
+# child.sendline('*<#/53#1/2')
+# child.expect(">")
+#
+# child.sendline('magic')
+# child.expect(">")
+#
+# child.sendline('conf')
+# child.expect(">>")
+#
+# child.sendline('system supplicant')
+# child.expect(">>")
+#
+# child.sendline('set')
+# child.expect(" off | on ]:")
+#
+# child.sendline('off')
+# child.expect(">>")
+#
+# child.sendline('save')
+# child.expect(">>")
+#
+# child.sendline("view")
+# child.expect(">>")
+#
+# out = child.before
+# print(out)
+#
+#
+# child.expect(">>")
+#
+# child.sendline('save')
+# child.expect(">>")
+#
+# child.sendline("view")
+# child.expect(">>")
+#
+# out = child.before
+# print(out)
+# #
+# # child.interact()
+# # child.expect(pexpect.EOF)
+#
+# # child.sendline("quit")
+# # child.expect(">")
+#
+# # print("done")
+# # child.sendline("bye")
+#
+# # exit()
