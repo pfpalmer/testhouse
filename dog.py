@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 import itertools
 import pprint
-#import global
+#import global.py
 import time
 
 # import requests
@@ -20,16 +20,18 @@ from datetime import datetime
 
 import pexpect
 from rgclass import Nvg599Class
+from rgclass import NON_DFS_CHANNELS
+from rgclass import DFS_CHANNELS
+from rgclass import  test_house_devices_static_info
 
 #from rgclass import NON_DFS_CHANNELS This stuff should be in a global module, once I figure out how to do it
 
 
-NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
-DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
+#NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
+#DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
 
 # from rgclass import  NON_DFS_CHANNELS
 # from rgclass import  DFS_CHANNELS
-
 # Find the current channel used for 5G
 # Check the 5G channel used. If none DFS , set to DFS and note the setting
 # enter the command to simulate radar detection
@@ -175,27 +177,13 @@ def test_ping_device_name(device_name_to_ping):
         if sh_ip_lan_dict[key]['Name']== device_name_to_ping:
             print('found it ' + sh_ip_lan_dict[key]['Name'])
             print('IP is: ' + sh_ip_lan_dict[key]['IP'])
+            nvg_599_dut.ping_from_local_host(sh_ip_lan_dict[key]['IP'])
+            nvg_599_dut.cli_sh_wi_clients()
+
+    # print('dict is ' + str(sh_ip_lan_dict))
 
 
-    print('dict is ' + str(sh_ip_lan_dict))
-
-
-#--------------------------------------------------------------------
-
-#statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)', re.DOTALL)
-
-#out = "rtt min/avg/max/mdev = 0.035/0.044/0.050/0.010 ms"
-#pingInfoRegEx = re.compile(r'.*?rtt/s+.*?/s+=(/d+/./d+)', re.DOTALL)
-#pingInfoRegEx = re.compile(r'rtt.*?=\s(.*)')
-#pingInfoRegEx = re.compile(r'rtt.*?=\s(\d+\.\d+)/(\d+\.\d+)/(\d+\.\d+)/(\d+\.\d+)')
-
-
-
-
-# for now we are ssuming thatthe dut is a 599
-
-
-#nvg_599_dut = Nvg599Class()
+nvg_599_dut = Nvg599Class()
 #down_load_speed, up_load_speed = nvg_599_dut.run_speed_test_cli(test_ip)
 
 #url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
@@ -219,20 +207,20 @@ def test_ping_device_name(device_name_to_ping):
 # nvg_599_dut.email_test_results(results_str)
 # exit()
 
+#print('dog' + str(DFS_CHANNELS))
+#print ('dict' + str(test_house_devices_static_info))
+
+#exit()
+
+
+nvg_599_dut.cli_sh_wi_all_clients()
+exit()
 
 test_ping_device_name('arris-Latitude-MBR')
 
 exit()
 
-
-#return_dict1 = nvg_599_dut.get_sh_wi_clients_cli()
-c#lientDictStr = pprint.pformat(return_dict1)
-print("1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-print(clientDictStr)
-print("2xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-
-exit()
-return_dict = nvg_599_dut.getRGShIPLanInfo()
+# return_dict = nvg_599_dut.getRGShIPLanInfo()
 dict_str = pprint.pformat(return_dict)
 print(dict_str)
 exit()
@@ -323,7 +311,6 @@ exit()
 #airTies2GChannel = airTies2GResult.split()[-2]
 #print("2G",airTies2GChannel)
 #print("")
-
 #airTiesTerm.sendline('wl -i wl1 chanspec')
 #irTiesTerm.expect("#")
 #airTies5GResult=airTiesTerm.before
@@ -333,10 +320,7 @@ exit()
 #print("5G Channel,airTies5GChannel)
 #airTies5GBandwidth =airTies5GChannelInfo.split("/")[1]
 #print("5G Bandwidth",airTies5GBandwidth)
-
 #resultFile.close()
-
-
 print("###############################################################################")
 print("###############################################################################")
 print("###############################################################################")
@@ -694,9 +678,6 @@ child.expect(">>")
 out = child.before
 print(out)
 #
-#
-
-
 child.expect("assword:")
 child.sendline('alcatel')
 # child.sendline('*<#/53#1/2')
