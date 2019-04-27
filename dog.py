@@ -3,9 +3,10 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import itertools
-import pprint
+#import pprint
 #import global.py
 import time
+from  pprint import pprint
 
 # import requests
 # from bs4 import BeautifulSoup
@@ -189,20 +190,40 @@ def test_ping_device_name(device_name_to_ping):
 nvg_599_dut = Nvg599Class()
 #down_load_speed, up_load_speed = nvg_599_dut.run_speed_test_cli(test_ip)
 
-#url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
+# url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
+
 # nvg_599_dut.factory_reset_rg(url_to_check)
+
 # nvg_599_dut.enable_sshd_ssh_cli()
+
 # nvg_599_dut.conf_tr69_eco_url()
+
 # nvg_599_dut.turn_off_supplicant_cli()
+
 # nvg_599_dut.ping_from_local_host('192.1681.228')
-# nvg_599_dut.ui_get_device_list()
+
+
+
+ui_dict = nvg_599_dut.ui_get_device_list()
+
+pprint(dict(ui_dict))
+
+#for key in ui_dict:
+#    print(key)
+
+exit()
+
 # tst_ping(nvg_599_dut,results_file,"192.168.1.239")
+
 # tst_speed_test(nvg_599_dut,results_file,"192.168.1.239")
+
 # dfs_file = open('dfs_file.txt','a')
+
 # test_dfs(nvg_599_dut,dfs_file)
+
 # dfs_file.close()
 
-#nvg_599_dut.get_rg_sh_ip_lan_info_cli()
+# nvg_599_dut.get_rg_sh_ip_lan_info_cli()
 
 # Nvg599Class.get_rg_sh_ip_lan_info_cli('arris-Latitude-MBR')
 
@@ -212,24 +233,18 @@ nvg_599_dut = Nvg599Class()
 
 #print('dog' + str(DFS_CHANNELS))
 #print ('dict' + str(test_house_devices_static_info))
-
 #exit()
 
 
-nvg_599_dut.cli_sh_wi_all_clients()
-exit()
-
-test_ping_device_name('arris-Latitude-MBR')
+#nvg_599_dut.cli_sh_wi_all_clients()
 
 
+#test_ping_device_name('arris-Latitude-MBR')
 
-
-
-exit()
 
 # return_dict = nvg_599_dut.getRGShIPLanInfo()
-dict_str = pprint.pformat(return_dict)
-print(dict_str)
+# dict_str = pprint.pformat(return_dict)
+# print(dict_str)
 exit()
 nvg_599_dut.email_test_results("dog")
 

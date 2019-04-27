@@ -13,7 +13,6 @@ import requests
 import httplib2
 import pexpect
 import re
-import pprint
 import os
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -28,39 +27,37 @@ import time
 from email.message import EmailMessage
 from datetime import datetime
 
-
 #  Apple path for wifi info
 # /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I
 
 # nvg_info: Dict[str, Dict[str, str]] = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
 nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
-            'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey', 'ssid': 'ATTqbrAnYs'},
-            "277427577103760": {'model': 'nvg599', 'device_access_code': '<<01%//4&/', 'magic': 'ggtxstgwipcg',
-            'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
+              'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey', 'ssid': 'ATTqbrAnYs'},
+              "277427577103760": {'model': 'nvg599', 'device_access_code': '<<01%//4&/', 'magic': 'ggtxstgwipcg',
+              'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
 
 test_house_devices_static_info = {
     '88:41:FC:86:64:D4': {'device_type': 'airties4920', 'radio': 'abg', 'band': 'base', 'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
-                          'test_name': 'airties_1',
-                          'host_name': 'ATT_4920_8664D4'},
-    '88:41:FC:86:64:D7':{'device_type': 'airties4920', 'radio': 'abg', 'band' : '5g','state': 'None',
-                         'address_type': 'None', 'port':'None','ssid':'None',  'rssi':'None', 'ip': 'None',
-                         'test_name': 'airties_1', 'host_name': 'ATT_4920_8664D4'},
-    '88:41:FC:C3:56:C0':{'device_type' : 'airties4920' ,'radio':'abg', 'band' : 'base', 'state': 'None',
-                         'address_type': 'None','port' : 'None','ssid':'None', 'rssi': 'None',' ip': 'None',
-                         ' test_name': 'airties_2','host_name': 'ATT_4920_C356C0'},
+                          'test_name': 'airties_1', 'host_name': 'ATT_4920_8664D4'},
+    '88:41:FC:86:64:D7': {'device_type': 'airties4920', 'radio': 'abg', 'band': '5g', 'state': 'None',
+                          'address_type': 'None', 'port': 'None', 'ssid': 'None',  'rssi': 'None', 'ip': 'None',
+                          'test_name': 'airties_1', 'host_name': 'ATT_4920_8664D4'},
+    '88:41:FC:C3:56:C0': {'device_type': 'airties4920', 'radio': 'abg', 'band': 'base', 'state': 'None',
+                          'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', ' ip': 'None',
+                          'test_name': 'airties_2','host_name': 'ATT_4920_C356C0'},
     '88:41:FC:C3:56:C3': {'device_type': 'airties4920', 'radio': 'abg', 'band': '5g', 'state': 'None',
-                          'address_type': 'None', 'port ': 'None' ,'ssid': 'None', 'rssi': 'None', 'ip': 'None',
-                          ' test_name': 'airties_2','host_name' : 'ATT_4920_C356C0'},
-    '4C:BB:58:68:BD:F6':{'device_type': 'ubuntu_laptop', 'radio': 'bg','band':'5g','state':'None' ,
-                         'address_type': 'None', 'port' : 'None',
-                         'ssid' : 'None' , 'rssi' : 'None', 'ip' : 'None', 'test_name' : 'ubuntu_1' ,
-                         'host_name':'arris-Latitude-MBR'},
-    'F4:5C:89:9D:F1:4F':{'device_type': 'macbook_pro', 'radio': 'abg','band': '5g', 'state': 'None',
-                         'address_type': 'None', 'port' : 'None',
-                         'ssid': 'None', 'rssi': 'None', 'ip': 'None', 'test_name': 'mac_book_1',
-                         'host_name': 'macbook-mbr'},
-    '5C:E0:C5:D9:8E:BF': {'device_type': 'ubuntu_laptop', 'radio': 'abg', 'band':'5g', 'state': 'None',
+                          'address_type': 'None', 'port ': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
+                          'test_name': 'airties_2', 'host_name': 'ATT_4920_C356C0'},
+    '4C:BB:58:68:BD:F6': {'device_type': 'ubuntu_laptop', 'radio': 'bg', 'band': '5g', 'state': 'None',
+                          'address_type': 'None', 'port': 'None',
+                          'ssid': 'None', 'rssi': 'None', 'ip': 'None', 'test_name': 'ubuntu_1',
+                          'host_name': 'arris-Latitude-MBR'},
+    'F4:5C:89:9D:F1:4F': {'device_type': 'macbook_pro', 'radio': 'abg', 'band': '5g', 'state': 'None',
+                          'address_type': 'None', 'port': 'None',
+                          'ssid': 'None', 'rssi': 'None', 'ip': 'None', 'test_name': 'mac_book_1',
+                          'host_name': 'macbook-mbr'},
+    '5C:E0:C5:D9:8E:BF': {'device_type': 'ubuntu_laptop', 'radio': 'abg', 'band': '5g', 'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'test_name': 'mac_book_1',
                           'host_name': 'palmer_Latitude-E5450'},
@@ -160,7 +157,7 @@ class Nvg599Class(GatewayClass):
         self.serial_number = None
         self.factory_reset = None
         # self.cli_rg_connected_clients_dict = {}
-        self.ui_rg_connected_clients_dict = {}
+        # self.ui_rg_connected_clients_dict = {}
         self.ip_lan_connections_dict_cli = {}
         self.get_ui_system_information()
         self.device_access_code = nvg_info[self.serial_number]['device_access_code']
@@ -168,9 +165,11 @@ class Nvg599Class(GatewayClass):
         self.init_info = True
         self.mesh_connected_clents = {}
 
+    # we want to use the same session but the dict of connected devices is a temporary value subject to change
     def ui_get_device_list(self):
         global nvg_info
         global test_house_devices_static_info
+        ui_rg_connected_clients_dict = {}
         print("in ui_get_device_list ")
         home_link = self.session.find_element_by_link_text("Device")
         home_link.click()
@@ -187,13 +186,14 @@ class Nvg599Class(GatewayClass):
                 continue
 
             if table_row.th.text == "MAC Address":
-                # print("table header:" + (table_row.th.text).strip() + ":test")
                 print("table mac:" + table_row.td.text.strip() + ":test")
 
                 mac = (table_row.td.text.strip()).upper()
-                if mac in test_house_devices_static_info:
+                # if mac in test_house_devices_static_info:
+                if 1 == 1:
+
                     print('macx found in lab dict', mac)
-                    self.ui_rg_connected_clients_dict[mac] = {}
+                    ui_rg_connected_clients_dict[mac] = {}
 
                     table_row = table_row.find_next_sibling()
                     if table_row.th.text == "IPv4 Address / Name":
@@ -205,164 +205,72 @@ class Nvg599Class(GatewayClass):
                         name = ip_and_name_list[1]
                         name = str(name)
                         print('ip is:' + ip + ' : name is:' + name)
-                        self.ui_rg_connected_clients_dict[mac]['ip'] = ip
-                        self.ui_rg_connected_clients_dict[mac]['name'] = name
+                        ui_rg_connected_clients_dict[mac]['ip'] = ip
+                        ui_rg_connected_clients_dict[mac]['name'] = name
 
                     table_row = table_row.find_next_sibling()
                     if table_row.th.text == "Last Activity":
-                        print('Last Activty:' + table_row.th.text.strip() + ' :Last Activity')
+                        print('Last Activty row :' + table_row.th.text.strip())
                         last_activity = table_row.td.text.strip()
-                        print('last activity:' + last_activity + ' : end last activity')
-                        self.ui_rg_connected_clients_dict[mac]['last_activity'] = last_activity
+                        print('last activity:' + last_activity)
+                        ui_rg_connected_clients_dict[mac]['last_activity'] = last_activity
 
                     table_row = table_row.find_next_sibling()
                     if table_row.th.text == "Status":
                         # print('status:' + (table_row.th.text).strip() + ':status')
                         status = table_row.td.text.strip()
                         print('last status:' + status + ':end status')
-                        self.ui_rg_connected_clients_dict[mac]['status'] = status
+                        ui_rg_connected_clients_dict[mac]['status'] = status
 
                     table_row = table_row.find_next_sibling()
                     if table_row.th.text == "Allocation":
                         # print('status:' + (table_row.th.text).strip() + ':status')
                         allocation = table_row.td.text.strip()
-                        print('allocation:' + allocation + '\n')
-                        self.ui_rg_connected_clients_dict[mac]['allocation'] = allocation
+                        print('allocation:' + allocation)
+                        ui_rg_connected_clients_dict[mac]['allocation'] = allocation
 
-                    table_row = table_row.find_next_sibling()
+                        table_row = table_row.find_next_sibling()
                     if table_row.th.text == "Connection Type":
-                        # print('status:' + (table_row.th.text).strip() + ':status')
                         connection_type = table_row.td.text
                         connection_type_str = str(connection_type)
-                        print('connecttype dtr before split:', connection_type_str)
-                        connection_list = connection_type_str.split()
-                        # connection_list = re.split(' |\n',connection_type_str)
-                        # connection_list = [s.strip() for s in connection_type_str.splitlines()]
-                        print('aftersplit0:' + connection_list[0] + '\n')
-                        print('aftersplit1:' + connection_list[1] + '\n')
-                        print('aftersplit2:' + connection_list[2] + '\n')
-                        print('aftersplit3:' + connection_list[3] + '\n')
-                        network_type = (connection_list[3])[0:4]
-                        print('Network Type', network_type)
-                        print('aftersplit4:' + connection_list[4] + '\n')
-                        network_name = (connection_list[4])
-                        print('Network Name', network_name)
+                        print('connecttype dtr before split:' + connection_type_str)
 
-                        exit()
-                        # connection_list = split('\n|\s' ,connection_type_str)
-
-                        print('conn type str:', connection_type_str)
-
-                        print('conn0:' + (connection_list[0]) + '\n')
-                        print('Connection Eth/Wi-FI:', connection_list[0])
-
-                        if connection_list[0].find("Ethernet") is not -1:
-                            print('con list 0:', connection_list[0])
-                            self.ui_rg_connected_clients_dict[mac]['connect_type_eth_wifi'] = connection_list[0]
+                        if re.search(r'.*Ethernet', connection_type_str) is not None:
+                            ui_rg_connected_clients_dict[mac]['Connection_Type '] = 'Ethernet'
+                            print('connecttype ethernet: Ethernet')
                             continue
 
-                        self.ui_rg_connected_clients_dict[mac]['connect_type_eth_wifi'] = connection_list[0]
-                        # print('Type wifi or eth:'+ (connection_list[0])[0:4] + '\n')
-                        print('exit con list 0GHZ:' + connection_list[0] + '\n')
-                        exit()
-                        print('conn1:' + connection_list[1] + '\n')
-                        conn_2 = connection_list[2]
-                        print('this is conn 2:' + conn_2 + '\n')
-                        print('Type:' + (connection_list[3])[0:4] + '\n')
-                        # self.ui_rg_connected_clients_dict[mac]['connect_speed'] = connection_list[1]
-                        conn_4 = connection_list[4]
-                        print('Name:  ' + conn_4 + '\n')
-                        # conn_4 = connection_list[4]
-                        # print('conn4_str:  ' + conn_4 + '\n')
-                        # self.ui_rg_connected_clients_dict[mac]['wi_fi_band'] = connection_list[2]
-                        # conn_2_str = str(conn_2)
-                        # print('connection Type:',conn_2_str[0:4])
-                        # conn_2_list = re.split('\n|\s', conn_2_str)
-                        # print('Connection Type:',conn_2_str[0:4])
-                        # print('Home name is:'+ conn_2_list[1])
-                        # type_str_list = conn_2.split()
-                        # print ('type is:' + type_str_list[0] + '\n')
-                        # print ('list 1 is:' + type_str_list[1] + '\n')
-                        # print ('list 2 is:' + type_str_list[2] + '\n')
-                        # print('type',connection_list[2])
-                        # name_str = str(connection_list[3])
-                        # name_str_list = name_str.split(' ','"')
-                        # print(re.split('\n|\s',name_str))
-                        # name_str_list = re.split('\n| ', name_str)
-                        # name_str_list = name_str.split(' ','"')
-                        # print ('Connection Name:'+ name_str_list[0]+'\n')
-                        # self.ui_rg_connected_clients_dict[mac]['connection_type_name'] = name_str_list[0]
-                        # print('is this the link' + str(table_row.td) + '\n')
-                        # td_connection_string = str(table_row.td)
+                        # sample input string
+                        # Wi-Fi2.4 GHzType: HomeName: ATTqbrAnYs
+                        if re.search(r'.*Wi-Fi(\w+)', connection_type_str) is not None:
+                            wifi_band = re.search(r'.*Wi-Fi(\d\.?\d?)', connection_type_str)
+                            print('wifi_band:'+ str(wifi_band.group(1)) )
+                            ui_rg_connected_clients_dict[mac]['wi_fi_band'] = wifi_band.group(1)
+
+                        # to simplify parsing the Type is assumed to be Home
+                        if re.search(r'.*HomeName:\s(\w+)', connection_type_str) is not None:
+                            network_name = re.search(r'.*HomeName:\s(\w+)', connection_type_str)
+                            print('Network name:'+ str(network_name.group(1)) )
+                            ui_rg_connected_clients_dict[mac]['network_name'] = network_name.group(1)
+
                         # print('td_con str:' + td_connection_string + '\n')
+                        # img = table_row.td.find_all('img')
+                        ui_rg_connected_clients_dict[mac]['strength'] = 'Not_present_in_ui'
+
                         for img in table_row.td.find_all('img'):
-                            # print('is this it', img['alt'])
+                        # if img in table_row.td.find_all('img'):
+                        # if img:
                             alt_entry = img['alt']
                             alt_entry_sting = str(alt_entry)
+                            # alt_entry_sting = str(img)
                             alt_entry_list = alt_entry_sting.split()
-                            print('strength out of 5 is:' + alt_entry_list[1] + '\n')
+                            print('strength out of 5 is:' + alt_entry_list[1])
+                            ui_rg_connected_clients_dict[mac]['strength'] = alt_entry_list[1]
 
-                        self.ui_rg_connected_clients_dict[mac]['strength'] = alt_entry_list[1]
+        return ui_rg_connected_clients_dict
 
-            #     exit()
-            #
-            # #continue
-            #
-            #
-            # if not table_row.has_attr('th'):
-            #     print('in header = 0 \n')
-            #     print("table_row:",table_row, end = '')
-            #
-            # if table_row.th.text == "MAC Address":
-            #     print ('mac is &&&&&&&&&&&x'+ (table_row.td.text).strip() + 'x*******************')
-            #     mac = ((table_row.td.text).strip()).upper()
-            #     if mac in test_house_devices_static_info:
-            #         self.cli_rg_connected_clients_dict[mac] = {}
-            #         print('               macx found in lab dict', mac)
-            #         self.ui_rg_connected_clients_dict[mac] = mac
-            #         ip_sibling = table_row.nextSibling
-            #         print('              sibling type',type(ip_sibling))
-            #         print(' ip sibling in as expected' + ip_sibling.findNext.th.text + 'end pf sibling expected\n')
-            #         print('              ----')
-            #         print('\n')
-            #         print('\n')
-            #         print('\n')
-            #         exit()
-            #         if ip_sibling.th.text == "IPv4 Address / Name":
-            #             ip_name =ip_sibling.th.text
-            #             print('ip found in as ex[ected' + ip_name + " end of expected \n")
-            #
-            #         else:
-            #             print('ip_ heading', ip_sibling.th.text)
-            #
-            #             print('')
-            #             print('')
-            #             print('')
-            #             continue
 
-        # exit()
-        # for table_rows in table.find_all("tr"):
-        #     for row_header in table_rows:
-        #         td = row_header.find_all('td')
-        #         print("Name    ", td.text)
-        # exit()
-        #
-        # soup = BeautifulSoup(self.session.page_source, 'html.parser')
-        # tables = soup.findChildren('table')
-        # # five tables on this page
-        # table = tables[4]
-        # # table = soup.find("table100", {"class": "table100"})
-        # # print ("table is",table)
-        # table_rows = table.find_all('tr')
-        # for tr in table_rows:
-        #     td = tr.find_all('td')
-        #     tc = td.find_all('class')
-        #     if tc.text == "reshr":
-        #         continue
-        #     row = [i.text for i in td]
-        #     # print("length is:",len(row))
-        #     # print("type",type(row))
-        #     print("row text", row)
+
 
     def check_if_password_required(self):
 
@@ -576,15 +484,18 @@ class Nvg599Class(GatewayClass):
     def cli_sh_wi_all_clients():
         global test_house_devices_static_info
         print("In cli_sh_wi_all_clients")
-        self.telnet_cli_session = self.login_nvg_599_cli()
-        self.telnet_cli_session.sendline("show wi clients")
-        self.telnet_cli_session.expect('OCKED>')
-        show_wi_client_str = self.telnet_cli_session.before
+        # Nvg599Class
+        # self.telnet_cli_session = self.login_nvg_599_cli()
+        telnet_cli_session = Nvg599Class.static_login_nvg_599_cli()
+
+        telnet_cli_session.sendline("show wi clients")
+        telnet_cli_session.expect('OCKED>')
+        show_wi_client_str = telnet_cli_session.before
         cli_rg_connected_clients_dict = {}
         g2_and_g5_list = show_wi_client_str.split('5.0 GHz')
         print('g2_list:' + g2_and_g5_list[0])
         print('g5_list:' + g2_and_g5_list[1])
-        self.telnet_cli_session.close()
+        telnet_cli_session.close()
         print('------------------------------------------------------\n')
         print('------------------------------------------------------\n')
         # dividing on macs
@@ -638,9 +549,9 @@ class Nvg599Class(GatewayClass):
                 print('Seting wi_state to Not Found or value missing ')
 
             if re.search(r'.*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})',
-                client_string_list[client_list_entry]) is not None:
+                         client_string_list[client_list_entry]) is not None:
                 wi_state_search = re.search(r'.*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})',
-                client_string_list[client_list_entry])
+                                            client_string_list[client_list_entry])
                 cli_rg_connected_clients_dict[mac]['ip'] = wi_state_search.group(1)
                 print('Seting ip to ', wi_state_search.group(1))
             else:
@@ -742,14 +653,13 @@ class Nvg599Class(GatewayClass):
             else:
                 cli_rg_connected_clients_dict[mac]['rssi'] = "Not found or value missing"
                 print('Seting rssi to Not Found or value missing ')
-        print("-------------------------")
-        # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*SSID=(\w+).*PSMod=(\w+)?,.*NMode=(\w+)?,.*WMMEn=(\w+)?,.*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+)?.*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)?', re.DOTALL)
-        # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:(\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)', re.DOTALL)
-        # not sure if I need to return this if the dictionary is alread bound to the instance
-        return cli_rg_connected_clients_dict
+            # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*SSID=(\w+).*PSMod=(\w+)?,.*NMode=(\w+)?,.*WMMEn=(\w+)?,.*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+)?.*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)?', re.DOTALL)
+            # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:(\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)', re.DOTALL)
+            # not sure if I need to return this if the dictionary is alread bound to the instance
+            return cli_rg_connected_clients_dict
 
     # @staticmethod
-    def factory_reset_rg(self,rg_url):
+    def factory_reset_rg(self, rg_url):
         # global nvg_info
         self.factory_reset = 1
         # url = 'http://192.168.1.254/'
@@ -783,7 +693,9 @@ class Nvg599Class(GatewayClass):
                 end = time.time()
                 print("Duration timer:", str(end - start))
                 break
-            except:
+            # except:
+            # need to check if this works
+            except TimeoutError:
                 print('Not ready, sleeping 10 seconds')
                 sleep(10)
                 print('time' + str(time.time()))
@@ -1137,10 +1049,9 @@ class Nvg599Class(GatewayClass):
 
     # @staticmethod
     def ping_from_local_host(self, remote_ip):
-    # def ping_from_local_host(remote_ip):
-
+        # def ping_from_local_host(remote_ip):
         print('In ping_from_local_host')
-        ping_file = open('ping_file.txt','a')
+        ping_file = open('ping_file.txt', 'a')
         # pfp
         # out = subprocess.Popen("ping  -c3 localhost",stdout=subprocess.PIPE,stderr=subprocess.STDOUT, shell=True)
         # out = subprocess.Popen(["ping ", "-c3"," localhost"], stdout=subprocess.PIPE)
@@ -1156,7 +1067,7 @@ class Nvg599Class(GatewayClass):
         # pingInfoRegEx = re.compile(r'.*?rtt/s+=/s+(/d+/./d+)',re.DOTALL)
         mo1 = ping_info_reg_ex.search(out)
         # print('mo1',mo1)
-        minimum = mo1.group(1)
+        # minimum = mo1.group(1)
         # print('mnext--just a value', minimum)
         min_ping = mo1.group(1)
         avg_ping = mo1.group(2)
@@ -1165,9 +1076,10 @@ class Nvg599Class(GatewayClass):
         # ping_file.write('test' )
         # self.software_version
         now = datetime.today().isoformat()
-        ping_file.writelines('Date:' + now + " 599 Software Vers:" + self.software_version + " Serial No:" + self.serial_number + '  min_ping:' + min_ping + '  avg_ping:' + '  max_ping:' + max_ping + '  max dev:' + mdev_ping )
+        ping_file.writelines('Date:' + now + " 599 Software Vers:" + self.software_version + " Serial No:" +
+                             self.serial_number + '  min_ping:' + min_ping + '  avg_ping:' +
+                             '  max_ping:' + max_ping + '  max dev:' + mdev_ping)
         ping_file.writelines('\n')
-
         ping_file.close()
         return min_ping, avg_ping, max_ping, mdev_ping
 
@@ -1177,7 +1089,6 @@ class Nvg599Class(GatewayClass):
         result = os.system(cmd)
         print('result:', result)
         start = time.time()
-        print("hello")
         end = time.time()
         print(end - start)
 
@@ -1206,6 +1117,7 @@ class Nvg599Class(GatewayClass):
         telnet_cli_session.expect(">")
         return telnet_cli_session
 
+# Sgould probable be statuc
 #    def login_4920(self,ip_4920):
 #        print('In login_4920')
 #        self.telnet_cli_session = pexpect.spawn("telnet" + ip_4920, encoding='utf-8')
@@ -1230,9 +1142,9 @@ class Nvg599Class(GatewayClass):
         session.expect('>')
         status_output = session.before
         status_info_reg_ex = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',
-            re.DOTALL)
+                                        re.DOTALL)
         # statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
-        # statusInfoRegEx = re.compile(r'Model\s(\w+)')
+        # status InfoRegEx = re.compile(r'Model\s(\w+)')
         mo1 = status_info_reg_ex.search(status_output)
         print(mo1)
         print('Model: ', mo1.group(1))
@@ -1291,7 +1203,7 @@ class Nvg599Class(GatewayClass):
         print('Enabled tr69 SshdEnabled=1')
         self.telnet_cli_session.close()
 
-    #@staticmethod
+    @staticmethod
     def check_if_url_is_up(url_to_check):
         start = time.time()
         print("starting timer:" + str(start))
@@ -1302,10 +1214,11 @@ class Nvg599Class(GatewayClass):
                 end = time.time()
                 print("Duration timer:", str(end - start))
                 return
-            except:
+
+            except TimeoutError:
                 print('Not ready, sleeping 10 seconds')
                 sleep(10)
-                print('time'+ str(time.time()))
+                print('time' + str(time.time()))
                 continue
 
     def conf_tr69_eco_url(self):
@@ -1395,7 +1308,7 @@ class Nvg599Class(GatewayClass):
         status_output = self.session.before
         print('Getting getSerialnumber')
         status_info_reg_ex = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',
-                re.DOTALL)
+                                        re.DOTALL)
         # statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
         # statusInfoRegEx = re.compile(r'Model\s(\w+)')
         mo1 = status_info_reg_ex.search(status_output)
