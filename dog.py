@@ -202,11 +202,11 @@ nvg_599_dut = Nvg599Class()
 
 # nvg_599_dut.ping_from_local_host('192.1681.228')
 
+nvg_599_dut.get_airties_ip('airties_1_5g')
 
+# ui_dict = nvg_599_dut.ui_get_device_list()
 
-ui_dict = nvg_599_dut.ui_get_device_list()
-
-pprint(dict(ui_dict))
+# pprint(dict(ui_dict))
 
 #for key in ui_dict:
 #    print(key)
