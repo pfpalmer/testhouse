@@ -40,13 +40,13 @@ test_house_devices_static_info = {
     '88:41:FC:86:64:D6': {'device_type': 'airties_4920', 'radio': 'abg', 'band': '2', 'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'airties_1_2g', 'name': 'ATT_4920_8664D4','location':'master_bedroom'},
-    '88:41:FC:86:64:D7': {'device_type': 'airties_4920', 'radio': 'abg', 'band': '5', 'state': 'None',
+    '88:41:FC:86:64:D4': {'device_type': 'airties_4920', 'radio': 'abg', 'band': '5', 'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None',  'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'airties_1_5g', 'name': 'ATT_4920_8664D4','location':'master_bedroom'},
     '88:41:FC:C3:56:C2': {'device_type': 'airties_4920', 'radio': 'abg', 'band': '2', 'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', ' ip': 'None',
                           'device_test_name': 'airties_2_2g','name': 'ATT_4920_C356C0','location':'master_bedroom'},
-    '88:41:FC:C3:56:C3': {'device_type': 'airties_4920', 'radio': 'abg', 'band': '5', 'state': 'None',
+    '88:41:FC:C3:56:C0': {'device_type': 'airties_4920', 'radio': 'abg', 'band': '5', 'state': 'None',
                           'address_type': 'None', 'port ': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'airties_2_5g', 'name': 'ATT_4920_C356C0','location':'master_bedroom'},
     '4C:BB:58:68:BD:F6': {'device_type': 'ubuntu_laptop', 'radio': 'bg', 'band': '5', 'state': 'None',
@@ -498,22 +498,34 @@ class Nvg599Class(GatewayClass):
             # print(type(key))
         #    print('entry: ' + current_ui_rg_connected_clients_dict[key]['ip'] )
         # print('ip is :' + current_ui_rg_connected_clients_dict[key])
+        airties_ip = None
         for key, value in test_house_devices_static_info.items():
             if test_house_devices_static_info[key]['device_test_name'] == airties_test_name:
                 print('mac isqq>' + key + '<')
-                # test_device_mac = key
+                test_device_mac = key
                 # print('ip is :' + current_ui_rg_connected_clients_dict[test_device_mac]['ip'])
-                print(type(key))
-                # print('ip is :' + current_ui_rg_connected_clients_dict['88:41:FC:86:64:D7'])
-                print('ip is :' + str(current_ui_rg_connected_clients_dict[key]['ip']))
+                # print(type(key))
+                # print('test_house_static_info>' + key + '<')
 
-            else:
-                print('not this one: ' + test_house_devices_static_info[key]['device_test_name'])
+                # print('ip is :' + current_ui_rg_connected_clients_dict['88:41:FC:86:64:D7'])
+                # print('ip is :' + str(current_ui_rg_connected_clients_dict[key]['ip']))
+                if test_device_mac in current_ui_rg_connected_clients_dict:
+                    print('ip is :' + str(current_ui_rg_connected_clients_dict[test_device_mac]['ip']) + ' Name: ' + test_house_devices_static_info[key]['device_test_name'])
+                    return current_ui_rg_connected_clients_dict[test_device_mac]['ip']
+                else:
+                    print('Device not present in UI device list')
+                    return None
+
+                    # for key, value in current_ui_rg_connected_clients_dict.items():
+            # else:
+                # print('not this one: ' + test_house_devices_static_info[key]['device_test_name'])
+            #    airties_ip = None
 
             # or key, value in current_ui_rg_connected_clients_dict.items():
                 # print('key:' + str(key) + ' the value:' + str(value))
             #    print('test name:' + current_ui_rg_connected_clients_dict[key]['test_name'])
-        #return airties_ip
+        print('Name not present in test house device dictionary')
+        return airties_ip
 
     @staticmethod
     def cli_sh_wi_all_clients():
