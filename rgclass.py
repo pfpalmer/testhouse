@@ -2,26 +2,24 @@
 # from typing import Dict
 import subprocess
 # from subprocess import check_output
-
 # from selenium.webdriver.common.by import By
-
 from selenium.common.exceptions import NoSuchElementException
 import urllib.request
-import url
-import urllib3
-import requests
-import httplib2
+# import url
+# import urllib3
+# import requests
+# import httplib2
 import pexpect
 import re
-import os
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support.ui import WebDriverWait
+# import os
+# from selenium.webdriver.common.by import By
+# from selenium.webdriver.support.ui import WebDriverWait
+# from selenium.webdriver.support.ui import WebDriverWait
 from selenium import webdriver
 from bs4 import BeautifulSoup
 import smtplib
-from collections import defaultdict
-import sys
+# from collections import defaultdict
+# import sys
 from time import sleep
 import time
 from email.message import EmailMessage
@@ -30,7 +28,6 @@ from datetime import datetime
 #  Apple path for wifi info
 # /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I
 
-# nvg_info: Dict[str, Dict[str, str]] = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
 nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
               'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey', 'ssid': 'ATTqbrAnYs'},
               "277427577103760": {'model': 'nvg599', 'device_access_code': '<<01%//4&/', 'magic': 'ggtxstgwipcg',
@@ -39,25 +36,26 @@ nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53
 test_house_devices_static_info = {
     '88:41:FC:86:64:D6': {'device_type': 'airties_4920', 'radio': 'abg', 'band': '2', 'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
-                          'device_test_name': 'airties_1_2g', 'name': 'ATT_4920_8664D4','location':'master_bedroom'},
+                          'device_test_name': 'airties_1_2g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
     '88:41:FC:86:64:D4': {'device_type': 'airties_4920', 'radio': 'abg', 'band': '5', 'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None',  'rssi': 'None', 'ip': 'None',
-                          'device_test_name': 'airties_1_5g', 'name': 'ATT_4920_8664D4','location':'master_bedroom'},
+                          'device_test_name': 'airties_1_5g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
     '88:41:FC:C3:56:C2': {'device_type': 'airties_4920', 'radio': 'abg', 'band': '2', 'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', ' ip': 'None',
-                          'device_test_name': 'airties_2_2g','name': 'ATT_4920_C356C0','location':'master_bedroom'},
+                          'device_test_name': 'airties_2_2g', 'name': 'ATT_4920_C356C0', 'location': 'master_bedroom'},
     '88:41:FC:C3:56:C0': {'device_type': 'airties_4920', 'radio': 'abg', 'band': '5', 'state': 'None',
                           'address_type': 'None', 'port ': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
-                          'device_test_name': 'airties_2_5g', 'name': 'ATT_4920_C356C0','location':'master_bedroom'},
+                          'device_test_name': 'airties_2_5g', 'name': 'ATT_4920_C356C0', 'location': 'master_bedroom'},
     '4C:BB:58:68:BD:F6': {'device_type': 'ubuntu_laptop', 'radio': 'bg', 'band': '5', 'state': 'None',
-                          'address_type': 'None', 'port': 'None','ssid': 'None', 'rssi': 'None', 'ip': 'None',
-                          'device_test_name': 'ubuntu_1', 'name': 'arris-Latitude-MBR','location':'master_bedroom'},
+                          'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
+                          'device_test_name': 'ubuntu_1', 'name': 'arris-Latitude-MBR', 'location': 'master_bedroom'},
     'F4:5C:89:9D:F1:4F': {'device_type': 'macbook_pro', 'radio': 'abg', 'band': '5', 'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
-                          'device_test_name': 'mac_book_1', 'name': 'macbook-mbr','location':'master_bedroom'},
+                          'device_test_name': 'mac_book_1', 'name': 'macbook-mbr', 'location': 'master_bedroom'},
     '5C:E0:C5:D9:8E:BF': {'device_type': 'ubuntu_laptop', 'radio': 'abg', 'band': '5', 'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
-                          'device_test_name': 'mac_book_1','name': 'palmer_Latitude-E5450','location':'master_bedroom'},
+                          'device_test_name': 'mac_book_1', 'name': 'palmer_Latitude-E5450',
+                          'location': 'master_bedroom'},
 }
 
 NON_DFS_CHANNELS = {36, 40, 44, 48, 149, 153, 157, 161, 165}
@@ -71,7 +69,8 @@ class GatewayClass:
         self.ip = None
         self.serial_number = None
 
-    def email_test_results(self, text_file):
+    @staticmethod
+    def email_test_results(text_file):
         now = datetime.today().isoformat()
         print('now')
         subject_title = 'Test results:' + str(now)
@@ -93,46 +92,49 @@ class GatewayClass:
         gmail_password = "1329brome"
         gmail_user = 'leandertesthouse@gmail.com'
 
-        with smtplib.SMTP('smtp.gmail.com', 587) as smtp_server:
-            smtp_server.ehlo()
-            smtp_server.starttls()
-            smtp_server.login(gmail_user, gmail_password)
-            smtp_server.send_message(msg)
+        try:
 
-        print('message sent successfully')
+            with smtplib.SMTP('smtp.gmail.com', 587) as smtp_server:
+                smtp_server.ehlo()
+                smtp_server.starttls()
+                smtp_server.login(gmail_user, gmail_password)
+                smtp_server.send_message(msg)
+                print('message sent successfully')
+        except smtplib.SMTPException as e:
+            print('failed to send email' + str(e))
 
 # this version has no subject when received
-    def email_test_results_deprecated(self, text_file):
-        print('in email_test_results')
-#        gmail_password="arris123"
-        gmail_password = "1329brome"
-
-        gmail_user = 'leandertesthouse@gmail.com'
-        to = 'pfpalmer@gmail.com'
-        sent_from = 'leandertesthouse:'
-        subject = 'Test results'
-#      body = "Results:" + channelResultContents
-        body = "Results:" + text_file
-        email_text = """
-        From:%s
-        To:%s
-        Subject:%s
-
-        %s 
-        """ % (sent_from, to, subject, body)
-
-        try:
-            server = smtplib.SMTP('smtp.gmail.com', 587)
-            server.ehlo()
-            server.starttls()
-            server.login(gmail_user, gmail_password)
-            # email_text = 'Subject:{}\n\nbody'.format(subject)
-            server.sendmail(sent_from, to, email_text)
-            sleep(2)
-            server.quit()
-            print("im the email section ====================")
-        except:
-            print('failed to send email')
+#     def email_test_results_deprecated(self, text_file):
+#         print('in email_test_results')
+# #        gmail_password="arris123"
+#         gmail_password = "1329brome"
+#
+#         gmail_user = 'leandertesthouse@gmail.com'
+#         to = 'pfpalmer@gmail.com'
+#         sent_from = 'leandertesthouse:'
+#         subject = 'Test results'
+# #      body = "Results:" + channelResultContents
+#         body = "Results:" + text_file
+#         email_text = """
+#         From:%s
+#         To:%s
+#         Subject:%s
+#
+#         %s
+#         """ % (sent_from, to, subject, body)
+#
+#         try:
+#             server = smtplib.SMTP('smtp.gmail.com', 587)
+#             server.ehlo()
+#             server.starttls()
+#             server.login(gmail_user, gmail_password)
+#             # email_text = 'Subject:{}\n\nbody'.format(subject)
+#             server.sendmail(sent_from, to, email_text)
+#             sleep(2)
+#             server.quit()
+#             print("im the email section ====================")
+#         except smtplib.SMTPException as e:
+#             print('failed to send email' + str(e))
 
 
 class Nvg599Class(GatewayClass):
@@ -162,6 +164,80 @@ class Nvg599Class(GatewayClass):
         self.init_info = True
         self.mesh_connected_clents = {}
 
+########################
+
+    def get_ui_ssid(self):
+        # dianostics_link = browser.find_element_by_link_text("Diagnostics")
+        home_network_link = self.session.find_element_by_link_text("Home Network")
+        home_network_link.click()
+        sleep(2)
+        # resets_link = browser.find_element_by_link_text("Resets")
+        wi_fi_link = self.session.find_element_by_link_text("Wi-Fi")
+        wi_fi_link.click()
+        sleep(2)
+        self.check_if_password_required()
+        wi_fi_link = self.session.find_element_by_link_text("Advanced Options")
+        wi_fi_link.click()
+        sleep(2)
+
+        band5_ssid_entry = self.session.find_element_by_name("tssidname")
+        band5_ssid = band5_ssid_entry.get_attribute('value')
+        guest_ssid_entry = self.session.find_element_by_name("ossidname2")
+        guest_ssid = guest_ssid_entry.get_attribute('value')
+        band2_ssid_entry = self.session.find_element_by_name("ossidname")
+        band2_ssid = band2_ssid_entry.get_attribute('value')
+        return band2_ssid, guest_ssid, band5_ssid
+
+
+    def set_ui_ssid(self,ssid_band5,ssid_guest,ssid_band2):
+        # dianostics_link = browser.find_element_by_link_text("Diagnostics")
+        home_network_link = self.session.find_element_by_link_text("Home Network")
+        home_network_link.click()
+        sleep(2)
+        # resets_link = browser.find_element_by_link_text("Resets")
+        wi_fi_link = self.session.find_element_by_link_text("Wi-Fi")
+        wi_fi_link.click()
+        sleep(2)
+        self.check_if_password_required()
+        wi_fi_link = self.session.find_element_by_link_text("Advanced Options")
+        wi_fi_link.click()
+        sleep(2)
+        if ssid_band5:
+            print("changing band 5 SSID: "+ ssid_band5)
+            band5_ssid_entry = self.session.find_element_by_name("tssidname")
+            self.session.find_element_by_name("tssidname").clear()
+            band5_ssid_entry.send_keys(ssid_band5)
+            submit = self.session.find_element_by_name("Save")
+            submit.click()
+            sleep(2)
+            self.check_for_wifi_warning()
+        else:
+            print("ssid_band5 unchanged")
+
+        if ssid_guest:
+            print("changing guest SSID: " + ssid_guest)
+            guest_ssid_entry = self.session.find_element_by_name("ossidname2")
+            self.session.find_element_by_name("ossidname2").clear()
+            guest_ssid_entry.send_keys(ssid_guest)
+            submit = self.session.find_element_by_name("Save")
+            submit.click()
+            sleep(2)
+            self.check_for_wifi_warning()
+        else:
+            print("ssid_guest unchanged")
+
+        if ssid_band2:
+            print("changing band 2 SSID: " + ssid_band2)
+            band2_ssid_entry = self.session.find_element_by_name("ossidname")
+            self.session.find_element_by_name("ossidname").clear()
+            band2_ssid_entry.send_keys(ssid_band2)
+            submit = self.session.find_element_by_name("Save")
+            submit.click()
+            sleep(2)
+        self.check_for_wifi_warning()
+
+    ##########################
+
     # we want to use the same session but the dict of connected devices is a temporary value subject to change
     def ui_get_device_list(self):
         global nvg_info
@@ -183,13 +259,11 @@ class Nvg599Class(GatewayClass):
                 continue
 
             if table_row.th.text == "MAC Address":
-                #print("table mac:" + table_row.td.text.strip() + ":test")
+                # print("table mac:" + table_row.td.text.strip() + ":test")
 
                 mac = (table_row.td.text.strip()).upper()
                 # if mac in test_house_devices_static_info:
                 if 1 == 1:
-
-                    #print('macx found in lab dict', mac)
                     ui_rg_connected_clients_dict[mac] = {}
 
                     table_row = table_row.find_next_sibling()
@@ -201,7 +275,7 @@ class Nvg599Class(GatewayClass):
                         ip = (str(ip).strip())
                         name = ip_and_name_list[1]
                         name = str(name)
-                        #print('ip is:' + ip + ' : name is:' + name)
+                        # print('ip is:' + ip + ' : name is:' + name)
                         ui_rg_connected_clients_dict[mac]['ip'] = ip
                         ui_rg_connected_clients_dict[mac]['name'] = name
 
@@ -264,8 +338,22 @@ class Nvg599Class(GatewayClass):
 
         return ui_rg_connected_clients_dict
 
-    def check_if_password_required(self):
+    def check_for_wifi_warning(self):
+        print('in check_for_wifi_warning ')
+#        warning = self.session.find_element_by_name("ReturnWarned")
+        warning = self.session.find_element_by_class_name("warning")
 
+        if warning:
+            print("we got the warning")
+            submit = self.session.find_element_by_name("Continue")
+            submit.click()
+            sleep(2)
+        else:
+            print("no warning")
+
+
+
+    def check_if_password_required(self):
         try:
             # dac_access_challenge = self.session.find_element_by_link_text("Forgot your Access Code?")
             self.session.find_element_by_link_text("Forgot your Access Code?")
@@ -275,7 +363,7 @@ class Nvg599Class(GatewayClass):
             dac_entry.send_keys(self.device_access_code)
             submit = self.session.find_element_by_name("Continue")
             submit.click()
-            sleep(5)
+            sleep(4)
         except NoSuchElementException:
             print('Password challenge not displayed- Continuing')
 
@@ -473,29 +561,13 @@ class Nvg599Class(GatewayClass):
 #         # not sure if I need to return this if the dictionary is alread bound to the instance
 #         return cli_rg_connected_clients_dict
 
-
- #  test_house_devices_static_info = {
- #   '88:41:FC:86:64:D7': {'device_type': 'airties_4920', 'radio': 'abg', 'band': '5', 'state': 'None',
- #                         'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
- #                         'test_name': 'airties_1', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
- #
-
-#    'F8:F1:B6:69:91:A3': {'allocation': 'dhcp',
-#                          'ip': '192.168.1.66',
-#                          'last_activity': '',
-#                          'name': 'android-2ddcdea19af37f59',
-#                          'network_name': 'ATTqbrAnYs',
-#                          'status': 'off',
-#                          'strength': 'Not_present_in_ui',
-#                          'wi_fi_band': '5'}}
-
-    # @staticmethod  not static because we use the YI
+    # @staticmethod  not static because we use the UI
     def get_airties_ip(self, airties_test_name):
-        #test_device_mac = None
+        # test_device_mac = None
         current_ui_rg_connected_clients_dict = self.ui_get_device_list()
-        #for key, value in current_ui_rg_connected_clients_dict.items():
+        # for key, value in current_ui_rg_connected_clients_dict.items():
         #    print('mac in ui_rg_connected_clients_dict>' + key + '<')
-            # print(type(key))
+        # print(type(key))
         #    print('entry: ' + current_ui_rg_connected_clients_dict[key]['ip'] )
         # print('ip is :' + current_ui_rg_connected_clients_dict[key])
         airties_ip = None
@@ -699,8 +771,8 @@ class Nvg599Class(GatewayClass):
             else:
                 cli_rg_connected_clients_dict[mac]['rssi'] = "Not found or value missing"
                 print('Seting rssi to Not Found or value missing ')
-            # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*SSID=(\w+).*PSMod=(\w+)?,.*NMode=(\w+)?,.*WMMEn=(\w+)?,.*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+)?.*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)?', re.DOTALL)
-            # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:(\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)', re.DOTALL)
+                # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*SSID=(\w+).*PSMod=(\w+)?,.*NMode=(\w+)?,.*WMMEn=(\w+)?,.*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+)?.*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)?', re.DOTALL)
+                # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:(\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)', re.DOTALL)
             # not sure if I need to return this if the dictionary is alread bound to the instance
             return cli_rg_connected_clients_dict
 
@@ -857,16 +929,8 @@ class Nvg599Class(GatewayClass):
         # band_selected = band
         # channel_selected = channel
         # bandwidth_selected = bandwidth
-        # if (not self.init_info):
-        #   self.ui_system_information()
-        #   print("self.serialNumer:", self.serial_number)
-        # we need the serial number to refernce the DAC which is in our local dicitonary
-        # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
-        #    self.device_access_code = nvg_info[self.serial_number]['device_access_code']
-        #    print("dac", self.device_access_code)
-        #   print("in ui_home_network_status  init if")
-
         print("in ui_set_band_bandwith_channel ")
+        # we assume that this
         # url = 'http://192.168.1.254/'
         # session = webdriver.Chrome()
         # session.get(url)
@@ -1029,27 +1093,26 @@ class Nvg599Class(GatewayClass):
 
 # not sure we want to open a new session
 # this is not correct, I have to get the IP of the 4920s before calling this
-    def get_4920_inf_from_ui(self):
-        global nvg_info
-        url_4920 = 'http://192.168.1.254/cgi-bin/devices.ha'
-        browser = webdriver.Chrome()
-        browser.get(url_4920)
-        soup = BeautifulSoup(browser.page_source, 'html.parser')
-        this = soup.find_all('th')
-        for th in this:
-            if th.text == "IPv4 Address / Name":
-                # print(th.next_sibling.next_sibling.text)
-                print("Name    ", th.text)
-                print("Name1", th.next_sibling.text)
-            else:
-                print("")
+    # deprecated
+    # def get_4920_inf_from_ui(self):
+    #     global nvg_info
+    #     url_4920 = 'http://192.168.1.254/cgi-bin/devices.ha'
+    #     browser = webdriver.Chrome()
+    #     browser.get(url_4920)
+    #     soup = BeautifulSoup(browser.page_source, 'html.parser')
+    #     this = soup.find_all('th')
+    #     for th in this:
+    #         if th.text == "IPv4 Address / Name":
+    #             # print(th.next_sibling.next_sibling.text)
+    #             print("Name    ", th.text)
+    #             print("Name1", th.next_sibling.text)
+    #         else:
+    #             print("")
 
     def run_speed_test_cli(self, speed_test_ip):
         print('in run_speedtest_cli')
         # speed_test_ip = "192.168.1.255"
         # ddd = f"{speed_test_ip} is a test"
-        # print (ddd)
-        # exit()
         # ssh_session = pexpect.spawn("ssh arris@192.168.1.239", encoding='utf-8',timeout=120)
         ssh_session = pexpect.spawn("ssh arris@" + speed_test_ip, encoding='utf-8', timeout=120)
 
@@ -1128,15 +1191,6 @@ class Nvg599Class(GatewayClass):
         ping_file.writelines('\n')
         ping_file.close()
         return min_ping, avg_ping, max_ping, mdev_ping
-
-    def connect_to_console(self):
-        print('Method: connect_to_console')
-        cmd = ' ping -c1 192.168.1.254'
-        result = os.system(cmd)
-        print('result:', result)
-        start = time.time()
-        end = time.time()
-        print(end - start)
 
     def login_nvg_599_cli(self):
         print('In login_nvg_cli')
@@ -1392,27 +1446,18 @@ class Nvg599Class(GatewayClass):
             # print("connectedDeviceDHCP", ip_lan_output_split[4])
             connected_device_dhcp = ip_lan_output_split[4]
             # print("connectedDeviceSSIDNumber", ip_lan_output_split[5])
-            connected_device_ssid_number = ip_lan_output_split[5]
+            connected_device_port = ip_lan_output_split[5]
             # This dict uses the mac as the primary key
             # self.ip_lan_connections_dict_cli[connected_device_mac] = {}
-            # self.ip_lan_connections_dict_cli[connected_device_mac]["IP"] = connected_device_ip
-            # self.ip_lan_connections_dict_cli[connected_device_mac]["Name"] = connected_device_name
-            # self.ip_lan_connections_dict_cli[connected_device_mac]["Status"] = connected_device_status
-            # self.ip_lan_connections_dict_cli[connected_device_mac]["DHCP"] = connected_device_dhcp
-            # self.ip_lan_connections_dict_cli[connected_device_mac]["SSIDNumber"] = connected_device_ssid_number
-            # self.telnet_cli_session.close()
-            # ip_lan_connections_dict_cli = {}
             ip_lan_connections_dict_cli[connected_device_mac] = {}
             ip_lan_connections_dict_cli[connected_device_mac]["IP"] = connected_device_ip
             ip_lan_connections_dict_cli[connected_device_mac]["Name"] = connected_device_name
-            ip_lan_connections_dict_cli[connected_device_mac]["Status"] = connected_device_status
+            ip_lan_connections_dict_cli[connected_device_mac]["State"] = connected_device_status
             ip_lan_connections_dict_cli[connected_device_mac]["DHCP"] = connected_device_dhcp
-            ip_lan_connections_dict_cli[connected_device_mac]["SSIDNumber"] = connected_device_ssid_number
+            ip_lan_connections_dict_cli[connected_device_mac]["Port"] = connected_device_port
             # self.telnet_cli_session.close()
         telnet_cli_session.close()
         return ip_lan_connections_dict_cli
-
-        # return self.ip_lan_connections_dict_cli
 
     # class Nvg_5268_Class(GatewayClass):
     #     def __init__(self):

@@ -2,11 +2,11 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import itertools
-#import pprint
-#import global.py
-import time
-from  pprint import pprint
+# import itertools
+import pprint
+# import global.py
+# import time
+# from  pprint import pprint
 
 # import requests
 # from bs4 import BeautifulSoup
@@ -21,15 +21,12 @@ from datetime import datetime
 
 import pexpect
 from rgclass import Nvg599Class
-from rgclass import NON_DFS_CHANNELS
-from rgclass import DFS_CHANNELS
-from rgclass import  test_house_devices_static_info
+# from rgclass import NON_DFS_CHANNELS
+# from rgclass import DFS_CHANNELS
+# from rgclass import  test_house_devices_static_info
 
-#from rgclass import NON_DFS_CHANNELS This stuff should be in a global module, once I figure out how to do it
-
-
-#NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
-#DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
+# NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
+# DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
 
 # from rgclass import  NON_DFS_CHANNELS
 # from rgclass import  DFS_CHANNELS
@@ -55,8 +52,6 @@ def test_dfs(nvg_599_dut,results_file):
     if current_5g_channel in DFS_CHANNELS:
         result = "Current 5G:" + current_5g_channel + " is a DFS channel\n"
         result_str = str(result)
-
-        #results_file.write("Current 5G:",current_5g_channel," is a DFS channel\n")
         results_file.write(result_str)
         print('this is a DFS channel')
     else:
@@ -109,12 +104,12 @@ def test_dfs(nvg_599_dut,results_file):
         #results_file.write("Current 5G:" ,current_5g_channel," is not a DFS channel\n")
         results_file.write(result)
 
-def tst_599_nvg_init():
-    nvg_599_dut = Nvg599Class()
-    url = 'http://192.168.1.254/'
-    nvg_599_dut.session = webdriver.Chrome()
-    nvg_599_dut.session.get(url)
-    return nvg_599_dut
+# def tst_599_nvg_init():
+#     nvg_599_dut = Nvg599Class()
+#     url = 'http://192.168.1.254/'
+#     nvg_599_dut.session = webdriver.Chrome()
+#     nvg_599_dut.session.get(url)
+#     return nvg_599_dut
 
 def tst_speed_test(nvg_599_dut,results_file,test_ip):
     print('in tst_speed_test')
@@ -169,25 +164,45 @@ def tst_ping_ip(nvg_599_dut,ping_history_file, remote_ip):
     print('mdev:',mdev)
 
 def test_ping_device_name(device_name_to_ping):
-    sh_ip_lan_dict = Nvg599Class.get_rg_sh_ip_lan_info_cli('arris-Latitude-MBR')
+#    sh_ip_lan_dict = Nvg599Class.get_rg_sh_ip_lan_info_cli('arris-Latitude-MBR')
+    sh_ip_lan_dict = Nvg599Class.get_rg_sh_ip_lan_info_cli()
+
     print('dict type' + str(type(sh_ip_lan_dict)))
     for key in sh_ip_lan_dict:
         #print('key----------------------------------------------' + key)
         if sh_ip_lan_dict[key]['Name']== device_name_to_ping:
             print('found it ' + sh_ip_lan_dict[key]['Name'])
             print('IP is: ' + sh_ip_lan_dict[key]['IP'])
-
-            # we have the IP now we want the radio band
             # we use the  mac from the IP table to get the radio band
             sh_wi_cl_dict = Nvg599Class.cli_sh_wi_all_clients()
-
             nvg_599_dut.ping_from_local_host(sh_ip_lan_dict[key]['IP'])
 
             # nvg_599_dut.cli_sh_wi_clients()
     # def cli_sh_wi_clients(self):
     # print('dict is ' + str(sh_ip_lan_dict))
 
+
+
+
 nvg_599_dut = Nvg599Class()
+
+
+
+ssid_band5 = "ATTqbrAnYs"
+ssid_guest = "ATTqbrAnYs_Guest"
+ssid_band2 = "ATTqbrAnYs"
+
+nvg_599_dut.set_ui_ssid(ssid_band5,ssid_guest,ssid_band2)
+
+band2, guest, band5 = nvg_599_dut.get_ui_ssid()
+print('band 2: '+ band2 + '  guest: '+ guest + '  band5: ' + band5)
+
+exit()
+show_ip_lan_dict = nvg_599_dut.get_rg_sh_ip_lan_info_cli()
+
+print(type(show_ip_lan_dict))
+pprint.pprint(show_ip_lan_dict, width = 1)
+exit()
 #down_load_speed, up_load_speed = nvg_599_dut.run_speed_test_cli(test_ip)
 
 # url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
@@ -206,11 +221,12 @@ print('1' + str(nvg_599_dut.get_airties_ip('airties_1_5g')))
 print('2' + str(nvg_599_dut.get_airties_ip('airties_2_5g')))
 print('3' + str(nvg_599_dut.get_airties_ip('airties_3_5g')))
 
-
+results_str ="1234 abcd \n 1234 5678"
+nvg_599_dut.email_test_results(results_str)
 
 # ui_dict = nvg_599_dut.ui_get_device_list()
 
-# pprint(dict(ui_dict))
+
 
 #for key in ui_dict:
 #    print(key)
@@ -245,53 +261,14 @@ exit()
 
 #test_ping_device_name('arris-Latitude-MBR')
 
-
-# return_dict = nvg_599_dut.getRGShIPLanInfo()
-# dict_str = pprint.pformat(return_dict)
-# print(dict_str)
-exit()
-nvg_599_dut.email_test_results("dog")
-
-xa2Gch=["21","22","23"]
-xa2Gbw=["a20","a40"]
-xb5Gbw=["b20","b40","b80"]
-xb5Gch = ["54","55","56"]
-
-
-
-for element in itertools.product(xa2Gch,xa2Gbw,xb5Gch,xb5Gbw):
-    print(element)
-exit()
-
-#def channelTest(self, b2G, channel, b5G):
-#    for channel in b2G:
-#        print(channel)
-
-
-exit()
-#nvg599DUT.connectCLI('192.168.1.254')
-#nvg599DUT.printme()
-#rgSerialNumber = nvg599DUT.getRGSerialNumber()
-#nvg_599_dut.loginNVG599()
-#nvg599DUT.connectCLI("1")
-#nvg_599_dut.get4920IPFromUI()
-#exit()
-
-
-
-
-
-
-#nvg_599_dut.getdeviceInfoFromUI()
-
-#nvg_599_dut.turn_off_supplicant_cli()
-#print (' exit all loging in')
-#exit()
-
-
-
-
-#statusInfoRegEx = re.compile(r'Model\s(\w+)\s+Serial\s+Number\s+(\d+)')
+#
+#
+# for element in itertools.product(xa2Gch,xa2Gbw,xb5Gch,xb5Gbw):
+#     print(element)
+# exit()
+#
+#
+# #statusInfoRegEx = re.compile(r'Model\s(\w+)\s+Serial\s+Number\s+(\d+)')
 #statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+\s+AnnexA\s+(\w+)',re.DOTALL)
 #statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*completed\s+(\w+)',re.DOTALL)
 #statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
@@ -349,25 +326,6 @@ exit()
 #resultFile.close()
 print("###############################################################################")
 print("###############################################################################")
-print("###############################################################################")
-
-rgTerm.expect("ogin:")
-rgTerm.sendline('admin')
-
-rgTerm.expect("assword:")
-# child.sendline('al        print(" ------------access code ----------------")catel')
-rgTerm.sendline('*<#/53#1/2')
-
-rgTerm.expect("UNLOCKED>")
-rgTerm.sendline('magic')
-rgTerm.expect("UNLOCKED>")
-
-output = rgTerm.sendline('tr69 get InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.Channel')
-#rgTerm.expect("MAGIC>")
-rgTerm.expect("UNLOCKED>")
-
-#result=rgTerm.after
-result=rgTerm.before
 
 #Channel = myresult.split()[-2]
 
@@ -387,121 +345,81 @@ airTiesTerm.logfile= sys.stdout
 #channelResultFP = open('channelResult.txt', 'w+')
 
 
-for l2g in list2GLite:
-    for i in list5GLite:
-        print("Config RG channel="+str(i))
-        output = rgTerm.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.Channel=' + str(i))
-        rgTerm.expect("UNLOCKED>")
-        # re-telnet into the airTies each time because the telnet session gets hung when channel is reset
-        print("Checking airTies for channel match: "+str(i))
-        # I think we want to wait before trying to login to the airtiesssh-add ~/.ssh/id_rsa
-        sleep(200)
-        airTiesTerm = pexpect.spawn("telnet 192.168.1.67", encoding='utf-8')
-        sleep(1)
-        airTiesTerm.expect("ogin")
-        airTiesTerm.sendline('root')
-        airTiesTerm.expect("#")
-        airTiesTerm.sendline('wl -i wl0 chanspec')
-        airTiesTerm.expect("#")
-        airTies2GResult = airTiesTerm.before
-        print("airties result " + str(airTies2GResult))
-        airTies2GChannel = airTies2GResult.split()[-2]
-        airTies2GChannel = airTies2GChannel.split()[-1]
-
-        print("AirTies 2G = ", airTies2GChannel)
-        print("")
-        sleep(2)
-
-        # airTiesTerm.sendline('wl -i wl1 status')   // we want this
-        airTiesTerm.sendline('wl -i wl1 chanspec')
-        airTiesTerm.expect("#")
-        airTies5GResult = airTiesTerm.before
-        airTies5GChannelInfo = airTies5GResult.split()[-2]
-        print("5G Info ", airTies5GChannelInfo)
-
-        sleep(2)
-        #airTies5GChannel = airTies5GChannelInfo.split("/")[-2]
-        airTies5GChannel = airTies5GChannelInfo.split("/")[0]
-
-        print("5G Channel = ", airTies5GChannel)
-        airTies5GBandWidth = airTies5GChannelInfo.split("/")[-1]  # type: object
-        print("5G Bandwidth = ", airTies5GBandWidth)
-
-        airTiesTerm.sendline('exit')
-        airTiesTerm.sendline("\x1b\r")
-        airTiesTerm.terminate(force=True)
-
-        sleep(10)
-
-        #print (type(i))
-        #print ("airTies5GChannel is of type "+ type(airTies5GChannel))
-
-
-        if i == int(airTies5GChannel):
-            channelResultFP.write(" \n")
-            channelResultFP.write(" 2G = "+ str(l2g) + " RG channel= "+ str(i) + " airTies5GChannel = " + airTies5GChannel  +  "  Passed" )
-            #channelResultFP.write("\r\n 2G = "+ str(l2g) + " RG channel= "+ str(i) + " airTies5GChannel = " + airTies5GChannel  +  "Passed" + "\r\n")
-
-            channelResultFP.write("\n ")
-
-            print(">> 2G = " + str(l2g) + " RG channel= "+ str(i) + " airTies5GChannel = " + airTies5GChannel  +  " Passed")
-            print ("----l2g--------------------------------------------- -------------------")
-        else:
-            channelResultFP.write(" ")
-            #channelResultFP.write("\r\n 2G = " + str(l2g) + "RG channel= "+ str(i) + " airTies5GChannel = " + airTies5GChannel  +  " Failed" + "\r\n")
-            channelResultFP.write(" 2G = " + str(l2g) + "RG channel= "+ str(i) + " airTies5GChannel = " + airTies5GChannel  +  " Failed  ")
-
-            channelResultFP.write(" ")
-
-        sleep(30)
-
-
-
-
-### this used to work
-channelResultFP.seek(0)
-channelResultContents = channelResultFP.read()
-channelResultFP.close()
-
-print ("-channelResultContents:" + channelResultContents)
-
-#msg['From']="leandertesthouse@gmail.com"
-#msg['To']= "paul.palmer@arris.com"
-#msg['Subject']="Test results"
-gmail_password="arris123"
-gmail_user= 'leandertesthouse@gmail.com'
-
-#to = 'paul.palmer@arris.com'
-to = 'pfpalmer@gmail.com'
-sent_from = 'leandertesthouse:'
-subject ='Test results'
-
-
-body = "Results:" + channelResultContents
-email_text = """
-From:%s
-To:%s
-Subject:%s
-
-%s 
-""" %(sent_from,to,subject,body)
-
-
-try:
-    server= smtplib.SMTP('smtp.gmail.com',587)
-    server.ehlo()
-    server.starttls()
-    server.login(gmail_user, gmail_password)
-    server.sendmail(sent_from, to, email_text)
-    sleep(2)
-    server.quit()
-    print ("im the email section ====================")
-except:
-    print ('failed to send email')
-
-exit()
-
+# for l2g in list2GLite:
+#     for i in list5GLite:
+#         print("Config RG channel="+str(i))
+#         output = rgTerm.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.Channel=' + str(i))
+#         rgTerm.expect("UNLOCKED>")
+#         # re-telnet into the airTies each time because the telnet session gets hung when channel is reset
+#         print("Checking airTies for channel match: "+str(i))
+#         # I think we want to wait before trying to login to the airtiesssh-add ~/.ssh/id_rsa
+#         sleep(200)
+#         airTiesTerm = pexpect.spawn("telnet 192.168.1.67", encoding='utf-8')
+#         sleep(1)
+#         airTiesTerm.expect("ogin")
+#         airTiesTerm.sendline('root')
+#         airTiesTerm.expect("#")
+#         airTiesTerm.sendline('wl -i wl0 chanspec')
+#         airTiesTerm.expect("#")
+#         airTies2GResult = airTiesTerm.before
+#         print("airties result " + str(airTies2GResult))
+#         airTies2GChannel = airTies2GResult.split()[-2]
+#         airTies2GChannel = airTies2GChannel.split()[-1]
 #
+#         print("AirTies 2G = ", airTies2GChannel)
+#         print("")
+#         sleep(2)
+#
+#         # airTiesTerm.sendline('wl -i wl1 status')   // we want this
+#         airTiesTerm.sendline('wl -i wl1 chanspec')
+#         airTiesTerm.expect("#")
+#         airTies5GResult = airTiesTerm.before
+#         airTies5GChannelInfo = airTies5GResult.split()[-2]
+#         print("5G Info ", airTies5GChannelInfo)
+#
+#         sleep(2)
+#         #airTies5GChannel = airTies5GChannelInfo.split("/")[-2]
+#         airTies5GChannel = airTies5GChannelInfo.split("/")[0]
+#
+#         print("5G Channel = ", airTies5GChannel)
+#         airTies5GBandWidth = airTies5GChannelInfo.split("/")[-1]  # type: object
+#         print("5G Bandwidth = ", airTies5GBandWidth)
+#
+#         airTiesTerm.sendline('exit')
+#         airTiesTerm.sendline("\x1b\r")
+#         airTiesTerm.terminate(force=True)
+#
+#         sleep(10)
+#
+#         #print (type(i))
+#         #print ("airTies5GChannel is of type "+ type(airTies5GChannel))
+#
+#
+#         if i == int(airTies5GChannel):
+#             channelResultFP.write(" \n")
+#             channelResultFP.write(" 2G = "+ str(l2g) + " RG channel= "+ str(i) + " airTies5GChannel = " + airTies5GChannel  +  "  Passed" )
+#             #channelResultFP.write("\r\n 2G = "+ str(l2g) + " RG channel= "+ str(i) + " airTies5GChannel = " + airTies5GChannel  +  "Passed" + "\r\n")
+#
+#             channelResultFP.write("\n ")
+#
+#             print(">> 2G = " + str(l2g) + " RG channel= "+ str(i) + " airTies5GChannel = " + airTies5GChannel  +  " Passed")
+#             print ("----l2g--------------------------------------------- -------------------")
+#         else:
+#             channelResultFP.write(" ")
+#             #channelResultFP.write("\r\n 2G = " + str(l2g) + "RG channel= "+ str(i) + " airTies5GChannel = " + airTies5GChannel  +  " Failed" + "\r\n")
+#             channelResultFP.write(" 2G = " + str(l2g) + "RG channel= "+ str(i) + " airTies5GChannel = " + airTies5GChannel  +  " Failed  ")
+#
+#             channelResultFP.write(" ")
+#
+#         sleep(30)
+#
+#
+#
+#
+# ### this used to work
+# channelResultFP.seek(0)
+# channelResultContents = channelResultFP.read()
+# channelResultFP.close()
 
 #resultFile.close()
 #sleep(1)
@@ -537,19 +455,10 @@ if 'min' in duration:
 # Print the parsed fields in CSV format.
 # print('days, hours, minutes, users, cpu avg 1 min, cpu avg 5 min, cpu avg 15 min')
 # print('%s, %s, %s, %s, %s, %s, %s' % (days, hours, mins, users, av1, av5, av15))
-
-
-
-
-
 exit()
 
 from time import sleep
 from selenium import webdriver
-
-# import
-
-
 
 # driver = webdriverhttps://www.waketech.edu/programs-courses/credit/electrical-systems-technology/degrees-pathways.Chrome('/usr/local/bin/chromedriver')
 driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
@@ -777,7 +686,6 @@ p.expect(
 duration, users, av1, av5, av15 = p.match.groups()
 
 
-# If anyone wants to send me a version using a single regex I'd be happy to see it.
 days = '0'
 hours = '0'
 mins = '0'
@@ -992,64 +900,3 @@ if 'min' in duration:
 # # Print the parsed fields in CSV format.
 # # print('days, hours, minutes, users, cpu avg 1 min, cpu avg 5 min, cpu avg 15 min')
 # # print('%s, %s, %s, %s, %s, %s, %s' % (days, hours, mins, users, av1, av5, av15))
-
-
-# print("Turning off supplicant")
-# ip = "192.168.1.254"
-# password = '<#/53#1/2'
-# child = pexpect.spawn("telnet " "192.168.1.254")
-# sleep(1)
-# # exit()
-# child.expect("ogin:")
-# child.sendline("admin")
-#
-# child.expect("assword:")
-# child.sendline('*<#/53#1/2')
-# child.expect(">")
-#
-# child.sendline('magic')
-# child.expect(">")
-#
-# child.sendline('conf')
-# child.expect(">>")
-#
-# child.sendline('system supplicant')
-# child.expect(">>")
-#
-# child.sendline('set')
-# child.expect(" off | on ]:")
-#
-# child.sendline('off')
-# child.expect(">>")
-#
-# child.sendline('save')
-# child.expect(">>")
-#
-# child.sendline("view")
-# child.expect(">>")
-#
-# out = child.before
-# print(out)
-#
-#
-# child.expect(">>")
-#
-# child.sendline('save')
-# child.expect(">>")
-#
-# child.sendline("view")
-# child.expect(">>")
-#
-# out = child.before
-# print(out)
-# #
-# # child.interact()
-# # child.expect(pexpect.EOF)
-#
-# # child.sendline("quit")
-# # child.expect(">")
-#
-# # print("done")
-# # child.sendline("bye")
-#
-# # exit()
