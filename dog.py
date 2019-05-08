@@ -12,7 +12,7 @@ import pprint
 # from bs4 import BeautifulSoup
 # import requests
 # from selenium import webdriver
-
+# import urllib3
 import re
 import smtplib
 import sys
@@ -25,8 +25,8 @@ from rgclass import Nvg599Class
 # from rgclass import DFS_CHANNELS
 # from rgclass import  test_house_devices_static_info
 
-# NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
-# DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
+NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
+DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
 
 # from rgclass import  NON_DFS_CHANNELS
 # from rgclass import  DFS_CHANNELS
@@ -185,8 +185,21 @@ def test_ping_device_name(device_name_to_ping):
 
 
 nvg_599_dut = Nvg599Class()
+#remote_driver = nvg_599_dut.remote_webserver()
+#remote_driver.get("http://www.firefox.com")
+#nvg_599_dut.enable_sshd_ssh_cli()
+#nvg_599_dut.turn_off_supplicant_cli()
+#nvg_599_dut.conf_tr69_eco_url()
+#url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
+#nvg_599_dut.factory_reset_rg(url_to_check)
+nvg_599_dut.turn_off_wi_fi_security_protection_cli()
+dfs_file = open('dfs_file.txt','a')
 
+test_dfs(nvg_599_dut,dfs_file)
 
+dfs_file.close()
+# nvg_599_dut.poc_for_youtube()
+exit()
 
 ssid_band5 = "ATTqbrAnYs"
 ssid_guest = "ATTqbrAnYs_Guest"

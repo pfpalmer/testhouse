@@ -6,7 +6,7 @@ import subprocess
 from selenium.common.exceptions import NoSuchElementException
 import urllib.request
 # import url
-# import urllib3
+import urllib3
 # import requests
 # import httplib2
 import pexpect
@@ -16,6 +16,7 @@ import re
 # from selenium.webdriver.support.ui import WebDriverWait
 # from selenium.webdriver.support.ui import WebDriverWait
 from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from bs4 import BeautifulSoup
 import smtplib
 # from collections import defaultdict
@@ -29,9 +30,9 @@ from datetime import datetime
 # /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I
 
 nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
-              'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey', 'ssid': 'ATTqbrAnYs'},
-              "277427577103760": {'model': 'nvg599', 'device_access_code': '<<01%//4&/', 'magic': 'ggtxstgwipcg',
-              'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
+               'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey', 'ssid': 'ATTqbrAnYs'},
+               "277427577103760": {'model': 'nvg599', 'device_access_code': '<<01%//4&/', 'magic': 'ggtxstgwipcg',
+                'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
 
 test_house_devices_static_info = {
     '88:41:FC:86:64:D6': {'device_type': 'airties_4920', 'radio': 'abg', 'band': '2', 'state': 'None',
@@ -75,7 +76,8 @@ class GatewayClass:
         print('now')
         subject_title = 'Test results:' + str(now)
         print('subject title', subject_title)
-
+        if text_file is None:
+            pass
         with open("results_file.txt") as fp:
             # Create a text/plain message
             msg = EmailMessage()
@@ -166,6 +168,15 @@ class Nvg599Class(GatewayClass):
 
 ########################
 
+    def remote_webserver(self):
+        # dianostics_link = browser.find_element_by_link_text("Diagnostics")
+        driver = webdriver.Remote (
+            command_executor = 'http://127.0.0.1:4444',
+            desired_capabilities = webdriver.DesiredCapabilities.FIREFOX)
+
+        return driver
+
+
     def get_ui_ssid(self):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
         home_network_link = self.session.find_element_by_link_text("Home Network")
@@ -188,8 +199,7 @@ class Nvg599Class(GatewayClass):
         band2_ssid = band2_ssid_entry.get_attribute('value')
         return band2_ssid, guest_ssid, band5_ssid
 
-
-    def set_ui_ssid(self,ssid_band5,ssid_guest,ssid_band2):
+    def set_ui_ssid(self, ssid_band5, ssid_guest, ssid_band2):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
         home_network_link = self.session.find_element_by_link_text("Home Network")
         home_network_link.click()
@@ -203,7 +213,7 @@ class Nvg599Class(GatewayClass):
         wi_fi_link.click()
         sleep(2)
         if ssid_band5:
-            print("changing band 5 SSID: "+ ssid_band5)
+            print("changing band 5 SSID: " + ssid_band5)
             band5_ssid_entry = self.session.find_element_by_name("tssidname")
             self.session.find_element_by_name("tssidname").clear()
             band5_ssid_entry.send_keys(ssid_band5)
@@ -350,8 +360,6 @@ class Nvg599Class(GatewayClass):
             sleep(2)
         else:
             print("no warning")
-
-
 
     def check_if_password_required(self):
         try:
@@ -1030,6 +1038,13 @@ class Nvg599Class(GatewayClass):
         #   sleep(20)
         # except NoSuchElementException:
         #   pass
+# https://www.youtube.com/watch?v=nPJo5uMlV5w
+#     def poc_for_youtube(self):
+#         self.session = webdriver.Chrome()
+#         rg_url = 'https://www.youtube.com/watch?v=nPJo5uMlV5w'
+#         self.session = webdriver.Chrome()
+#         self.session.get(rg_url)
+#         sleep(20)
 
     def get_ui_system_information(self):
         print('in get_ui_system_information)')
@@ -1084,12 +1099,16 @@ class Nvg599Class(GatewayClass):
 # tr69 SetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth=X_0000C5_80MHz
 # tr69 SetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth=X_0000C5_40MHz
 # InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth X_0000C5_80MH
-
-    def channel_test(self, b2g, b5g, bw2g, bw5g):
-        for ib2g in b2g:
-            for ib5G in b5g:
-                for ibw in b2g:
-                    print("2G:" + ib2g + " 5G:" + ib5G + "bandwidth" + ibw)
+#
+#     def channel_test(self, b2g, b5g, bw2g, bw5g):
+#
+#         test = bw2g
+#         test = bw5g
+#         print('just to get rid of the pep8 warning' + test)
+#         for ib2g in b2g:
+#             for ib5G in b5g:
+#                 for ibw in b2g:
+#                     print("2G:" + ib2g + " 5G:" + ib5G + "bandwidth" + ibw)
 
 # not sure we want to open a new session
 # this is not correct, I have to get the IP of the 4920s before calling this
@@ -1225,7 +1244,26 @@ class Nvg599Class(GatewayClass):
         cli_session.sendline('admin')
         cli_session.expect("#")
         return cli_session
-    
+
+    @staticmethod
+    def get_4920_ssid(ip_4920):
+        print('In get_4920_ssid')
+        cli_session = pexpect.spawn("telnet" + ip_4920, encoding='utf-8')
+        cli_session.expect("ogin:")
+        cli_session.sendline('admin')
+        cli_session.expect("#")
+        cli_session.sendline('wl -i wl1 status')
+        cli_session.expect("#")
+        status_output = cli_session.before
+        status_info_reg_ex = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',
+                                        re.DOTALL)
+        # statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
+        # status InfoRegEx = re.compile(r'Model\s(\w+)')
+        mo1 = status_info_reg_ex.search(status_output)
+        # ssid = 0
+        # return ssid
+        return mo1
+
     def connect_cli(self, ip):
         self.ip = ip
         # cls.ssh = pexpect.spawn('ssh ' + name)
@@ -1318,6 +1356,19 @@ class Nvg599Class(GatewayClass):
                 sleep(10)
                 print('time' + str(time.time()))
                 continue
+# incomplete
+    def enable_parental_controlb(self):
+        self.telnet_cli_session = self.login_nvg_599_cli()
+        self.telnet_cli_session.sendline('magic')
+        self.telnet_cli_session.expect("UNLOCKED>")
+        self.telnet_cli_session.sendline('conf')
+        self.telnet_cli_session.expect("\\(top\\)>>")
+        self.telnet_cli_session.sendline('manage cwmp')
+        self.telnet_cli_session.expect("\\(management cwmp\\)>>")
+        self.telnet_cli_session.sendline('set')
+        self.telnet_cli_session.expect("]:")
+        self.telnet_cli_session.sendline('on')
+        self.telnet_cli_session.expect("\\):")
 
     def conf_tr69_eco_url(self):
         self.telnet_cli_session = self.login_nvg_599_cli()
