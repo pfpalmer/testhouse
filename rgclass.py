@@ -5,6 +5,7 @@ import subprocess
 # from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 import urllib.request
+from urllib.error import URLError, HTTPError
 # import url
 import urllib3
 # import requests
@@ -16,7 +17,7 @@ import re
 # from selenium.webdriver.support.ui import WebDriverWait
 # from selenium.webdriver.support.ui import WebDriverWait
 from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+# from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from bs4 import BeautifulSoup
 import smtplib
 # from collections import defaultdict
@@ -30,9 +31,10 @@ from datetime import datetime
 # /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I
 
 nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
-               'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey', 'ssid': 'ATTqbrAnYs'},
-               "277427577103760": {'model': 'nvg599', 'device_access_code': '<<01%//4&/', 'magic': 'ggtxstgwipcg',
-                'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
+                                'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey',
+                                'ssid': 'ATTqbrAnYs'}, "277427577103760": {'model': 'nvg599', 'device_access_code':
+                                '<<01%//4&/', 'magic': 'ggtxstgwipcg', 'mac2g': 'fc:51:a4:2f:25:90', 'mac5g':
+                                'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
 
 test_house_devices_static_info = {
     '88:41:FC:86:64:D6': {'device_type': 'airties_4920', 'radio': 'abg', 'band': '2', 'state': 'None',
@@ -169,13 +171,11 @@ class Nvg599Class(GatewayClass):
 ########################
 
     def remote_webserver(self):
+        pass
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
-        driver = webdriver.Remote (
-            command_executor = 'http://127.0.0.1:4444',
-            desired_capabilities = webdriver.DesiredCapabilities.FIREFOX)
-
-        return driver
-
+        # driver = webdriver.Remote(command_executor='http://127.0.0.1:4444',
+        #                         desired_capabilities = webdriver.DesiredCapabilities.FIREFOX)
+        # return driver
 
     def get_ui_ssid(self):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
@@ -564,8 +564,11 @@ class Nvg599Class(GatewayClass):
 #
 #         return cli_rg_connected_clients_dict
 #
-#         # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*SSID=(\w+).*PSMod=(\w+)?,.*NMode=(\w+)?,.*WMMEn=(\w+)?,.*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+)?.*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)?', re.DOTALL)
-#         # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:(\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)', re.DOTALL)
+#         # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).
+    #         *SSID=(\w+).*PSMod=(\w+)?,.*NMode=(\w+)?,.*WMMEn=(\w+)?,.*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+)?.
+    #         *TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)?', re.DOTALL)
+#         # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:(\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\w+).
+    #         *RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)', re.DOTALL)
 #         # not sure if I need to return this if the dictionary is alread bound to the instance
 #         return cli_rg_connected_clients_dict
 
@@ -590,7 +593,8 @@ class Nvg599Class(GatewayClass):
                 # print('ip is :' + current_ui_rg_connected_clients_dict['88:41:FC:86:64:D7'])
                 # print('ip is :' + str(current_ui_rg_connected_clients_dict[key]['ip']))
                 if test_device_mac in current_ui_rg_connected_clients_dict:
-                    print('ip is :' + str(current_ui_rg_connected_clients_dict[test_device_mac]['ip']) + ' Name: ' + test_house_devices_static_info[key]['device_test_name'])
+                    print('ip is :' + str(current_ui_rg_connected_clients_dict[test_device_mac]['ip']) + ' Name: '
+                          + test_house_devices_static_info[key]['device_test_name'])
                     return current_ui_rg_connected_clients_dict[test_device_mac]['ip']
                 else:
                     print('Device not present in UI device list')
@@ -779,10 +783,42 @@ class Nvg599Class(GatewayClass):
             else:
                 cli_rg_connected_clients_dict[mac]['rssi'] = "Not found or value missing"
                 print('Seting rssi to Not Found or value missing ')
-                # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*SSID=(\w+).*PSMod=(\w+)?,.*NMode=(\w+)?,.*WMMEn=(\w+)?,.*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+)?.*TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)?', re.DOTALL)
-                # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:(\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)', re.DOTALL)
+                # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).
+                # *SSID=(\w+).*PSMod=(\w+)?,.*NMode=(\w+)?,.*WMMEn=(\w+)?,.*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+)?.
+                # *TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)?', re.DOTALL)
+                # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:(\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\w+).
+                # *RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)', re.DOTALL)
             # not sure if I need to return this if the dictionary is alread bound to the instance
             return cli_rg_connected_clients_dict
+    @staticmethod
+    def factory_test():
+        loop = 1
+        start = time.time()
+        while loop == 1:
+            try:
+                urllib.request.urlopen("http://192.168.1.254/cgi-bin/home.ha", timeout=3)
+                end = time.time()
+                print("Duration timer:", str(end - start))
+                break
+            # except:
+            # need to check if this works
+            except TimeoutError:
+                print('Not ready, sleeping 10 seconds')
+                sleep(10)
+                print('time' + str(time.time()))
+                continue
+
+            except HTTPError as e:
+                print('HTTP Error: ' + str(e))
+                sleep(10)
+                print('time' + str(time.time()))
+                continue
+
+            except URLError as e:
+                print('URL Error: ' + str(e))
+                sleep(10)
+                print('time' + str(time.time()))
+                continue
 
     # @staticmethod
     def factory_reset_rg(self, rg_url):
@@ -818,11 +854,24 @@ class Nvg599Class(GatewayClass):
                 urllib.request.urlopen(rg_url, timeout=3)
                 end = time.time()
                 print("Duration timer:", str(end - start))
+                sleep(20)
                 break
             # except:
             # need to check if this works
             except TimeoutError:
                 print('Not ready, sleeping 10 seconds')
+                sleep(10)
+                print('time' + str(time.time()))
+                continue
+
+            except HTTPError as e:
+                print('HTTP Error: ' + str(e))
+                sleep(10)
+                print('time' + str(time.time()))
+                continue
+
+            except URLError as e:
+                print('URL Error: ' + str(e))
                 sleep(10)
                 print('time' + str(time.time()))
                 continue
@@ -1356,19 +1405,94 @@ class Nvg599Class(GatewayClass):
                 sleep(10)
                 print('time' + str(time.time()))
                 continue
-# incomplete
-    def enable_parental_controlb(self):
+
+# incomplete there are profiles to add
+    def enable_parental_control(self):
+        print("In enable_parental_contol")
         self.telnet_cli_session = self.login_nvg_599_cli()
-        self.telnet_cli_session.sendline('magic')
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.Enable=1")
         self.telnet_cli_session.expect("UNLOCKED>")
-        self.telnet_cli_session.sendline('conf')
-        self.telnet_cli_session.expect("\\(top\\)>>")
-        self.telnet_cli_session.sendline('manage cwmp')
-        self.telnet_cli_session.expect("\\(management cwmp\\)>>")
-        self.telnet_cli_session.sendline('set')
-        self.telnet_cli_session.expect("]:")
-        self.telnet_cli_session.sendline('on')
-        self.telnet_cli_session.expect("\\):")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD.TODEnable=1")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.RestrictionType=TimeSlot")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Apps=67137536,218163712")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD.Profile."
+                                         "9.UsageThreshold=10000")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.1.Days=1000000")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.1.TimeSlots=11111111111111111111111111111111111111111"
+                                         "1111111000000000000000000000000000011111111111111111111")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.1.UsageDuration=86400")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.2.Days=0100000")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.2.TimeSlots=111111111111111111111111111111111111111111"
+                                         "111111000000000000000000000000000011111111111111111111")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.2.UsageDuration=86400")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.3.Days=0010000")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.3.TimeSlots=111111111111111111111111111111111111111111"
+                                         "111111000000000000000000000000000011111111111111111111")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.3.UsageDuration=86400")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.4.Days=0001000")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.4.TimeSlots=1111111111111111111111111111111111111111"
+                                         "11111111000000000000000000000000000011111111111111111111")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.4.UsageDuration=86400")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.5.Days=0000100")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.5.TimeSlots=1111111111111111111111111111111111111111"
+                                         "11111111000000000000000000000000000011111111111111111111")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.5.UsageDuration=86400")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.6.Days=0000010")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.6.TimeSlots=1111111111111111111111111111111111111111"
+                                         "11111111000000000000000000000000000011111111111111111111")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.6.UsageDuration=86400")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.7.Days=0000001")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.7.TimeSlots=11111111111111111111111111111111111111"
+                                         "1111111111000000000000000000000000000011111111111111111111")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
+                                         "Profile.9.Scheduler.7.UsageDuration=86400")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
 
     def conf_tr69_eco_url(self):
         self.telnet_cli_session = self.login_nvg_599_cli()

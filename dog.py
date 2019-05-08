@@ -182,9 +182,7 @@ def test_ping_device_name(device_name_to_ping):
     # print('dict is ' + str(sh_ip_lan_dict))
 
 
-
-
-nvg_599_dut = Nvg599Class()
+# nvg_599_dut = Nvg599Class()
 #remote_driver = nvg_599_dut.remote_webserver()
 #remote_driver.get("http://www.firefox.com")
 #nvg_599_dut.enable_sshd_ssh_cli()
@@ -192,12 +190,12 @@ nvg_599_dut = Nvg599Class()
 #nvg_599_dut.conf_tr69_eco_url()
 #url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
 #nvg_599_dut.factory_reset_rg(url_to_check)
-nvg_599_dut.turn_off_wi_fi_security_protection_cli()
-dfs_file = open('dfs_file.txt','a')
-
-test_dfs(nvg_599_dut,dfs_file)
-
-dfs_file.close()
+# nvg_599_dut.enable_parental_control()
+#nvg_599_dut.turn_off_wi_fi_security_protection_cli()
+#dfs_file = open('dfs_file.txt','a')
+#test_dfs(nvg_599_dut,dfs_file)
+Nvg599Class.factory_test()
+#dfs_file.close()
 # nvg_599_dut.poc_for_youtube()
 exit()
 
