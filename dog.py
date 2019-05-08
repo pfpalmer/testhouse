@@ -194,7 +194,7 @@ def test_ping_device_name(device_name_to_ping):
 #nvg_599_dut.turn_off_wi_fi_security_protection_cli()
 #dfs_file = open('dfs_file.txt','a')
 #test_dfs(nvg_599_dut,dfs_file)
-Nvg599Class.factory_test()
+# Nvg599Class.factory_test()
 #dfs_file.close()
 # nvg_599_dut.poc_for_youtube()
 exit()

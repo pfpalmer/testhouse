@@ -177,7 +177,10 @@ class Nvg599Class(GatewayClass):
         #                         desired_capabilities = webdriver.DesiredCapabilities.FIREFOX)
         # return driver
 
-    def get_ui_ssid(self):
+   #  def get_ui_ssid(self):
+    """ We should use this function to get the information for a specific band /guest SSID
+    This would make the test case logic  easier to follow"""
+    def get_ui_ssid_info(self):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
         home_network_link = self.session.find_element_by_link_text("Home Network")
         home_network_link.click()
@@ -193,10 +196,20 @@ class Nvg599Class(GatewayClass):
 
         band5_ssid_entry = self.session.find_element_by_name("tssidname")
         band5_ssid = band5_ssid_entry.get_attribute('value')
+
+
+        band5_password_entry = self.session.find_element_by_name("tkey1")
+        band5_password = band5_password_entry.get_attribute('value')
+
         guest_ssid_entry = self.session.find_element_by_name("ossidname2")
         guest_ssid = guest_ssid_entry.get_attribute('value')
+        guest_password_entry = self.session.find_element_by_name("okey2")
+        guest_password = guest_password_entry.get_attribute('value')
+
         band2_ssid_entry = self.session.find_element_by_name("ossidname")
         band2_ssid = band2_ssid_entry.get_attribute('value')
+        band2_password_entry = self.session.find_element_by_name("okey1")
+        band2_password = band2_password_entry.get_attribute('value')
         return band2_ssid, guest_ssid, band5_ssid
 
     def set_ui_ssid(self, ssid_band5, ssid_guest, ssid_band2):
@@ -790,6 +803,7 @@ class Nvg599Class(GatewayClass):
                 # *RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)', re.DOTALL)
             # not sure if I need to return this if the dictionary is alread bound to the instance
             return cli_rg_connected_clients_dict
+
     @staticmethod
     def factory_test():
         loop = 1
@@ -897,7 +911,7 @@ class Nvg599Class(GatewayClass):
         print("dac", self.device_access_code)
         # url = 'http://192.168.1.254/cgi-bin/wconfig.ha'
         # url = 'http://192.168.1.254/'
-        # session = webdriver.Chrome()
+        # session = driver.Chrome()
         # session.get(url)
 
         status_link = self.session.find_element_by_link_text("Home Network")
