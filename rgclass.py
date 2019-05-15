@@ -201,7 +201,6 @@ class Nvg599Class(GatewayClass):
         band5_ssid_entry = self.session.find_element_by_name("tssidname")
         band5_ssid = band5_ssid_entry.get_attribute('value')
 
-
         band5_password_entry = self.session.find_element_by_name("tkey1")
         band5_password = band5_password_entry.get_attribute('value')
 
@@ -1310,15 +1309,19 @@ class Nvg599Class(GatewayClass):
         return min_ping, avg_ping, max_ping, mdev_ping
 
     def ping_check(self,remote_ip):
-        # def ping_from_local_host(remote_ip):
         print('In ping_check')
-        out = subprocess.check_output("ping -c5 " + remote_ip, shell=True).decode("utf-8")
-        # result = os.system(cmd)
-        print('out===========\n', out)
-        print('endout1===========\n')
-        ping_info_reg_ex = re.compile(r'(\d+.*loss)')
-        ping_status = ping_info_reg_ex.search(out)
-        return ping_status.group(1)
+        # out = subprocess.check_output("ping -c10 " + remote_ip, shell=True).decode("utf-8")
+        try:
+            out = subprocess.check_output("ping -c10 " + remote_ip, shell=True).decode("utf-8")
+            ping_info_reg_ex = re.compile(r'(\d+.*loss)')
+            ping_status = ping_info_reg_ex.search(out)
+            return ping_status.group(1)
+        except subprocess.CalledProcessError as e:
+            print('ping error:', e.output)
+            e.returncode = 0
+            ping_fail_str = str(e.output)
+            ping_fail_return = "Ping_failed:" + ping_fail_str
+            return ping_fail_return
 
     def login_nvg_599_cli(self):
         print('In login_nvg_cli')
