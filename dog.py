@@ -27,6 +27,7 @@ from rgclass import Nvg599Class
 
 NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
 DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
+ALL_BAND5_CHANNELS = {36, 40, 44, 48,52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144, 149, 153, 157, 161, 165}
 
 # from rgclass import  NON_DFS_CHANNELS
 # from rgclass import  DFS_CHANNELS
@@ -182,7 +183,35 @@ def test_ping_device_name(device_name_to_ping):
     # print('dict is ' + str(sh_ip_lan_dict))
 
 
-# nvg_599_dut = Nvg599Class()
+nvg_599_dut = Nvg599Class()
+#ALL_BAND5_CHANNELS = [36, 40, 44, 48,52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144, 149, 153, 157, 161, 165]
+#ALL_BAND5_BANDWIDTHS= [20,40,80]
+ALL_BAND5_CHANNELS = [36, 40, 44]
+ALL_BAND5_BANDWIDTHS= [20, 40]
+
+
+# ui_set_band_bandwith_channel(self, band, bandwidth, channel):
+channel_band_file = open('ping_file.txt', 'a')
+for band5_channel in range(len(ALL_BAND5_CHANNELS)):
+    for band5_bandwidth in range(len(ALL_BAND5_BANDWIDTHS)):
+        print(' ')
+        print('band bandwidth channel: ' + str(ALL_BAND5_CHANNELS[band5_channel]) + "  "  + str(ALL_BAND5_BANDWIDTHS[band5_bandwidth]))
+        print(' ')
+        sleep(30)
+        nvg_599_dut.ui_set_band_bandwith_channel('5g', ALL_BAND5_BANDWIDTHS[band5_bandwidth], ALL_BAND5_CHANNELS[band5_channel])
+        ping_results = nvg_599_dut.ping_check('192.168.1.77')
+        print('Channel:' + str(ALL_BAND5_CHANNELS[band5_channel]) + " Bandwidth:"  + str(ALL_BAND5_BANDWIDTHS[band5_bandwidth]) + ' Ping result:' + str(ping_results))
+        #min_ping, avg_ping, max_ping, mdev_ping = nvg_599_dut.ping_from_local_host('192.168.1.77')
+        #print('min_ping:'+  ping_file = open('ping_file.txt', 'a') min_ping + ' avg_ping:' + avg_ping + ' max_ping:' + max_ping)
+
+        channel_band_file.writelines('Channel:' + str(ALL_BAND5_CHANNELS[band5_channel]) + " Bandwidth:"  + str(ALL_BAND5_BANDWIDTHS[band5_bandwidth]) + ' Ping result:' + str(ping_results))
+        #                     self.serial_number + '  min_ping:' + min_ping + '  avg_ping:' +
+        #                     '  max_ping:' + max_ping + '  max dev:' + mdev_ping)
+        #ping_file.writelines('\n')
+channel_band_file.close()
+# nvg_599_dut.ui_set_band_bandwith_channel('5g', band5_bandwidth, band5_channel)
+
+exit()
 #remote_driver = nvg_599_dut.remote_webserver()
 #remote_driver.get("http://www.firefox.com")
 #nvg_599_dut.enable_sshd_ssh_cli()
@@ -190,7 +219,7 @@ def test_ping_device_name(device_name_to_ping):
 #nvg_599_dut.conf_tr69_eco_url()
 #url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
 #nvg_599_dut.factory_reset_rg(url_to_check)
-# nvg_599_dut.enable_parental_control()
+#nvg_599_dut.enable_parental_control()
 #nvg_599_dut.turn_off_wi_fi_security_protection_cli()
 #dfs_file = open('dfs_file.txt','a')
 #test_dfs(nvg_599_dut,dfs_file)
@@ -216,15 +245,15 @@ pprint.pprint(show_ip_lan_dict, width = 1)
 exit()
 #down_load_speed, up_load_speed = nvg_599_dut.run_speed_test_cli(test_ip)
 
-# url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
+url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
 
-# nvg_599_dut.factory_reset_rg(url_to_check)
+##nvg_599_dut.factory_reset_rg(url_to_check)
 
-# nvg_599_dut.enable_sshd_ssh_cli()
+#nvg_599_dut.enable_sshd_ssh_cli()
 
-# nvg_599_dut.conf_tr69_eco_url()
+#nvg_599_dut.conf_tr69_eco_url()
 
-# nvg_599_dut.turn_off_supplicant_cli()
+#nvg_599_dut.turn_off_supplicant_cli()
 
 # nvg_599_dut.ping_from_local_host('192.1681.228')
 

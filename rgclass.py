@@ -32,9 +32,13 @@ from datetime import datetime
 
 nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
                                 'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey',
-                                'ssid': 'ATTqbrAnYs'}, "277427577103760": {'model': 'nvg599', 'device_access_code':
-                                '<<01%//4&/', 'magic': 'ggtxstgwipcg', 'mac2g': 'fc:51:a4:2f:25:90', 'mac5g':
-                                'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'}}
+                                'ssid': 'ATTqbrAnYs'},
+            "277427577103760": {'model': 'nvg599', 'device_access_code':'<<01%//4&/', 'magic': 'ggtxstgwipcg',
+                                'mac2g': 'fc:51:a4:2f:25:90', 'mac5g':
+                                'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'},
+            "35448081188192":   {'model':'nvg599','device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
+                                 'mac2g':'20:3d:66:49:85:61', 'mac5g': '11:22:33:44:55:66','wifi': 'eeh4jxmh7q26',
+                                 'ssid': 'ATT4ujR48s'}}
 
 test_house_devices_static_info = {
     '88:41:FC:86:64:D6': {'device_type': 'airties_4920', 'radio': 'abg', 'band': '2', 'state': 'None',
@@ -63,7 +67,7 @@ test_house_devices_static_info = {
 
 NON_DFS_CHANNELS = {36, 40, 44, 48, 149, 153, 157, 161, 165}
 DFS_CHANNELS = {52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144}
-
+ALL_BAND5_CHANNELS = {36, 40, 44, 48,52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144, 149, 153, 157, 161, 165}
 
 class GatewayClass:
     def __init__(self):
@@ -387,10 +391,27 @@ class Nvg599Class(GatewayClass):
             sleep(4)
         except NoSuchElementException:
             print('Password challenge not displayed- Continuing')
+       #pfp
+    #        # browser.find_element_by_xpath("//*[@id='main-content']/div[2]/div[2]/div/h1.text")
 
-# # All temporal methods should be static
-#     def cli_sh_wi_clients(self):
-#         global test_house_devices_static_info
+    def check_if_wifi_warning_displayed(self):
+        print('in check_ifwi_warning_displayed')
+        try:
+            sleep(4)
+            self.session.find_element_by_xpath('//*[@id="content-sub"]/div[1]/h1')
+            print('WiFi warning displayed')
+            print('Clicking on Continue')
+            submit = self.session.find_element_by_name("Continue")
+            submit.click()
+            sleep(10)
+        except NoSuchElementException:
+            print('Wi-Fi warning not displayed - Continuing')
+        try:
+            sleep(4)
+            self.session.find_element_by_xpath('//*[@id="error-message-text"]')
+            print('Changes Saved')
+        except NoSuchElementException:
+            print('No save confirmation')
 #         print("in cli_sh_wi_clients")
 #         self.telnet_cli_session = self.login_nvg_599_cli()
 #         self.telnet_cli_session.sendline("show wi clients")
@@ -897,6 +918,7 @@ class Nvg599Class(GatewayClass):
         self.enable_sshd_ssh_cli()
         self.conf_tr69_eco_url()
         self.turn_off_wi_fi_security_protection_cli()
+        self.enable_parental_control()
 
     def get_ui_home_network_status_value(self, value_requested):
         print('in get_ui_home_network_status_value)')
@@ -1018,7 +1040,7 @@ class Nvg599Class(GatewayClass):
         # self.session = self.check_if_password_required()
         self.check_if_password_required()
 
-        sleep(10)
+        sleep(5)
         advanced_options_link = self.session.find_element_by_link_text("Advanced Options")
         advanced_options_link.click()
         sleep(2)
@@ -1047,17 +1069,31 @@ class Nvg599Class(GatewayClass):
             print('bandwidth', bandwidth)
             # bandwidth_select.select_by_value(bandwidth)
             for option in bandwidth_select.find_elements_by_tag_name('option'):
-                if option.text == bandwidth:
+                if option.text == str(bandwidth):
                     option.click()
+                    print('bandwidth changed to:' + str(bandwidth))
+
+                else:
+                    pass
+                    print('did not find bandwidth')
 
             channel_select = self.session.find_element_by_id("tchannelplusauto")
             print('tchannel 5g', channel)
             # bandwidth_select.select_by_value(bandwidth)
             for option in channel_select.find_elements_by_tag_name('option'):
-                if option.text == channel:
+                if option.text == str(channel):
                     option.click()
                     print('5g channel changed to channel:', channel)
+                else:
+                    pass
+                    # print('did not find channel')
             sleep(2)
+
+            submit = self.session.find_element_by_name("Save")
+            submit.click()
+
+            self.check_if_wifi_warning_displayed()
+
 #            ui_start_status_ = self.session.find_element_by_link_text("Device")
 #            ui_start_status_()
 #            sleep(2)
@@ -1243,7 +1279,6 @@ class Nvg599Class(GatewayClass):
         # def ping_from_local_host(remote_ip):
         print('In ping_from_local_host')
         ping_file = open('ping_file.txt', 'a')
-        # pfp
         # out = subprocess.Popen("ping  -c3 localhost",stdout=subprocess.PIPE,stderr=subprocess.STDOUT, shell=True)
         # out = subprocess.Popen(["ping ", "-c3"," localhost"], stdout=subprocess.PIPE)
         # out, err = out.communicate()
@@ -1274,13 +1309,27 @@ class Nvg599Class(GatewayClass):
         ping_file.close()
         return min_ping, avg_ping, max_ping, mdev_ping
 
+    def ping_check(self,remote_ip):
+        # def ping_from_local_host(remote_ip):
+        print('In ping_check')
+        out = subprocess.check_output("ping -c5 " + remote_ip, shell=True).decode("utf-8")
+        # result = os.system(cmd)
+        print('out===========\n', out)
+        print('endout1===========\n')
+        ping_info_reg_ex = re.compile(r'(\d+.*loss)')
+        ping_status = ping_info_reg_ex.search(out)
+        return ping_status.group(1)
+
     def login_nvg_599_cli(self):
         print('In login_nvg_cli')
         self.telnet_cli_session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
         self.telnet_cli_session.expect("ogin:")
         self.telnet_cli_session.sendline('admin')
         self.telnet_cli_session.expect("ord:")
-        self.telnet_cli_session.sendline('<<01%//4&/')
+     #   self.telnet_cli_session.sendline('<<01%//4&/')
+      #  self.telnet_cli_session.sendline('9==5485?6<')
+        nvg_dac = self.device_access_code
+        self.telnet_cli_session.sendline(nvg_dac)
         self.telnet_cli_session.expect(">")
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect(">")
@@ -1327,7 +1376,7 @@ class Nvg599Class(GatewayClass):
         # return ssid
         return mo1
 
-    def connect_cli(self, ip):
+    def cli_rg_status(self, ip):
         self.ip = ip
         # cls.ssh = pexpect.spawn('ssh ' + name)
         print('in connect_cli')
