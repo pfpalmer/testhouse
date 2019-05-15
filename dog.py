@@ -191,7 +191,7 @@ ALL_BAND5_BANDWIDTHS= [20, 40]
 
 
 # ui_set_band_bandwith_channel(self, band, bandwidth, channel):
-channel_band_file = open('ping_file.txt', 'a')
+channel_band_file = open('channel_band_file.txt', 'a')
 for band5_channel in range(len(ALL_BAND5_CHANNELS)):
     for band5_bandwidth in range(len(ALL_BAND5_BANDWIDTHS)):
         print(' ')
