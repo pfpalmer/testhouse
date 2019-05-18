@@ -193,7 +193,7 @@ class Nvg599Class(GatewayClass):
         wi_fi_link = self.session.find_element_by_link_text("Wi-Fi")
         wi_fi_link.click()
         sleep(2)
-        self.check_if_password_required()
+        self.check_if_dac_required()
         wi_fi_link = self.session.find_element_by_link_text("Advanced Options")
         wi_fi_link.click()
         sleep(2)
@@ -224,7 +224,7 @@ class Nvg599Class(GatewayClass):
         wi_fi_link = self.session.find_element_by_link_text("Wi-Fi")
         wi_fi_link.click()
         sleep(2)
-        self.check_if_password_required()
+        self.check_if_dac_required()
         wi_fi_link = self.session.find_element_by_link_text("Advanced Options")
         wi_fi_link.click()
         sleep(2)
@@ -377,7 +377,7 @@ class Nvg599Class(GatewayClass):
         else:
             print("no warning")
 
-    def check_if_password_required(self):
+    def check_if_dac_required(self):
         try:
             # dac_access_challenge = self.session.find_element_by_link_text("Forgot your Access Code?")
             self.session.find_element_by_link_text("Forgot your Access Code?")
@@ -855,8 +855,10 @@ class Nvg599Class(GatewayClass):
                 continue
 
     # @staticmethod
-    def factory_reset_rg(self, rg_url):
-        # global nvg_info
+    #def factory_reset_rg(self, rg_url="http://192.168.1.254/cgi-bin/home.ha"):
+    def factory_reset_rg(self, rg_url="http://192.168.1.254/"):
+
+        # the default is the usual default RG IP
         self.factory_reset = 1
         # url = 'http://192.168.1.254/'
         # browser = webdriver.Chrome()
@@ -870,7 +872,7 @@ class Nvg599Class(GatewayClass):
         resets_link = self.session.find_element_by_link_text("Resets")
         resets_link.click()
         sleep(2)
-        self.check_if_password_required()
+        self.check_if_dac_required()
         factory_reset = self.session.find_element_by_name("Reset")
         factory_reset.click()
         sleep(5)
@@ -885,7 +887,8 @@ class Nvg599Class(GatewayClass):
         loop = 1
         while loop == 1:
             try:
-                urllib.request.urlopen(rg_url, timeout=3)
+                urllib.request.urlopen(rg_url, timeout=600)
+                # response.read().decode("utf-8", 'ignore')
                 end = time.time()
                 print("Duration timer:", str(end - start))
                 sleep(20)
@@ -1036,8 +1039,8 @@ class Nvg599Class(GatewayClass):
         wifi_link.click()
 
         # handle being asked for password
-        # self.session = self.check_if_password_required()
-        self.check_if_password_required()
+        # self.session = self.check_if_dac_required()
+        self.check_if_dac_required()
 
         sleep(5)
         advanced_options_link = self.session.find_element_by_link_text("Advanced Options")
@@ -1093,10 +1096,64 @@ class Nvg599Class(GatewayClass):
 
             self.check_if_wifi_warning_displayed()
 
-#            ui_start_status_ = self.session.find_element_by_link_text("Device")
-#            ui_start_status_()
-#            sleep(2)
             return self.session
+
+
+    def ui_get_wifi_password(self):
+        print('in ui_get_wifi_password')
+        rg_url = 'http://192.168.1.254/'
+        # session = webdriver.Chrome()
+        self.session.get(rg_url)
+        status_link = self.session.find_element_by_link_text("Home Network")
+        status_link.click()
+        sleep(2)
+        home_network_link = self.session.find_element_by_link_text("Wi-Fi")
+        home_network_link.click()
+        sleep(2)
+        self.check_if_dac_required()
+        password_input = self.session.find_element_by_id("password")
+        print('password is: ' + password_input.get_attribute("value"))
+        default_password = password_input.get_attribute("value")
+        # password_input.set_attribute("value","12345678")
+        print('tada2)')
+        return default_password
+
+    def ui_set_wifi_password(self,password):
+        print('in ui_set_password')
+        rg_url = 'http://192.168.1.254/'
+        # session = webdriver.Chrome()
+        self.session.get(rg_url)
+        status_link = self.session.find_element_by_link_text("Home Network")
+        status_link.click()
+        sleep(2)
+        home_network_link = self.session.find_element_by_link_text("Wi-Fi")
+        home_network_link.click()
+        sleep(2)
+        self.check_if_dac_required()
+        password_input = self.session.find_element_by_id("password")
+        print('current password is: ' + password_input.get_attribute("value"))
+        # default_password = password_input.get_attribute("value")
+        #java_script = 'document.getElementsById("password").setAttribute('value','1234567890')
+
+
+        # if we are setting the password then we have to make sure that the use default is not set
+        channel_select = self.session.find_element_by_id("ochannelplusauto")
+        print('found ochannel')
+        print('channel', channel)
+        # bandwidth_select.select_by_value(bandwidth)
+        for option in channel_select.find_elements_by_tag_name('option'):
+            if option.text == channel:
+                option.click()
+
+
+        self.session.execute_script('document.getElementsById("password").setAttribute("value","1234567890")')
+        #password_input.set_attribute("value","12345678")
+        print('tada2')
+        print('new password is: ' + password_input.get_attribute("value"))
+        new_password = password_input.get_attribute("value")
+        submit = self.session.find_element_by_name("Save")
+        submit.click()
+        return new_password
 
     def ui_get_wifi_info(self):
         print('in ui_get_wifi_info')
@@ -1121,28 +1178,8 @@ class Nvg599Class(GatewayClass):
             print("title", session.title)
             print("handle", handles[x])
 
-        self.check_if_password_required()
+        self.check_if_dac_required()
         print('tada2)')
-
-        # try:
-        #    #dac_access_challenge = browser.find_element_by_link_text("Forgot your Access Code")
-        #    dac_access_challenge = session.find_element_by_xpath('//*[@id="main-content"]/div[2]/div[2]/div/h1').text
-        #   print('dac challenge',dac_access_challenge)
-        # #   dac_entry = session.find_element_by_id("password")
-        #  print('dac_access',self.device_access_code)
-        #   dac_entry.send_keys(self.device_access_code)
-        #   submit = session.find_element_by_name("Continue")
-        #   submit.click()
-        #   sleep(20)
-        # except NoSuchElementException:
-        #   pass
-# https://www.youtube.com/watch?v=nPJo5uMlV5w
-#     def poc_for_youtube(self):
-#         self.session = webdriver.Chrome()
-#         rg_url = 'https://www.youtube.com/watch?v=nPJo5uMlV5w'
-#         self.session = webdriver.Chrome()
-#         self.session.get(rg_url)
-#         sleep(20)
 
     def get_ui_system_information(self):
         print('in get_ui_system_information)')
@@ -1197,34 +1234,7 @@ class Nvg599Class(GatewayClass):
 # tr69 SetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth=X_0000C5_80MHz
 # tr69 SetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth=X_0000C5_40MHz
 # InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth X_0000C5_80MH
-#
-#     def channel_test(self, b2g, b5g, bw2g, bw5g):
-#
-#         test = bw2g
-#         test = bw5g
-#         print('just to get rid of the pep8 warning' + test)
-#         for ib2g in b2g:
-#             for ib5G in b5g:
-#                 for ibw in b2g:
-#                     print("2G:" + ib2g + " 5G:" + ib5G + "bandwidth" + ibw)
 
-# not sure we want to open a new session
-# this is not correct, I have to get the IP of the 4920s before calling this
-    # deprecated
-    # def get_4920_inf_from_ui(self):
-    #     global nvg_info
-    #     url_4920 = 'http://192.168.1.254/cgi-bin/devices.ha'
-    #     browser = webdriver.Chrome()
-    #     browser.get(url_4920)
-    #     soup = BeautifulSoup(browser.page_source, 'html.parser')
-    #     this = soup.find_all('th')
-    #     for th in this:
-    #         if th.text == "IPv4 Address / Name":
-    #             # print(th.next_sibling.next_sibling.text)
-    #             print("Name    ", th.text)
-    #             print("Name1", th.next_sibling.text)
-    #         else:
-    #             print("")
 
     def run_speed_test_cli(self, speed_test_ip):
         print('in run_speedtest_cli')
@@ -1325,11 +1335,12 @@ class Nvg599Class(GatewayClass):
 
     def login_nvg_599_cli(self):
         print('In login_nvg_cli')
+
         self.telnet_cli_session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
         self.telnet_cli_session.expect("ogin:")
         self.telnet_cli_session.sendline('admin')
         self.telnet_cli_session.expect("ord:")
-     #   self.telnet_cli_session.sendline('<<01%//4&/')
+      #  self.telnet_cli_session.sendline('<<01%//4&/')
       #  self.telnet_cli_session.sendline('9==5485?6<')
         nvg_dac = self.device_access_code
         self.telnet_cli_session.sendline(nvg_dac)

@@ -182,16 +182,69 @@ def test_ping_device_name(device_name_to_ping):
     # def cli_sh_wi_clients(self):
     # print('dict is ' + str(sh_ip_lan_dict))
 
+def test_channel_channelband_combinations(band5_channel_list, band5_bandwidth_list,ip_to_ping, result_file_name):
+    nvg_599_dut = Nvg599Class()
+
+    # ui_set_band_bandwith_channel(self, band, bandwidth, channel):
+    channel_band_file = open(result_file_name, 'a')
+    now = datetime.today().isoformat()
+    channel_band_file.write("\" + ""Test Title:Channel/Channel band test:" + "\n")
+    channel_band_file.write(now + "\n")
+    software_version = nvg_599_dut.software_version
+    channel_band_file.write("NVG599 Firmware:" + software_version + "\n")
+
+    for band5_channel in range(len(band5_channel_list)):
+        for band5_bandwidth in range(len(band5_bandwidth_list)):
+            print(' ')
+            print('band bandwidth channel: ' + str(band5_channel_list[band5_channel]) + "  "  + str(band5_bandwidth_list[band5_bandwidth]))
+            print(' ')
+            sleep(30)
+            nvg_599_dut.ui_set_band_bandwith_channel('5g', band5_bandwidth_list[band5_bandwidth], band5_channel_list[band5_channel])
+
+            sleep(60)
+            ping_results = nvg_599_dut.ping_check(ip_to_ping)
+            # ping_results = nvg_599_dut.ping_check('192.168.1.80')
+
+            print('Channel:' + str(band5_channel_list[band5_channel]) + " Bandwidth:"  + str(band5_bandwidth_list[band5_bandwidth]) + ' Ping result:' + str(ping_results))
+        #min_ping, avg_ping, max_ping, mdev_ping = nvg_599_dut.ping_from_local_host('192.168.1.77')
+        #print('min_ping:'+  ping_file = open('ping_file.txt', 'a') min_ping + ' avg_ping:' + avg_ping + ' max_ping:' + max_ping)
+
+            channel_band_file.writelines('Channel:' + str(band5_channel_list[band5_channel]) + " Bandwidth:"  + str(band5_bandwidth_list[band5_bandwidth]) + ' Ping result:' + str(ping_results) + '\n')
+        #                     self.serial_number + '  min_ping:' + min_ping + '  avg_ping:' +
+        #                     '  max_ping:' + max_ping + '  max dev:' + mdev_ping)
+        #ping_file.writelines('\n')
+    channel_band_file.close()
+
 
 nvg_599_dut = Nvg599Class()
+# the default  url is "http://192.168.1.254/cgi-bin/home.ha"
+# nvg_599_dut.factory_reset_rg()
+current_password = nvg_599_dut.ui_get_wifi_password()
+print('current pasword:' + current_password)
+new_password = nvg_599_dut.ui_set_wifi_password("1234567890")
+print('new pasword:' + current_password)
+exit()
+
+
+# test_channel_channelband_combinations(band5_channel_list, band5_bandwidth_list,ip_to_ping, result_file_name)
+xALL_BAND5_CHANNELS = [52, 56]
+xALL_BAND5_BANDWIDTHS= [20, 40]
+
+ip_to_ping = '192.168.1.80'
+
+test_channel_channelband_combinations(xALL_BAND5_CHANNELS, xALL_BAND5_BANDWIDTHS, ip_to_ping, 'tc_chan_tm.txt')
+
+exit()
+
+ALL_BAND5_CHANNELS = [104, 108, 112, 116, 132, 136, 140, 144, 149, 153, 157, 161, 165]
 #ALL_BAND5_CHANNELS = [36, 40, 44, 48,52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144, 149, 153, 157, 161, 165]
-#ALL_BAND5_BANDWIDTHS= [20,40,80]
-ALL_BAND5_CHANNELS = [52, 56]
-ALL_BAND5_BANDWIDTHS= [20, 40]
+ALL_BAND5_BANDWIDTHS= [20,40,80]
+xALL_BAND5_CHANNELS = [52, 56]
+xALL_BAND5_BANDWIDTHS= [20, 40]
 
 
 # ui_set_band_bandwith_channel(self, band, bandwidth, channel):
-channel_band_file = open('channel_band_file_with_4920_2.txt', 'a')
+channel_band_file = open('channel_band_file_to_4920.txt', 'a')
 now = datetime.today().isoformat()
 channel_band_file.write("\" + ""Test Title:Channel/Channel band test:" +"\n")
 channel_band_file.write(now + "\n")
@@ -205,8 +258,8 @@ for band5_channel in range(len(ALL_BAND5_CHANNELS)):
         sleep(30)
         nvg_599_dut.ui_set_band_bandwith_channel('5g', ALL_BAND5_BANDWIDTHS[band5_bandwidth], ALL_BAND5_CHANNELS[band5_channel])
 
-        sleep(120)
-        ping_results = nvg_599_dut.ping_check('192.168.1.77')
+        sleep(60)
+        ping_results = nvg_599_dut.ping_check('192.168.1.80')
         print('Channel:' + str(ALL_BAND5_CHANNELS[band5_channel]) + " Bandwidth:"  + str(ALL_BAND5_BANDWIDTHS[band5_bandwidth]) + ' Ping result:' + str(ping_results))
         #min_ping, avg_ping, max_ping, mdev_ping = nvg_599_dut.ping_from_local_host('192.168.1.77')
         #print('min_ping:'+  ping_file = open('ping_file.txt', 'a') min_ping + ' avg_ping:' + avg_ping + ' max_ping:' + max_ping)
@@ -252,16 +305,13 @@ pprint.pprint(show_ip_lan_dict, width = 1)
 exit()
 #down_load_speed, up_load_speed = nvg_599_dut.run_speed_test_cli(test_ip)
 
-url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
+#url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
 
-##nvg_599_dut.factory_reset_rg(url_to_check)
-
-#nvg_599_dut.enable_sshd_ssh_cli()
-
-#nvg_599_dut.conf_tr69_eco_url()
-
-#nvg_599_dut.turn_off_supplicant_cli()
-
+nvg_599_dut.factory_reset_rg()
+# These are now part of standard factory reset.
+# nvg_599_dut.enable_sshd_ssh_cli()
+# nvg_599_dut.conf_tr69_eco_url()
+# nvg_599_dut.turn_off_supplicant_cli()
 # nvg_599_dut.ping_from_local_host('192.1681.228')
 
 print('1' + str(nvg_599_dut.get_airties_ip('airties_1_5g')))
