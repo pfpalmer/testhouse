@@ -17,6 +17,8 @@ import re
 # from selenium.webdriver.support.ui import WebDriverWait
 # from selenium.webdriver.support.ui import WebDriverWait
 from selenium import webdriver
+from selenium.webdriver.support.select import Select
+
 # from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from bs4 import BeautifulSoup
 import smtplib
@@ -1111,12 +1113,17 @@ class Nvg599Class(GatewayClass):
         home_network_link.click()
         sleep(2)
         self.check_if_dac_required()
+        ussidsecurity = self.session.find_element_by_id("ussidsecurity")
+        # print('ussidsecurity is: ' + ussidsecurity.get_attribute("value"))
+        print('ussidsecurity_value is: ' + str(ussidsecurity.get_attribute("value")))
+        ussidsecurity_value = str(ussidsecurity.get_attribute("value"))
+        # print('ussidsecurity is: ' + str(ussidsecurity.select_by_index(1)))
         password_input = self.session.find_element_by_id("password")
         print('password is: ' + password_input.get_attribute("value"))
-        default_password = password_input.get_attribute("value")
+        default_password = str(password_input.get_attribute("value"))
         # password_input.set_attribute("value","12345678")
-        print('tada2)')
-        return default_password
+        # print('tada2)')
+        return ussidsecurity_value, default_password
 
     def ui_set_wifi_password(self,password):
         print('in ui_set_password')
@@ -1130,11 +1137,18 @@ class Nvg599Class(GatewayClass):
         home_network_link.click()
         sleep(2)
         self.check_if_dac_required()
-        password_input = self.session.find_element_by_id("password")
-        print('current password is: ' + password_input.get_attribute("value"))
+        ussidsecurity_value = self.session.find_element_by_id("ussidsecurity")
+        for option in ussidsecurity_value.find_elements_by_tag_name('option'):
+            print('text:' + str(option.text))
+            if option.text == "Default Password":
+                option.click()
+        # print('current password is: ' + password_input.get_attribute("value"))
         # default_password = password_input.get_attribute("value")
-        #java_script = 'document.getElementsById("password").setAttribute('value','1234567890')
-
+        # java_script = 'document.getElementsById("ussidsecurity").setAttribute("value","1234567890")'
+        # java_script = 'document.getElementsByName("security")[0].click()'
+        # self.session.execute_script(java_script)
+        sleep(10)
+        exit()
 
         # if we are setting the password then we have to make sure that the use default is not set
         channel_select = self.session.find_element_by_id("ochannelplusauto")

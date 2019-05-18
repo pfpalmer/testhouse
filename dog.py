@@ -215,14 +215,15 @@ def test_channel_channelband_combinations(band5_channel_list, band5_bandwidth_li
         #ping_file.writelines('\n')
     channel_band_file.close()
 
-
+# jillian
 nvg_599_dut = Nvg599Class()
 # the default  url is "http://192.168.1.254/cgi-bin/home.ha"
 # nvg_599_dut.factory_reset_rg()
-current_password = nvg_599_dut.ui_get_wifi_password()
-print('current pasword:' + current_password)
-new_password = nvg_599_dut.ui_set_wifi_password("1234567890")
-print('new pasword:' + current_password)
+# security, current_password = nvg_599_dut.ui_get_wifi_password()
+# print('current pasword:' + current_password)
+# print('security:' + security + ' new pasword:' + current_password)
+nvg_599_dut.ui_set_wifi_password("defwpa")
+
 exit()
 
 
