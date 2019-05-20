@@ -15,11 +15,10 @@ import re
 # import os
 # from selenium.webdriver.common.by import By
 # from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.webdriver.support.ui import WebDriverWait
+# from selenium.webdriver.support.ui import WebDriverWai
 from selenium import webdriver
-from selenium.webdriver.support.select import Select
-
-# from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from bs4 import BeautifulSoup
 import smtplib
 # from collections import defaultdict
@@ -1125,7 +1124,7 @@ class Nvg599Class(GatewayClass):
         # print('tada2)')
         return ussidsecurity_value, default_password
 
-    def ui_set_wifi_password(self,password):
+    def ui_set_wifi_password(self,security, password):
         print('in ui_set_password')
         rg_url = 'http://192.168.1.254/'
         # session = webdriver.Chrome()
@@ -1137,37 +1136,88 @@ class Nvg599Class(GatewayClass):
         home_network_link.click()
         sleep(2)
         self.check_if_dac_required()
-        ussidsecurity_value = self.session.find_element_by_id("ussidsecurity")
-        for option in ussidsecurity_value.find_elements_by_tag_name('option'):
+        ussidsecurity_select = Select(self.session.find_element_by_id("ussidsecurity"))
+
+        for options in ussidsecurity_select.options:
+            print('option:' + str(options.text))
+            print('security:' + security)
+        sleep(10)
+        #ussidsecurity_select.select_by_value(security)
+        ussidsecurity_select.select_by_visible_text(security)
+        password_input = self.session.find_element_by_id("password")
+        password_input.clear()
+        password_input.send_keys(password)
+        submit = self.session.find_element_by_name("Save")
+        sleep(10)
+        submit.click()
+        self.check_for_wifi_warning()
+        exit()
+        #selected = ussidsecurity_value.option.value(security)
+        for options in ussidsecurity_select.options:
+            print('option:' + str(options.text))
+            #if options.text == security:
+            #    options.click()
+        # ussidsecurity_select.select_by_index(0)
+        # ussidsecurity_select.options
+        password_input = self.session.find_element_by_id("password")
+        password_input.clear()
+        password_input.send_keys(password)
+        submit = self.session.find_element_by_name("Save")
+        sleep(10)
+        submit.click()
+        self.check_for_wifi_warning()
+        exit()
+
+
+        for option in ussidsecurity_select.find_elements_by_tag_name('option'):
             print('text:' + str(option.text))
+            if option.text == security:
+                option.click()
+
+        sleep(10)
+        exit()
+        for option in ussidsecurity_select.find_elements_by_tag_name('option'):
+            print('text:' + str(option.text))
+            # if option.text == "Default Password":
             if option.text == "Default Password":
                 option.click()
+                # if the text is not Defaut Password then it must be Custom Password
+                # logic is simpler is we set the option to Custom Password
+                # I think by clicking on it it is selected
+        password_input = self.session.find_element_by_id("password")
+        password_input.clear()
+        password_input.send_keys(password)
+
+        submit = self.session.find_element_by_name("Save")
+        sleep(10)
+        submit.click()
+        self.check_for_wifi_warning()
+
         # print('current password is: ' + password_input.get_attribute("value"))
         # default_password = password_input.get_attribute("value")
         # java_script = 'document.getElementsById("ussidsecurity").setAttribute("value","1234567890")'
         # java_script = 'document.getElementsByName("security")[0].click()'
         # self.session.execute_script(java_script)
-        sleep(10)
-        exit()
+        #exit()
 
         # if we are setting the password then we have to make sure that the use default is not set
-        channel_select = self.session.find_element_by_id("ochannelplusauto")
-        print('found ochannel')
-        print('channel', channel)
+        #channel_select = self.session.find_element_by_id("ochannelplusauto")
+        #print('found ochannel')
+        #print('channel', channel)
         # bandwidth_select.select_by_value(bandwidth)
-        for option in channel_select.find_elements_by_tag_name('option'):
-            if option.text == channel:
-                option.click()
+        #for option in channel_select.find_elements_by_tag_name('option'):
+         #   if option.text == channel:
+         #       option.click()
 
 
-        self.session.execute_script('document.getElementsById("password").setAttribute("value","1234567890")')
+        #self.session.execute_script('document.getElementsById("password").setAttribute("value","1234567890")')
         #password_input.set_attribute("value","12345678")
-        print('tada2')
-        print('new password is: ' + password_input.get_attribute("value"))
-        new_password = password_input.get_attribute("value")
-        submit = self.session.find_element_by_name("Save")
-        submit.click()
-        return new_password
+        #print('tada2')
+        #print('new password is: ' + password_input.get_attribute("value"))
+        #new_password = password_input.get_attribute("value")
+        #submit = self.session.find_element_by_name("Save")
+        #submit.click()
+        #return new_password
 
     def ui_get_wifi_info(self):
         print('in ui_get_wifi_info')

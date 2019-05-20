@@ -222,7 +222,8 @@ nvg_599_dut = Nvg599Class()
 # security, current_password = nvg_599_dut.ui_get_wifi_password()
 # print('current pasword:' + current_password)
 # print('security:' + security + ' new pasword:' + current_password)
-nvg_599_dut.ui_set_wifi_password("defwpa")
+# wpa or defwpa
+nvg_599_dut.ui_set_wifi_password("Custom Password", "5534567890")
 
 exit()
 
