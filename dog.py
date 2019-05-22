@@ -223,7 +223,68 @@ nvg_599_dut = Nvg599Class()
 # print('current pasword:' + current_password)
 # print('security:' + security + ' new pasword:' + current_password)
 # wpa or defwpa
-nvg_599_dut.ui_set_wifi_password("Custom Password", "5534567890")
+default_security = "Default Password"
+custom_security = "Custom Password"
+
+# too long >  63
+password_too_short_7 = "1234567"
+password_max_63 = "000000000011111111112222222222333333333344444444445555555555666"
+password_too_long_64 = "0000000000111111111122222222223333333333444444444455555555556666"
+password_too_long_65 = "00000000001111111111222222222233333333334444444444555555555566666"
+password_too_long_66 = "000000000011111111112222222222333333333344444444445555555555666666"
+password_too_long_67 = "0000000000111111111122222222223333333333444444444455555555556666666"
+password_too_long_68 = "00000000001111111111222222222233333333334444444444555555555566666666"
+password_too_long_69 = "000000000011111111112222222222333333333344444444445555555555666666666"
+password_too_long_70 = "0000000000111111111122222222223333333333444444444455555555556666666666"
+password_too_long_71 = "00000000001111111111222222222233333333334444444444555555555566666666666"
+
+# set_wifi_return_code = nvg_599_dut.ui_set_wifi_password(custom_security, password_too_long_64)
+# print('******** set_wifi_return_code: ' + set_wifi_return_code)
+# print('############################################')
+# set_wifi_return_code = nvg_599_dut.ui_set_wifi_password(custom_security, password_too_long_65)
+# print('******** set_wifi_return_code: ' + set_wifi_return_code)
+# print('############################################')
+# set_wifi_return_code = nvg_599_dut.ui_set_wifi_password(custom_security, password_too_long_66)
+# print('******** set_wifi_return_code: ' + set_wifi_return_code)
+# print('############################################')
+# set_wifi_return_code = nvg_599_dut.ui_set_wifi_password(custom_security, password_too_long_67)
+# print('******** set_wifi_return_code: ' + set_wifi_return_code)
+# print('############################################')
+# set_wifi_return_code = nvg_599_dut.ui_set_wifi_password(custom_security, password_too_long_68)
+# print('******** set_wifi_return_code: ' + set_wifi_return_code)
+# print('############################################')
+# set_wifi_return_code = nvg_599_dut.ui_set_wifi_password(custom_security, password_too_long_69)
+# print('******** set_wifi_return_code: ' + set_wifi_return_code)
+# print('############################################')
+# set_wifi_return_code = nvg_599_dut.ui_set_wifi_password(custom_security, password_too_long_70)
+# print('******** set_wifi_return_code: ' + set_wifi_return_code)
+# print('############################################')
+# set_wifi_return_code = nvg_599_dut.ui_set_wifi_password(custom_security, password_too_long_71)
+# print('******** set_wifi_return_code: ' + set_wifi_return_code)
+# print('############################################')
+# exit()
+
+# min chars is 8
+
+# max chars is 63
+#password_just_right ="000000000011111111112222222222333333333344444444445555555555666"
+update_rg ='/home/palmer/PycharmProjects/nvg599-9.2.2h13d3_1.1.bin'
+nvg_599_dut.update_rg(update_rg)
+exit()
+
+set_wifi_return_code = nvg_599_dut.ui_set_wifi_password(custom_security, password_too_long_64)
+print('******** set_wifi_return_code: ' + set_wifi_return_code)
+print('############################################')
+set_wifi_return_code = nvg_599_dut.ui_set_wifi_password(custom_security, password_too_short_7)
+print('******** set_wifi_return_code: ' + str(set_wifi_return_code))
+print('############################################')
+set_wifi_return_code = nvg_599_dut.ui_set_wifi_password(custom_security, password_max_63)
+print('******** set_wifi_return_code: ' + str(set_wifi_return_code))
+print('############################################')
+
+
+dfs_file = open('dfs_file.txt','a')
+test_dfs(nvg_599_dut,dfs_file)
 
 exit()
 

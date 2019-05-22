@@ -367,35 +367,146 @@ class Nvg599Class(GatewayClass):
 
     def check_for_wifi_warning(self):
         print('in check_for_wifi_warning ')
-#        warning = self.session.find_element_by_name("ReturnWarned")
-        warning = self.session.find_element_by_class_name("warning")
+        # warning = self.session.find_element_by_name("ReturnWarned")
+        # we get this warning every time so we don't have to check for no such exception
+        try:
+            wi_fi_warning = self.session.find_element_by_class_name("warning")
+        except NoSuchElementException:
+            return_string =  "No changes detected. Save not performed"
+            return return_string
 
-        if warning:
-            print("we got the warning")
+        if wi_fi_warning:
+            print("got wifi warning")
             submit = self.session.find_element_by_name("Continue")
             submit.click()
-            sleep(2)
-        else:
-            print("no warning")
+            sleep(5)
+            return_string = None
+            #try:
+             #   self.session.find_elements_by_xpath("//*[contains(text(), 'too long')]")
+            #    # print('special_bad_warning too long')
+            ##    submit = self.session.find_element_by_name("Cancel")
+             #   print('Password too long, Cancelling change')
+            #    submit.click()
+            #    return_string =  "xxpassword too long"
+              #  return return_string
+#
+            #except NoSuchElementException:
+            #    print('No password too long  warning - Continuing')
+
+            #wi_fi_warning = self.session.find_element_by_class_name("special bad")
+
+            # print('wi_fi_warning' + wi_fi_warning)
+
+            # exit()
+            return_string = "password changed successfully"
+
+            displayed_text = self.session.page_source
+            sleep(5)
+            if  "The Password is too long" in displayed_text:
+                submit = self.session.find_element_by_name("Cancel")
+                print('Password too long, Cancelling change')
+                submit.click()
+                return_string =  "password too long"
+                return return_string
+            # else:
+            #     print('too long not found')
+            #     #print(displayed_text)
+
+            if "must contain 8-63" in displayed_text:
+                submit = self.session.find_element_by_name("Cancel")
+                print('Password length not in range 8-63')
+                submit.click()
+                return_string =  "password length not in range 8-63"
+                return return_string
+
+
+            return return_string
+            #
+            #
+            # print('text' + displayed_text)
+            # exit()
+            # elem = self.session.find_elements_by_xpath("//*[@id='content-sub']/div[3]/form/table[2]/tbody/tr[5]/th/label/em")
+            # print('No password xxxx - Continuing' + str(elem[0]))
+            # print('No password too short warning - Continuing' + str(elem[0]))
+            # try:
+            #     # self.session.find_elements_by_xpath("//*[contains(text(), 'must contain 8-63')]")
+            #     #elem = self.session.find_elements_by_xpath("//label[@for='password][contains(text(), 'must contain 8-63'")
+            #     #elem = self.session.find_element_by_xpath("//*label[@for='password]")
+            #     elem = self.session.find_elements_by_xpath("//*[@id='content-sub']/div[3]/form/table[2]/tbody/tr[5]/th/label/em")
+            #     #wi_fi_warning = self.session.find_element_by_class_name("special bad")
+            #
+            #     #elem = self.session.find_element_by_xpath("//*id="content-sub"]/div[3]/form/table[2]/tbody/tr[5]/th/label/em")
+            #
+            #     print('elem' + str(elem))
+            #     exit()
+            #     print('special_bad_warning too short' + wi_fi_warning)
+            #     submit = self.session.find_element_by_name("Cancel")
+            #     print('Password too short, Cancelling change')
+            #     submit.click()
+            #     return_string = "password too short"
+            #     return return_string
+            # except NoSuchElementException:
+            #     print('No password too short warning - Continuing' + str(elem))
+            #
+            # return return_string
+            # #   print('No Input errors displayed- Continuing')
+            # #if(self.session.page_source().contains("too long")):
+            # #    print("too long")
+            #try:
+            #    special_bad_warning = self.session.find_element_by_class_name('special bad')
+             #   if special_bad_warning:
+             #       print('special_bad_warning' + special_bad_warning)
+#
+            #except NoSuchElementException:
+             #   print('No Input errors displayed- Continuing')
+
+#            submit = self.session.find_element_by_name("Continue")
+ #           submit.click()
+  #          sleep(2)
+        #else:
+#
+         #   try:
+         #       special_bad_warning = self.session.find_element_by_class_name("special bad").getText()
+         #       if special_bad_warning:
+          #          print('special_bad_warning' + special_bad_warning)
+#
+          #  except NoSuchElementException:
+          #      print('No Input errors displayed- Continuing')
+
+    def update_rg(self, update_bin_file):
+        print('in update_rg')
+        print("in ui_get_device_list ")
+        home_link = self.session.find_element_by_link_text("Diagnostics")
+        home_link.click()
+        self.check_if_dac_required()
+        status_link = self.session.find_element_by_link_text("Update")
+        status_link.click()
+        sleep(5)
+        #firm_ware_element = self.session.find_element_by_name("uploadfile")
+        firm_ware_element = self.session.find_element_by_xpath("//*[@id='firmware']")        # session = webdriver.Chrome()
+        # session = webdriver.Chrome()
+        firm_ware_element.send_keys(update_bin_file)
+        submit = self.session.find_element_by_name("Update")
+        submit.click()
 
     def check_if_dac_required(self):
         try:
             # dac_access_challenge = self.session.find_element_by_link_text("Forgot your Access Code?")
             self.session.find_element_by_link_text("Forgot your Access Code?")
-            print('we found the request for password screen')
-            print('sending dac', self.device_access_code)
+            print('we found the request for DAC')
+            print('sending DAC', self.device_access_code)
             dac_entry = self.session.find_element_by_id("password")
             dac_entry.send_keys(self.device_access_code)
             submit = self.session.find_element_by_name("Continue")
             submit.click()
             sleep(4)
         except NoSuchElementException:
-            print('Password challenge not displayed- Continuing')
+            print('DAC challenge not displayed- Continuing')
        #pfp
     #        # browser.find_element_by_xpath("//*[@id='main-content']/div[2]/div[2]/div/h1.text")
 
     def check_if_wifi_warning_displayed(self):
-        print('in check_ifwi_warning_displayed')
+        print('in check_if_wifi_warning_displayed')
         try:
             sleep(4)
             self.session.find_element_by_xpath('//*[@id="content-sub"]/div[1]/h1')
@@ -1124,6 +1235,8 @@ class Nvg599Class(GatewayClass):
         # print('tada2)')
         return ussidsecurity_value, default_password
 
+
+
     def ui_set_wifi_password(self,security, password):
         print('in ui_set_password')
         rg_url = 'http://192.168.1.254/'
@@ -1138,20 +1251,32 @@ class Nvg599Class(GatewayClass):
         self.check_if_dac_required()
         ussidsecurity_select = Select(self.session.find_element_by_id("ussidsecurity"))
 
-        for options in ussidsecurity_select.options:
-            print('option:' + str(options.text))
-            print('security:' + security)
-        sleep(10)
+       # for options in ussidsecurity_select.options:
+        #    print('option:' + str(options.text))
+        #    print('security:' + security)
+        # sleep(10)
         #ussidsecurity_select.select_by_value(security)
         ussidsecurity_select.select_by_visible_text(security)
-        password_input = self.session.find_element_by_id("password")
-        password_input.clear()
-        password_input.send_keys(password)
+        if security == "Custom Password":
+            password_input = self.session.find_element_by_id("password")
+            password_input.clear()
+            password_input.send_keys(password)
         submit = self.session.find_element_by_name("Save")
         sleep(10)
         submit.click()
+        print('password len before check:' + str(len(password)))
+        print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         self.check_for_wifi_warning()
-        exit()
+        return_str = self.check_for_wifi_warning()
+        return return_str
+        #pfp
+
+
+
+
+
+
+
         #selected = ussidsecurity_value.option.value(security)
         for options in ussidsecurity_select.options:
             print('option:' + str(options.text))
@@ -1165,7 +1290,10 @@ class Nvg599Class(GatewayClass):
         submit = self.session.find_element_by_name("Save")
         sleep(10)
         submit.click()
+        print('password before check:' + str(len(password)))
+        print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         self.check_for_wifi_warning()
+
         exit()
 
 
@@ -1212,7 +1340,6 @@ class Nvg599Class(GatewayClass):
 
         #self.session.execute_script('document.getElementsById("password").setAttribute("value","1234567890")')
         #password_input.set_attribute("value","12345678")
-        #print('tada2')
         #print('new password is: ' + password_input.get_attribute("value"))
         #new_password = password_input.get_attribute("value")
         #submit = self.session.find_element_by_name("Save")
