@@ -215,8 +215,49 @@ def test_channel_channelband_combinations(band5_channel_list, band5_bandwidth_li
         #ping_file.writelines('\n')
     channel_band_file.close()
 
-# jillian
+#upgrade_file = 'sadf'
+def test_rg_upgrade(nvg_599_dut, upgrade_file):
+    upgrade_status = nvg_599_dut.update_rg(upgrade_file)
+    nvg_599_dut.ping_from_local_host('192.168.1.67')
+
+#def test_rg_upgrade(nvg_599_dut(nvg_599_dut, upgrade_file):#    pass
+#     print('in test_rg_upgrade')
+#     upgrade_status = nvg_599_dut.update_rg(upgrade_file)
+import matplotlib.pyplot as plt
+x = ["bat","cat","dat","fat","gat"]
+y = [100, 200, 300, 400, 500]
+
+#x_ticks_labels=['asdfasdfsd','sdfsadfsadfsdf','DSFDFDFEEF']
+plt.bar(x,y, label='Label for the legend')
+#plt.plot(x,y, label='Label for the legend')
+plt.xticks(["bat","cat","dat","fat","gat"],['sadf','asdfsdf','sadf','sadffsdfa','asdfsdf'],rotation='vertical')
+#plt.title('Awesome Test Graph')
+#plt.ylabel('Time in seconds')
+#plt.xlabel('Firmware')
+#plt.legend(title='Legend Title', loc=20)
+#plt.subplots_adjust(bottom=1)
+plt.tight_layout()
+#plt.subplot(200)
+plt.show()
+exit()
+#
 nvg_599_dut = Nvg599Class()
+
+test_rg_upgrade(nvg_599_dut,"/home/palmer/Downloads/nvg599-9.2.2h13d4_1.1.bin")
+exit()
+#nvg_599_dut.factory_test()
+#exit()
+#nvg_599_dut.enable_sshd_ssh_cli()
+#nvg_599_dut.turn_off_supplicant_cli()
+#nvg_599_dut.conf_tr69_eco_url()
+#url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
+nvg_599_dut.factory_reset_rg()
+#nvg_599_dut.enable_parental_control()
+#nvg_599_dut.turn_off_wi_fi_security_protection_cli()
+#dfs_file = open('dfs_file.txt','a')
+#nvg_599_dut.factory_reset_rg()
+exit()
+
 # the default  url is "http://192.168.1.254/cgi-bin/home.ha"
 # nvg_599_dut.factory_reset_rg()
 # security, current_password = nvg_599_dut.ui_get_wifi_password()
@@ -268,7 +309,7 @@ password_too_long_71 = "00000000001111111111222222222233333333334444444444555555
 
 # max chars is 63
 #password_just_right ="000000000011111111112222222222333333333344444444445555555555666"
-update_rg ='/home/palmer/PycharmProjects/nvg599-9.2.2h13d3_1.1.bin'
+update_rg ='/home/palmer/Downloads/nvg599-9.2.2h13d4_1.1.bin'
 nvg_599_dut.update_rg(update_rg)
 exit()
 

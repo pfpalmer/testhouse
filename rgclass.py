@@ -1,6 +1,8 @@
 # from itertools import count
 # from typing import Dict
 import subprocess
+
+from socket import timeout
 # from subprocess import check_output
 # from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
@@ -406,7 +408,7 @@ class Nvg599Class(GatewayClass):
                 submit = self.session.find_element_by_name("Cancel")
                 print('Password too long, Cancelling change')
                 submit.click()
-                return_string =  "password too long"
+                return_string = "password too long"
                 return return_string
             # else:
             #     print('too long not found')
@@ -478,9 +480,9 @@ class Nvg599Class(GatewayClass):
         print("in ui_get_device_list ")
         home_link = self.session.find_element_by_link_text("Diagnostics")
         home_link.click()
-        self.check_if_dac_required()
         status_link = self.session.find_element_by_link_text("Update")
         status_link.click()
+        self.check_if_dac_required()
         sleep(5)
         #firm_ware_element = self.session.find_element_by_name("uploadfile")
         firm_ware_element = self.session.find_element_by_xpath("//*[@id='firmware']")        # session = webdriver.Chrome()
@@ -488,6 +490,7 @@ class Nvg599Class(GatewayClass):
         firm_ware_element.send_keys(update_bin_file)
         submit = self.session.find_element_by_name("Update")
         submit.click()
+        return "Upgrade started"
 
     def check_if_dac_required(self):
         try:
@@ -942,7 +945,8 @@ class Nvg599Class(GatewayClass):
         start = time.time()
         while loop == 1:
             try:
-                urllib.request.urlopen("http://192.168.1.254/cgi-bin/home.ha", timeout=3)
+                test_req = urllib.request.Request("http://192.168.1.254/")
+                urllib.request.urlopen(test_req, timeout = 120)
                 end = time.time()
                 print("Duration timer:", str(end - start))
                 break
@@ -965,7 +969,9 @@ class Nvg599Class(GatewayClass):
                 sleep(10)
                 print('time' + str(time.time()))
                 continue
-
+            #finally:
+             #   print("idk")
+        print('done')
     # @staticmethod
     #def factory_reset_rg(self, rg_url="http://192.168.1.254/cgi-bin/home.ha"):
     def factory_reset_rg(self, rg_url="http://192.168.1.254/"):
@@ -999,7 +1005,8 @@ class Nvg599Class(GatewayClass):
         loop = 1
         while loop == 1:
             try:
-                urllib.request.urlopen(rg_url, timeout=600)
+                test_req = urllib.request.Request("http://192.168.1.254/")
+                urllib.request.urlopen(test_req, timeout=60)
                 # response.read().decode("utf-8", 'ignore')
                 end = time.time()
                 print("Duration timer:", str(end - start))
@@ -1013,17 +1020,19 @@ class Nvg599Class(GatewayClass):
                 print('time' + str(time.time()))
                 continue
 
-            except HTTPError as e:
+            except (HTTPError, URLError) as e:
                 print('HTTP Error: ' + str(e))
                 sleep(10)
                 print('time' + str(time.time()))
                 continue
+            except timeout:
+                print('Socket timeout error')
 
-            except URLError as e:
-                print('URL Error: ' + str(e))
-                sleep(10)
-                print('time' + str(time.time()))
-                continue
+            #except URLError as e:
+             #   print('URL Error: ' + str(e))
+             #   sleep(10)
+             #   print('time' + str(time.time()))
+             #   continue
 
         end = time.time()
         print("in outer duration in seconds:", end - start)
@@ -1296,12 +1305,10 @@ class Nvg599Class(GatewayClass):
 
         exit()
 
-
         for option in ussidsecurity_select.find_elements_by_tag_name('option'):
             print('text:' + str(option.text))
             if option.text == security:
                 option.click()
-
         sleep(10)
         exit()
         for option in ussidsecurity_select.find_elements_by_tag_name('option'):
