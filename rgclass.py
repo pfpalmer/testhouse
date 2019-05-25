@@ -490,7 +490,46 @@ class Nvg599Class(GatewayClass):
         firm_ware_element.send_keys(update_bin_file)
         submit = self.session.find_element_by_name("Update")
         submit.click()
-        return "Upgrade started"
+
+        start = time.time()
+        print("starting upgrade timer:" + str(start))
+        loop = 1
+        while loop == 1:
+            try:
+                test_req = urllib.request.Request("http://192.168.1.254/")
+                urllib.request.urlopen(test_req, timeout=60)
+                # response.read().decode("utf-8", 'ignore')
+                end = time.time()
+                print("Duration timer:", str(end - start))
+                sleep(20)
+                break
+            # except:
+            # need to check if this works
+            except TimeoutError:
+                print('Not ready, sleeping 10 seconds')
+                sleep(10)
+                print('time' + str(time.time()))
+                continue
+
+            except (HTTPError, URLError) as e:
+                print('HTTP Error: ' + str(e))
+                sleep(10)
+                print('time' + str(time.time()))
+                continue
+            except timeout:
+                print('Socket timeout error')
+
+            #except URLError as e:
+             #   print('URL Error: ' + str(e))
+             #   sleep(10)
+             #   print('time' + str(time.time()))
+             #   continue
+
+        end = time.time()
+        print("upgrade duration in seconds:", round(end - start))
+        sleep(2)
+
+        return "Upgrade compete"
 
     def check_if_dac_required(self):
         try:

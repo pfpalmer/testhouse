@@ -29,6 +29,16 @@ NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
 DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
 ALL_BAND5_CHANNELS = {36, 40, 44, 48,52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144, 149, 153, 157, 161, 165}
 
+firmware_599_available =['/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin',
+    '/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin',
+    '/home/palmer/Downloads/nvg599-9.2.2h12d10_1.1.bin',
+    '/home/palmer/Downloads/nvg599-9.2.2h12d13_1.1.bin',
+    '/home/palmer/Downloads/nvg599-9.2.2h13d1_1.1.bin',
+    '/home/palmer/Downloads/nvg599-9.2.2h13d2_1.1.bin',
+    '/home/palmer/Downloads/nvg599-9.2.2h13d3_1.1.bin',
+    '/home/palmer/Downloads/nvg599-9.2.2h13d4_1.1.bin',
+    ]
+
 # from rgclass import  NON_DFS_CHANNELS
 # from rgclass import  DFS_CHANNELS
 # Find the current channel used for 5G
@@ -215,14 +225,43 @@ def test_channel_channelband_combinations(band5_channel_list, band5_bandwidth_li
         #ping_file.writelines('\n')
     channel_band_file.close()
 
+#
+# firmware_599_available =['/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin',
+#     '/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin'
+#     '/home/palmer/Downloads/nvg599-9.2.2h12d10_1.1.bin',
+#     '/home/palmer/Downloads/nvg599-9.2.2h12d13_1.1.bin',
+#     '/home/palmer/Downloads/nvg599-9.2.2h13d1_1.1.bin'
+#     '/home/palmer/Downloads/nvg599-9.2.2h13d2_1.1.bin'
+#     '/home/palmer/Downloads/nvg599-9.2.2h13d3_1.1.bin'
+#     '/home/palmer/Downloads/nvg599-9.2.2h13d4_1.1.bin'
+#
+#                          ]
+
+
 #upgrade_file = 'sadf'
-def test_rg_upgrade(nvg_599_dut, upgrade_file):
-    upgrade_status = nvg_599_dut.update_rg(upgrade_file)
+def test_rg_upgrade(nvg_599_dut, firmware_599_available):
+    upgrade_status = nvg_599_dut.update_rg(firmware_599_available)
     nvg_599_dut.ping_from_local_host('192.168.1.67')
+    # nvg_599_dut.ping_from_local_host('192.168.1.67')
 
 #def test_rg_upgrade(nvg_599_dut(nvg_599_dut, upgrade_file):#    pass
 #     print('in test_rg_upgrade')
 #     upgrade_status = nvg_599_dut.update_rg(upgrade_file)
+
+
+# x = 13.73333
+# x_round = round(x)
+# print('x_round:',x_round)
+# exit()
+
+#
+#
+# nvg_599_dut = Nvg599Class()
+# #
+# test_rg_upgrade(nvg_599_dut, firmware_599_available[1])
+# exit()
+
+
 import matplotlib.pyplot as plt
 x = ["bat","cat","dat","fat","gat"]
 y = [100, 200, 300, 400, 500]
@@ -237,13 +276,15 @@ plt.xticks(["bat","cat","dat","fat","gat"],['sadf','asdfsdf','sadf','sadffsdfa',
 #plt.legend(title='Legend Title', loc=20)
 #plt.subplots_adjust(bottom=1)
 plt.tight_layout()
-#plt.subplot(200)
-plt.show()
+
+#plt.subplot(200)plt.savefig("/home/palmer/Downloads/myfig")
+#plt.show()
+plt.savefig('books_read.png')
+sleep(2)
 exit()
 #
 nvg_599_dut = Nvg599Class()
-
-test_rg_upgrade(nvg_599_dut,"/home/palmer/Downloads/nvg599-9.2.2h13d4_1.1.bin")
+test_rg_upgrade("/home/palmer/Downloads/nvg599-9.2.2h13d5_1.1.bin")
 exit()
 #nvg_599_dut.factory_test()
 #exit()
