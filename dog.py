@@ -239,6 +239,18 @@ def test_channel_channelband_combinations(band5_channel_list, band5_bandwidth_li
 
 
 #upgrade_file = 'sadf'
+
+
+def test_comprehension(firmware_599_available):
+    i = 0
+    for i in range (len(firmware_599_available)):
+        print('list:',str(firmware_599_available[i]))
+
+
+    upper_case = [item.upper() for item in firmware_599_available]
+    print('upper case:', upper_case)
+    result = []
+
 def test_rg_upgrade(nvg_599_dut, firmware_599_available):
     upgrade_status = nvg_599_dut.update_rg(firmware_599_available)
     nvg_599_dut.ping_from_local_host('192.168.1.67')
@@ -260,6 +272,12 @@ def test_rg_upgrade(nvg_599_dut, firmware_599_available):
 # #
 # test_rg_upgrade(nvg_599_dut, firmware_599_available[1])
 # exit()
+
+test_comprehension(firmware_599_available)
+
+
+exit()
+
 
 
 import matplotlib.pyplot as plt
