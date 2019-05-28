@@ -1532,56 +1532,25 @@ class Nvg599Class(GatewayClass):
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         #ssh.connect(hostname=speed_test_ip, username=UN, password=PW)
         ssh_client.connect(hostname=speed_test_ip, port = 8022)
-        ssh_session = SSHClientInteraction(ssh_client, timeout=5, display=True)
+        ssh_session = SSHClientInteraction(ssh_client, timeout=200, display=True)
         #print('interactive SSH session established!')
         ssh_session.expect(prompt,timeout=2)
-        # sleep(2)
-        #ssh_session.current_output_clean
+        # Austin speedtest server is 5024, check speedtest --list for a complete listing
 
-        #ssh_session.current_output_clean
-        # ssh_session.send('ls -la')
-        ssh_session.send('speedtest')
-
+        ssh_session.send('speedtest  --server 5024')
         sleep(2)
-        ssh_session.expect(prompt,timeout=10)
-        #sleep(2)
-        cmd_output = ssh_session.current_output_clean
+        ssh_session.expect(prompt,timeout=30)
+        speed_test_output = ssh_session.current_output_clean
 
-        print('this is it',cmd_output )
-        #sleep(2)
-      #   ssh_session.expect(prompt,timeout=2)
-
-        #ssh_session.expect(prompt,timeout=2)
-        #ssh_session.send('exit)')
-
-        #cmd_output = ssh_session.current_output_clean
-        #print('output' + cmd_output)
-
-        #print('output: ' + cmd_output)
-        #ssh_session.send('speedtest')
-        #print(ssh_session())
-        exit()
-        #print('output' + cmd_output)
-
-        #ssh_session.expect(prompt,timeout=20)
-
-       # sleep(10)
-        cmd_output = ssh_session.current_output_clean
-        print('output' + cmd_output)
-        exit()
-        #interact = SSHClientInteraction(ssh_client, timeout=10, display=True)
-        ssh_session.send('speedtest')
-        ssh_session.expect(prompt, timeout=20)
-        #interact.send('ls -l /')
-        #interact.expect(PROMPT, timeout=5)
-        cmd_output = ssh_session.current_output_clean
-        print('output' + cmd_output)
-        exit()
-        # speed_test_ip = "192.168.1.255"
-        # ddd = f"{speed_test_ip} is a test"
-        # ssh_session = pexpect.spawn("ssh arris@192.168.1.239", encoding='utf-8',timeout=120)
-        #ssh_session = pexpect.spawn("/usr/bin/ssh -p 8022 admin@192.168.1.70", encoding='utf-8', timeout=120)
-
+        print('speedtest_output:   ',speed_test_output )
+        # speed_test_regex = re.compile(r'.*Download:\s+(\w+)\s+.*Upload:\s+(\w+)',re.DOTALL)
+        speed_test_regex = re.compile(r'(Download:\s+\w+\.\w+\s+\w+).*(Upload:\s+\w+\.\w+\s+\w+)', re.DOTALL)
+        speed_test_groups = speed_test_regex.search(speed_test_output)
+        print(speed_test_groups.group(1))
+        print(speed_test_groups.group(2))
+        down_load_speed = speed_test_groups.group(1)
+        up_load_speed = speed_test_groups.group(2)
+        return down_load_speed, up_load_speed
 
         #ssh_session = pexpect.spawn("ssh -p 8022 " + speed_test_ip, encoding='utf-8', timeout=120)
         #print('speedtestip',speed_test_ip)
@@ -1590,34 +1559,34 @@ class Nvg599Class(GatewayClass):
         # result = os.system(cmd)
         #print('out===========\n', out)
         #exit()
+        #
+        # ssh_session.expect("$")
+        # print('1', ssh_session.before)
+        # sleep(2)
+        #
+        # ssh_session.sendline('date')
+        # #self.device_access_code = None
+        #
+        # ssh_session.expect("$")
+        # print('2', ssh_session.before)
+        #
+        # ssh_session.sendline('speedtest')
+        # sleep(10)
+        # # ssh_session.expect(".*Mbits.*Mbits\/s")
+        # ssh_session.sendline()
+        # ssh_session.expect("$")
+        # print('3', ssh_session.before)
+        # speed_test_ouput = ssh_session.before
+        # # speed_test_regex = re.compile(r'.*Download:\s+(\w+)\s+.*Upload:\s+(\w+)',re.DOTALL)
+        # speed_test_regex = re.compile(r'(Download:\s+\w+\.\w+\s+\w+).*(Upload:\s+\w+\.\w+\s+\w+)', re.DOTALL)
+        # speed_test_groups = speed_test_regex.search(speed_test_ouput)
+        # print(speed_test_groups.group(1))
+        # print(speed_test_groups.group(2))
+        # down_load_speed = speed_test_groups.group(1)
+        # up_load_speed = speed_test_groups.group(2)
+        # ssh_session.close()
 
-        ssh_session.expect("$")
-        print('1', ssh_session.before)
-        sleep(2)
-
-        ssh_session.sendline('date')
-        #self.device_access_code = None
-
-        ssh_session.expect("$")
-        print('2', ssh_session.before)
-
-        ssh_session.sendline('speedtest')
-        sleep(10)
-        # ssh_session.expect(".*Mbits.*Mbits\/s")
-        ssh_session.sendline()
-        ssh_session.expect("$")
-        print('3', ssh_session.before)
-        speed_test_ouput = ssh_session.before
-        # speed_test_regex = re.compile(r'.*Download:\s+(\w+)\s+.*Upload:\s+(\w+)',re.DOTALL)
-        speed_test_regex = re.compile(r'(Download:\s+\w+\.\w+\s+\w+).*(Upload:\s+\w+\.\w+\s+\w+)', re.DOTALL)
-        speed_test_groups = speed_test_regex.search(speed_test_ouput)
-        print(speed_test_groups.group(1))
-        print(speed_test_groups.group(2))
-        down_load_speed = speed_test_groups.group(1)
-        up_load_speed = speed_test_groups.group(2)
-        ssh_session.close()
-
-        return down_load_speed, up_load_speed
+        # return down_load_speed, up_load_speed
         # exit()
         # statusInfoRegEx = re.compile(r'Model\s(\w+)')
         # mo1 = statusInfoRegEx.search(statusOutput)

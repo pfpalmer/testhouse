@@ -236,8 +236,22 @@ def test_channel_channelband_combinations(band5_channel_list, band5_bandwidth_li
 #     '/home/palmer/Downloads/nvg599-9.2.2h13d4_1.1.bin'
 #
 #                          ]
-
-
+#
+firmware_599_names_test =[
+'nvg599-9.2.2h12d9_1.1',
+'nvg599-9.2.2h13d4_1.1']
+#
+#                          ]
+firmware_599_names =[
+    'nvg599-9.2.2h12d9_1.1',
+    'nvg599-9.2.2h12d9_1.1',
+    'nvg599-9.2.2h12d10_1.1',
+    'nvg599-9.2.2h12d13_1.1',
+    'nvg599-9.2.2h13d1_1.1',
+    'nvg599-9.2.2h13d2_1.1',
+    'nvg599-9.2.2h13d3_1.1',
+    'nvg599-9.2.2h13d4_1.1']
+#
 #upgrade_file = 'sadf'
 
 
@@ -253,7 +267,7 @@ def test_comprehension(firmware_599_available):
 
 def test_rg_upgrade(nvg_599_dut, firmware_599_available):
     upgrade_status = nvg_599_dut.update_rg(firmware_599_available)
-    nvg_599_dut.ping_from_local_host('192.168.1.67')
+    #nvg_599_dut.ping_from_local_host('192.168.1.67')
     # nvg_599_dut.ping_from_local_host('192.168.1.67')
 
 #def test_rg_upgrade(nvg_599_dut(nvg_599_dut, upgrade_file):#    pass
@@ -275,32 +289,153 @@ def test_rg_upgrade(nvg_599_dut, firmware_599_available):
 
 #-------------------------------------------
 
+import matplotlib.pyplot as plt
+import matplotlib.image as img
+now = datetime.today().isoformat()
+x = [1,2,3,4,5,6,7,8]
+note8_file = open('note_file.txt','a')
+tablet_file = open('tablet_file.txt','a')
+
+note8_file.write("Speedtest results for Samsung Note 8:" + "\n")
+note8_file.write(now + "\n")
+tablet_file.write("Speedtest results for Samsung Tablet:" + "\n")
+tablet_file.write(now + "\n")
+#note8_file.write("\" + Speedtest  + "\n")
+#channel_band_file.write(now + "\n")
+
+speed_test_result_list_tablet= []
+speed_test_result_list_tablet_download= []
+speed_test_result_list_tablet_upload= []
+
+speed_test_result_list_note8 = []
+speed_test_result_list_note8_download= []
+speed_test_result_list_note8_upload= []
+
+# pfp
+import matplotlib.pyplot as plt
+
+def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available):
+    speed_test_result_list_tablet = []
+    speed_test_result_list_note8 = []
+    for firmware in firmware_599_available:
+        print('firmware' + str(firmware))
+        nvg_599_dut.update_rg(firmware)
+        sleep(240)
+        speed_test_result_tuple_tablet = Nvg599Class.run_speed_test_from_android_termux("192.168.1.68")
+        for a, b in speed_test_result_tuple_tablet:
+            print('download speed: ' + a + ' Upload speed:' + b)
+            speed_test_result_list_tablet_download.append(a)
+            speed_test_result_list_tablet_upload.append(b)
+            tablet_file.write("download:" + a + "Upload:" + b + "\n")
+            sleep(60)
+
+        speed_test_result_tuple_note8 = Nvg599Class.run_speed_test_from_android_termux("192.168.1.70")
+        for a, b in speed_test_result_tuple_note8:
+            print('download speed: ' + a + ' Upload speed:' + b)
+            speed_test_result_list_tablet_download.append(a)
+            speed_test_result_list_tablet_upload.append(b)
+            note8_file.write("download:" + a + "Upload:" + b + "\n")
+            sleep(60)
+
+    x = [1, 2, 3, 4, 5, 6, 7, 8]
+    y = speed_test_result_list_tablet_download
+    y1 = speed_test_result_list_tablet_upload
+    y2 = speed_test_result_list_tablet_download
+    y3 = speed_test_result_list_tablet_upload
 
 
+    plt.axis([0,10,0,60])
+    plt.plot(x, y, color='green')
+    plt.plot(x, y1)
+    plt.plot(x, y2)
+    plt.plot(x, y3)
 
-#test_comprehension(firmware_599_available)
+    plt.legend(['Download speed Samsung Tablet', 'Upload speed Samsung Tablet', 'Download speed Note 8',
+                    'Upload speed Note 8'], title='Download and Upload speeds', loc='upper right')
 
-
-
-
-
-
-Nvg599Class.run_speed_test_from_android_termux("192.168.1.70")
-
-
-
-
-
-
-
-
-
-
+    plt.xticks([1, 2, 3, 4, 5, 6, 7, 8], firmware_599_names, rotation='vertical')
+    plt.tight_layout()
+    plt.show()
+    plt.savefig('speedtest.png')
+    note8_file.close
+    tablet_file.close
+    #nvg_599_dut.ping_from_local_host('192.168.1.67')
+    # nvg_599_dut.ping_from_local_host('192.168.1.67')
 
 
-#-------------------
+nvg_599_dut = Nvg599Class()
+test_rg_upgrade_speedtest(nvg_599_dut,firmware_599_available)
 exit()
 
+
+import matplotlib.pyplot as plt
+import matplotlib.image as img
+x = [1,2,3,4,5,6,7,8]
+y = [35, 42, 37, 38, 47,44,39,47]
+y1 = [10, 15, 12, 14, 11,12,13,19]
+y2= [13, 12, 9, 11, 10,12,13,8]
+y3 = [7, 12, 12, 8, 13,10,15,12]
+
+plt.axis([0,10,0,60])
+
+
+#plt.bar(x,y, label='Label for the legend',color = 'green')
+#plt.plot(x,y, label='Label for the legend',color = 'green')
+plt.plot(x,y,color = 'green')
+plt.plot(x,y1)
+plt.plot(x,y2)
+plt.plot(x,y3)
+
+plt.title('Speedtest Download and Upload speeds')
+plt.ylabel('Speed in MBPS')
+plt.xlabel('Trial')
+#plt.legend(facecolor='grey', title='Download  and Upload',loc = 'upper left')
+plt.legend(['Download speed Note 8','Upload speed Note 8', 'Download speed Samsung Tablet', 'Upload speed Samsung tablet'],title='Download and Upload',loc = 'upper right')
+plt.xticks([1,2,3,4,5,6,7,8],firmware_599_names,rotation='vertical')
+#plt.xticks([1,2,3,4,5],['trial1','trial2','trial3','trial5','trial5'],rotation='vertical')
+# changed from y to a
+#plt.bar(x,a, label='Label for the legend')
+#plt.plot(x,y, label='Label for the legend')
+#plt.xticks(["bat","cat","dat","fat","gat"],['trial1','trial2','trial3','trial5','trial5'],rotation='vertical')
+#plt.title('Awesome Test Graph')
+#plt.ylabel('Time in seconds')
+#plt.xlabel('Firmware')
+#plt.legend(title='Legend Title', loc=20)
+#plt.subplots_adjust(bottom=1)
+plt.tight_layout()
+
+#plt.subplot(200)plt.savefig("/home/palmer/Downloads/myfig")
+plt.show()
+
+
+exit()
+plt.savefig('test_read.png')
+sleep(2)
+exit()
+#
+
+
+
+
+speed_test_result_list = []
+# download, upload = Nvg599Class.run_speed_test_from_android_termux("192.168.1.70")
+for i in  range(4):
+    print('loop:' + str(i))
+    speed_test_result_tuple  = Nvg599Class.run_speed_test_from_android_termux("192.168.1.70")
+    speed_test_result_list.append(speed_test_result_tuple)
+
+
+down_load = []
+up_load= []
+
+for a,b in speed_test_result_list:
+    print('download speed: ' + a + ' Upload speed:' + b)
+    down_load.append(a)
+    up_load.append(b)
+
+
+
+#-------------
 
 
 import matplotlib.pyplot as plt
@@ -308,9 +443,12 @@ x = ["bat","cat","dat","fat","gat"]
 y = [100, 200, 300, 400, 500]
 
 #x_ticks_labels=['asdfasdfsd','sdfsadfsadfsdf','DSFDFDFEEF']
-plt.bar(x,y, label='Label for the legend')
+
+
+# changed from y to a
+plt.bar(x,a, label='Label for the legend')
 #plt.plot(x,y, label='Label for the legend')
-plt.xticks(["bat","cat","dat","fat","gat"],['sadf','asdfsdf','sadf','sadffsdfa','asdfsdf'],rotation='vertical')
+plt.xticks(["bat","cat","dat","fat","gat"],['trial1','trial2','trial3','trial5','trial5'],rotation='vertical')
 #plt.title('Awesome Test Graph')
 #plt.ylabel('Time in seconds')
 #plt.xlabel('Firmware')
@@ -320,7 +458,7 @@ plt.tight_layout()
 
 #plt.subplot(200)plt.savefig("/home/palmer/Downloads/myfig")
 #plt.show()
-plt.savefig('books_read.png')
+plt.savefig('test_read.png')
 sleep(2)
 exit()
 #
