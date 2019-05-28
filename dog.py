@@ -271,11 +271,34 @@ def test_rg_upgrade(nvg_599_dut, firmware_599_available):
 # nvg_599_dut = Nvg599Class()
 # #
 # test_rg_upgrade(nvg_599_dut, firmware_599_available[1])
-# exit()
+# exit(
 
-test_comprehension(firmware_599_available)
+#-------------------------------------------
 
 
+
+
+#test_comprehension(firmware_599_available)
+
+
+
+
+
+
+Nvg599Class.run_speed_test_from_android_termux("192.168.1.70")
+
+
+
+
+
+
+
+
+
+
+
+
+#-------------------
 exit()
 
 
