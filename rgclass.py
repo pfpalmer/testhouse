@@ -39,7 +39,7 @@ from datetime import datetime
 
 nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
                                 'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey',
-                                'ssid': 'ATTqbrAnYs'},
+                                'ssid': 'xxxxxx'},
             "277427577103760": {'model': 'nvg599', 'device_access_code':'<<01%//4&/', 'magic': 'ggtxstgwipcg',
                                 'mac2g': 'fc:51:a4:2f:25:90', 'mac5g':
                                 'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'},
@@ -1734,6 +1734,10 @@ class Nvg599Class(GatewayClass):
         self.up_time = mo1.group(3)
         self.session.close()
 
+
+
+
+
     def setup_tr69_url(self):
         self.session = self.login_nvg_599_cli()
         self.session.sendline('magic')
@@ -1770,7 +1774,7 @@ class Nvg599Class(GatewayClass):
         self.session.expect("tr69.*]:")
         self.session.sendline()
         self.session.expect("log-spv.*]:")
-        print('hello from turn on tr069')
+        print('tr69 enbled for ECO')
         self.session.close()
 
     def enable_sshd_ssh_cli(self):
@@ -1805,7 +1809,7 @@ class Nvg599Class(GatewayClass):
         print("In enable_parental_contol")
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.Enable=1")
-        self.telnet_cli_session.expect("UNLOCKED>")
+        self.telnet_cli_session.expect("successful.*UNLOCKED>")
         self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD.TODEnable=1")
         self.telnet_cli_session.expect("successful.*UNLOCKED>")
         self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."

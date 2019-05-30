@@ -30,14 +30,15 @@ DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
 ALL_BAND5_CHANNELS = {36, 40, 44, 48,52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144, 149, 153, 157, 161, 165}
 
 firmware_599_available =['/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin',
-    '/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin',
-    '/home/palmer/Downloads/nvg599-9.2.2h12d10_1.1.bin',
-    '/home/palmer/Downloads/nvg599-9.2.2h12d13_1.1.bin',
-    '/home/palmer/Downloads/nvg599-9.2.2h13d1_1.1.bin',
-    '/home/palmer/Downloads/nvg599-9.2.2h13d2_1.1.bin',
-    '/home/palmer/Downloads/nvg599-9.2.2h13d3_1.1.bin',
-    '/home/palmer/Downloads/nvg599-9.2.2h13d4_1.1.bin',
-    ]
+                         '/home/palmer/Downloads/nvg599-9.2.2h12d10_1.1.bin',
+                         '/home/palmer/Downloads/nvg599-9.2.2h12d13_1.1.bin',
+                         '/home/palmer/Downloads/nvg599-9.2.2h13d1_1.1.bin',
+                         '/home/palmer/Downloads/nvg599-9.2.2h13d2_1.1.bin',
+                         '/home/palmer/Downloads/nvg599-9.2.2h13d3_1.1.bin',
+                         '/home/palmer/Downloads/nvg599-9.2.2h13d4_1.1.bin',
+                         '/home/palmer/Downloads/nvg599-9.2.2h13d5_1.1.bin',
+                         '/home/palmer/Downloads/nvg599-9.2.2h13d6_1.1.bin',
+                         ]
 
 # from rgclass import  NON_DFS_CHANNELS
 # from rgclass import  DFS_CHANNELS
@@ -243,14 +244,16 @@ firmware_599_names_test =[
 #
 #                          ]
 firmware_599_names =[
-    'nvg599-9.2.2h12d9_1.1',
-    'nvg599-9.2.2h12d9_1.1',
-    'nvg599-9.2.2h12d10_1.1',
-    'nvg599-9.2.2h12d13_1.1',
-    'nvg599-9.2.2h13d1_1.1',
-    'nvg599-9.2.2h13d2_1.1',
-    'nvg599-9.2.2h13d3_1.1',
-    'nvg599-9.2.2h13d4_1.1']
+    '9.2.2h12d9',
+    '9.2.2h12d10',
+    '9.2.2h12d13',
+    '9.2.2h13d',
+    '9.2.2h13d2',
+    '9.2.2h13d3',
+    '9.2.2h13d4',
+    '9.2.2h13d5',
+    '9.2.2h13d6'
+    ]
 #
 #upgrade_file = 'sadf'
 
@@ -363,9 +366,81 @@ def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available):
     # nvg_599_dut.ping_from_local_host('192.168.1.67')
 
 
-nvg_599_dut = Nvg599Class()
-test_rg_upgrade_speedtest(nvg_599_dut,firmware_599_available)
+
+
+
+from  matplotlib import pyplot as plt
+# firmware_599_names =[
+#     'nvg599-9.2.2h12d9_1.1',
+#     'nvg599-9.2.2h12d10_1.1',
+#     'nvg599-9.2.2h12d13_1.1',
+#     'nvg599-9.2.2h13d1_1.1',
+#     'nvg599-9.2.2h13d2_1.1',
+#     'nvg599-9.2.2h13d3_1.1',
+#     'nvg599-9.2.2h13d4_1.1',
+#     'nvg599-9.2.2h13d5_1.1',
+#     'nvg599-9.2.2h13d6_1.1'
+#     ]
+#
+
+
+from pylab import *
+
+s_download =  [100,120,80,120,114,111,121,101,105]
+s_download_1=  [110,125,90,110,120,100,104,107,95]
+s1_upload = [11,8,13,9,15,11,8,13,8]
+s1_upload_1 = [9,7,14,10,15,8,5,8,3]
+plt.figure("Test House Speedtest results for NVG 599 ",figsize=(8, 6))
+x_label_list = ['9.2.2h12d1','9.2.2h12d2','9.2.2h12d3','9.2.2h12d4','9.2.2h12d5','asdf6','asdf7','asdf8','3459']
+# y_label_list = ['1mb','2mb','3mb','4mb','5mb']
+# start number,stop number, steps
+#ty =  arange(0.0, 270.0, 30)
+ty =  arange(1.0, 10.0, 1)
+tx =  arange(1.0, 10.0, 1)
+
+plt.xticks([1,2,3,4,5,6,7,8,9])
+#plt.title('Speedtest Download and Upload speeds')
+
+subplot(2,1,1)
+plt.ylabel('Speed in MBPS')
+#plt.xticks([0,30,60,90,120],x_label_list,rotation='vertical')
+#
+title('NVG 599 Download Speed')
+plot(ty,s_download,'g')
+plot(ty,s_download_1,'b')
+plt.grid()
+#
+subplot(2,1,2)
+title('NVG 599 Upload Speed')
+plt.ylabel('Speed in MBPS')
+# plot(t1,s1,'r-')
+plt.xlabel('Firmware')
+#plt.xticks([0,10,20,30,40],x_temp_list,rotation='vertical')
+#plt.set(xticks(range=(5)),xlim=[0,6])
+#plt.xticks([30,60,90,120,150,180,210,240,270],firmware_599_names,rotation='vertical')
+plt.xticks([1,2,3,4,5,6,7,8,9],firmware_599_names,rotation='vertical')
+
+#plt.xticklabels(x_temp_list)
+
+#plt.xticks(np.arange(0,40,10), x_temp_list,rotation=]'vertical')
+#plt.xaxis.set_ticks(s)
+plot(ty,s1_upload,'b',label= 'Tablet')
+plot(ty,s1_upload_1,'g', label='Note8')
+#plt.legend(bbox_to_anchor=(2,0), loc='lower right', ncol=1)
+plt.legend(bbox_to_anchor=(1,-1.2), ncol=1)
+
+
+plt.grid()
+#fig = plt.figure("Speed test results for NVG 599",figsize=(12,6))
+
+plt.tight_layout()
+
+show()
 exit()
+
+#nvg_599_dut = Nvg599Class()
+#test_rg_upgrade_speedtest(nvg_599_dut,firmware_599_available)
+#exit()
 
 
 import matplotlib.pyplot as plt
@@ -391,7 +466,7 @@ plt.ylabel('Speed in MBPS')
 plt.xlabel('Trial')
 #plt.legend(facecolor='grey', title='Download  and Upload',loc = 'upper left')
 plt.legend(['Download speed Note 8','Upload speed Note 8', 'Download speed Samsung Tablet', 'Upload speed Samsung tablet'],title='Download and Upload',loc = 'upper right')
-plt.xticks([1,2,3,4,5,6,7,8],firmware_599_names,rotation='vertical')
+#plt.xticks([1,2,3,4,5,6,7,8],firmware_599_names,rotation='vertical')
 #plt.xticks([1,2,3,4,5],['trial1','trial2','trial3','trial5','trial5'],rotation='vertical')
 # changed from y to a
 #plt.bar(x,a, label='Label for the legend')
@@ -413,9 +488,6 @@ plt.savefig('test_read.png')
 sleep(2)
 exit()
 #
-
-
-
 
 speed_test_result_list = []
 # download, upload = Nvg599Class.run_speed_test_from_android_termux("192.168.1.70")
