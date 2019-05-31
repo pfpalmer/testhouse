@@ -24,7 +24,7 @@ from paramiko_expect import SSHClientInteraction
 # from selenium.webdriver.support.ui import WebDriverWai
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+# from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from bs4 import BeautifulSoup
 import smtplib
 # from collections import defaultdict
@@ -40,11 +40,11 @@ from datetime import datetime
 nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
                                 'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey',
                                 'ssid': 'xxxxxx'},
-            "277427577103760": {'model': 'nvg599', 'device_access_code':'<<01%//4&/', 'magic': 'ggtxstgwipcg',
+            "277427577103760": {'model': 'nvg599', 'device_access_code': '<<01%//4&/', 'magic': 'ggtxstgwipcg',
                                 'mac2g': 'fc:51:a4:2f:25:90', 'mac5g':
                                 'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'},
-            "35448081188192":   {'model':'nvg599','device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
-                                 'mac2g':'20:3d:66:49:85:61', 'mac5g': '11:22:33:44:55:66','wifi': 'eeh4jxmh7q26',
+            "35448081188192":   {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
+                                 'mac2g': '20:3d:66:49:85:61', 'mac5g': '11:22:33:44:55:66', 'wifi': 'eeh4jxmh7q26',
                                  'ssid': 'ATT4ujR48s'}}
 
 test_house_devices_static_info = {
@@ -74,7 +74,8 @@ test_house_devices_static_info = {
 
 NON_DFS_CHANNELS = {36, 40, 44, 48, 149, 153, 157, 161, 165}
 DFS_CHANNELS = {52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144}
-ALL_BAND5_CHANNELS = {36, 40, 44, 48,52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144, 149, 153, 157, 161, 165}
+ALL_BAND5_CHANNELS = {36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144, 149, 153, 157, 161, 165}
+
 
 class GatewayClass:
     def __init__(self):
@@ -188,7 +189,7 @@ class Nvg599Class(GatewayClass):
         #                         desired_capabilities = webdriver.DesiredCapabilities.FIREFOX)
         # return driver
 
-   #  def get_ui_ssid(self):
+    #  def get_ui_ssid(self):
     """ We should use this function to get the information for a specific band /guest SSID
     This would make the test case logic  easier to follow"""
     def get_ui_ssid_info(self):
@@ -386,29 +387,25 @@ class Nvg599Class(GatewayClass):
             submit = self.session.find_element_by_name("Continue")
             submit.click()
             sleep(5)
-            return_string = None
-            #try:
-             #   self.session.find_elements_by_xpath("//*[contains(text(), 'too long')]")
+            # return_string = None
+            # try:
+            #   self.session.find_elements_by_xpath("//*[contains(text(), 'too long')]")
             #    # print('special_bad_warning too long')
-            ##    submit = self.session.find_element_by_name("Cancel")
-             #   print('Password too long, Cancelling change')
+            # #    submit = self.session.find_element_by_name("Cancel")
+            #   print('Password too long, Cancelling change')
             #    submit.click()
             #    return_string =  "xxpassword too long"
-              #  return return_string
-#
-            #except NoSuchElementException:
+            #  return return_string
+            # except NoSuchElementException:
             #    print('No password too long  warning - Continuing')
-
-            #wi_fi_warning = self.session.find_element_by_class_name("special bad")
-
+            # wi_fi_warning = self.session.find_element_by_class_name("special bad")
             # print('wi_fi_warning' + wi_fi_warning)
-
             # exit()
             return_string = "password changed successfully"
 
             displayed_text = self.session.page_source
             sleep(5)
-            if  "The Password is too long" in displayed_text:
+            if "The Password is too long" in displayed_text:
                 submit = self.session.find_element_by_name("Cancel")
                 print('Password too long, Cancelling change')
                 submit.click()
@@ -424,7 +421,6 @@ class Nvg599Class(GatewayClass):
                 submit.click()
                 return_string =  "password length not in range 8-63"
                 return return_string
-
 
             return return_string
             #
@@ -458,26 +454,24 @@ class Nvg599Class(GatewayClass):
             # #   print('No Input errors displayed- Continuing')
             # #if(self.session.page_source().contains("too long")):
             # #    print("too long")
-            #try:
+            # try:
             #    special_bad_warning = self.session.find_element_by_class_name('special bad')
-             #   if special_bad_warning:
-             #       print('special_bad_warning' + special_bad_warning)
-#
-            #except NoSuchElementException:
-             #   print('No Input errors displayed- Continuing')
+            #   if special_bad_warning:
+            #       print('special_bad_warning' + special_bad_warning)
+            #
+            # except NoSuchElementException:
+            #   print('No Input errors displayed- Continuing')
 
-#            submit = self.session.find_element_by_name("Continue")
- #           submit.click()
-  #          sleep(2)
-        #else:
-#
-         #   try:
-         #       special_bad_warning = self.session.find_element_by_class_name("special bad").getText()
-         #       if special_bad_warning:
-          #          print('special_bad_warning' + special_bad_warning)
-#
-          #  except NoSuchElementException:
-          #      print('No Input errors displayed- Continuing')
+            #            submit = self.session.find_element_by_name("Continue")
+            #           submit.click()
+            #          sleep(2)
+            # else:
+            #   try:
+            #       special_bad_warning = self.session.find_element_by_class_name("special bad").getText()
+            #       if special_bad_warning:
+            #          print('special_bad_warning' + special_bad_warning)
+            #  except NoSuchElementException:
+            #      print('No Input errors displayed- Continuing')
 
     def update_rg(self, update_bin_file):
         print('in update_rg')
@@ -488,8 +482,8 @@ class Nvg599Class(GatewayClass):
         status_link.click()
         self.check_if_dac_required()
         sleep(5)
-        #firm_ware_element = self.session.find_element_by_name("uploadfile")
-        firm_ware_element = self.session.find_element_by_xpath("//*[@id='firmware']")        # session = webdriver.Chrome()
+        # firm_ware_element = self.session.find_element_by_name("uploadfile")
+        firm_ware_element = self.session.find_element_by_xpath("//*[@id='firmware']")
         # session = webdriver.Chrome()
         firm_ware_element.send_keys(update_bin_file)
         submit = self.session.find_element_by_name("Update")
@@ -523,11 +517,11 @@ class Nvg599Class(GatewayClass):
             except timeout:
                 print('Socket timeout error')
 
-            #except URLError as e:
-             #   print('URL Error: ' + str(e))
-             #   sleep(10)
-             #   print('time' + str(time.time()))
-             #   continue
+            # except URLError as e:
+            #   print('URL Error: ' + str(e))
+            #   sleep(10)
+            #   print('time' + str(time.time()))
+            #   continue
 
         end = time.time()
         print("upgrade duration in seconds:", round(end - start))
@@ -548,7 +542,6 @@ class Nvg599Class(GatewayClass):
             sleep(4)
         except NoSuchElementException:
             print('DAC challenge not displayed- Continuing')
-       #pfp
     #        # browser.find_element_by_xpath("//*[@id='main-content']/div[2]/div[2]/div/h1.text")
 
     def check_if_wifi_warning_displayed(self):
@@ -989,7 +982,7 @@ class Nvg599Class(GatewayClass):
         while loop == 1:
             try:
                 test_req = urllib.request.Request("http://192.168.1.254/")
-                urllib.request.urlopen(test_req, timeout = 120)
+                urllib.request.urlopen(test_req, timeout=120)
                 end = time.time()
                 print("Duration timer:", str(end - start))
                 break
@@ -1012,11 +1005,9 @@ class Nvg599Class(GatewayClass):
                 sleep(10)
                 print('time' + str(time.time()))
                 continue
-            #finally:
-             #   print("idk")
         print('done')
     # @staticmethod
-    #def factory_reset_rg(self, rg_url="http://192.168.1.254/cgi-bin/home.ha"):
+    # def factory_reset_rg(self, rg_url="http://192.168.1.254/cgi-bin/home.ha"):
     def factory_reset_rg(self, rg_url="http://192.168.1.254/"):
 
         # the default is the usual default RG IP
@@ -1071,11 +1062,11 @@ class Nvg599Class(GatewayClass):
             except timeout:
                 print('Socket timeout error')
 
-            #except URLError as e:
-             #   print('URL Error: ' + str(e))
-             #   sleep(10)
-             #   print('time' + str(time.time()))
-             #   continue
+                # except URLError as e:
+                #   print('URL Error: ' + str(e))
+                #   sleep(10)
+                #   print('time' + str(time.time()))
+                #   continue
 
         end = time.time()
         print("in outer duration in seconds:", end - start)
@@ -1262,7 +1253,6 @@ class Nvg599Class(GatewayClass):
 
             return self.session
 
-
     def ui_get_wifi_password(self):
         print('in ui_get_wifi_password')
         rg_url = 'http://192.168.1.254/'
@@ -1287,9 +1277,7 @@ class Nvg599Class(GatewayClass):
         # print('tada2)')
         return ussidsecurity_value, default_password
 
-
-
-    def ui_set_wifi_password(self,security, password):
+    def ui_set_wifi_password(self, security, password):
         print('in ui_set_password')
         rg_url = 'http://192.168.1.254/'
         # session = webdriver.Chrome()
@@ -1303,11 +1291,11 @@ class Nvg599Class(GatewayClass):
         self.check_if_dac_required()
         ussidsecurity_select = Select(self.session.find_element_by_id("ussidsecurity"))
 
-       # for options in ussidsecurity_select.options:
+        # for options in ussidsecurity_select.options:
         #    print('option:' + str(options.text))
         #    print('security:' + security)
         # sleep(10)
-        #ussidsecurity_select.select_by_value(security)
+        # ussidsecurity_select.select_by_value(security)
         ussidsecurity_select.select_by_visible_text(security)
         if security == "Custom Password":
             password_input = self.session.find_element_by_id("password")
@@ -1321,80 +1309,71 @@ class Nvg599Class(GatewayClass):
         self.check_for_wifi_warning()
         return_str = self.check_for_wifi_warning()
         return return_str
-        #pfp
 
+        # selected = ussidsecurity_value.option.value(security)
+        # for options in ussidsecurity_select.options:
+        #     print('option:' + str(options.text))
+        #     #if options.text == security:
+        #     #    options.click()
+        # # ussidsecurity_select.select_by_index(0)
+        # # ussidsecurity_select.options
+        # password_input = self.session.find_element_by_id("password")
+        # password_input.clear()
+        # password_input.send_keys(password)
+        # submit = self.session.find_element_by_name("Save")
+        # sleep(10)
+        # submit.click()
+        # print('password before check:' + str(len(password)))
+        # print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        # self.check_for_wifi_warning()
+        #
+        # exit()
 
-
-
-
-
-
-        #selected = ussidsecurity_value.option.value(security)
-        for options in ussidsecurity_select.options:
-            print('option:' + str(options.text))
-            #if options.text == security:
-            #    options.click()
-        # ussidsecurity_select.select_by_index(0)
-        # ussidsecurity_select.options
-        password_input = self.session.find_element_by_id("password")
-        password_input.clear()
-        password_input.send_keys(password)
-        submit = self.session.find_element_by_name("Save")
-        sleep(10)
-        submit.click()
-        print('password before check:' + str(len(password)))
-        print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-        self.check_for_wifi_warning()
-
-        exit()
-
-        for option in ussidsecurity_select.find_elements_by_tag_name('option'):
-            print('text:' + str(option.text))
-            if option.text == security:
-                option.click()
-        sleep(10)
-        exit()
-        for option in ussidsecurity_select.find_elements_by_tag_name('option'):
-            print('text:' + str(option.text))
-            # if option.text == "Default Password":
-            if option.text == "Default Password":
-                option.click()
-                # if the text is not Defaut Password then it must be Custom Password
-                # logic is simpler is we set the option to Custom Password
-                # I think by clicking on it it is selected
-        password_input = self.session.find_element_by_id("password")
-        password_input.clear()
-        password_input.send_keys(password)
-
-        submit = self.session.find_element_by_name("Save")
-        sleep(10)
-        submit.click()
-        self.check_for_wifi_warning()
+        # for option in ussidsecurity_select.find_elements_by_tag_name('option'):
+        #     print('text:' + str(option.text))
+        #     if option.text == security:
+        #         option.click()
+        # sleep(10)
+        # exit()
+        # for option in ussidsecurity_select.find_elements_by_tag_name('option'):
+        #     print('text:' + str(option.text))
+        #     # if option.text == "Default Password":
+        #     if option.text == "Default Password":
+        #         option.click()
+        #         # if the text is not Defaut Password then it must be Custom Password
+        #         # logic is simpler is we set the option to Custom Password
+        #         # I think by clicking on it it is selected
+        # password_input = self.session.find_element_by_id("password")
+        # password_input.clear()
+        # password_input.send_keys(password)
+        #
+        # submit = self.session.find_element_by_name("Save")
+        # sleep(10)
+        # submit.click()
+        # self.check_for_wifi_warning()
 
         # print('current password is: ' + password_input.get_attribute("value"))
         # default_password = password_input.get_attribute("value")
         # java_script = 'document.getElementsById("ussidsecurity").setAttribute("value","1234567890")'
         # java_script = 'document.getElementsByName("security")[0].click()'
         # self.session.execute_script(java_script)
-        #exit()
+        # exit()
 
         # if we are setting the password then we have to make sure that the use default is not set
-        #channel_select = self.session.find_element_by_id("ochannelplusauto")
-        #print('found ochannel')
-        #print('channel', channel)
+        # channel_select = self.session.find_element_by_id("ochannelplusauto")
+        # print('found ochannel')
+        # print('channel', channel)
         # bandwidth_select.select_by_value(bandwidth)
-        #for option in channel_select.find_elements_by_tag_name('option'):
-         #   if option.text == channel:
-         #       option.click()
-
-
-        #self.session.execute_script('document.getElementsById("password").setAttribute("value","1234567890")')
-        #password_input.set_attribute("value","12345678")
-        #print('new password is: ' + password_input.get_attribute("value"))
-        #new_password = password_input.get_attribute("value")
-        #submit = self.session.find_element_by_name("Save")
-        #submit.click()
-        #return new_password
+        # for option in channel_select.find_elements_by_tag_name('option'):
+        #   if option.text == channel:
+        #       option.click()
+        # self.session.execute_script('document.getElementsById("password").setAttribute("value","1234567890")')
+        # password_input.set_attribute("value","12345678")
+        # print('new password is: ' + password_input.get_attribute("value"))
+        # new_password = password_input.get_attribute("value")
+        # submit = self.session.find_element_by_name("Save")
+        # submit.click()
+        # return new_password
 
     def ui_get_wifi_info(self):
         print('in ui_get_wifi_info')
@@ -1476,7 +1455,6 @@ class Nvg599Class(GatewayClass):
 # tr69 SetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth=X_0000C5_40MHz
 # InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth X_0000C5_80MH
 
-
     def run_speed_test_cli(self, speed_test_ip):
         print('in run_speedtest_cli')
         # speed_test_ip = "192.168.1.255"
@@ -1530,35 +1508,37 @@ class Nvg599Class(GatewayClass):
         prompt = '\$\s+'
         ssh_client = paramiko.SSHClient()
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        #ssh.connect(hostname=speed_test_ip, username=UN, password=PW)
+        # ssh.connect(hostname=speed_test_ip, username=UN, password=PW)
         ssh_client.connect(hostname=speed_test_ip, port = 8022)
         ssh_session = SSHClientInteraction(ssh_client, timeout=200, display=True)
-        #print('interactive SSH session established!')
-        ssh_session.expect(prompt,timeout=2)
+        # print('interactive SSH session established!')
+        ssh_session.expect(prompt, timeout=200)
         # Austin speedtest server is 5024, check speedtest --list for a complete listing
 
         ssh_session.send('speedtest  --server 5024')
         sleep(2)
-        ssh_session.expect(prompt,timeout=30)
+        ssh_session.expect(prompt, timeout=200)
         speed_test_output = ssh_session.current_output_clean
 
         print('speedtest_output:   ',speed_test_output )
         # speed_test_regex = re.compile(r'.*Download:\s+(\w+)\s+.*Upload:\s+(\w+)',re.DOTALL)
-        speed_test_regex = re.compile(r'(Download:\s+\w+\.\w+\s+\w+).*(Upload:\s+\w+\.\w+\s+\w+)', re.DOTALL)
+        # speed_test_regex = re.compile(r'(Download:\s+\w+\.\w+\s+\w+).*(Upload:\s+\w+\.\w+\s+\w+)', re.DOTALL)
+        speed_test_regex = re.compile(r'Download:\s+(\d+\.\d+)\s+\w+.*Upload:\s+(\d+\.\d+)\s+\w+', re.DOTALL)
+
         speed_test_groups = speed_test_regex.search(speed_test_output)
-        print(speed_test_groups.group(1))
-        print(speed_test_groups.group(2))
+        print('download:', speed_test_groups.group(1))
+        print('upload:', speed_test_groups.group(2))
         down_load_speed = speed_test_groups.group(1)
         up_load_speed = speed_test_groups.group(2)
         return down_load_speed, up_load_speed
 
-        #ssh_session = pexpect.spawn("ssh -p 8022 " + speed_test_ip, encoding='utf-8', timeout=120)
-        #print('speedtestip',speed_test_ip)
-        #exit()
+        # ssh_session = pexpect.spawn("ssh -p 8022 " + speed_test_ip, encoding='utf-8', timeout=120)
+        # rint('speedtestip',speed_test_ip)
+        # exit()
         # out = subprocess.check_output("ssh -p -t -t 8022  " + speed_test_ip + ' bash -s', shell=True).decode("utf-8")
         # result = os.system(cmd)
-        #print('out===========\n', out)
-        #exit()
+        # print('out===========\n', out)
+        # exit()
         #
         # ssh_session.expect("$")
         # print('1', ssh_session.before)
@@ -1599,9 +1579,8 @@ class Nvg599Class(GatewayClass):
         # end = time.time()
         # print(end - start)
 
-
     # @staticmethod
-    def ping_from_local_host(self, remote_ip):
+    def ping_from_local_host(self, remote_ip, number_of_pings=20):
         # def ping_from_local_host(remote_ip):
         print('In ping_from_local_host')
         ping_file = open('ping_file.txt', 'a')
@@ -1610,7 +1589,7 @@ class Nvg599Class(GatewayClass):
         # out, err = out.communicate()
         # out = check_output(["ping ", "-c3 ", "localhost"]).decode("utf-8")
         # out = check_output(["ls -la"].decode("utf-8").shell=True)
-        out = subprocess.check_output("ping -c10 " + remote_ip, shell=True).decode("utf-8")
+        out = subprocess.check_output("ping -c20 " + remote_ip, shell=True).decode("utf-8")
         # result = os.system(cmd)
         print('out===========\n', out)
         print('endout1===========\n')
@@ -1633,9 +1612,9 @@ class Nvg599Class(GatewayClass):
                              '  max_ping:' + max_ping + '  max dev:' + mdev_ping)
         ping_file.writelines('\n')
         ping_file.close()
-        return min_ping, avg_ping, max_ping, mdev_ping
+        return (min_ping, avg_ping, max_ping, mdev_ping)
 
-    def ping_check(self,remote_ip):
+    def ping_check(self, remote_ip):
         print('In ping_check')
         # out = subprocess.check_output("ping -c10 " + remote_ip, shell=True).decode("utf-8")
         try:
@@ -1657,8 +1636,8 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.expect("ogin:")
         self.telnet_cli_session.sendline('admin')
         self.telnet_cli_session.expect("ord:")
-      #  self.telnet_cli_session.sendline('<<01%//4&/')
-      #  self.telnet_cli_session.sendline('9==5485?6<')
+        #  self.telnet_cli_session.sendline('<<01%//4&/')
+        #  self.telnet_cli_session.sendline('9==5485?6<')
         nvg_dac = self.device_access_code
         self.telnet_cli_session.sendline(nvg_dac)
         self.telnet_cli_session.expect(">")
@@ -1733,10 +1712,6 @@ class Nvg599Class(GatewayClass):
         self.serial_number = mo1.group(2)
         self.up_time = mo1.group(3)
         self.session.close()
-
-
-
-
 
     def setup_tr69_url(self):
         self.session = self.login_nvg_599_cli()
