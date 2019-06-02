@@ -274,57 +274,46 @@ def test_rg_upgrade(nvg_599_dut, firmware_599_available):
 
 import matplotlib.pyplot as plt
 import matplotlib.image as img
-now = datetime.today().isoformat()
-x = [1,2,3,4,5,6,7,8]
-note8_file = open('note_file.txt','a')
-tablet_file = open('tablet_file.txt','a')
 
-note8_file.write("Speedtest results for Samsung Note 8:" + "\n")
-note8_file.write(now + "\n")
-tablet_file.write("Speedtest results for Samsung Tablet:" + "\n")
-tablet_file.write(now + "\n")
-#note8_file.write("\" + Speedtest  + "\n")
-#channel_band_file.write(now + "\n")
-
-speed_test_result_list_tablet= []
-speed_test_result_list_tablet_download= []
-speed_test_result_list_tablet_upload= []
-
-speed_test_result_list_note8 = []
-speed_test_result_list_note8_download= []
-speed_test_result_list_note8_upload= []
+#
+# note8_file.write("Speedtest results for Samsung Note 8:" + "\n")
+# note8_file.write(now + "\n")
+# tablet_file.write("Speedtest results for Samsung Tablet:" + "\n")
+# tablet_file.write(now + "\n")
+# #note8_file.write("\" + Speedtest  + "\n")
+# #channel_band_file.write(now + "\n")
+#
+# speed_test_result_list_tablet= []
+# speed_test_result_list_tablet_download= []
+# speed_test_result_list_tablet_upload= []
+#
+# speed_test_result_list_note8 = []
+# speed_test_result_list_note8_download= []
+# speed_test_result_list_note8_upload= []
 
 # pfp
 import matplotlib.pyplot as plt
 
-firmware_599_available = ['/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin',
-                         '/home/palmer/Downloads/nvg599-9.2.2h12d10_1.1.bin',
-                         '/home/palmer/Downloads/nvg599-9.2.2h12d13_1.1.bin',
-                         '/home/palmer/Downloads/nvg599-9.2.2h13d1_1.1.bin',
-                         '/home/palmer/Downloads/nvg599-9.2.2h13d2_1.1.bin',
-                         '/home/palmer/Downloads/nvg599-9.2.2h13d3_1.1.bin',
-                         '/home/palmer/Downloads/nvg599-9.2.2h13d4_1.1.bin',
-                         '/home/palmer/Downloads/nvg599-9.2.2h13d5_1.1.bin',
-                         '/home/palmer/Downloads/nvg599-9.2.2h13d6_1.1.bin',
-                          '/home/palmer/Downloads/nvg599-9.2.2h13d7_1.1.bin',
 
-                          ]
 
-firmware_599_names = [
-    '9.2.2h12d9',
-    '9.2.2h12d10',
-    '9.2.2h12d13',
-    '9.2.2h13d1',
-    '9.2.2h13d2',
-    '9.2.2h13d3',
-    '9.2.2h13d4',
-    '9.2.2h13d5',
-    '9.2.2h13d6',
-    '9.2.2h13d7'
-
-]
 #
 def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_names):
+    now = datetime.today().isoformat()
+    start_time = datetime.today().strftime("%b-%d-%Y--%H:%M")
+    # x = [1, 2, 3, 4, 5, 6, 7, 8]
+    note8_file_name = "note8_" + start_time +'.txt'
+    tablet_file_name = "tablet_" + start_time +'.txt'
+
+    # note8_file = open('note_file.txt', 'a')
+    # tablet_file = open('tablet_file.txt', 'a')
+    note8_file = open(note8_file_name, 'a')
+    tablet_file = open(tablet_file_name, 'a')
+    tablet_file.write(start_time + "\n")
+    note8_file.write(start_time + "\n")
+    note8_file.close()
+    tablet_file.close()
+
+
     tablet_ping_list = []
     note8_ping_list = []
     tablet_download_list = []
@@ -333,22 +322,25 @@ def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_
     note8_upload_list = []
 
     for firmware in firmware_599_available:
-        print('firmware' + str(firmware))
+        print('in firmware loop ******************* firmware' + str(firmware))
         nvg_599_dut.update_rg(firmware)
-        sleep(240)
+        sleep(300)
+        #.67 is  the tablet
         #speed_test_result_tuple_tablet = Nvg599Class.run_speed_test_from_android_termux("192.168.1.67")
         a,b = Nvg599Class.run_speed_test_from_android_termux("192.168.1.67")
+        print('Tablet ---------------------------------------------firmware:' + str(firmware))
+
         # print("speed_test_result_tuple:", speed_test_result_tuple_tablet)
         #for a, b in speed_test_result_tuple_tablet:
         print('tablet download speed: ' + a + ' Upload speed:' + b)
         tablet_download_list.append(a)
         tablet_upload_list.append(b)
+        tablet_file = open(tablet_file_name, 'a')
         tablet_file.write("firmware:" + str(firmware) + "download:" + a + "Upload:" + b + "\n")
-        print('firmware:' + str(firmware))
+        tablet_file.close()
         sleep(60)
-
-        mina, avga, maxa, mdeva = nvg_599_dut.ping_from_local_host("192.168.1.67")
-        print('192.168.1.67 - min:' + str(mina) + ' max:' + str(maxa) + ' avg: ' + avga)
+        # mina, avga, maxa, mdeva = nvg_599_dut.ping_from_local_host("192.168.1.67")
+        # print('192.168.1.67 - min:' + str(mina) + ' max:' + str(maxa) + ' avg: ' + avga)
         # for a, b in speed_test_result_tuple_tablet:
         #     print('tablet download speed: ' + a + ' Upload speed:' + b)
         #     tablet_download_list.append(a)
@@ -359,15 +351,20 @@ def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_
         # speed_test_result_tuple_note8 = Nvg599Class.run_speed_test_from_android_termux("192.168.1.70")
         a,b = Nvg599Class.run_speed_test_from_android_termux("192.168.1.70")
         #for a, b in speed_test_result_tuple_note8:
+        print('Note 8 ---------------------------------------------firmware:' + str(firmware))
         print('Note 8 download speed: ' + a + ' Upload speed:' + b)
         note8_download_list.append(a)
         note8_upload_list.append(b)
+        note8_file = open(note8_file_name, 'a')
         note8_file.write("firmware:" + str(firmware) + "download:" + a + "Upload:" + b + "\n")
+        note8_file.close()
         sleep(60)
 
+        # # post pone this for now
+        # mina, avga, maxa, mdeva = nvg_599_dut.ping_from_local_host("192.168.1.70")
+        # print('192.168.1.70 - min:' + str(mina) + ' max:' + str(maxa) + ' avg: ' + avga)
+        #
 
-        mina, avga, maxa, mdeva = nvg_599_dut.ping_from_local_host("192.168.1.70")
-        print('192.168.1.70 - min:' + str(mina) + ' max:' + str(maxa) + ' avg: ' + avga)
         # for a, b in speed_test_result_tuple_note8:
         # #for a, b in speed_test_result_tuple_note8:
         #     print('Note 8 download speed: ' + a + ' Upload speed:' + b)
@@ -376,8 +373,8 @@ def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_
         #     note8_file.write("firmware:" + str(firmware) + "download:" + a + "Upload:" + b + "\n")
         #     sleep(60)
 
-    note8_file.close()
-    tablet_file.close()
+    # note8_file.close()
+    # tablet_file.close()
     # tablet_download_list
     # note8_download_list
     plt.figure("Test House Speedtest results for NVG 599 ", figsize=(8, 7))
@@ -404,8 +401,8 @@ def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_
     plt.tight_layout()
     plt.subplots_adjust(left=0.1, right=0.9, bottom=0.2, top=0.9)
     now = datetime.today().isoformat()
-    plt.savefig("/home/palmer/Downloads/speedtest:" + now)
-    # show()
+    plt.savefig("/home/palmer/Downloads/speedtest:" + start_time)
+    show()
     return tablet_download_list, tablet_upload_list, note8_download_list, note8_upload_list
 
 #
@@ -420,11 +417,45 @@ def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_
 # print('a:',a,' b:',b)
 # exit()
 
+# now = datetime.today().isoformat()
+# start_time = datetime.today().strftime("%b-%d-%Y--%H:%M")
+# x = [1, 2, 3, 4, 5, 6, 7, 8]
+# note8_file_name = "note8_" + start_time +'.txt'
+# tablet_file_name = "tablet" + start_time +'.txt'
+# print('fn:',note8_file_name)
+# exit()
+
+firmware_599_names = [
+        '9.2.2h12d9',
+        '9.2.2h12d10',
+        '9.2.2h12d13',
+        '9.2.2h13d1',
+        '9.2.2h13d2',
+        '9.2.2h13d3',
+        '9.2.2h13d4',
+        '9.2.2h13d5',
+        '9.2.2h13d6',
+        '9.2.2h13d7'
+        ]
+
+firmware_599_available = ['/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin',
+                        '/home/palmer/Downloads/nvg599-9.2.2h12d10_1.1.bin',
+                        '/home/palmer/Downloads/nvg599-9.2.2h12d13_1.1.bin',
+                        '/home/palmer/Downloads/nvg599-9.2.2h13d1_1.1.bin',
+                        '/home/palmer/Downloads/nvg599-9.2.2h13d2_1.1.bin',
+                        '/home/palmer/Downloads/nvg599-9.2.2h13d3_1.1.bin',
+                        '/home/palmer/Downloads/nvg599-9.2.2h13d4_1.1.bin',
+                        '/home/palmer/Downloads/nvg599-9.2.2h13d5_1.1.bin',
+                        '/home/palmer/Downloads/nvg599-9.2.2h13d6_1.1.bin',
+                        '/home/palmer/Downloads/nvg599-9.2.2h13d7_1.1.bin',
+                        ]
+
+
 nvg_599_dut = Nvg599Class()
 # return min_ping, avg_ping, max_ping, mdev_ping
-mina, avga, maxa, mdeva  =  nvg_599_dut.ping_from_local_host("192.168.1.70")
-print('min:' + str(mina) + ' max:' + str(maxa) +  ' avg: ' + avga)
-exit()
+#mina, avga, maxa, mdeva  =  nvg_599_dut.ping_from_local_host("192.168.1.70")
+#print('min:' + str(mina) + ' max:' + str(maxa) +  ' avg: ' + avga)
+#exit()
 #Nvg599Class().run_speed_test_from_android_termux("192.168.1.70")
 test_rg_upgrade_speedtest(nvg_599_dut,firmware_599_available,firmware_599_names)
 exit()
@@ -434,7 +465,7 @@ tablet_download_list =  [100,120,80,120,114,111,121,101,105]
 note8_download_list =  [110,125,90,110,120,100,104,107,95]
 tablet_upload_list = [11,8,13,9,15,11,8,13,8]
 note8_upload_list = [9,7,14,10,15,8,5,8,3]
-plt.figure("Test House Speedtest results for NVG 599 ",figsize=(8, 7))
+plt.figure("Test House Speedtest results for NVG 599",figsize=(8, 7))
 #x_label_list = ['9.2.2h12d9','9.2.2h12d10','9.2.2h12d13','9.2.2h13d1 ', '9.2.2h13d2','9.2.2h13d3', '9.2.2h13d4','9.2.2h13d5','9.2.2h13d6']
 # start number,stop number, steps
 ty =  arange(1.0, 10.0, 1)
@@ -711,39 +742,39 @@ exit()
 #
 #
 # #statusInfoRegEx = re.compile(r'Model\s(\w+)\s+Serial\s+Number\s+(\d+)')
-#statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+\s+AnnexA\s+(\w+)',re.DOTALL)
-#statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*completed\s+(\w+)',re.DOTALL)
-#statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
-#statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
-#statusInfoRegEx = re.compile(r'Model\s(\w+)')
-#mo1 = statusInfoRegEx.search(statusOutput)
+# statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+\s+AnnexA\s+(\w+)',re.DOTALL)
+# statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*completed\s+(\w+)',re.DOTALL)
+# statusInfoRegEx = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
+# statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
+# statusInfoRegEx = re.compile(r'Model\s(\w+)')
+# mo1 = statusInfoRegEx.search(statusOutput)
 
-#print(mo1)
-#print ('model ', mo1.group(1))
+# print(mo1)
+# print ('model ', mo1.group(1))
 
-#print ('Serial Number', mo1.group(2))
-#print ('Uptime ', mo1.group(3))
+# print ('Serial Number', mo1.group(2))
+# print ('Uptime ', mo1.group(3))
 
-#exit()
+ # exit()
 
-#rgModel= mo1.group(1)
-#serialNumber= mo1.group(2)
-#addition
+# rgModel= mo1.group(1)
+# serialNumber= mo1.group(2)
+# addition
 
-#if rgModel=='NVG599':
+# if rgModel=='NVG599':
 #    print('we are going to instantiate an NVG599')
 #    nvg599DUT = Nvg599Class()
 #    nvg599DUT.printme()
 #    nvg599DUT.turnOffSupplicant()
 
 
-#else:
+# else:
 #    print('what  to instantiate an NVG599')
 #
-#exit()
+# exit()
 
 
-#airTiesTerm = pexpect.spawn("telnet 192.168.1.67")
+# airTiesTerm = pexpect.spawn("telnet 192.168.1.67")
 #sleep(1)
 #airTiesTerm.expect("ogin:")
 #airTiesTerm.sendline('root')

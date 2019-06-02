@@ -1509,7 +1509,7 @@ class Nvg599Class(GatewayClass):
         ssh_client = paramiko.SSHClient()
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         # ssh.connect(hostname=speed_test_ip, username=UN, password=PW)
-        ssh_client.connect(hostname=speed_test_ip, port = 8022)
+        ssh_client.connect(hostname=speed_test_ip, port = 8022,  timeout=30)
         ssh_session = SSHClientInteraction(ssh_client, timeout=200, display=True)
         # print('interactive SSH session established!')
         ssh_session.expect(prompt, timeout=200)
