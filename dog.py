@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 # import itertools
 import pprint
+import pickle
 # import global.py
 # import time
 # from  pprint import pprint
@@ -17,7 +18,9 @@ import re
 import smtplib
 import sys
 from time import sleep
-from datetime import datetime
+# from datetime import datetime
+import datetime
+
 
 import pexpect
 from rgclass import Nvg599Class
@@ -293,8 +296,9 @@ import matplotlib.image as img
 
 # pfp
 import matplotlib.pyplot as plt
-
-
+import numpy as np
+# import matplotlib.pyplot as plt
+from pylab import *
 
 #
 def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_names):
@@ -327,6 +331,7 @@ def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_
         sleep(300)
         #.67 is  the tablet
         #speed_test_result_tuple_tablet = Nvg599Class.run_speed_test_from_android_termux("192.168.1.67")
+        ping_results = nvg_599_dut.ping_check('192.168.1.67')
         a,b = Nvg599Class.run_speed_test_from_android_termux("192.168.1.67")
         print('Tablet ---------------------------------------------firmware:' + str(firmware))
 
@@ -335,10 +340,12 @@ def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_
         print('tablet download speed: ' + a + ' Upload speed:' + b)
         tablet_download_list.append(a)
         tablet_upload_list.append(b)
+        pickle.dump(tablet_download_list, open("tabletdownloadpickle.p", "wb"))
+        pickle.dump(tablet_upload_list, open("tabletuploadpickle.p", "wb"))
         tablet_file = open(tablet_file_name, 'a')
-        tablet_file.write("firmware:" + str(firmware) + "download:" + a + "Upload:" + b + "\n")
+        tablet_file.write("firmware:" + str(firmware) + "Download:" + a + " Upload:" + b + "\n")
         tablet_file.close()
-        sleep(60)
+        sleep(30)
         # mina, avga, maxa, mdeva = nvg_599_dut.ping_from_local_host("192.168.1.67")
         # print('192.168.1.67 - min:' + str(mina) + ' max:' + str(maxa) + ' avg: ' + avga)
         # for a, b in speed_test_result_tuple_tablet:
@@ -349,16 +356,20 @@ def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_
         #     sleep(60)
 
         # speed_test_result_tuple_note8 = Nvg599Class.run_speed_test_from_android_termux("192.168.1.70")
+        ping_results = nvg_599_dut.ping_check('192.168.1.70')
         a,b = Nvg599Class.run_speed_test_from_android_termux("192.168.1.70")
         #for a, b in speed_test_result_tuple_note8:
         print('Note 8 ---------------------------------------------firmware:' + str(firmware))
         print('Note 8 download speed: ' + a + ' Upload speed:' + b)
         note8_download_list.append(a)
         note8_upload_list.append(b)
+        pickle.dump(note8_download_list, open("note8downloadpickle.p", "wb"))
+        pickle.dump(note8_upload_list, open("note8uploadpickle.p", "wb"))
+
         note8_file = open(note8_file_name, 'a')
-        note8_file.write("firmware:" + str(firmware) + "download:" + a + "Upload:" + b + "\n")
+        note8_file.write("firmware:" + str(firmware) + "Download:" + a + " Upload:" + b + "\n")
         note8_file.close()
-        sleep(60)
+        sleep(200)
 
         # # post pone this for now
         # mina, avga, maxa, mdeva = nvg_599_dut.ping_from_local_host("192.168.1.70")
@@ -378,7 +389,9 @@ def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_
     # tablet_download_list
     # note8_download_list
     plt.figure("Test House Speedtest results for NVG 599 ", figsize=(8, 7))
-    ty = arange(1.0, 11.0, 1)
+    ty = arange(1.0, 12.0, 1)
+#    ty = arange(1.0, 10.0, 1)
+
     #
     subplot(2, 1, 1)
     plt.ylabel('Speed in MBPS')
@@ -402,6 +415,8 @@ def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_
     plt.subplots_adjust(left=0.1, right=0.9, bottom=0.2, top=0.9)
     now = datetime.today().isoformat()
     plt.savefig("/home/palmer/Downloads/speedtest:" + start_time)
+    plt.savefig("thisisit")
+
     show()
     return tablet_download_list, tablet_upload_list, note8_download_list, note8_upload_list
 
@@ -435,6 +450,7 @@ firmware_599_names = [
         '9.2.2h13d4',
         '9.2.2h13d5',
         '9.2.2h13d6',
+        '9.2.2h13d7',
         '9.2.2h13d7'
         ]
 
@@ -448,54 +464,125 @@ firmware_599_available = ['/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin',
                         '/home/palmer/Downloads/nvg599-9.2.2h13d5_1.1.bin',
                         '/home/palmer/Downloads/nvg599-9.2.2h13d6_1.1.bin',
                         '/home/palmer/Downloads/nvg599-9.2.2h13d7_1.1.bin',
-                        ]
+                        '/home/palmer/Downloads/nvg599-9.2.2h13d8_1.1.bin',
+                          ]
+
+# from string
+# mystring = '{
+#   "bssid": "fc:51:a4:2f:25:90",
+#   "frequency_mhz": 2437,
+#   "ip": "192.168.1.67",
+#   "link_speed_mbps": 72,
+#   "mac_address": "02:00:00:00:00:00",
+#   "network_id": 22,
+#   "rssi": -43,
+#   "ssid": "ATTqbrAnYs",
+#   "ssid_hidden": false,
+#   "supplicant_state": "COMPLETED""
+# }'
+
+#Nvg599Class.run_speed_test_from_android_termux('192.168.1.67')
+Nvg599Class.get_wifi_info_from_android_termux('192.168.1.67')
+
+exit()
+
+#Nvg599Class.wait_for_ssh_to_be_ready('192.168.1.70', '8022', '20', '1')
+#exit()
+
+# def pickle_test():
+#     note8_upload_list = [2.1, 2.1, 2.0, 2.1, 2.4, 2.1, 2.01, 2.1, 2.2, 1.9]
+#     pickle.dump(note8_upload_list, open("mypickle.p","wb"))
+#     new_pickle= pickle.load( open("mypickle.p","rb"))
+#     print('new_pickle',new_pickle)
+#
+#
+#
+# pickle_test()
+# print('done')
+# exit()
+
+from datetime import datetime
+
+#date = datetime.datetime.strptime(date,"%m%d%Y")
+
+def datetimetest():
+    now = datetime.today().isoformat()
 
 
-nvg_599_dut = Nvg599Class()
+# datetimetest()
+# exit()
 # return min_ping, avg_ping, max_ping, mdev_ping
 #mina, avga, maxa, mdeva  =  nvg_599_dut.ping_from_local_host("192.168.1.70")
 #print('min:' + str(mina) + ' max:' + str(maxa) +  ' avg: ' + avga)
 #exit()
+
+
+nvg_599_dut = Nvg599Class()
 #Nvg599Class().run_speed_test_from_android_termux("192.168.1.70")
 test_rg_upgrade_speedtest(nvg_599_dut,firmware_599_available,firmware_599_names)
 exit()
 
-from pylab import *
-tablet_download_list =  [100,120,80,120,114,111,121,101,105]
-note8_download_list =  [110,125,90,110,120,100,104,107,95]
-tablet_upload_list = [11,8,13,9,15,11,8,13,8]
-note8_upload_list = [9,7,14,10,15,8,5,8,3]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#import datetime
+#date = datetime.datetime.strptime(date, "%m%d%Y")
+# from pylab import *
+tablet_download_list = [27.7, 28.9, 27.6, 27.1, 30.1 ,29.2 ,30.6, 28.1, 29.0, 26.2]
+note8_download_list =  [55.3, 54.4, 50.1, 58.2, 48.8, 41.1, 44.0, 44.0, 50.5, 51.7]
+tablet_upload_list =   [2.4, 2.3 ,2.4, 2.4, 2.1, 2.3, 2.1, 2.2, 2.4, 2.1]
+note8_upload_list =    [2.1, 2.1, 2.0, 2.1, 2.4, 2.1, 2.01, 2.1, 2.2, 1.9]
 plt.figure("Test House Speedtest results for NVG 599",figsize=(8, 7))
-#x_label_list = ['9.2.2h12d9','9.2.2h12d10','9.2.2h12d13','9.2.2h13d1 ', '9.2.2h13d2','9.2.2h13d3', '9.2.2h13d4','9.2.2h13d5','9.2.2h13d6']
+# x_label_list = ['9.2.2h12d9','9.2.2h12d10','9.2.2h12d13','9.2.2h13d1 ', '9.2.2h13d2','9.2.2h13d3', '9.2.2h13d4','9.2.2h13d5','9.2.2h13d6']
 # start number,stop number, steps
-ty =  arange(1.0, 10.0, 1)
-#tx =  arange(1.0, 10.0, 1)
-#plt.xticks([1,2,3,4,5,6,7,8,9])
-#plt.xticks([1,2,3,4,5,6,7,8,9],x_label_list,rotation='vertical')
+ty =  arange(1.0, 11.0, 1)
+# tx =  arange(1.0, 10.0, 1)
+# plt.xticks([1,2,3,4,5,6,7,8,9])
+# plt.xticks([1,2,3,4,5,6,7,8,9],x_label_list,rotation='vertical')
+#plt.subplots(2,1,sharey=True)
 
 subplot(2,1,1)
 plt.ylabel('Speed in MBPS')
 title('NVG 599 Download Speed')
+plt.ylim([10,70])
 plot(ty,tablet_download_list,'g')
 plot(ty,note8_download_list,'b')
 plt.grid()
 #
+#plt.legend(bbox_to_anchor=(1, -1.2), ncol=1)
+#plt.legend(bbox_to_anchor=(1, -1.2), ncol=1)
+
 subplot(2,1,2)
 title('NVG 599 Upload Speed')
 plt.ylabel('Speed in MBPS')
 plt.xlabel('Firmware')
-plt.xticks([1,2,3,4,5,6,7,8,9],firmware_599_names,rotation='vertical')
+plt.xticks([1,2,3,4,5,6,7,8,9,10],firmware_599_names,rotation='vertical')
 
-plot(ty,tablet_upload_list,'b',label= 'Tablet')
-plot(ty,note8_upload_list,'g', label='Note8')
-plt.legend(bbox_to_anchor=(1,-1.2), ncol=1)
+plt.ylim([0,4])
+
+plot(ty,tablet_upload_list,'b', label = "Samsung Note8 5 G")
+plot(ty,note8_upload_list,'g', label = "Samsung Tablet 2.4 G")
+plt.legend(bbox_to_anchor=(1,-1.0), ncol=1)
 plt.grid()
-plt.tight_layout()
-plt.subplots_adjust(left=0.1, right=0.9, bottom=0.2, top=0.9)
-now = datetime.today().isoformat()
+#plt.tight_layout()
+plt.subplots_adjust(left=0.1, right=0.9, bottom=0.4, top=0.9, hspace=0.4)
+plt.legend(bbox_to_anchor=(1, -1.2), ncol=1)
+#now = datetime.today().isoformat()
+# now = datetime.today().isoformat()
 #channel_band_file.write(now + ""Test Title:Channel/Channel band test:" +"\n")
-plt.savefig("/home/palmer/Downloads/speedtest:" + now)
-#show()
+plt.savefig("/home/palmer/Downloads/speedtest:")
+show()
 exit()
 
 speed_test_result_list = []

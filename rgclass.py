@@ -1,7 +1,7 @@
 # from itertools import count
 # from typing import Dict
 import subprocess
-
+from pexpect import pxssh
 from socket import timeout
 # from subprocess import check_output
 # from selenium.webdriver.common.by import By
@@ -14,7 +14,7 @@ import urllib3
 # import httplib2
 import pexpect
 import re
-
+import socket
 import paramiko
 from paramiko_expect import SSHClientInteraction
 
@@ -1454,6 +1454,39 @@ class Nvg599Class(GatewayClass):
 # tr69 SetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth=X_0000C5_80MHz
 # tr69 SetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth=X_0000C5_40MHz
 # InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth X_0000C5_80MH
+    @staticmethod
+    def wait_for_ssh_to_be_ready(host, port, timeout, retry_interval):
+        print('in wait_for_ssh_to_be_read')
+        client = paramiko.client.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        retry_interval = float(retry_interval)
+        timeout = int(timeout)
+        timeout_start = time.time()
+        while time.time() < timeout_start + timeout:
+            time.sleep(retry_interval)
+            try:
+                # client.connect(host, int(port), allow_agent=False, look_for_keys=False)
+                client.connect(host, int(port))
+
+            except paramiko.ssh_exception.SSHException as e:
+                # print('????????????????????????', e)
+                # exit()
+                # socket is open but SSH has not responded
+                if str(e) == 'Error reading SSH protocol banner':
+                    print('SSH Error reading ssh banner -pfp- ')
+
+                # if str(e) == 'Error reading SSH protocol banner':
+                #if e.msg == 'Error reading SSH protocol banner':
+                # if e.message == 'Error reading SSH protocol banner':
+                    print(e)
+                    continue
+                print('SSH transport is available!')
+                break
+            except paramiko.ssh_exception.NoValidConnectionsError as e:
+                print('SSH transport not ready...')
+                sleep(5)
+                continue
+
 
     def run_speed_test_cli(self, speed_test_ip):
         print('in run_speedtest_cli')
@@ -1503,24 +1536,101 @@ class Nvg599Class(GatewayClass):
         # print(end - start)
 # possible check out netmiko
     @staticmethod
+    def get_wifi_info_from_android_termux(wifi_info_ip):
+        print('in get_wifi_connection_info_from_android_termux')
+        ssh_client = pxssh.pxssh(timeout=300, encoding='utf-8', options={"StrictHostKeyChecking": "no"})
+        hostname = (wifi_info_ip)
+        ssh_client.login(hostname, username=None, port=8022)
+        ssh_client.prompt()
+        ssh_client.sendline('termux-wifi-connectioninfo')
+        ssh_client.prompt()
+        #speed_test_output_b = ssh_client.before
+        wifi_info_output = ssh_client.before
+        #print(ssh_client.before)
+        # wifi_info_regex = re.compile(r'bssid":\s+(\w+\.\d+)\s+\w+.*Upload:\s+(\d+\.\d+)\s+\w+', re.DOTALL)
+
+        print('after', wifi_info_output)
+
+        #speed_test_regex = re.compile(r'Download:\s+(\d+\.\d+)\s+\w+.*Upload:\s+(\d+\.\d+)\s+\w+', re.DOTALL)
+        # wifi_info_regex = re.compile(r'\s*bssid\":\s+\"(\w+:\w+:\w+:\w+:\w+:\w+)\"\s+\"frequency_mhz\":\s+(\w+)\"ip\":\s+(\d+:\d+:\d+:\d+)\"',re.DOTALL)
+        wifi_info_regex = re.compile(r'\s*\"(bssid)\"',re.DOTALL)
+
+
+        wifi_info_groups = wifi_info_regex.search(wifi_info_output)
+        print('bssid:', wifi_info_groups.group(1))
+       # print('frequency:', wifi_info_groups.group(2))
+       # print('ip:', wifi_info_groups.group(3))
+
+        #down_load_speed = wifi_info_groups.group(1)
+        #up_load_speed = wifi_info_groups.group(2)
+
+    @staticmethod
     def run_speed_test_from_android_termux(speed_test_ip):
         print('in run_speed_test_from_android_termux')
-        prompt = '\$\s+'
-        ssh_client = paramiko.SSHClient()
-        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        #prompt = '\$\s+'
+        # prompt = '\$'
+
+
+        # sort of works-----------
+        # ssh_client = paramiko.SSHClient()
+        # ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        # sleep(10)
+        #-------------------------------------
+
+
+        #ssh_client= pxssh.pxssh()
+        #ssh_client = pxssh.pxssh(options={"StrictHostKeyChecking": "no","AutoPromptReset": "True"})
+        # not sure if this is defined like this
+        #ssh_client = pxssh.pxssh(timeout=200, encoding='utf-8',options={"StrictHostKeyChecking": "no","AutoPromptReset": "True"})
+        #ssh_client = pxssh.pxssh(timeout=200, encoding='utf-8')
+
+        ssh_client = pxssh.pxssh(timeout=300, encoding='utf-8', options={"StrictHostKeyChecking": "no"})
+        hostname = (speed_test_ip)
+        ssh_client.login(hostname, username=None, port=8022)
+        ssh_client.prompt()
+        ssh_client.sendline('speedtest  --server 5024')
+        ssh_client.prompt()
+        #speed_test_output_b = ssh_client.before
+        speed_test_output = ssh_client.before
+        #print(ssh_client.before)
+        print('after conversion ti string',speed_test_output)
+        # exit()
         # ssh.connect(hostname=speed_test_ip, username=UN, password=PW)
-        ssh_client.connect(hostname=speed_test_ip, port = 8022,  timeout=30)
-        ssh_session = SSHClientInteraction(ssh_client, timeout=200, display=True)
-        # print('interactive SSH session established!')
-        ssh_session.expect(prompt, timeout=200)
+
+
+        #ssh_client.connect(hostname=speed_test_ip, port = 8022,  timeout=30)
+        #ssh_client.connect(hostname=speed_test_ip, port = 8022,  timeout=30)
+
+
+# sort of works-----------
+#         Nvg599Class.wait_for_ssh_to_be_ready(speed_test_ip, '8022', '220', '10')
+#         ssh_client.connect(hostname=speed_test_ip, port=8022, timeout=120)
+        #-------------------------------------
+        # loop = 1
+        # while loop == 1:
+        #     try:
+        #         ssh_client.connect(hostname=speed_test_ip, port = 8022,  timeout=120)
+        #     except socket.timeout as error:
+        #         print('socket timeout..',error)
+        #         continue
+
+#---------sort of works
+        # ssh_session = SSHClientInteraction(ssh_client, timeout=200, display=True)
+        # ssh_session.expect(prompt, timeout=200)
         # Austin speedtest server is 5024, check speedtest --list for a complete listing
 
-        ssh_session.send('speedtest  --server 5024')
-        sleep(2)
-        ssh_session.expect(prompt, timeout=200)
-        speed_test_output = ssh_session.current_output_clean
 
-        print('speedtest_output:   ',speed_test_output )
+        #
+        # ssh_session.send('speedtest  --server 5024')
+        # sleep(2)
+        # ssh_session.expect(prompt, timeout=200)
+        # speed_test_output = ssh_session.current_output_clean
+# sort of works
+
+        # ssh_client.sendline('speedtest  --server 5024')
+
+
+        #print('speedtest_output:   ',speed_test_output )
         # speed_test_regex = re.compile(r'.*Download:\s+(\w+)\s+.*Upload:\s+(\w+)',re.DOTALL)
         # speed_test_regex = re.compile(r'(Download:\s+\w+\.\w+\s+\w+).*(Upload:\s+\w+\.\w+\s+\w+)', re.DOTALL)
         speed_test_regex = re.compile(r'Download:\s+(\d+\.\d+)\s+\w+.*Upload:\s+(\d+\.\d+)\s+\w+', re.DOTALL)
@@ -1621,12 +1731,16 @@ class Nvg599Class(GatewayClass):
             out = subprocess.check_output("ping -c10 " + remote_ip, shell=True).decode("utf-8")
             ping_info_reg_ex = re.compile(r'(\d+.*loss)')
             ping_status = ping_info_reg_ex.search(out)
+            print('ping result:',ping_status.group(1) )
+
             return ping_status.group(1)
         except subprocess.CalledProcessError as e:
             print('ping error:', e.output)
             e.returncode = 0
             ping_fail_str = str(e.output)
             ping_fail_return = "Ping_failed:" + ping_fail_str
+            print('ping failed:',ping_status.group(1) )
+
             return ping_fail_return
 
     def login_nvg_599_cli(self):
@@ -2007,9 +2121,8 @@ class Nvg599Class(GatewayClass):
         telnet_cli_session.close()
         return ip_lan_connections_dict_cli
 
-    # class Nvg_5268_Class(GatewayClass):
-    #     def __init__(self):
-    #         self.name = "Nvg_5268"
-    #      # rg5268 = pexpect.spawn("telnet 192.168.1.254")
-    #         sleep(1)
-    #
+# class Nvg_5268_Class(GatewayClass):
+#     def __init__(self):
+#         self.name = "Nvg_5268"
+#      # rg5268 = pexpect.spawn("telnet 192.168.1.254")
+
