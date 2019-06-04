@@ -1535,34 +1535,67 @@ class Nvg599Class(GatewayClass):
         # end = time.time()
         # print(end - start)
 # possible check out netmiko
+#    import sys
     @staticmethod
     def get_wifi_info_from_android_termux(wifi_info_ip):
         print('in get_wifi_connection_info_from_android_termux')
-        ssh_client = pxssh.pxssh(timeout=300, encoding='utf-8', options={"StrictHostKeyChecking": "no"})
-        hostname = (wifi_info_ip)
-        ssh_client.login(hostname, username=None, port=8022)
+        #ssh_client = pxssh.pxssh(timeout=100, encoding='utf-8', maxread=5000, options={"StrictHostKeyChecking": "no"})
+        ssh_client = pxssh.pxssh(timeout=100, encoding='ascii', maxread=5000, options={"StrictHostKeyChecking": "no"})
+
+        ssh_client.PROMPT='r[#$]'
+        #ssh_client.login(wifi_info_ip, username='None', port=8022, auto_prompt_reset='False', sync_multiplier=5)
+        ssh_client.login(wifi_info_ip, username='None', port=8022, original_prompt=r'[#$]', auto_prompt_reset=False, sync_multiplier=5, quiet=False,login_timeout=10)
+        #ssh_client.PROMPT='\$
+        #
+        #
         ssh_client.prompt()
+        # ssh_client.expect(".*x11-repo")
+        ssh_client.expect_exact("issues")
+        print('1', ssh_client.before)
+
+        sleep(2)
         ssh_client.sendline('termux-wifi-connectioninfo')
-        ssh_client.prompt()
+        #ssh_client.expect('termux-wifi-connectioninfo')
+        #ssh_client.sendline('help')
+        #ssh_client.sendline('\n')
+
+
+
+        ssh_client.expect_exact("COMPLETED")
+        #ssh_client.prompt()
+        # print('logfile', ssh_client.logfile_read )
+
+        #ssh_client.expect(".*\$ ")
+        # print('2', ssh_client.before)
+
+        #ssh_client.prompt()
         #speed_test_output_b = ssh_client.before
-        wifi_info_output = ssh_client.before
-        #print(ssh_client.before)
-        # wifi_info_regex = re.compile(r'bssid":\s+(\w+\.\d+)\s+\w+.*Upload:\s+(\d+\.\d+)\s+\w+', re.DOTALL)
-
-        print('after', wifi_info_output)
-
-        #speed_test_regex = re.compile(r'Download:\s+(\d+\.\d+)\s+\w+.*Upload:\s+(\d+\.\d+)\s+\w+', re.DOTALL)
-        # wifi_info_regex = re.compile(r'\s*bssid\":\s+\"(\w+:\w+:\w+:\w+:\w+:\w+)\"\s+\"frequency_mhz\":\s+(\w+)\"ip\":\s+(\d+:\d+:\d+:\d+)\"',re.DOTALL)
-        wifi_info_regex = re.compile(r'\s*\"(bssid)\"',re.DOTALL)
+        #wifi_info_output = ssh_client.before
+        print('wifi op---------------',ssh_client.before)
+        ssh_client.logout()
+  #      ssh_client.sendline('help  hash')
+  #      ssh_client.prompt()
+  #      print('hash',ssh_client.before)
 
 
-        wifi_info_groups = wifi_info_regex.search(wifi_info_output)
-        print('bssid:', wifi_info_groups.group(1))
-       # print('frequency:', wifi_info_groups.group(2))
-       # print('ip:', wifi_info_groups.group(3))
-
-        #down_load_speed = wifi_info_groups.group(1)
-        #up_load_speed = wifi_info_groups.group(2)
+       #
+       #  exit()
+       #  # wifi_info_regex = re.compile(r'bssid":\s+(\w+\.\d+)\s+\w+.*Upload:\s+(\d+\.\d+)\s+\w+', re.DOTALL)
+       #
+       #  print('after', wifi_info_output)
+       #
+       #  #speed_test_regex = re.compile(r'Download:\s+(\d+\.\d+)\s+\w+.*Upload:\s+(\d+\.\d+)\s+\w+', re.DOTALL)
+       #  # wifi_info_regex = re.compile(r'\s*bssid\":\s+\"(\w+:\w+:\w+:\w+:\w+:\w+)\"\s+\"frequency_mhz\":\s+(\w+)\"ip\":\s+(\d+:\d+:\d+:\d+)\"',re.DOTALL)
+       #  wifi_info_regex = re.compile(r'\s*\"(bssid)\"',re.DOTALL)
+       #
+       #  exit()
+       #  wifi_info_groups = wifi_info_regex.search(wifi_info_output)
+       #  print('bssid:', wifi_info_groups.group(1))
+       # # print('frequency:', wifi_info_groups.group(2))
+       # # print('ip:', wifi_info_groups.group(3))
+       #
+       #  #down_load_speed = wifi_info_groups.group(1)
+       #  #up_load_speed = wifi_info_groups.group(2)
 
     @staticmethod
     def run_speed_test_from_android_termux(speed_test_ip):

@@ -482,7 +482,7 @@ firmware_599_available = ['/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin',
 # }'
 
 #Nvg599Class.run_speed_test_from_android_termux('192.168.1.67')
-Nvg599Class.get_wifi_info_from_android_termux('192.168.1.67')
+Nvg599Class.get_wifi_info_from_android_termux('192.168.1.70')
 
 exit()
 
