@@ -482,9 +482,9 @@ firmware_599_available = ['/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin',
 # }'
 
 #Nvg599Class.run_speed_test_from_android_termux('192.168.1.67')
-Nvg599Class.get_wifi_info_from_android_termux('192.168.1.70')
+#Nvg599Class.get_wifi_info_from_android_termux('192.168.1.70')
 
-exit()
+#exit()
 
 #Nvg599Class.wait_for_ssh_to_be_ready('192.168.1.70', '8022', '20', '1')
 #exit()
@@ -518,8 +518,9 @@ def datetimetest():
 
 
 nvg_599_dut = Nvg599Class()
+nvg_599_dut.enable_guest_network_and_set_password_ssid()
 #Nvg599Class().run_speed_test_from_android_termux("192.168.1.70")
-test_rg_upgrade_speedtest(nvg_599_dut,firmware_599_available,firmware_599_names)
+#test_rg_upgrade_speedtest(nvg_599_dut,firmware_599_available,firmware_599_names)
 exit()
 
 

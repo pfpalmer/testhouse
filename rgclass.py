@@ -126,7 +126,7 @@ class GatewayClass:
 #         gmail_password = "1329brome"
 #
 #         gmail_user = 'leandertesthouse@gmail.com'
-#         to = 'pfpalmer@gmail.com'
+#         to = palmer@gmail.com'
 #         sent_from = 'leandertesthouse:'
 #         subject = 'Test results'
 # #      body = "Results:" + channelResultContents
@@ -190,7 +190,32 @@ class Nvg599Class(GatewayClass):
         # return driver
 
     #  def get_ui_ssid(self):
-    """ We should use this function to get the information for a specific band /guest SSID
+
+#pfp
+    def enable_guest_network_and_set_password_ssid(self):
+        # dianostics_link = browser.find_element_by_link_text("Diagnostics")
+        home_network_link = self.session.find_element_by_link_text("Home Network")
+        home_network_link.click()
+        sleep(2)
+        # resets_link = browser.find_element_by_link_text("Resets")
+        wi_fi_link = self.session.find_element_by_link_text("Wi-Fi")
+        wi_fi_link.click()
+        sleep(2)
+        self.check_if_dac_required()
+        guest_id_enable = self.session.find_element_by_name("gssidenable")
+        guest_id_enable.click()
+
+        for option in guest_id_enable.find_elements_by_tag_name('option'):
+            if option.text == "On":
+                option.click()
+        guest_id_password = self.session.find_element_by_id("gssidpassword")
+        guest_id_password.send_keys("1111111111")
+
+        submit = self.session.find_element_by_name("Save")
+        submit.click()
+        self.check_for_wifi_warning()
+
+    """ I should use this function to get the information for a specific band /guest SSID
     This would make the test case logic  easier to follow"""
     def get_ui_ssid_info(self):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
@@ -204,7 +229,7 @@ class Nvg599Class(GatewayClass):
         self.check_if_dac_required()
         wi_fi_link = self.session.find_element_by_link_text("Advanced Options")
         wi_fi_link.click()
-        sleep(2)
+
 
         band5_ssid_entry = self.session.find_element_by_name("tssidname")
         band5_ssid = band5_ssid_entry.get_attribute('value')
@@ -212,7 +237,7 @@ class Nvg599Class(GatewayClass):
         band5_password_entry = self.session.find_element_by_name("tkey1")
         band5_password = band5_password_entry.get_attribute('value')
 
-        guest_ssid_entry = self.session.find_element_by_name("ossidname2")
+        guest_ssid_entry = self.session.find_element_by_name("gssidname2")
         guest_ssid = guest_ssid_entry.get_attribute('value')
         guest_password_entry = self.session.find_element_by_name("okey2")
         guest_password = guest_password_entry.get_attribute('value')
@@ -269,8 +294,6 @@ class Nvg599Class(GatewayClass):
             submit.click()
             sleep(2)
         self.check_for_wifi_warning()
-
-    ##########################
 
     # we want to use the same session but the dict of connected devices is a temporary value subject to change
     def ui_get_device_list(self):
@@ -411,9 +434,6 @@ class Nvg599Class(GatewayClass):
                 submit.click()
                 return_string = "password too long"
                 return return_string
-            # else:
-            #     print('too long not found')
-            #     #print(displayed_text)
 
             if "must contain 8-63" in displayed_text:
                 submit = self.session.find_element_by_name("Cancel")
@@ -516,12 +536,6 @@ class Nvg599Class(GatewayClass):
                 continue
             except timeout:
                 print('Socket timeout error')
-
-            # except URLError as e:
-            #   print('URL Error: ' + str(e))
-            #   sleep(10)
-            #   print('time' + str(time.time()))
-            #   continue
 
         end = time.time()
         print("upgrade duration in seconds:", round(end - start))
@@ -1076,6 +1090,7 @@ class Nvg599Class(GatewayClass):
         self.conf_tr69_eco_url()
         self.turn_off_wi_fi_security_protection_cli()
         self.enable_parental_control()
+        self.enable_guest_network_and_set_password_ssid()
 
     def get_ui_home_network_status_value(self, value_requested):
         print('in get_ui_home_network_status_value)')
@@ -1473,7 +1488,7 @@ class Nvg599Class(GatewayClass):
                 # exit()
                 # socket is open but SSH has not responded
                 if str(e) == 'Error reading SSH protocol banner':
-                    print('SSH Error reading ssh banner -pfp- ')
+                    print('SSH Error reading ssh banner - ')
 
                 # if str(e) == 'Error reading SSH protocol banner':
                 #if e.msg == 'Error reading SSH protocol banner':
