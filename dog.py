@@ -518,7 +518,18 @@ def datetimetest():
 
 
 nvg_599_dut = Nvg599Class()
-nvg_599_dut.enable_guest_network_and_set_password_ssid()
+
+
+#device_dict = nvg_599_dut.ui_get_device_list()
+#print('device_dict:', device_dict)
+
+#nvg_599_dut.disable_enable_wifi_2_4_and_5g_wifi()
+#exit()
+#nvg_599_dut.enable_parental_control()
+#nvg_599_dut.enable_guest_network_and_set_password_ssid()
+#nvg_599_dut.factory_reset_rg()
+nvg_599_dut.turn_off_supplicant_cli()
+#nvg_599_dut.enable_guest_network_and_set_password_ssid()
 #Nvg599Class().run_speed_test_from_android_termux("192.168.1.70")
 #test_rg_upgrade_speedtest(nvg_599_dut,firmware_599_available,firmware_599_names)
 exit()

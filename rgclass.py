@@ -395,6 +395,37 @@ class Nvg599Class(GatewayClass):
 
         return ui_rg_connected_clients_dict
 
+    def check_for_wifi_security_and_regular_warning(self):
+        print('in check_for_wifi_warning ')
+        # warning = self.session.find_element_by_name("ReturnWarned")
+        # we get this warning every time so we don't have to check for no such exception
+        try:
+            wi_fi_warning = self.session.find_element_by_class_name("warning")
+        except NoSuchElementException:
+            return_string = "Wi-Fi Warning not detcted."
+            return return_string
+
+        if wi_fi_warning:
+            print("Wi-Fi Warning displayed ")
+            # submit = self.session.find_element_by_name("ReturnWarned")
+
+            displayed_text = self.session.page_source
+            sleep(5)
+            if "Wi-Fi security that is not recommended." in displayed_text:
+                submit = self.session.find_element_by_name("ReturnWarned")
+                submit.click()
+                return_string = "wi-fi security change... Continue"
+                print("wi-fi security change... Continue")
+                return return_string
+
+            if "You have made a change to your Wi-Fi configuration" in displayed_text:
+                submit = self.session.find_element_by_name("Continue")
+                submit.click()
+                return_string = "wi-fi regular warning change... Continue"
+                print("wi-fi regular warning change... Continue")
+                return return_string
+
+# I think this shoudl only be used for the password testcases
     def check_for_wifi_warning(self):
         print('in check_for_wifi_warning ')
         # warning = self.session.find_element_by_name("ReturnWarned")
@@ -407,23 +438,10 @@ class Nvg599Class(GatewayClass):
 
         if wi_fi_warning:
             print("got wifi warning")
+            # submit = self.session.find_element_by_name("ReturnWarned")
             submit = self.session.find_element_by_name("Continue")
             submit.click()
             sleep(5)
-            # return_string = None
-            # try:
-            #   self.session.find_elements_by_xpath("//*[contains(text(), 'too long')]")
-            #    # print('special_bad_warning too long')
-            # #    submit = self.session.find_element_by_name("Cancel")
-            #   print('Password too long, Cancelling change')
-            #    submit.click()
-            #    return_string =  "xxpassword too long"
-            #  return return_string
-            # except NoSuchElementException:
-            #    print('No password too long  warning - Continuing')
-            # wi_fi_warning = self.session.find_element_by_class_name("special bad")
-            # print('wi_fi_warning' + wi_fi_warning)
-            # exit()
             return_string = "password changed successfully"
 
             displayed_text = self.session.page_source
@@ -454,7 +472,8 @@ class Nvg599Class(GatewayClass):
             #     # self.session.find_elements_by_xpath("//*[contains(text(), 'must contain 8-63')]")
             #     #elem = self.session.find_elements_by_xpath("//label[@for='password][contains(text(), 'must contain 8-63'")
             #     #elem = self.session.find_element_by_xpath("//*label[@for='password]")
-            #     elem = self.session.find_elements_by_xpath("//*[@id='content-sub']/div[3]/form/table[2]/tbody/tr[5]/th/label/em")
+            #     elem = self.session.find_elements_by_xpath
+            #     ("//*[@id='content-sub']/div[3]/form/table[2]/tbody/tr[5]/th/label/em")
             #     #wi_fi_warning = self.session.find_element_by_class_name("special bad")
             #
             #     #elem = self.session.find_element_by_xpath("//*id="content-sub"]/div[3]/form/table[2]/tbody/tr[5]/th/label/em")
@@ -1022,8 +1041,8 @@ class Nvg599Class(GatewayClass):
         print('done')
     # @staticmethod
     # def factory_reset_rg(self, rg_url="http://192.168.1.254/cgi-bin/home.ha"):
-    def factory_reset_rg(self, rg_url="http://192.168.1.254/"):
-
+    # we have to assume that the default RG IP is 192.168.1.254
+    def factory_reset_rg(self):
         # the default is the usual default RG IP
         self.factory_reset = 1
         # url = 'http://192.168.1.254/'
@@ -1084,7 +1103,8 @@ class Nvg599Class(GatewayClass):
 
         end = time.time()
         print("in outer duration in seconds:", end - start)
-        sleep(2)
+        #
+        sleep(120)
         self.turn_off_supplicant_cli()
         self.enable_sshd_ssh_cli()
         self.conf_tr69_eco_url()
@@ -1267,6 +1287,66 @@ class Nvg599Class(GatewayClass):
             self.check_if_wifi_warning_displayed()
 
             return self.session
+
+# pfp
+    def disable_enable_wifi_2_4_and_5g_wifi(self):
+        print('in disable_enable_wifi_2_4_and_5g_wifi')
+        rg_url = 'http://192.168.1.254/'
+        # session = webdriver.Chrome()
+        self.session.get(rg_url)
+        status_link = self.session.find_element_by_link_text("Home Network")
+        status_link.click()
+        sleep(2)
+        home_network_link = self.session.find_element_by_link_text("Wi-Fi")
+        home_network_link.click()
+        sleep(2)
+        self.check_if_dac_required()
+        advanced_options_link = self.session.find_element_by_link_text("Advanced Options")
+        advanced_options_link.click()
+        sleep(2)
+
+        wi_fi_2_4 = self.session.find_element_by_name("owl80211on")
+
+        for option in wi_fi_2_4.find_elements_by_tag_name('option'):
+            # this is problematic line
+            if option.text == "Off":
+                option.click()
+                break
+        sleep(10)
+        self.session.implicitly_wait(5)
+        wi_fi_5_g = self.session.find_element_by_name("twl80211on")
+        # wi_fi_5_g.click()
+        for option in wi_fi_5_g.find_elements_by_tag_name('option'):
+            if option.text == "Off":
+                option.click()
+                break
+        submit = self.session.find_element_by_name("Save")
+        sleep(10)
+        submit.click()
+
+        # self.check_for_wifi_warning()
+        self.check_for_wifi_security_and_regular_warning()
+        self.session.implicitly_wait(5)
+        wi_fi_2_4 = self.session.find_element_by_name("owl80211on")
+        wi_fi_2_4.click()
+
+        for option in wi_fi_2_4.find_elements_by_tag_name('option'):
+            if option.text == "On":
+                option.click()
+                break
+
+        wi_fi_5_g = self.session.find_element_by_name("twl80211on")
+        wi_fi_5_g.click()
+
+        for option in wi_fi_5_g.find_elements_by_tag_name('option'):
+            if option.text == "On":
+                option.click()
+                break
+        submit = self.session.find_element_by_name("Save")
+        sleep(10)
+        submit.click()
+        self.check_for_wifi_security_and_regular_warning()
+        # self.check_for_wifi_warning()
 
     def ui_get_wifi_password(self):
         print('in ui_get_wifi_password')
@@ -1484,15 +1564,9 @@ class Nvg599Class(GatewayClass):
                 client.connect(host, int(port))
 
             except paramiko.ssh_exception.SSHException as e:
-                # print('????????????????????????', e)
-                # exit()
                 # socket is open but SSH has not responded
                 if str(e) == 'Error reading SSH protocol banner':
                     print('SSH Error reading ssh banner - ')
-
-                # if str(e) == 'Error reading SSH protocol banner':
-                #if e.msg == 'Error reading SSH protocol banner':
-                # if e.message == 'Error reading SSH protocol banner':
                     print(e)
                     continue
                 print('SSH transport is available!')
@@ -1550,7 +1624,6 @@ class Nvg599Class(GatewayClass):
         # end = time.time()
         # print(end - start)
 # possible check out netmiko
-#    import sys
     @staticmethod
     def get_wifi_info_from_android_termux(wifi_info_ip):
         print('in get_wifi_connection_info_from_android_termux')
@@ -1573,9 +1646,6 @@ class Nvg599Class(GatewayClass):
         #ssh_client.expect('termux-wifi-connectioninfo')
         #ssh_client.sendline('help')
         #ssh_client.sendline('\n')
-
-
-
         ssh_client.expect_exact("COMPLETED")
         #ssh_client.prompt()
         # print('logfile', ssh_client.logfile_read )
@@ -1591,8 +1661,6 @@ class Nvg599Class(GatewayClass):
   #      ssh_client.sendline('help  hash')
   #      ssh_client.prompt()
   #      print('hash',ssh_client.before)
-
-
        #
        #  exit()
        #  # wifi_info_regex = re.compile(r'bssid":\s+(\w+\.\d+)\s+\w+.*Upload:\s+(\d+\.\d+)\s+\w+', re.DOTALL)
@@ -1617,15 +1685,11 @@ class Nvg599Class(GatewayClass):
         print('in run_speed_test_from_android_termux')
         #prompt = '\$\s+'
         # prompt = '\$'
-
-
         # sort of works-----------
         # ssh_client = paramiko.SSHClient()
         # ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         # sleep(10)
         #-------------------------------------
-
-
         #ssh_client= pxssh.pxssh()
         #ssh_client = pxssh.pxssh(options={"StrictHostKeyChecking": "no","AutoPromptReset": "True"})
         # not sure if this is defined like this
@@ -1676,7 +1740,6 @@ class Nvg599Class(GatewayClass):
 # sort of works
 
         # ssh_client.sendline('speedtest  --server 5024')
-
 
         #print('speedtest_output:   ',speed_test_output )
         # speed_test_regex = re.compile(r'.*Download:\s+(\w+)\s+.*Upload:\s+(\w+)',re.DOTALL)
@@ -1817,7 +1880,7 @@ class Nvg599Class(GatewayClass):
         telnet_cli_session.sendline('<<01%//4&/')
         telnet_cli_session.expect(">")
         telnet_cli_session.sendline('magic')
-        telnet_cli_session.expect(">")
+        telnet_cli_session.expect("UNLOCKED>")
         return telnet_cli_session
 
     @staticmethod
@@ -1844,8 +1907,6 @@ class Nvg599Class(GatewayClass):
         # statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
         # status InfoRegEx = re.compile(r'Model\s(\w+)')
         mo1 = status_info_reg_ex.search(status_output)
-        # ssid = 0
-        # return ssid
         return mo1
 
     def cli_rg_status(self, ip):
@@ -1945,6 +2006,7 @@ class Nvg599Class(GatewayClass):
     def enable_parental_control(self):
         print("In enable_parental_contol")
         self.telnet_cli_session = self.login_nvg_599_cli()
+        self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.Enable=1")
         self.telnet_cli_session.expect("successful.*UNLOCKED>")
         self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD.TODEnable=1")
