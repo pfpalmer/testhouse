@@ -48,34 +48,63 @@ nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53
                                  'ssid': 'ATT4ujR48s'}}
 
 test_house_devices_static_info = {
-    '88:41:FC:86:64:D6': {'device_type': 'airties_4920', 'radio': 'abg', 'band': '2', 'state': 'None',
+    '88:41:FC:86:64:D6': {'device_type': 'airties_4920', 'oper_sys':'tbd', 'radio': 'abg', 'band': '2',
+                          'state': 'Nonne',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'airties_1_2g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
-    '88:41:FC:86:64:D4': {'device_type': 'airties_4920', 'radio': 'abg', 'band': '5', 'state': 'None',
+    '88:41:FC:86:64:D4': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '5',
+                          'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None',  'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'airties_1_5g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
-    '88:41:FC:C3:56:C2': {'device_type': 'airties_4920', 'radio': 'abg', 'band': '2', 'state': 'None',
+    '88:41:FC:C3:56:C2': {'device_type': 'airties_4920', 'oper_sys':'tbd', 'radio': 'abg', 'band': '2',
+                          'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', ' ip': 'None',
                           'device_test_name': 'airties_2_2g', 'name': 'ATT_4920_C356C0', 'location': 'master_bedroom'},
-    '88:41:FC:C3:56:C0': {'device_type': 'airties_4920', 'radio': 'abg', 'band': '5', 'state': 'None',
+    '88:41:FC:C3:56:C0': {'device_type': 'airties_4920', 'oper_sys':'tbd',  'radio': 'abg', 'band': '5',
+                          'state': 'None',
                           'address_type': 'None', 'port ': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'airties_2_5g', 'name': 'ATT_4920_C356C0', 'location': 'master_bedroom'},
-    '4C:BB:58:68:BD:F6': {'device_type': 'ubuntu_laptop', 'radio': 'bg', 'band': '5', 'state': 'None',
+    '4C:BB:58:68:BD:F6': {'device_type': 'ubuntu_laptop', 'oper_sys':'tbd', 'radio': 'bg', 'band': '5',
+                          'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
-                          'device_test_name': 'ubuntu_1', 'name': 'arris-Latitude-MBR', 'location': 'master_bedroom'},
-    'F4:5C:89:9D:F1:4F': {'device_type': 'macbook_pro', 'radio': 'abg', 'band': '5', 'state': 'None',
+                          'device_test_name': 'ubuntu_1', 'name': 'arris-Latitude-MBR', 'location': 'tbd'},
+
+    'F4:5C:89:9D:F1:4F': {'device_type': 'macbook_pro', 'oper_sys':'tbd', 'radio': 'abg', 'band': '5',
+                          'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'mac_book_1', 'name': 'macbook-mbr', 'location': 'master_bedroom'},
-    '5C:E0:C5:D9:8E:BF': {'device_type': 'ubuntu_laptop', 'radio': 'abg', 'band': '5', 'state': 'None',
+
+    '34:E6:D7:2B:CD:7C': {'device_type': 'ubuntu_laptop', 'oper_sys':'18.04',  'radio': 'abg', 'band': '5',
+                          'state': 'None', # lsb_release -a to get ubuntu release
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'mac_book_1', 'name': 'palmer_Latitude-E5450',
-                          'location': 'master_bedroom'},
+                          'location': 'tbd'},
+
+    'E4:58:E7:02:14:D6': {'device_type': 'Galaxy-Tab-A', 'oper_sys': 'Andoid 9', 'radio': 'abg', 'band': '5',
+                          'state': 'None',
+                          'address_type': 'fixed', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': '192.168.1.65',
+                          'device_test_name': 'fixed_taba', 'name': 'palmer_Latitude-E5450',
+                          'location': 'tdb'},
+    'F8:F1:B6:69:91:A3': {'device_type': 'Moto X', 'oper_sys': 'Android 5.1', 'radio': 'abg', 'band': '5',
+                          'state': 'None',
+                          'address_type': 'fixed', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': '192.168.1.66',
+                          'device_test_name': 'fixed_motox', 'name': 'palmer_Latitude-E5450','location': 'tbd'},
+    'B8:D7:AF:AA:27:C3': {'device_type': 'Galaxy-Note8', 'oper_sys': 'Android 9', 'radio': 'abg', 'band': '5',
+                          'state': 'None',
+                          'address_type': 'fixed', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': '192.168.1.67',
+                          'device_test_name': 'fixed_note8', 'name': 'palmer_Latitude-E5450',
+                          'location': 'tdb'},
+    '8C:45:00:9F:82:9D': {'device_type': ' Galaxy-S9', 'oper_sys': 'Android 9', 'radio': 'abg', 'band': '5',
+                          'state': 'None',
+                          'address_type': 'fixed', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': '192.168.1.67',
+                          'device_test_name': 'fixed_s9', 'name': 'palmer_Latitude-E5450',
+                          'location': 'tbd'},
 }
 
 NON_DFS_CHANNELS = {36, 40, 44, 48, 149, 153, 157, 161, 165}
 DFS_CHANNELS = {52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144}
-ALL_BAND5_CHANNELS = {36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144, 149, 153, 157, 161, 165}
-
+ALL_BAND5_CHANNELS = {36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 132,
+                      136, 140, 144, 149, 153, 157, 161, 165}
 
 class GatewayClass:
     def __init__(self):
@@ -180,18 +209,43 @@ class Nvg599Class(GatewayClass):
         self.init_info = True
         self.mesh_connected_clents = {}
 
-########################
-
     def remote_webserver(self):
         pass
+
+# pfp
+    def set_fixed_ip_allocation(self):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
-        # driver = webdriver.Remote(command_executor='http://127.0.0.1:4444',
-        #                         desired_capabilities = webdriver.DesiredCapabilities.FIREFOX)
-        # return driver
+        home_network_link = self.session.find_element_by_link_text("Home Network")
+        home_network_link.click()
+        sleep(2)
+        wi_fi_link = self.session.find_element_by_link_text("IP Allocation")
+        wi_fi_link.click()
+        sleep(2)
+        self.check_if_dac_required()
+        soup = BeautifulSoup(self.session.page_source, 'html.parser')
+        tables = soup.findChildren('table')
+        # five tables on this page
+        table = tables[0]
+        # table = soup.find("table100", {"class": "table100"})
+        # print ("table is",table)
+        #table_rows = table.find_all('tr')
+        table_rows = table.find_all('tr')
 
-    #  def get_ui_ssid(self):
+        for tr in table_rows:
+            cells= tr.find_all('td')
+            # print('cells[1]------', cells)
+            # I am sure there is a better way to do this
+            i = 0
+            for cell in cells:
+                if i==1:
+                    print('cell text is:>' + cell.text + '<')
+                    break
+                i = i+1
+            print('----------------------------------------')
 
-#pfp
+
+
+
     def enable_guest_network_and_set_password_ssid(self):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
         home_network_link = self.session.find_element_by_link_text("Home Network")
@@ -229,7 +283,6 @@ class Nvg599Class(GatewayClass):
         self.check_if_dac_required()
         wi_fi_link = self.session.find_element_by_link_text("Advanced Options")
         wi_fi_link.click()
-
 
         band5_ssid_entry = self.session.find_element_by_name("tssidname")
         band5_ssid = band5_ssid_entry.get_attribute('value')
@@ -433,7 +486,7 @@ class Nvg599Class(GatewayClass):
         try:
             wi_fi_warning = self.session.find_element_by_class_name("warning")
         except NoSuchElementException:
-            return_string =  "No changes detected. Save not performed"
+            return_string = "No changes detected. Save not performed"
             return return_string
 
         if wi_fi_warning:
@@ -452,14 +505,12 @@ class Nvg599Class(GatewayClass):
                 submit.click()
                 return_string = "password too long"
                 return return_string
-
             if "must contain 8-63" in displayed_text:
                 submit = self.session.find_element_by_name("Cancel")
                 print('Password length not in range 8-63')
                 submit.click()
-                return_string =  "password length not in range 8-63"
+                return_string = "password length not in range 8-63"
                 return return_string
-
             return return_string
             #
             #
@@ -470,7 +521,8 @@ class Nvg599Class(GatewayClass):
             # print('No password too short warning - Continuing' + str(elem[0]))
             # try:
             #     # self.session.find_elements_by_xpath("//*[contains(text(), 'must contain 8-63')]")
-            #     #elem = self.session.find_elements_by_xpath("//label[@for='password][contains(text(), 'must contain 8-63'")
+            #     #elem = self.session.find_elements_by_xpath("//label[@for='password][contains(text(),
+            #     'must contain 8-63'")
             #     #elem = self.session.find_element_by_xpath("//*label[@for='password]")
             #     elem = self.session.find_elements_by_xpath
             #     ("//*[@id='content-sub']/div[3]/form/table[2]/tbody/tr[5]/th/label/em")
@@ -1042,6 +1094,7 @@ class Nvg599Class(GatewayClass):
     # @staticmethod
     # def factory_reset_rg(self, rg_url="http://192.168.1.254/cgi-bin/home.ha"):
     # we have to assume that the default RG IP is 192.168.1.254
+
     def factory_reset_rg(self):
         # the default is the usual default RG IP
         self.factory_reset = 1
@@ -1555,9 +1608,9 @@ class Nvg599Class(GatewayClass):
         client = paramiko.client.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         retry_interval = float(retry_interval)
-        timeout = int(timeout)
+        my_timeout = int(timeout)
         timeout_start = time.time()
-        while time.time() < timeout_start + timeout:
+        while time.time() < timeout_start + my_timeout:
             time.sleep(retry_interval)
             try:
                 # client.connect(host, int(port), allow_agent=False, look_for_keys=False)
@@ -1575,7 +1628,6 @@ class Nvg599Class(GatewayClass):
                 print('SSH transport not ready...')
                 sleep(5)
                 continue
-
 
     def run_speed_test_cli(self, speed_test_ip):
         print('in run_speedtest_cli')
@@ -1643,24 +1695,21 @@ class Nvg599Class(GatewayClass):
 
         sleep(2)
         ssh_client.sendline('termux-wifi-connectioninfo')
-        #ssh_client.expect('termux-wifi-connectioninfo')
-        #ssh_client.sendline('help')
-        #ssh_client.sendline('\n')
+        # ssh_client.expect('termux-wifi-connectioninfo')
+        # ssh_client.sendline('help')
+        # ssh_client.sendline('\n')
         ssh_client.expect_exact("COMPLETED")
-        #ssh_client.prompt()
+        # ssh_client.prompt()
         # print('logfile', ssh_client.logfile_read )
 
         #ssh_client.expect(".*\$ ")
         # print('2', ssh_client.before)
 
-        #ssh_client.prompt()
-        #speed_test_output_b = ssh_client.before
-        #wifi_info_output = ssh_client.before
+        # ssh_client.prompt()
+        #  speed_test_output_b = ssh_client.before
+        # wifi_info_output = ssh_client.before
         print('wifi op---------------',ssh_client.before)
         ssh_client.logout()
-  #      ssh_client.sendline('help  hash')
-  #      ssh_client.prompt()
-  #      print('hash',ssh_client.before)
        #
        #  exit()
        #  # wifi_info_regex = re.compile(r'bssid":\s+(\w+\.\d+)\s+\w+.*Upload:\s+(\d+\.\d+)\s+\w+', re.DOTALL)
@@ -1702,9 +1751,9 @@ class Nvg599Class(GatewayClass):
         ssh_client.prompt()
         ssh_client.sendline('speedtest  --server 5024')
         ssh_client.prompt()
-        #speed_test_output_b = ssh_client.before
+        # speed_test_output_b = ssh_client.before
         speed_test_output = ssh_client.before
-        #print(ssh_client.before)
+        # print(ssh_client.before)
         print('after conversion ti string',speed_test_output)
         # exit()
         # ssh.connect(hostname=speed_test_ip, username=UN, password=PW)
@@ -1741,7 +1790,7 @@ class Nvg599Class(GatewayClass):
 
         # ssh_client.sendline('speedtest  --server 5024')
 
-        #print('speedtest_output:   ',speed_test_output )
+        # print('speedtest_output:   ',speed_test_output )
         # speed_test_regex = re.compile(r'.*Download:\s+(\w+)\s+.*Upload:\s+(\w+)',re.DOTALL)
         # speed_test_regex = re.compile(r'(Download:\s+\w+\.\w+\s+\w+).*(Upload:\s+\w+\.\w+\s+\w+)', re.DOTALL)
         speed_test_regex = re.compile(r'Download:\s+(\d+\.\d+)\s+\w+.*Upload:\s+(\d+\.\d+)\s+\w+', re.DOTALL)
@@ -1803,6 +1852,7 @@ class Nvg599Class(GatewayClass):
     # @staticmethod
     def ping_from_local_host(self, remote_ip, number_of_pings=20):
         # def ping_from_local_host(remote_ip):
+        min_ping, avg_ping, max_ping, mdev_ping = 0
         print('In ping_from_local_host')
         ping_file = open('ping_file.txt', 'a')
         # out = subprocess.Popen("ping  -c3 localhost",stdout=subprocess.PIPE,stderr=subprocess.STDOUT, shell=True)
@@ -1842,7 +1892,7 @@ class Nvg599Class(GatewayClass):
             out = subprocess.check_output("ping -c10 " + remote_ip, shell=True).decode("utf-8")
             ping_info_reg_ex = re.compile(r'(\d+.*loss)')
             ping_status = ping_info_reg_ex.search(out)
-            print('ping result:',ping_status.group(1) )
+            print('ping result:', ping_status.group(1) )
 
             return ping_status.group(1)
         except subprocess.CalledProcessError as e:
@@ -1850,7 +1900,7 @@ class Nvg599Class(GatewayClass):
             e.returncode = 0
             ping_fail_str = str(e.output)
             ping_fail_return = "Ping_failed:" + ping_fail_str
-            print('ping failed:',ping_status.group(1) )
+            print('ping failed:', ping_status.group(1))
 
             return ping_fail_return
 
