@@ -232,18 +232,56 @@ class Nvg599Class(GatewayClass):
         table_rows = table.find_all('tr')
 
         for tr in table_rows:
+            # we are looking at each row
             cells= tr.find_all('td')
             # print('cells[1]------', cells)
             # I am sure there is a better way to do this
+            # we add a number to each row
+            # probable a way
             i = 0
+
+            mac_present_static_info = test_house_devices_static_info.get(wifi_ui_mac_present)
+            if mac_present_static_info:
+                #this is where we want to do everything
+                my_row = tr.find("td")
+                print('my_row', my_row)
+                exit()
+
+                pass
+
             for cell in cells:
+
+                # parse all  the info from each row  if the mac is present in th satic_info_table
+                # This means that we may have to update the UI IP to match the staitc IP in the table
+                mac_present_static_info = test_house_devices_static_info.get(wifi_ui_mac_present)
+
                 if i==1:
-                    print('cell text is:>' + cell.text + '<')
+                    print('cell mac from ui is:>' + cell.text + '<')
+                    wifi_ui_mac_present = (cell.text).upper()
+                    print('wifi_mac_present:',wifi_ui_mac_present)
+
+                    # if the key is present it means that the device is known.
+
+
+
+
+
+                    for key in test_house_devices_static_info.keys():
+                        # print('key:', key)
+                        if key == wifi_ui_mac_present:
+                            print('device_test_name',test_house_devices_static_info[wifi_ui_mac_present]['device_test_name'])
+                            print('device_test_name',test_house_devices_static_info[wifi_ui_mac_present]['ip'])
+                            test_house_ip = test_house_devices_static_info[wifi_ui_mac_present]['ip']
+                            print('th',test_house_ip)
                     break
                 i = i+1
             print('----------------------------------------')
 
-
+    # '8C:45:00:9F:82:9D': {'device_type': ' Galaxy-S9', 'oper_sys': 'Android 9', 'radio': 'abg', 'band': '5',
+    #                       'state': 'None',
+    #                       'address_type': 'fixed', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': '192.168.1.67',
+    #                       'device_test_name': 'fixed_s9', 'name': 'palmer_Latitude-E5450',
+    #                       'location': 'tbd'},
 
 
     def enable_guest_network_and_set_password_ssid(self):
