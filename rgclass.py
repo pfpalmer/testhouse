@@ -222,18 +222,69 @@ class Nvg599Class(GatewayClass):
         wi_fi_link.click()
         sleep(2)
         self.check_if_dac_required()
+        test_mac = '5c:f8:a1:a6:6b:b2'
+        #allocate_link = self.session.find_element_by_xpath("//tr//td//td[name()='Allocate_7c:64:56:b8:2f:30']/..")
+        #allocate_link = self.session.find_element_by_xpath("//td[text()='Allocate_7c:64:56:b8:2f:30']")
+        #allocate_link = self.session.find_element_by_xpath("//table[@class='grid table100']//tr[contains(td[2],'Allocate_7c:64:56:b8:2f:30')]")
+
+        allocate_link = self.session.find_element_by_xpath("//table[@class='grid table100']//td[2]")
+
+
+
+        #allocate_link.find_element_by_class_name("cssbtn smallbtn").click()
+
+        exit()
+
         soup = BeautifulSoup(self.session.page_source, 'html.parser')
         tables = soup.findChildren('table')
         # five tables on this page
-        table = tables[0]
+        # table = tables[0]
+        table_body_rows = tables[0].tbody.findAll('tr')
+
+        for tr in table_body_rows:
+            # print("table body row is", table_body_rows[0])
+            #print("table body row is", tr)
+            cells = tr.findAll('td')
+            print('cells:',cells)
+            print('cell1:',cells[1].get_text())
+            print('cell2:',cells[2].get_text())
+            print('cell3:',cells[3].get_text())
+            print('cell4:',cells[4].get_text())
+            #print('cell4:',cells[4].find(attrs={type : "submit"}))
+            submit_button = cells[4].find(attrs={type:'submit'})
+            submit_button.click()
+            #print('submit_button',submit_button)
+            exit()
+
+        exit()
         # table = soup.find("table100", {"class": "table100"})
-        # print ("table is",table)
+        print ("table body row is",table_body_rows[0])
+        exit()
+
         #table_rows = table.find_all('tr')
-        table_rows = table.find_all('tr')
+
+
+        # table_rows = table.find_all('tr')
+
+        #
+        # start_row = table.find('tr')
+        # for row in start_row.find_next_sibling('tr'):
+
 
         for tr in table_rows:
             # we are looking at each row
-            cells= tr.find_all('td')
+            print('tr:', tr)
+            cells= tr.find_all("td")
+
+            exit()
+            cells= tr.find_all("td")
+            #print('cells:',cells)
+            #print('cell1:',cells[1].text())
+            #print('cell2:',cells[2].get_text())
+            #print('cell3:',cells[3].get_text())
+            #print('cell4:',cells[4].get_text())
+            #exit()
+
             # print('cells[1]------', cells)
             # I am sure there is a better way to do this
             # we add a number to each row
@@ -246,8 +297,6 @@ class Nvg599Class(GatewayClass):
                 my_row = tr.find("td")
                 print('my_row', my_row)
                 exit()
-
-                pass
 
             for cell in cells:
 
