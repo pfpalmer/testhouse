@@ -518,8 +518,14 @@ def datetimetest():
 
 
 nvg_599_dut = Nvg599Class()
+#update_rg ='/home/palmer/Downloads/nvg599-9.2.2h13d10_1.1.bin'
+#nvg_599_dut.update_rg(update_rg)
+#sleep(200)
+nvg_599_dut.factory_reset_rg()
+#nvg_599_dut.enable_guest_network_and_set_password_ssid()
 
-
+exit()
+########################################################################################################3
 #device_dict = nvg_599_dut.ui_get_device_list()
 #print('device_dict:', device_dict)
 
@@ -530,7 +536,12 @@ nvg_599_dut = Nvg599Class()
 #nvg_599_dut.factory_reset_rg()
 #nvg_599_dut.turn_off_supplicant_cli()
 
+
+
+
 nvg_599_dut.set_fixed_ip_allocation()
+
+
 
 #nvg_599_dut.enable_guest_network_and_set_password_ssid()
 #Nvg599Class().run_speed_test_from_android_termux("192.168.1.70")
@@ -683,7 +694,7 @@ password_too_long_71 = "00000000001111111111222222222233333333334444444444555555
 
 # max chars is 63
 #password_just_right ="000000000011111111112222222222333333333344444444445555555555666"
-update_rg ='/home/palmer/Downloads/nvg599-9.2.2h13d4_1.1.bin'
+update_rg ='/home/palmer/Downloads/nvg599-9.2.2h13d10_1.1.bin'
 nvg_599_dut.update_rg(update_rg)
 exit()
 

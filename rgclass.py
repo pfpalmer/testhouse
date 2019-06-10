@@ -227,9 +227,48 @@ class Nvg599Class(GatewayClass):
         #allocate_link = self.session.find_element_by_xpath("//td[text()='Allocate_7c:64:56:b8:2f:30']")
         #allocate_link = self.session.find_element_by_xpath("//table[@class='grid table100']//tr[contains(td[2],'Allocate_7c:64:56:b8:2f:30')]")
 
-        allocate_link = self.session.find_element_by_xpath("//table[@class='grid table100']//td[2]")
+        #allocate_link = self.session.find_element_by_xpath("//table[@class='grid table100']//td")
+        table_rows = self.session.find_elements_by_xpath("//table[@class='grid table100']/tbody//tr")
+        #table_rows = self.session.find_element_by_xpath("//table//r[@class='a']")
 
+        print('row', table_rows[1].text)
+        for tr in table_rows:
+            # mac = tr.find_elements_by_xpath(".//td[1]/text()")
+            name = tr.find_elements_by_xpath(".//td")[0].text
+            mac = (tr.find_elements_by_xpath(".//td")[1].text).upper()
+            status = tr.find_elements_by_xpath(".//td")[2].text
+            allocation = tr.find_elements_by_xpath(".//td")[3].text
+            action = tr.find_elements_by_xpath(".//td")[4].click()
+            # wi_fi_link.navigate.refresh()
+            alloc = self.session.find_element_by_id("alloc")
+            #for fixed in alloc:
 
+            for option in alloc.find_elements_by_tag_name('option'):
+                print('option',option.text)
+                # if option.text == "192.168.1.68":
+                if "192.168.1.68" in option.text:
+                    print('clicked 192.168.1.68')
+                    option.click()
+                    sleep(5)
+                    submit = self.session.find_element_by_name("Save")
+                    submit.click()
+                    break
+
+            exit()
+            print('name:',name)
+            print('mac:',mac)
+            print('status:',status)
+            print('allocation:',allocation)
+            print('action type:',type(action))
+            sleep(10)
+            exit()
+
+            # cells = tr.findAll('td')
+            # print('cells:', cells)
+            # print('cell1:', cells[1].get_text())
+            # print('cell2:', cells[2].get_text())
+            # print('cell3:', cells[3].get_text())
+            # print('cell4:', cells[4].get_text())
 
         #allocate_link.find_element_by_class_name("cssbtn smallbtn").click()
 
@@ -337,7 +376,7 @@ class Nvg599Class(GatewayClass):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
         home_network_link = self.session.find_element_by_link_text("Home Network")
         home_network_link.click()
-        sleep(2)
+        sleep(10)
         # resets_link = browser.find_element_by_link_text("Resets")
         wi_fi_link = self.session.find_element_by_link_text("Wi-Fi")
         wi_fi_link.click()
