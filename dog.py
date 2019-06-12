@@ -32,8 +32,6 @@ NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
 DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
 ALL_BAND5_CHANNELS = {36, 40, 44, 48,52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144, 149, 153, 157, 161, 165}
 
-
-
 # from rgclass import  NON_DFS_CHANNELS
 # from rgclass import  DFS_CHANNELS
 # Find the current channel used for 5G
@@ -73,7 +71,9 @@ def test_dfs(nvg_599_dut,results_file):
     nvg_599_dut.login_nvg_599_cli()
     nvg_599_dut.telnet_cli_session.sendline()
     nvg_599_dut.telnet_cli_session.expect(">")
-    nvg_599_dut.telnet_cli_session.sendline("telnet 192.168.1.1")
+    # this is the IP used for build prior to corvus3 d13/d11
+    # nvg_599_dut.telnet_cli_session.sendline("telnet 192.168.1.1")
+    nvg_599_dut.telnet_cli_session.sendline("telnet 203.0.113.2")
     nvg_599_dut.telnet_cli_session.expect("#")
     nvg_599_dut.telnet_cli_session.sendline("wl -i eth1 radar 2")
     sleep(10)
@@ -420,17 +420,7 @@ def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_
     show()
     return tablet_download_list, tablet_upload_list, note8_download_list, note8_upload_list
 
-#
-# #
-# def test_tuple():
-#      tuple = 1.2,3.4
-#      return tuple
-# #
-# #
-# a,b = test_tuple()
-# #
-# print('a:',a,' b:',b)
-# exit()
+
 
 # now = datetime.today().isoformat()
 # start_time = datetime.today().strftime("%b-%d-%Y--%H:%M")
@@ -451,7 +441,7 @@ firmware_599_names = [
         '9.2.2h13d5',
         '9.2.2h13d6',
         '9.2.2h13d7',
-        '9.2.2h13d7'
+        '9.2.2h13d8'
         ]
 
 firmware_599_available = ['/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin',
@@ -517,14 +507,20 @@ def datetimetest():
 #exit()
 
 
+#update_rg ='/home/palmer/Downloads/nvg599-9.2.2h13d11_1.1.bin'
 nvg_599_dut = Nvg599Class()
-#update_rg ='/home/palmer/Downloads/nvg599-9.2.2h13d10_1.1.bin'
-#nvg_599_dut.update_rg(update_rg)
-#sleep(200)
-nvg_599_dut.factory_reset_rg()
-#nvg_599_dut.enable_guest_network_and_set_password_ssid()
+
+dfs_file = open('dfs_file.txt','a')
+test_dfs(nvg_599_dut,dfs_file)
 
 exit()
+
+# nvg_599_dut.update_rg(update_rg)
+#sleep(300)
+#nvg_599_dut.factory_reset_rg()
+#exit()
+#nvg_599_dut.enable_guest_network_and_set_password_ssid()
+
 ########################################################################################################3
 #device_dict = nvg_599_dut.ui_get_device_list()
 #print('device_dict:', device_dict)
@@ -536,31 +532,13 @@ exit()
 #nvg_599_dut.factory_reset_rg()
 #nvg_599_dut.turn_off_supplicant_cli()
 
-
-
-
-nvg_599_dut.set_fixed_ip_allocation()
+#nvg_599_dut.set_fixed_ip_allocation()
 
 
 
 #nvg_599_dut.enable_guest_network_and_set_password_ssid()
 #Nvg599Class().run_speed_test_from_android_termux("192.168.1.70")
 #test_rg_upgrade_speedtest(nvg_599_dut,firmware_599_available,firmware_599_names)
-exit()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #import datetime
 #date = datetime.datetime.strptime(date, "%m%d%Y")
@@ -636,12 +614,12 @@ exit()
 #nvg_599_dut.turn_off_supplicant_cli()
 #nvg_599_dut.conf_tr69_eco_url()
 #url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
-nvg_599_dut.factory_reset_rg()
+#nvg_599_dut.factory_reset_rg()
 #nvg_599_dut.enable_parental_control()
 #nvg_599_dut.turn_off_wi_fi_security_protection_cli()
 #dfs_file = open('dfs_file.txt','a')
 #nvg_599_dut.factory_reset_rg()
-exit()
+#exit()
 
 # the default  url is "http://192.168.1.254/cgi-bin/home.ha"
 # nvg_599_dut.factory_reset_rg()

@@ -16,7 +16,7 @@ import pexpect
 import re
 import socket
 import paramiko
-from paramiko_expect import SSHClientInteraction
+# from paramiko_expect import SSHClientInteraction
 
 # import os
 # from selenium.webdriver.common.by import By
@@ -48,7 +48,7 @@ nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53
                                  'ssid': 'ATT4ujR48s'}}
 
 test_house_devices_static_info = {
-    '88:41:FC:86:64:D6': {'device_type': 'airties_4920', 'oper_sys':'tbd', 'radio': 'abg', 'band': '2',
+    '88:41:FC:86:64:D6': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '2',
                           'state': 'Nonne',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'airties_1_2g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
@@ -56,26 +56,26 @@ test_house_devices_static_info = {
                           'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None',  'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'airties_1_5g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
-    '88:41:FC:C3:56:C2': {'device_type': 'airties_4920', 'oper_sys':'tbd', 'radio': 'abg', 'band': '2',
+    '88:41:FC:C3:56:C2': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '2',
                           'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', ' ip': 'None',
                           'device_test_name': 'airties_2_2g', 'name': 'ATT_4920_C356C0', 'location': 'master_bedroom'},
-    '88:41:FC:C3:56:C0': {'device_type': 'airties_4920', 'oper_sys':'tbd',  'radio': 'abg', 'band': '5',
+    '88:41:FC:C3:56:C0': {'device_type': 'airties_4920', 'oper_sys': 'tbd',  'radio': 'abg', 'band': '5',
                           'state': 'None',
                           'address_type': 'None', 'port ': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'airties_2_5g', 'name': 'ATT_4920_C356C0', 'location': 'master_bedroom'},
-    '4C:BB:58:68:BD:F6': {'device_type': 'ubuntu_laptop', 'oper_sys':'tbd', 'radio': 'bg', 'band': '5',
+    '4C:BB:58:68:BD:F6': {'device_type': 'ubuntu_laptop', 'oper_sys': 'tbd', 'radio': 'bg', 'band': '5',
                           'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'ubuntu_1', 'name': 'arris-Latitude-MBR', 'location': 'tbd'},
 
-    'F4:5C:89:9D:F1:4F': {'device_type': 'macbook_pro', 'oper_sys':'tbd', 'radio': 'abg', 'band': '5',
+    'F4:5C:89:9D:F1:4F': {'device_type': 'macbook_pro', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '5',
                           'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'mac_book_1', 'name': 'macbook-mbr', 'location': 'master_bedroom'},
 
-    '34:E6:D7:2B:CD:7C': {'device_type': 'ubuntu_laptop', 'oper_sys':'18.04',  'radio': 'abg', 'band': '5',
-                          'state': 'None', # lsb_release -a to get ubuntu release
+    '34:E6:D7:2B:CD:7C': {'device_type': 'ubuntu_laptop', 'oper_sys': '18.04',  'radio': 'abg', 'band': '5',
+                          'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'mac_book_1', 'name': 'palmer_Latitude-E5450',
                           'location': 'tbd'},
@@ -88,7 +88,7 @@ test_house_devices_static_info = {
     'F8:F1:B6:69:91:A3': {'device_type': 'Moto X', 'oper_sys': 'Android 5.1', 'radio': 'abg', 'band': '5',
                           'state': 'None',
                           'address_type': 'fixed', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': '192.168.1.66',
-                          'device_test_name': 'fixed_motox', 'name': 'palmer_Latitude-E5450','location': 'tbd'},
+                          'device_test_name': 'fixed_motox', 'name': 'palmer_Latitude-E5450', 'location': 'tbd'},
     'B8:D7:AF:AA:27:C3': {'device_type': 'Galaxy-Note8', 'oper_sys': 'Android 9', 'radio': 'abg', 'band': '5',
                           'state': 'None',
                           'address_type': 'fixed', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': '192.168.1.67',
@@ -101,10 +101,13 @@ test_house_devices_static_info = {
                           'location': 'tbd'},
 }
 
+# lsb_release -a to get ubuntu release
+
 NON_DFS_CHANNELS = {36, 40, 44, 48, 149, 153, 157, 161, 165}
 DFS_CHANNELS = {52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144}
 ALL_BAND5_CHANNELS = {36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 132,
                       136, 140, 144, 149, 153, 157, 161, 165}
+
 
 class GatewayClass:
     def __init__(self):
@@ -223,13 +226,14 @@ class Nvg599Class(GatewayClass):
         sleep(2)
         self.check_if_dac_required()
         test_mac = '5c:f8:a1:a6:6b:b2'
-        #allocate_link = self.session.find_element_by_xpath("//tr//td//td[name()='Allocate_7c:64:56:b8:2f:30']/..")
-        #allocate_link = self.session.find_element_by_xpath("//td[text()='Allocate_7c:64:56:b8:2f:30']")
-        #allocate_link = self.session.find_element_by_xpath("//table[@class='grid table100']//tr[contains(td[2],'Allocate_7c:64:56:b8:2f:30')]")
+        # allocate_link = self.session.find_element_by_xpath("//tr//td//td[name()='Allocate_7c:64:56:b8:2f:30']/..")
+        # allocate_link = self.session.find_element_by_xpath("//td[text()='Allocate_7c:64:56:b8:2f:30']")
+        # allocate_link = self.session.find_element_by_xpath("//table[@class='grid table100']//tr[contains(td[2],
+        # 'Allocate_7c:64:56:b8:2f:30')]")
 
-        #allocate_link = self.session.find_element_by_xpath("//table[@class='grid table100']//td")
+        # allocate_link = self.session.find_element_by_xpath("//table[@class='grid table100']//td")
         table_rows = self.session.find_elements_by_xpath("//table[@class='grid table100']/tbody//tr")
-        #table_rows = self.session.find_element_by_xpath("//table//r[@class='a']")
+        # table_rows = self.session.find_element_by_xpath("//table//r[@class='a']")
 
         print('row', table_rows[1].text)
         for tr in table_rows:
@@ -241,10 +245,10 @@ class Nvg599Class(GatewayClass):
             action = tr.find_elements_by_xpath(".//td")[4].click()
             # wi_fi_link.navigate.refresh()
             alloc = self.session.find_element_by_id("alloc")
-            #for fixed in alloc:
+            # for fixed in alloc:
 
             for option in alloc.find_elements_by_tag_name('option'):
-                print('option',option.text)
+                print('option', option.text)
                 # if option.text == "192.168.1.68":
                 if "192.168.1.68" in option.text:
                     print('clicked 192.168.1.68')
@@ -255,11 +259,11 @@ class Nvg599Class(GatewayClass):
                     break
 
             exit()
-            print('name:',name)
-            print('mac:',mac)
-            print('status:',status)
-            print('allocation:',allocation)
-            print('action type:',type(action))
+            print('name:', name)
+            print('mac:', mac)
+            print('status:', status)
+            print('allocation:', allocation)
+            print('action type:', type(action))
             sleep(10)
             exit()
 
@@ -269,9 +273,6 @@ class Nvg599Class(GatewayClass):
             # print('cell2:', cells[2].get_text())
             # print('cell3:', cells[3].get_text())
             # print('cell4:', cells[4].get_text())
-
-        #allocate_link.find_element_by_class_name("cssbtn smallbtn").click()
-
         exit()
 
         soup = BeautifulSoup(self.session.page_source, 'html.parser')
@@ -285,54 +286,43 @@ class Nvg599Class(GatewayClass):
             #print("table body row is", tr)
             cells = tr.findAll('td')
             print('cells:',cells)
-            print('cell1:',cells[1].get_text())
-            print('cell2:',cells[2].get_text())
-            print('cell3:',cells[3].get_text())
-            print('cell4:',cells[4].get_text())
-            #print('cell4:',cells[4].find(attrs={type : "submit"}))
-            submit_button = cells[4].find(attrs={type:'submit'})
+            print('cell1:', cells[1].get_text())
+            print('cell2:', cells[2].get_text())
+            print('cell3:', cells[3].get_text())
+            print('cell4:', cells[4].get_text())
+            # print('cell4:',cells[4].find(attrs={type : "submit"}))
+            submit_button = cells[4].find(attrs={type: 'submit'})
             submit_button.click()
-            #print('submit_button',submit_button)
+            # print('submit_button',submit_button)
             exit()
 
         exit()
         # table = soup.find("table100", {"class": "table100"})
-        print ("table body row is",table_body_rows[0])
+        print("table body row is", table_body_rows[0])
         exit()
-
-        #table_rows = table.find_all('tr')
-
-
-        # table_rows = table.find_all('tr')
-
-        #
-        # start_row = table.find('tr')
-        # for row in start_row.find_next_sibling('tr'):
-
 
         for tr in table_rows:
             # we are looking at each row
             print('tr:', tr)
-            cells= tr.find_all("td")
-
+            cells = tr.find_all("td")
             exit()
+
             cells= tr.find_all("td")
-            #print('cells:',cells)
-            #print('cell1:',cells[1].text())
-            #print('cell2:',cells[2].get_text())
-            #print('cell3:',cells[3].get_text())
-            #print('cell4:',cells[4].get_text())
-            #exit()
+            # print('cells:',cells)
+            # print('cell1:',cells[1].text())
+            # print('cell2:',cells[2].get_text())
+            # print('cell3:',cells[3].get_text())
+            # print('cell4:',cells[4].get_text())
+            # exit()
 
             # print('cells[1]------', cells)
             # I am sure there is a better way to do this
             # we add a number to each row
             # probable a way
             i = 0
-
             mac_present_static_info = test_house_devices_static_info.get(wifi_ui_mac_present)
             if mac_present_static_info:
-                #this is where we want to do everything
+                # this is where we want to do everything
                 my_row = tr.find("td")
                 print('my_row', my_row)
                 exit()
@@ -346,33 +336,26 @@ class Nvg599Class(GatewayClass):
                 if i==1:
                     print('cell mac from ui is:>' + cell.text + '<')
                     wifi_ui_mac_present = (cell.text).upper()
-                    print('wifi_mac_present:',wifi_ui_mac_present)
-
+                    print('wifi_mac_present:', wifi_ui_mac_present)
                     # if the key is present it means that the device is known.
-
-
-
-
-
                     for key in test_house_devices_static_info.keys():
                         # print('key:', key)
                         if key == wifi_ui_mac_present:
-                            print('device_test_name',test_house_devices_static_info[wifi_ui_mac_present]['device_test_name'])
-                            print('device_test_name',test_house_devices_static_info[wifi_ui_mac_present]['ip'])
+                            print('device_test_name', test_house_devices_static_info[wifi_ui_mac_present]['device_test_name'])
+                            print('device_test_name', test_house_devices_static_info[wifi_ui_mac_present]['ip'])
                             test_house_ip = test_house_devices_static_info[wifi_ui_mac_present]['ip']
-                            print('th',test_house_ip)
+                            print('th', test_house_ip)
                     break
                 i = i+1
             print('----------------------------------------')
-
     # '8C:45:00:9F:82:9D': {'device_type': ' Galaxy-S9', 'oper_sys': 'Android 9', 'radio': 'abg', 'band': '5',
     #                       'state': 'None',
     #                       'address_type': 'fixed', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': '192.168.1.67',
     #                       'device_test_name': 'fixed_s9', 'name': 'palmer_Latitude-E5450',
     #                       'location': 'tbd'},
 
-
     def enable_guest_network_and_set_password_ssid(self):
+        print('in enable_guest_network_and_set_password_ssid')
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
         home_network_link = self.session.find_element_by_link_text("Home Network")
         home_network_link.click()
@@ -425,7 +408,7 @@ class Nvg599Class(GatewayClass):
         band2_ssid = band2_ssid_entry.get_attribute('value')
         band2_password_entry = self.session.find_element_by_name("okey1")
         band2_password = band2_password_entry.get_attribute('value')
-        return band2_ssid, guest_ssid, band5_ssid
+        return band2_ssid, guest_ssid, band5_ssid, band2_password
 
     def set_ui_ssid(self, ssid_band5, ssid_guest, ssid_band2):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
@@ -642,7 +625,8 @@ class Nvg599Class(GatewayClass):
             #
             # print('text' + displayed_text)
             # exit()
-            # elem = self.session.find_elements_by_xpath("//*[@id='content-sub']/div[3]/form/table[2]/tbody/tr[5]/th/label/em")
+            # elem = self.session.find_elements_by_xpath("//*[@id='content-sub']
+            # /div[3]/form/table[2]/tbody/tr[5]/th/label/em")
             # print('No password xxxx - Continuing' + str(elem[0]))
             # print('No password too short warning - Continuing' + str(elem[0]))
             # try:
@@ -654,7 +638,8 @@ class Nvg599Class(GatewayClass):
             #     ("//*[@id='content-sub']/div[3]/form/table[2]/tbody/tr[5]/th/label/em")
             #     #wi_fi_warning = self.session.find_element_by_class_name("special bad")
             #
-            #     #elem = self.session.find_element_by_xpath("//*id="content-sub"]/div[3]/form/table[2]/tbody/tr[5]/th/label/em")
+            #     #elem = self.session.find_element_by_xpath("//*id="content-sub"]
+            #     /div[3]/form/table[2]/tbody/tr[5]/th/label/em")
             #
             #     print('elem' + str(elem))
             #     exit()
@@ -1503,7 +1488,6 @@ class Nvg599Class(GatewayClass):
         sleep(10)
         submit.click()
 
-        # self.check_for_wifi_warning()
         self.check_for_wifi_security_and_regular_warning()
         self.session.implicitly_wait(5)
         wi_fi_2_4 = self.session.find_element_by_name("owl80211on")
@@ -1751,7 +1735,7 @@ class Nvg599Class(GatewayClass):
                 print('SSH transport is available!')
                 break
             except paramiko.ssh_exception.NoValidConnectionsError as e:
-                print('SSH transport not ready...')
+                print('SSH transport not ready...', e)
                 sleep(5)
                 continue
 
@@ -1805,15 +1789,11 @@ class Nvg599Class(GatewayClass):
     @staticmethod
     def get_wifi_info_from_android_termux(wifi_info_ip):
         print('in get_wifi_connection_info_from_android_termux')
-        #ssh_client = pxssh.pxssh(timeout=100, encoding='utf-8', maxread=5000, options={"StrictHostKeyChecking": "no"})
         ssh_client = pxssh.pxssh(timeout=100, encoding='ascii', maxread=5000, options={"StrictHostKeyChecking": "no"})
-
         ssh_client.PROMPT='r[#$]'
-        #ssh_client.login(wifi_info_ip, username='None', port=8022, auto_prompt_reset='False', sync_multiplier=5)
+        # ssh_client.login(wifi_info_ip, username='None', port=8022, auto_prompt_reset='False', sync_multiplier=5)
         ssh_client.login(wifi_info_ip, username='None', port=8022, original_prompt=r'[#$]', auto_prompt_reset=False, sync_multiplier=5, quiet=False,login_timeout=10)
-        #ssh_client.PROMPT='\$
-        #
-        #
+        # ssh_client.PROMPT='\$
         ssh_client.prompt()
         # ssh_client.expect(".*x11-repo")
         ssh_client.expect_exact("issues")
@@ -1834,45 +1814,46 @@ class Nvg599Class(GatewayClass):
         # ssh_client.prompt()
         #  speed_test_output_b = ssh_client.before
         # wifi_info_output = ssh_client.before
-        print('wifi op---------------',ssh_client.before)
+        print('wifi op---------------', ssh_client.before)
         ssh_client.logout()
-       #
-       #  exit()
-       #  # wifi_info_regex = re.compile(r'bssid":\s+(\w+\.\d+)\s+\w+.*Upload:\s+(\d+\.\d+)\s+\w+', re.DOTALL)
-       #
-       #  print('after', wifi_info_output)
-       #
-       #  #speed_test_regex = re.compile(r'Download:\s+(\d+\.\d+)\s+\w+.*Upload:\s+(\d+\.\d+)\s+\w+', re.DOTALL)
-       #  # wifi_info_regex = re.compile(r'\s*bssid\":\s+\"(\w+:\w+:\w+:\w+:\w+:\w+)\"\s+\"frequency_mhz\":\s+(\w+)\"ip\":\s+(\d+:\d+:\d+:\d+)\"',re.DOTALL)
-       #  wifi_info_regex = re.compile(r'\s*\"(bssid)\"',re.DOTALL)
-       #
-       #  exit()
-       #  wifi_info_groups = wifi_info_regex.search(wifi_info_output)
-       #  print('bssid:', wifi_info_groups.group(1))
-       # # print('frequency:', wifi_info_groups.group(2))
-       # # print('ip:', wifi_info_groups.group(3))
-       #
-       #  #down_load_speed = wifi_info_groups.group(1)
-       #  #up_load_speed = wifi_info_groups.group(2)
+        #
+        #  exit()
+        #  # wifi_info_regex = re.compile(r'bssid":\s+(\w+\.\d+)\s+\w+.*Upload:\s+(\d+\.\d+)\s+\w+', re.DOTALL)
+        #
+        #  print('after', wifi_info_output)
+        #
+        #  #speed_test_regex = re.compile(r'Download:\s+(\d+\.\d+)\s+\w+.*Upload:\s+(\d+\.\d+)\s+\w+', re.DOTALL)
+        #  # wifi_info_regex = re.compile(r'\s*bssid\":\s+\"(\w+:\w+:\w+:\w+:\w+:\w+)\"\s+\"frequency_mhz\":
+        #  \s+(\w+)\"ip\":\s+(\d+:\d+:\d+:\d+)\"',re.DOTALL)
+        #  wifi_info_regex = re.compile(r'\s*\"(bssid)\"',re.DOTALL)
+        #
+        #  exit()
+        #  wifi_info_groups = wifi_info_regex.search(wifi_info_output)
+        #  print('bssid:', wifi_info_groups.group(1))
+        # # print('frequency:', wifi_info_groups.group(2))
+        # # print('ip:', wifi_info_groups.group(3))
+        #
+        #  #down_load_speed = wifi_info_groups.group(1)
+        #  #up_load_speed = wifi_info_groups.group(2)
 
     @staticmethod
     def run_speed_test_from_android_termux(speed_test_ip):
         print('in run_speed_test_from_android_termux')
-        #prompt = '\$\s+'
+        # prompt = '\$\s+'
         # prompt = '\$'
         # sort of works-----------
         # ssh_client = paramiko.SSHClient()
         # ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         # sleep(10)
-        #-------------------------------------
-        #ssh_client= pxssh.pxssh()
-        #ssh_client = pxssh.pxssh(options={"StrictHostKeyChecking": "no","AutoPromptReset": "True"})
+        # -------------------------------------
+        # ssh_client= pxssh.pxssh()
+        # ssh_client = pxssh.pxssh(options={"StrictHostKeyChecking": "no","AutoPromptReset": "True"})
         # not sure if this is defined like this
-        #ssh_client = pxssh.pxssh(timeout=200, encoding='utf-8',options={"StrictHostKeyChecking": "no","AutoPromptReset": "True"})
-        #ssh_client = pxssh.pxssh(timeout=200, encoding='utf-8')
+        # ssh_client = pxssh.pxssh(timeout=200, encoding='utf-8',options={"StrictHostKeyChecking": "no","AutoPromptReset": "True"})
+        # ssh_client = pxssh.pxssh(timeout=200, encoding='utf-8')
 
         ssh_client = pxssh.pxssh(timeout=300, encoding='utf-8', options={"StrictHostKeyChecking": "no"})
-        hostname = (speed_test_ip)
+        hostname = speed_test_ip
         ssh_client.login(hostname, username=None, port=8022)
         ssh_client.prompt()
         ssh_client.sendline('speedtest  --server 5024')
@@ -1880,19 +1861,15 @@ class Nvg599Class(GatewayClass):
         # speed_test_output_b = ssh_client.before
         speed_test_output = ssh_client.before
         # print(ssh_client.before)
-        print('after conversion ti string',speed_test_output)
+        print('after conversion ti string', speed_test_output)
         # exit()
         # ssh.connect(hostname=speed_test_ip, username=UN, password=PW)
-
-
-        #ssh_client.connect(hostname=speed_test_ip, port = 8022,  timeout=30)
-        #ssh_client.connect(hostname=speed_test_ip, port = 8022,  timeout=30)
-
-
+        # ssh_client.connect(hostname=speed_test_ip, port = 8022,  timeout=30)
+        # ssh_client.connect(hostname=speed_test_ip, port = 8022,  timeout=30)
 # sort of works-----------
 #         Nvg599Class.wait_for_ssh_to_be_ready(speed_test_ip, '8022', '220', '10')
 #         ssh_client.connect(hostname=speed_test_ip, port=8022, timeout=120)
-        #-------------------------------------
+        #  -------------------------------------
         # loop = 1
         # while loop == 1:
         #     try:
@@ -1900,27 +1877,21 @@ class Nvg599Class(GatewayClass):
         #     except socket.timeout as error:
         #         print('socket timeout..',error)
         #         continue
-
-#---------sort of works
+        # ---------sort of works
         # ssh_session = SSHClientInteraction(ssh_client, timeout=200, display=True)
         # ssh_session.expect(prompt, timeout=200)
         # Austin speedtest server is 5024, check speedtest --list for a complete listing
-
-
         #
         # ssh_session.send('speedtest  --server 5024')
         # sleep(2)
         # ssh_session.expect(prompt, timeout=200)
         # speed_test_output = ssh_session.current_output_clean
 # sort of works
-
         # ssh_client.sendline('speedtest  --server 5024')
-
         # print('speedtest_output:   ',speed_test_output )
         # speed_test_regex = re.compile(r'.*Download:\s+(\w+)\s+.*Upload:\s+(\w+)',re.DOTALL)
         # speed_test_regex = re.compile(r'(Download:\s+\w+\.\w+\s+\w+).*(Upload:\s+\w+\.\w+\s+\w+)', re.DOTALL)
         speed_test_regex = re.compile(r'Download:\s+(\d+\.\d+)\s+\w+.*Upload:\s+(\d+\.\d+)\s+\w+', re.DOTALL)
-
         speed_test_groups = speed_test_regex.search(speed_test_output)
         print('download:', speed_test_groups.group(1))
         print('upload:', speed_test_groups.group(2))
@@ -2009,7 +1980,7 @@ class Nvg599Class(GatewayClass):
                              '  max_ping:' + max_ping + '  max dev:' + mdev_ping)
         ping_file.writelines('\n')
         ping_file.close()
-        return (min_ping, avg_ping, max_ping, mdev_ping)
+        return min_ping, avg_ping, max_ping, mdev_ping
 
     def ping_check(self, remote_ip):
         print('In ping_check')
@@ -2018,7 +1989,7 @@ class Nvg599Class(GatewayClass):
             out = subprocess.check_output("ping -c10 " + remote_ip, shell=True).decode("utf-8")
             ping_info_reg_ex = re.compile(r'(\d+.*loss)')
             ping_status = ping_info_reg_ex.search(out)
-            print('ping result:', ping_status.group(1) )
+            print('ping result:', ping_status.group(1))
 
             return ping_status.group(1)
         except subprocess.CalledProcessError as e:
@@ -2026,7 +1997,7 @@ class Nvg599Class(GatewayClass):
             e.returncode = 0
             ping_fail_str = str(e.output)
             ping_fail_return = "Ping_failed:" + ping_fail_str
-            print('ping failed:', ping_status.group(1))
+            print('ping failed:')
 
             return ping_fail_return
 
@@ -2180,7 +2151,7 @@ class Nvg599Class(GatewayClass):
 
 # incomplete there are profiles to add
     def enable_parental_control(self):
-        print("In enable_parental_contol")
+        print("Enabled_parental_contol")
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.Enable=1")
