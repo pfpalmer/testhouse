@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 
 # import itertools
 import pprint
+from datetime import datetime
+
 import pickle
 # import global.py
 # import time
@@ -266,14 +268,6 @@ def test_rg_upgrade(nvg_599_dut, firmware_599_available):
 # print('x_round:',x_round)
 # exit()
 
-#
-#
-# nvg_599_dut = Nvg599Class()
-# #
-# test_rg_upgrade(nvg_599_dut, firmware_599_available[1])
-# exit(
-
-#-------------------------------------------
 
 import matplotlib.pyplot as plt
 import matplotlib.image as img
@@ -491,12 +485,11 @@ firmware_599_available = ['/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin',
 # print('done')
 # exit()
 
-from datetime import datetime
 
 #date = datetime.datetime.strptime(date,"%m%d%Y")
 
-def datetimetest():
-    now = datetime.today().isoformat()
+# def datetimetest():
+#     now = datetime.today().isoformat()
 
 
 # datetimetest()
@@ -507,13 +500,126 @@ def datetimetest():
 #exit()
 
 
-#update_rg ='/home/palmer/Downloads/nvg599-9.2.2h13d11_1.1.bin'
+#now = datetime.today().isofor.strftime('%Y-%m-%d')mat()
+#now = datetime.today().strftime("%I:%M%p on %B %d, %Y")
+#now = datetime.today().strftime("%B %d, %Y,%I:%Mp")
+
+
+
+#################  This is the one I want
+#now = datetime.today().strftime("%B %d, %Y,%H:%M")
+#########################################
+#now.strftime('%m-%d-%y %H:%M:')
+
+def tst_ping_rg_power_level(nvg_599_dut, band, percentage, remote_ip, number_of_pings):
+    print('testing ping after power level changes')
+    #band = 'band2'
+    #percentage = 100
+    #nvg_599_dut.set_wifi_power_level(band, percentage)
+    #band = 'band5'
+    #percentage = 100
+    #nvg_599_dut.set_wifi_power_level(band, percentage)
+    #remote_ip = "192.168.1.94"
+    #number_of_pings = 20
+    min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss = nvg_599_dut.ping_from_local_host(remote_ip,
+                                                                                                     number_of_pings)
+    print('min:' + min_ping + ' max:' + max_ping)
+
+    ping_file = open('ping_file_with_power_change_test.txt', 'a')
+
+    # now = datetime.today().isoformat()
+    now = datetime.today().strftime("%B %d, %Y,%H:%M")
+    # ping_file.writelines('Ping ' + remote_ip + ' RG Pwr %:' + str(percentage) +  ' Sent:' + sent + ' Received:' + received + ' Percent loss:' + loss + '%' + ' Date:' + now + '\n')
+    ping_file.writelines('Date:' + now + '599 FW Ver:' + nvg_599_dut.software_version + ' Ser. No:' + nvg_599_dut.serial_number + '\n')
+    ping_file.writelines('Ping ' + remote_ip + ' RG Pwr:' + str(percentage) + '%' +
+                         ' Sent:' + sent + ' Received:' + received + ' Percent loss:' + loss + '%\n')
+    # ping_file.writelines('Date:' + now + ' Ping ' + remote_ip + ' RG Pwr %:' + str(percentage) +  ' Sent:' + sent + ' Received:' + received + ' Percent loss:' + loss + '%\n')
+
+    # ping_file.writelines("599 FW Ver:" + nvg_599_dut.software_version + " Ser. No:" +
+    #                      nvg_599_dut.serial_number + '  min_ping:' + min_ping + '  avg_ping:' + avg_ping +
+    #                      '  max_ping:' + max_ping + '  max dev:' + mdev_ping +'\n')
+
+    ping_file.writelines(
+        'Minimum:' + min_ping + ' Average::' + avg_ping + ' Maximum:' + max_ping + ' max dev:' + mdev_ping + '\n')
+
+    # ping_file.writelines('Date:' + now + " 599 FW Ver:" + nvg_599_dut.software_version + " Ser. No:" +
+    #                      nvg_599_dut.serial_number + '  min_ping:' + min_ping + '  avg_ping:' + avg_ping +
+    #                      '  max_ping:' + max_ping + '  max dev:' + mdev_ping)
+    ping_file.writelines('\n')
+    ping_file.close()
+
+
+
+
+#paul
+from datetime import datetime
+
+#now = datetime.today().strftime("%B %d, %Y,%H:%M")
+#print(now)
+#exit()
+update_rg ='/home/palmer/Downloads/nvg599-9.2.2h13d13_1.1.bin'
 nvg_599_dut = Nvg599Class()
+#nvg_599_dut.enable_guest_network_and_set_password_ssid()
+#exit()
 
-dfs_file = open('dfs_file.txt','a')
-test_dfs(nvg_599_dut,dfs_file)
-
+#def tst_ping_rg_power_level(nvg_599_dut, band, powerlevel, remote_ip, number_of_pings):
+tst_ping_rg_power_level(nvg_599_dut, 'band2', 100 , '192.168.1.94', 20)
+#tst_ping_rg_power_level(nvg_599_dut, 'band5', 100 , '192.168.1.94', 20)
 exit()
+nvg_599_dut.update_rg(update_rg)
+sleep(300)
+nvg_599_dut.factory_reset_rg()
+sleep(120)
+
+
+
+
+
+#dfs_file = open('dfs_file.txt','a')
+#test_dfs(nvg_599_dut,dfs_file)
+#wifi_password_script = "1111111111"
+#custom_security = "Custom Password"
+#set_wifi_return_code = nvg_599_dut.ui_set_wifi_password(custom_security, wifi_password_script)
+#print('******** set_wifi_return_code: ' + set_wifi_return_code)
+
+
+# band2  idicating that the band2 radio  power is being changed (else band5) and a number 1-100
+band = 'band2'
+percentage = 100
+#nvg_599_dut.set_wifi_power_level(band, percentage)
+#band = 'band5'
+#percentage = 100
+#nvg_599_dut.set_wifi_power_level(band, percentage)
+remote_ip = "192.168.1.94"
+number_of_pings = 20
+# return min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss
+
+min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss  = nvg_599_dut.ping_from_local_host(remote_ip, number_of_pings)
+print('min:'+ min_ping + ' max:' + max_ping)
+
+ping_file = open('ping_file_with_power_change_test.txt', 'a')
+
+#now = datetime.today().isoformat()
+now = datetime.today().strftime("%B %d, %Y,%H:%M")
+#ping_file.writelines('Ping ' + remote_ip + ' RG Pwr %:' + str(percentage) +  ' Sent:' + sent + ' Received:' + received + ' Percent loss:' + loss + '%' + ' Date:' + now + '\n')
+ping_file.writelines('Date:' + now + '599 FW Ver:' + nvg_599_dut.software_version + ' Ser. No:' + nvg_599_dut.serial_number + '\n')
+ping_file.writelines('Ping ' + remote_ip + ' RG Pwr %:' + str(percentage) +  ' Sent:' + sent + ' Received:' + received + ' Percent loss:' + loss + '%\n')
+#ping_file.writelines('Date:' + now + ' Ping ' + remote_ip + ' RG Pwr %:' + str(percentage) +  ' Sent:' + sent + ' Received:' + received + ' Percent loss:' + loss + '%\n')
+
+# ping_file.writelines("599 FW Ver:" + nvg_599_dut.software_version + " Ser. No:" +
+#                      nvg_599_dut.serial_number + '  min_ping:' + min_ping + '  avg_ping:' + avg_ping +
+#                      '  max_ping:' + max_ping + '  max dev:' + mdev_ping +'\n')
+
+ping_file.writelines('Minimum:' + min_ping + ' Average::' + avg_ping + ' Maximum:' + max_ping + ' max dev:' + mdev_ping +'\n')
+
+# ping_file.writelines('Date:' + now + " 599 FW Ver:" + nvg_599_dut.software_version + " Ser. No:" +
+#                      nvg_599_dut.serial_number + '  min_ping:' + min_ping + '  avg_ping:' + avg_ping +
+#                      '  max_ping:' + max_ping + '  max dev:' + mdev_ping)
+ping_file.writelines('\n')
+ping_file.close()
+#Nvg599Class.nmcli_test()
+exit()
+########################################################################################################3
 
 # nvg_599_dut.update_rg(update_rg)
 #sleep(300)
@@ -521,7 +627,6 @@ exit()
 #exit()
 #nvg_599_dut.enable_guest_network_and_set_password_ssid()
 
-########################################################################################################3
 #device_dict = nvg_599_dut.ui_get_device_list()
 #print('device_dict:', device_dict)
 
@@ -631,6 +736,10 @@ default_security = "Default Password"
 custom_security = "Custom Password"
 
 # too long >  63
+wifi_password_script = "1111111111"
+set_wifi_return_code = nvg_599_dut.ui_set_wifi_password(custom_security, wifi_password_script)
+print('******** set_wifi_return_code: ' + set_wifi_return_code)
+
 password_too_short_7 = "1234567"
 password_max_63 = "000000000011111111112222222222333333333344444444445555555555666"
 password_too_long_64 = "0000000000111111111122222222223333333333444444444455555555556666"

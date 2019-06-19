@@ -47,9 +47,29 @@ nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53
                                  'mac2g': '20:3d:66:49:85:61', 'mac5g': '11:22:33:44:55:66', 'wifi': 'eeh4jxmh7q26',
                                  'ssid': 'ATT4ujR48s'}}
 
+
+airties_4920_defaults = {
+    '88:41:FC:86:64:D6': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '2',
+                          'state': 'None', ' default_ssid':'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
+                          'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
+                          'device_test_name': 'airties_1_2g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
+    '88:41:FC:86:64:D4': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '5',
+                          'state': 'None',  ' default_ssid':'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
+                          'address_type': 'None', 'port': 'None', 'ssid': 'None',  'rssi': 'None', 'ip': 'None',
+                          'device_test_name': 'airties_1_5g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
+    '88:41:FC:C3:56:C2': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '2',
+                          'state': 'None', ' default_ssid':'AirTies_Air4920_33N3', 'default_pw': 'wthchc7344',
+                          'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', ' ip': 'None',
+                          'device_test_name': 'airties_2_2g', 'name': 'ATT_4920_C356C0', 'location': 'master_bedroom'},
+    '88:41:FC:C3:56:C0': {'device_type': 'airties_4920', 'oper_sys': 'tbd',  'radio': 'abg', 'band': '5',
+                          'state': 'None',  ' default_ssid':'AirTies_Air4920_33N3', 'default_pw': 'wthchc7344',
+                          'address_type': 'None', 'port ': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
+                          'device_test_name': 'airties_2_5g', 'name': 'tbd', 'location': 'master_bedroom'},}
+
+
 test_house_devices_static_info = {
     '88:41:FC:86:64:D6': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '2',
-                          'state': 'Nonne',
+                          'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'airties_1_2g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
     '88:41:FC:86:64:D4': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '5',
@@ -729,7 +749,7 @@ class Nvg599Class(GatewayClass):
         try:
             # dac_access_challenge = self.session.find_element_by_link_text("Forgot your Access Code?")
             self.session.find_element_by_link_text("Forgot your Access Code?")
-            print('we found the request for DAC')
+            print('DAC requested.. sending DAC')
             print('sending DAC', self.device_access_code)
             dac_entry = self.session.find_element_by_id("password")
             dac_entry.send_keys(self.device_access_code)
@@ -1273,7 +1293,10 @@ class Nvg599Class(GatewayClass):
         self.enable_sshd_ssh_cli()
         self.conf_tr69_eco_url()
         self.turn_off_wi_fi_security_protection_cli()
+        # not sure why this failed
         self.enable_parental_control()
+        # not sure why this failed
+        sleep(60)
         self.enable_guest_network_and_set_password_ssid()
 
     def get_ui_home_network_status_value(self, value_requested):
@@ -1444,15 +1467,55 @@ class Nvg599Class(GatewayClass):
                     pass
                     # print('did not find channel')
             sleep(2)
-
             submit = self.session.find_element_by_name("Save")
             submit.click()
-
             self.check_if_wifi_warning_displayed()
-
             return self.session
 
-# pfp
+
+#
+
+
+    def set_wifi_power_level(self, band, percentage):
+        print('Adjusting ' + band + ' wifi power level to ' + str(percentage) + '%')
+        rg_url = 'http://192.168.1.254/'
+        # session = webdriver.Chrome()
+        self.session.get(rg_url)
+        status_link = self.session.find_element_by_link_text("Home Network")
+        status_link.click()
+        sleep(2)
+        home_network_link = self.session.find_element_by_link_text("Wi-Fi")
+        home_network_link.click()
+        sleep(2)
+        self.check_if_dac_required()
+        advanced_options_link = self.session.find_element_by_link_text("Advanced Options")
+        advanced_options_link.click()
+        sleep(2)
+
+        if band == "band2":
+            band2_power = self.session.find_element_by_id("opower")
+            band2_power.clear()
+            band2_power.send_keys(percentage)
+            submit = self.session.find_element_by_name("Save")
+            sleep(10)
+            submit.click()
+        else:
+            # this is band5
+            band2_power = self.session.find_element_by_id("tpower")
+            band2_power.clear()
+            band2_power.send_keys(percentage)
+            submit = self.session.find_element_by_name("Save")
+            sleep(10)
+            submit.click()
+
+        #submit = self.session.find_element_by_name("Save")
+        #sleep(2)
+        #submit.click()
+        self.check_for_wifi_security_and_regular_warning()
+            # self.check_for_wifi_warning()
+
+    # This needs an enable disable ar
+
     def disable_enable_wifi_2_4_and_5g_wifi(self):
         print('in disable_enable_wifi_2_4_and_5g_wifi')
         rg_url = 'http://192.168.1.254/'
@@ -1510,6 +1573,12 @@ class Nvg599Class(GatewayClass):
         submit.click()
         self.check_for_wifi_security_and_regular_warning()
         # self.check_for_wifi_warning()
+
+
+
+
+
+
 
     def ui_get_wifi_password(self):
         print('in ui_get_wifi_password')
@@ -1657,7 +1726,6 @@ class Nvg599Class(GatewayClass):
             print("handle", handles[x])
 
         self.check_if_dac_required()
-        print('tada2)')
 
     def get_ui_system_information(self):
         print('in get_ui_system_information)')
@@ -1745,20 +1813,16 @@ class Nvg599Class(GatewayClass):
         # ddd = f"{speed_test_ip} is a test"
         # ssh_session = pexpect.spawn("ssh arris@192.168.1.239", encoding='utf-8',timeout=120)
         ssh_session = pexpect.spawn("ssh arris@" + speed_test_ip, encoding='utf-8', timeout=120)
-
         ssh_session.expect("ord:")
         ssh_session.sendline('arris123')
         print('after sendline\n')
         ssh_session.expect("$")
         print('1', ssh_session.before)
         sleep(2)
-
         ssh_session.sendline('date')
         self.device_access_code = None
-
         ssh_session.expect("$")
         print('2', ssh_session.before)
-
         ssh_session.sendline('speedtest-cli')
         sleep(10)
         # ssh_session.expect(".*Mbits.*Mbits\/s")
@@ -1774,18 +1838,7 @@ class Nvg599Class(GatewayClass):
         down_load_speed = speed_test_groups.group(1)
         up_load_speed = speed_test_groups.group(2)
         return down_load_speed, up_load_speed
-        # exit()
-        # statusInfoRegEx = re.compile(r'Model\s(\w+)')
-        # mo1 = statusInfoRegEx.search(statusOutput)
-        # print('in_speedtest_cli')
-        # cmd='ping -c1 192.168.1.254'
-        # result = os.system(cmd)
-        # print ('result:',result)
-        # start = time.time()
-        # print("hello")
-        # end = time.time()
-        # print(end - start)
-# possible check out netmiko
+
     @staticmethod
     def get_wifi_info_from_android_termux(wifi_info_ip):
         print('in get_wifi_connection_info_from_android_termux')
@@ -1947,21 +2000,35 @@ class Nvg599Class(GatewayClass):
         # print(end - start)
 
     # @staticmethod
+
+    @staticmethod
+    def nmcli_test():
+        command = 'nmcli c'
+        output = subprocess.check_output(['nmcli', 'c'])
+        #output = subprocess.check_output(['ls', '-l'])
+
+        #process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+        #output, error = process.communicate()
+        # result = os.system(cmd)
+        for line in output.splitlines():
+            print('out===========\n', line)
+        #print('endout1===========\n', error)
+
     def ping_from_local_host(self, remote_ip, number_of_pings=20):
-        # def ping_from_local_host(remote_ip):
-        min_ping, avg_ping, max_ping, mdev_ping = 0
-        print('In ping_from_local_host')
-        ping_file = open('ping_file.txt', 'a')
+
+        print('ping ' + remote_ip + ' from_local_host')
+        #ping_file = open('ping_file.txt', 'a')
         # out = subprocess.Popen("ping  -c3 localhost",stdout=subprocess.PIPE,stderr=subprocess.STDOUT, shell=True)
         # out = subprocess.Popen(["ping ", "-c3"," localhost"], stdout=subprocess.PIPE)
         # out, err = out.communicate()
         # out = check_output(["ping ", "-c3 ", "localhost"]).decode("utf-8")
         # out = check_output(["ls -la"].decode("utf-8").shell=True)
-        out = subprocess.check_output("ping -c20 " + remote_ip, shell=True).decode("utf-8")
+        out = subprocess.check_output("ping -c"+ str(number_of_pings) + " " + remote_ip, shell=True).decode("utf-8")
         # result = os.system(cmd)
         print('out===========\n', out)
         print('endout1===========\n')
         # pingInfoRegEx = re.compile(r'.*=\s(\w+)/(\w+)/(\w+)/(\w+)',re.DOTALL)
+        #ping_statistics = re.compile(r'statistics ---.*(\d+)\spackets\.*(\d+)\sreceived',re.DOTALL)
         ping_info_reg_ex = re.compile(r'rtt.*?=\s(\d+\.\d+)/(\d+\.\d+)/(\d+\.\d+)/(\d+\.\d+)')
         # pingInfoRegEx = re.compile(r'.*?rtt/s+=/s+(/d+/./d+)',re.DOTALL)
         mo1 = ping_info_reg_ex.search(out)
@@ -1972,15 +2039,17 @@ class Nvg599Class(GatewayClass):
         avg_ping = mo1.group(2)
         max_ping = mo1.group(3)
         mdev_ping = mo1.group(4)
-        # ping_file.write('test' )
-        # self.software_version
-        now = datetime.today().isoformat()
-        ping_file.writelines('Date:' + now + " 599 Software Vers:" + self.software_version + " Serial No:" +
-                             self.serial_number + '  min_ping:' + min_ping + '  avg_ping:' +
-                             '  max_ping:' + max_ping + '  max dev:' + mdev_ping)
-        ping_file.writelines('\n')
-        ping_file.close()
-        return min_ping, avg_ping, max_ping, mdev_ping
+
+
+        ping_statistics = re.compile(r'statistics ---\s(\d+)\spackets.*\s(\d+)\sreceived,\s(\d+)%')
+        stats = ping_statistics.search(out)
+        #print('sent:>' + stats.group(1))
+        print('sent:>' + stats.group(1) + ' received:' + stats.group(2) + 'loss:' + stats.group(3))
+        sent = stats.group(1)
+        received = stats.group(2)
+        loss = stats.group(3)
+
+        return min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss
 
     def ping_check(self, remote_ip):
         print('In ping_check')
@@ -2151,9 +2220,9 @@ class Nvg599Class(GatewayClass):
 
 # incomplete there are profiles to add
     def enable_parental_control(self):
-        print("Enabled_parental_contol")
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
+        self.telnet_cli_session.expect("UNLOCKED>")
         self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.Enable=1")
         self.telnet_cli_session.expect("successful.*UNLOCKED>")
         self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD.TODEnable=1")
@@ -2237,6 +2306,8 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
                                          "Profile.9.Scheduler.7.UsageDuration=86400")
         self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        print("Enabled_parental_contol")
+
 
     def conf_tr69_eco_url(self):
         self.telnet_cli_session = self.login_nvg_599_cli()
@@ -2279,7 +2350,7 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.expect(">>")
         self.telnet_cli_session.sendline('save')
         self.telnet_cli_session.expect(">>")
-        print('Configured TR068 ECO url')
+        print('Configured TR069 ECO url')
         self.telnet_cli_session.close()
 
     def turn_off_supplicant_cli(self):
