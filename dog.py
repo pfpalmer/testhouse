@@ -511,7 +511,91 @@ firmware_599_available = ['/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin',
 #########################################
 #now.strftime('%m-%d-%y %H:%M:')
 
-def tst_ping_rg_power_level(nvg_599_dut, band, percentage, remote_ip, number_of_pings):
+#-pfp-
+def tst_ping_rg_power_level(nvg_599_dut, remote_ip, number_of_pings):
+# def tst_ping_rg_power_level(nvg_599_dut, remote_ip, number_of_pings):
+
+    ping_file = open('ping_file_with_power_change_test.txt', 'a')
+    ping_file.writelines('tst_ping_rg_power_level' + '\n')
+    now = datetime.today().strftime("%B %d, %Y,%H:%M")
+    ping_file.writelines('Date:' + now + '  599 FW Ver:' + nvg_599_dut.software_version + '  Ser. No:' + nvg_599_dut.serial_number + '\n\n')
+
+    nvg_599_dut.disable_enable_wifi_2_4g('On')
+    nvg_599_dut.disable_enable_wifi_5g('Off')
+    nvg_599_dut.set_wifi_power_level('band2', '100')
+    sleep(90)
+    #nvg_599_dut.ping_from_local_host(remote_ip, number_of_pings=20)
+    min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss = nvg_599_dut.ping_from_local_host(remote_ip,number_of_pings)
+    print('min:' + min_ping + ' max:' + max_ping)
+
+    ping_file.writelines('Band:' + 'band2' + '  Ping: ' + remote_ip + '  RG Pwr: 100%' +
+                     '  Sent:' + sent + '  Received:' + received + '  Percent loss:' + loss + '%\n')
+
+
+    ping_file.writelines('Minimum:' + min_ping + '  Average::' + avg_ping + '  Maximum:' + max_ping + ' Max dev:' + mdev_ping + '\n')
+    ping_file.writelines('\n')
+
+    nvg_599_dut.set_wifi_power_level('band2', '50')
+    sleep(90)
+
+    min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss = nvg_599_dut.ping_from_local_host(remote_ip,number_of_pings)
+
+    ping_file.writelines('Band:' + 'band2' + '  Ping: ' + remote_ip + '  RG Pwr: 50%' +
+                     '  Sent:' + sent + '  Received:' + received + '  Percent loss:' + loss + '%\n')
+    ping_file.writelines('Minimum:' + min_ping + '  Average::' + avg_ping + '  Maximum:' + max_ping + ' Max dev:' + mdev_ping + '\n')
+
+
+    # restore  band2
+    ping_file.writelines('\n')
+    # nvg_599_dut.disable_enable_wifi_2_4g('On')
+    nvg_599_dut.set_wifi_power_level('band2', '100')
+    sleep(90)
+
+
+    # nvg_599_dut.disable_enable_wifi_5g('On')
+    ## band 5
+    nvg_599_dut.disable_enable_wifi_2_4g('Off')
+    nvg_599_dut.set_wifi_power_level('band5', '100')
+    sleep(90)
+
+    min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss = nvg_599_dut.ping_from_local_host(remote_ip,number_of_pings)
+    print('min:' + min_ping + ' max:' + max_ping)
+
+    ping_file.writelines('Band:' + 'band5' + '  Ping: ' + remote_ip + '  RG Pwr: 100%' +
+                     '  Sent:' + sent + '  Received:' + received + '  Percent loss:' + loss + '%\n')
+    ping_file.writelines(
+        'Minimum:' + min_ping + '  Average::' + avg_ping + '  Maximum:' + max_ping + ' Max dev:' + mdev_ping + '\n')
+    ping_file.writelines('\n')
+
+    nvg_599_dut.set_wifi_power_level('band5', '50')
+    sleep(90)
+    min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss = nvg_599_dut.ping_from_local_host(remote_ip,number_of_pings)
+
+    ping_file.writelines('Band:' + 'band5' + '  Ping: ' + remote_ip + '  RG Pwr: 50%' +
+                     '  Sent:' + sent + '  Received:' + received + '  Percent loss:' + loss + '%\n')
+    ping_file.writelines('Minimum:' + min_ping + '  Average::' + avg_ping + '  Maximum:' + max_ping + ' Max dev:' + mdev_ping + '\n')
+    ping_file.writelines('\n')
+
+    nvg_599_dut.set_wifi_power_level('band5', '100')
+    # sleep(90)
+
+    ping_file.writelines('-------------------------------------------------------------------------------------' + '\n')
+    ping_file.writelines('-------------------------------------------------------------------------------------' + '\n')
+
+    ping_file.writelines('\n')
+    ping_file.close()
+
+    nvg_599_dut.disable_enable_wifi_5g('On')
+    nvg_599_dut.disable_enable_wifi_2_4g('On')
+    #band = 'band5'
+    #percentage = 100
+    nvg_599_dut.set_wifi_power_level('band2', '100')
+    #band = 'band2'
+    nvg_599_dut.set_wifi_power_level('band5', '100')
+
+# -pfp-
+# deprecated
+def tst_ping_rg_power_level_orig(nvg_599_dut, band, percentage, remote_ip, number_of_pings):
     print('testing ping after power level changes')
     #band = 'band2'
     #percentage = 100
@@ -521,52 +605,59 @@ def tst_ping_rg_power_level(nvg_599_dut, band, percentage, remote_ip, number_of_
     #nvg_599_dut.set_wifi_power_level(band, percentage)
     #remote_ip = "192.168.1.94"
     #number_of_pings = 20
+    if band == 'band2':
+        nvg_599_dut.disable_enable_wifi_2_4g('On')
+        nvg_599_dut.disable_enable_wifi_5g('Off')
+    else:
+        # this is band 5
+        nvg_599_dut.disable_enable_wifi_5g('On')
+        nvg_599_dut.disable_enable_wifi_2_4g('Off')
+    nvg_599_dut.set_wifi_power_level(band, percentage)
     min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss = nvg_599_dut.ping_from_local_host(remote_ip,
-                                                                                                     number_of_pings)
+                                                    number_of_pings)
     print('min:' + min_ping + ' max:' + max_ping)
-
     ping_file = open('ping_file_with_power_change_test.txt', 'a')
-
-    # now = datetime.today().isoformat()
     now = datetime.today().strftime("%B %d, %Y,%H:%M")
-    # ping_file.writelines('Ping ' + remote_ip + ' RG Pwr %:' + str(percentage) +  ' Sent:' + sent + ' Received:' + received + ' Percent loss:' + loss + '%' + ' Date:' + now + '\n')
-    ping_file.writelines('Date:' + now + '599 FW Ver:' + nvg_599_dut.software_version + ' Ser. No:' + nvg_599_dut.serial_number + '\n')
-    ping_file.writelines('Ping ' + remote_ip + ' RG Pwr:' + str(percentage) + '%' +
-                         ' Sent:' + sent + ' Received:' + received + ' Percent loss:' + loss + '%\n')
-    # ping_file.writelines('Date:' + now + ' Ping ' + remote_ip + ' RG Pwr %:' + str(percentage) +  ' Sent:' + sent + ' Received:' + received + ' Percent loss:' + loss + '%\n')
-
-    # ping_file.writelines("599 FW Ver:" + nvg_599_dut.software_version + " Ser. No:" +
-    #                      nvg_599_dut.serial_number + '  min_ping:' + min_ping + '  avg_ping:' + avg_ping +
-    #                      '  max_ping:' + max_ping + '  max dev:' + mdev_ping +'\n')
-
+    ping_file.writelines('Date:' + now + '  599 FW Ver:' + nvg_599_dut.software_version + '  Ser. No:' + nvg_599_dut.serial_number + '\n')
+    ping_file.writelines('Band:' + band + '  Ping: ' + remote_ip + '  RG Pwr:' + str(percentage) + '%' +
+                         '  Sent:' + sent + '  Received:' + received + '  Percent loss:' + loss + '%\n')
     ping_file.writelines(
-        'Minimum:' + min_ping + ' Average::' + avg_ping + ' Maximum:' + max_ping + ' max dev:' + mdev_ping + '\n')
-
-    # ping_file.writelines('Date:' + now + " 599 FW Ver:" + nvg_599_dut.software_version + " Ser. No:" +
-    #                      nvg_599_dut.serial_number + '  min_ping:' + min_ping + '  avg_ping:' + avg_ping +
-    #                      '  max_ping:' + max_ping + '  max dev:' + mdev_ping)
+        'Minimum:' + min_ping + '  Average::' + avg_ping + '  Maximum:' + max_ping + ' Max dev:' + mdev_ping + '\n')
     ping_file.writelines('\n')
     ping_file.close()
+    nvg_599_dut.disable_enable_wifi_5g('On')
+    nvg_599_dut.disable_enable_wifi_2_4g('On')
+    band = 'band5'
+    percentage = 100
+    nvg_599_dut.set_wifi_power_level(band, percentage)
+    band = 'band2'
+    nvg_599_dut.set_wifi_power_level(band, percentage)
 
-
-
-
-#paul
+#pau    #nvg_599_dut.set_wifi_power_level(band, percentage)   l
 from datetime import datetime
 
 #now = datetime.today().strftime("%B %d, %Y,%H:%M")
 #print(now)
 #exit()
-update_rg ='/home/palmer/Downloads/nvg599-9.2.2h13d13_1.1.bin'
+#update_rg ='/home/palmer/Downloads/nvg599-9.2.2h13d13_1.1.bin'
 nvg_599_dut = Nvg599Class()
+#'192.168.1.94'
+#tst_ping_rg_power_level(nvg_599_dut, 'band2', '100', '192.168.1.94', '20')
+tst_ping_rg_power_level(nvg_599_dut, '192.168.1.94', '20')
+exit()
+
+
 #nvg_599_dut.enable_guest_network_and_set_password_ssid()
 #exit()
 
+# must be 'Off' or 'On'
+# nvg_599_dut.disable_enable_wifi_5g('On')
 #def tst_ping_rg_power_level(nvg_599_dut, band, powerlevel, remote_ip, number_of_pings):
 tst_ping_rg_power_level(nvg_599_dut, 'band2', 100 , '192.168.1.94', 20)
+
 #tst_ping_rg_power_level(nvg_599_dut, 'band5', 100 , '192.168.1.94', 20)
 exit()
-nvg_599_dut.update_rg(update_rg)
+#nvg_599_dut.update_rg(update_rg)
 sleep(300)
 nvg_599_dut.factory_reset_rg()
 sleep(120)

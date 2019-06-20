@@ -1516,6 +1516,130 @@ class Nvg599Class(GatewayClass):
 
     # This needs an enable disable ar
 
+    #  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    def disable_enable_wifi_2_4g(self, off_on):
+        print('disable_enable_wifi_2_4, setting 2.4G to:' + off_on)
+        rg_url = 'http://192.168.1.254/'
+        # session = webdriver.Chrome()
+        self.session.get(rg_url)
+        status_link = self.session.find_element_by_link_text("Home Network")
+        status_link.click()
+        sleep(2)
+        home_network_link = self.session.find_element_by_link_text("Wi-Fi")
+        home_network_link.click()
+        sleep(2)
+        self.check_if_dac_required()
+        advanced_options_link = self.session.find_element_by_link_text("Advanced Options")
+        advanced_options_link.click()
+        sleep(2)
+
+        wi_fi_2_4 = self.session.find_element_by_name("owl80211on")
+
+        for option in wi_fi_2_4.find_elements_by_tag_name('option'):
+            # this is problematic line
+            #if option.text == "Off":
+            if option.text == off_on:
+                option.click()
+                break
+        sleep(10)
+        submit = self.session.find_element_by_name("Save")
+        sleep(10)
+        submit.click()
+        self.check_for_wifi_security_and_regular_warning()
+        #
+        #
+        #
+        #
+        #
+        # self.check_for_wifi_security_and_regular_warning()
+        # self.session.implicitly_wait(5)
+        # wi_fi_2_4 = self.session.find_element_by_name("owl80211on")
+        # wi_fi_2_4.click()
+        #
+        # for option in wi_fi_2_4.find_elements_by_tag_name('option'):
+        #     if option.text == "On":
+        #         option.click()
+        #         break
+        #
+        # wi_fi_5_g = self.session.find_element_by_name("twl80211on")
+        # wi_fi_5_g.click()
+        #
+        # for option in wi_fi_5_g.find_elements_by_tag_name('option'):
+        #     if option.text == "On":
+        #         option.click()
+        #         break
+        # submit = self.session.find_element_by_name("Save")
+        # sleep(10)
+        # submit.click()
+        # self.check_for_wifi_security_and_regular_warning()
+        # # self.check_for_wifi_warning()
+
+    #   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    # parm must be Off or On with capitalized firs
+    def disable_enable_wifi_5g(self,off_on):
+        #print('in disable_enable_wifi_2_4_and_5g_wifi')
+        print('disable_enable_wifi_5g_wifi, setting 5G to:' + off_on)
+
+        rg_url = 'http://192.168.1.254/'
+        # session = webdriver.Chrome()
+        self.session.get(rg_url)
+        status_link = self.session.find_element_by_link_text("Home Network")
+        status_link.click()
+        sleep(2)
+        home_network_link = self.session.find_element_by_link_text("Wi-Fi")
+        home_network_link.click()
+        sleep(2)
+        self.check_if_dac_required()
+        advanced_options_link = self.session.find_element_by_link_text("Advanced Options")
+        advanced_options_link.click()
+        sleep(2)
+
+        # wi_fi_2_4 = self.session.find_element_by_name("owl80211on")
+        #
+        # for option in wi_fi_2_4.find_elements_by_tag_name('option'):
+        #     # this is problematic line
+        #     if option.text == "Off":
+        #         option.click()
+        #         break
+        # sleep(10)
+        # self.session.implicitly_wait(5)
+        wi_fi_5_g = self.session.find_element_by_name("twl80211on")
+        # wi_fi_5_g.click()
+        for option in wi_fi_5_g.find_elements_by_tag_name('option'):
+            #if option.text == "Off":
+            if option.text == off_on:
+                option.click()
+                break
+        submit = self.session.find_element_by_name("Save")
+        sleep(10)
+        submit.click()
+
+        # self.check_for_wifi_security_and_regular_warning()
+        # self.session.implicitly_wait(5)
+        # wi_fi_2_4 = self.session.find_element_by_name("owl80211on")
+        # wi_fi_2_4.click()
+        #
+        # for option in wi_fi_2_4.find_elements_by_tag_name('option'):
+        #     if option.text == "On":
+        #         option.click()
+        #         break
+        #
+        # wi_fi_5_g = self.session.find_element_by_name("twl80211on")
+        # wi_fi_5_g.click()
+        #
+        # for option in wi_fi_5_g.find_elements_by_tag_name('option'):
+        #     if option.text == "On":
+        #         option.click()
+        #         break
+        # submit = self.session.find_element_by_name("Save")
+        # sleep(10)
+        # submit.click()
+        self.check_for_wifi_security_and_regular_warning()
+        # self.check_for_wifi_warning()
+
+
+    #    ################################################
+
     def disable_enable_wifi_2_4_and_5g_wifi(self):
         print('in disable_enable_wifi_2_4_and_5g_wifi')
         rg_url = 'http://192.168.1.254/'
@@ -1573,12 +1697,6 @@ class Nvg599Class(GatewayClass):
         submit.click()
         self.check_for_wifi_security_and_regular_warning()
         # self.check_for_wifi_warning()
-
-
-
-
-
-
 
     def ui_get_wifi_password(self):
         print('in ui_get_wifi_password')
@@ -1731,7 +1849,6 @@ class Nvg599Class(GatewayClass):
         print('in get_ui_system_information)')
         global nvg_info
         rg_url = 'http://192.168.1.254/'
-        # session = self.session
         self.session = webdriver.Chrome()
         self.session.get(rg_url)
         status_link = self.session.find_element_by_link_text("System Information")
@@ -2006,16 +2123,10 @@ class Nvg599Class(GatewayClass):
         command = 'nmcli c'
         output = subprocess.check_output(['nmcli', 'c'])
         #output = subprocess.check_output(['ls', '-l'])
-
-        #process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
-        #output, error = process.communicate()
-        # result = os.system(cmd)
         for line in output.splitlines():
             print('out===========\n', line)
-        #print('endout1===========\n', error)
-
+# paul palmer
     def ping_from_local_host(self, remote_ip, number_of_pings=20):
-
         print('ping ' + remote_ip + ' from_local_host')
         #ping_file = open('ping_file.txt', 'a')
         # out = subprocess.Popen("ping  -c3 localhost",stdout=subprocess.PIPE,stderr=subprocess.STDOUT, shell=True)
@@ -2030,25 +2141,43 @@ class Nvg599Class(GatewayClass):
         # pingInfoRegEx = re.compile(r'.*=\s(\w+)/(\w+)/(\w+)/(\w+)',re.DOTALL)
         #ping_statistics = re.compile(r'statistics ---.*(\d+)\spackets\.*(\d+)\sreceived',re.DOTALL)
         ping_info_reg_ex = re.compile(r'rtt.*?=\s(\d+\.\d+)/(\d+\.\d+)/(\d+\.\d+)/(\d+\.\d+)')
+        print('out2===========\n', out)
+        print('endout2===========\n')
+
         # pingInfoRegEx = re.compile(r'.*?rtt/s+=/s+(/d+/./d+)',re.DOTALL)
         mo1 = ping_info_reg_ex.search(out)
         # print('mo1',mo1)
         # minimum = mo1.group(1)
         # print('mnext--just a value', minimum)
         min_ping = mo1.group(1)
-        avg_ping = mo1.group(2)
-        max_ping = mo1.group(3)
-        mdev_ping = mo1.group(4)
+        print('min' + min_ping)
+        # sleep(10)
 
+        avg_ping = mo1.group(2)
+        print('avg' + avg_ping)
+        # sleep(10)
+
+        max_ping = mo1.group(3)
+        print('max' + max_ping)
+        # sleep(10)
+
+
+        mdev_ping = mo1.group(4)
+        print('mdev' + mdev_ping)
 
         ping_statistics = re.compile(r'statistics ---\s(\d+)\spackets.*\s(\d+)\sreceived,\s(\d+)%')
         stats = ping_statistics.search(out)
         #print('sent:>' + stats.group(1))
         print('sent:>' + stats.group(1) + ' received:' + stats.group(2) + 'loss:' + stats.group(3))
         sent = stats.group(1)
+        print('sent' + sent)
+        # sleep(10)
         received = stats.group(2)
+        print('rec' + received)
+        # sleep(10)
         loss = stats.group(3)
-
+        print('loss' + loss)
+        # sleep(10)
         return min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss
 
     def ping_check(self, remote_ip):
