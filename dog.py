@@ -40,14 +40,16 @@ ALL_BAND5_CHANNELS = {36, 40, 44, 48,52, 56, 60, 64, 100, 104, 108, 112, 116, 13
 # Check the 5G channel used. If none DFS , set to DFS and note the setting
 # enter the command to simulate radar detection
 # verify that the channel changes to a non DFS channel
-def test_dfs(nvg_599_dut,results_file):
+def test_dfs(nvg_599_dut,):
     global NON_DFS_CHANNELS
     global DFS_CHANNELS
     print('in test_dfs')
-    now = datetime.today().isoformat()
-    results_file.write("Test Title:tst_dfs Execution time:")
-    results_file.write(now)
-    results_file.write("\n")
+    # now = datetime.today().isoformat()
+    now = datetime.today().strftime("%B %d, %Y,%H:%M")
+    dfs_results_file = open('dfs_file.txt', 'a')
+    dfs_results_file.write("Test Title:tst_dfs Execution time:")
+    dfs_results_file.write(now)
+    dfs_results_file.write("\n")
 
     session = nvg_599_dut.session
     home_link = session.find_element_by_link_text("Device")
@@ -58,14 +60,14 @@ def test_dfs(nvg_599_dut,results_file):
     if current_5g_channel in DFS_CHANNELS:
         result = "Current 5G:" + current_5g_channel + " is a DFS channel\n"
         result_str = str(result)
-        results_file.write(result_str)
+        dfs_results_file.write(result_str)
         print('this is a DFS channel')
     else:
         print('this is a non DFS Changing to DFS channel 100')
         # def ui_set_bw_channel(self, band, bandwidth, channel):
         result = "Current 5G:" + current_5g_channel + " is not a DFS channel\n"
         # result_str = str(result)
-        results_file.write("Changing to DFS channel 100, bandwidth 80\n")
+        dfs_results_file.write("Changing to DFS channel 100, bandwidth 80\n")
 
         nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, 100)
         print('setting channel to DFS channel 100')
@@ -87,9 +89,9 @@ def test_dfs(nvg_599_dut,results_file):
     # after the test we expect the channel to have been changed to a non DFS channel
 
     if current_5g_channel in NON_DFS_CHANNELS:
-        results_file.write("5G channel changed to non DFS channel: ")
-        results_file.write(str(current_5g_channel))
-        results_file.write("\n")
+        dfs_results_file.write("5G channel changed to non DFS channel: ")
+        dfs_results_file.write(str(current_5g_channel))
+        dfs_results_file.write("\n")
 
         print("Channel change to non DFS  Passed\n")
         print("Setting back to DFS\n")
@@ -100,7 +102,7 @@ def test_dfs(nvg_599_dut,results_file):
             result = "Current 5G:" + current_5g_channel + " is a DFS channel\n"
             print("Setting back to DFS passed\n")
 
-        results_file.write("Test Passed\n")
+        dfs_results_file.write("Test Passed\n")
     else:
         print('test failed:Channel found:',current_5g_channel,' expected non DFS channel')
         print('current_5g_channel', current_5g_channel)
@@ -110,7 +112,7 @@ def test_dfs(nvg_599_dut,results_file):
 
         print("result string  -dbg",result)
         #results_file.write("Current 5G:" ,current_5g_channel," is not a DFS channel\n")
-        results_file.write(result)
+        dfs_results_file.write(result)
 
 # def tst_599_nvg_init():
 #     nvg_599_dut = Nvg599Class()
@@ -515,15 +517,20 @@ firmware_599_available = ['/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin',
 def tst_ping_rg_power_level(nvg_599_dut, remote_ip, number_of_pings):
 # def tst_ping_rg_power_level(nvg_599_dut, remote_ip, number_of_pings):
 
-    ping_file = open('ping_file_with_power_change_test.txt', 'a')
+    ping_file = open('tst_ping_with_power_change.txt', 'a')
     ping_file.writelines('tst_ping_rg_power_level' + '\n')
     now = datetime.today().strftime("%B %d, %Y,%H:%M")
     ping_file.writelines('Date:' + now + '  599 FW Ver:' + nvg_599_dut.software_version + '  Ser. No:' + nvg_599_dut.serial_number + '\n\n')
 
     nvg_599_dut.disable_enable_wifi_2_4g('On')
-    nvg_599_dut.disable_enable_wifi_5g('Off')
+    sleep(60)
+    nvg_599_dut.disable_enable_wifi_5g('On')
+    sleep(60)
     nvg_599_dut.set_wifi_power_level('band2', '100')
-    sleep(90)
+    nvg_599_dut.set_wifi_power_level('band5', '100')
+
+    nvg_599_dut.disable_enable_wifi_5g('Off')
+    sleep(120)
     #nvg_599_dut.ping_from_local_host(remote_ip, number_of_pings=20)
     min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss = nvg_599_dut.ping_from_local_host(remote_ip,number_of_pings)
     print('min:' + min_ping + ' max:' + max_ping)
@@ -531,32 +538,33 @@ def tst_ping_rg_power_level(nvg_599_dut, remote_ip, number_of_pings):
     ping_file.writelines('Band:' + 'band2' + '  Ping: ' + remote_ip + '  RG Pwr: 100%' +
                      '  Sent:' + sent + '  Received:' + received + '  Percent loss:' + loss + '%\n')
 
-
     ping_file.writelines('Minimum:' + min_ping + '  Average::' + avg_ping + '  Maximum:' + max_ping + ' Max dev:' + mdev_ping + '\n')
     ping_file.writelines('\n')
-
+    print('xx2')
     nvg_599_dut.set_wifi_power_level('band2', '50')
-    sleep(90)
-
+    sleep(120)
     min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss = nvg_599_dut.ping_from_local_host(remote_ip,number_of_pings)
 
     ping_file.writelines('Band:' + 'band2' + '  Ping: ' + remote_ip + '  RG Pwr: 50%' +
                      '  Sent:' + sent + '  Received:' + received + '  Percent loss:' + loss + '%\n')
     ping_file.writelines('Minimum:' + min_ping + '  Average::' + avg_ping + '  Maximum:' + max_ping + ' Max dev:' + mdev_ping + '\n')
 
-
+    print('xx2')
     # restore  band2
     ping_file.writelines('\n')
     # nvg_599_dut.disable_enable_wifi_2_4g('On')
     nvg_599_dut.set_wifi_power_level('band2', '100')
-    sleep(90)
+    sleep(120)
 
-
+    # 5g section
     # nvg_599_dut.disable_enable_wifi_5g('On')
     ## band 5
-    nvg_599_dut.disable_enable_wifi_2_4g('Off')
+    nvg_599_dut.disable_enable_wifi_5g('On')
+    sleep(120)
     nvg_599_dut.set_wifi_power_level('band5', '100')
-    sleep(90)
+    sleep(120)
+    nvg_599_dut.disable_enable_wifi_2_4g('Off')
+    sleep(120)
 
     min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss = nvg_599_dut.ping_from_local_host(remote_ip,number_of_pings)
     print('min:' + min_ping + ' max:' + max_ping)
@@ -566,16 +574,16 @@ def tst_ping_rg_power_level(nvg_599_dut, remote_ip, number_of_pings):
     ping_file.writelines(
         'Minimum:' + min_ping + '  Average::' + avg_ping + '  Maximum:' + max_ping + ' Max dev:' + mdev_ping + '\n')
     ping_file.writelines('\n')
-
+    print('xxx3')
     nvg_599_dut.set_wifi_power_level('band5', '50')
-    sleep(90)
+    sleep(120)
     min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss = nvg_599_dut.ping_from_local_host(remote_ip,number_of_pings)
 
     ping_file.writelines('Band:' + 'band5' + '  Ping: ' + remote_ip + '  RG Pwr: 50%' +
                      '  Sent:' + sent + '  Received:' + received + '  Percent loss:' + loss + '%\n')
     ping_file.writelines('Minimum:' + min_ping + '  Average::' + avg_ping + '  Maximum:' + max_ping + ' Max dev:' + mdev_ping + '\n')
     ping_file.writelines('\n')
-
+    print('xxx4')
     nvg_599_dut.set_wifi_power_level('band5', '100')
     # sleep(90)
 
@@ -593,8 +601,42 @@ def tst_ping_rg_power_level(nvg_599_dut, remote_ip, number_of_pings):
     #band = 'band2'
     nvg_599_dut.set_wifi_power_level('band5', '100')
 
+
+
+def tst_android_speed_test(nvg_599_dut, remote_ip):
+# def tst_ping_rg_power_level(nvg_599_dut, remote_ip, number_of_pings):
+    tst_android_speed_file = open('tst_android_speed_test.txt', 'a')
+    tst_android_speed_file.writelines('tst_android_speed_test: Remote IP:' + remote_ip + '\n')
+    now = datetime.today().strftime("%B %d, %Y,%H:%M")
+    tst_android_speed_file.writelines('Date:' + now + '  599 FW Ver:' + nvg_599_dut.software_version +
+        '  Ser. No:' + nvg_599_dut.serial_number + '\n')
+    nvg_599_dut.disable_enable_wifi_5g('Off')
+    sleep(120)
+    down_load_speed, up_load_speed = Nvg599Class().run_speed_test_from_android_termux(remote_ip)
+    tst_android_speed_file.writelines(
+        'Band 2 Download Speed:' +  down_load_speed + 'Band 2 Upload speed:' + up_load_speed + '\n\n')
+
+    nvg_599_dut.disable_enable_wifi_5g('On')
+    sleep(120)
+
+    # Band 5
+    nvg_599_dut.disable_enable_wifi_2_4g('Off')
+    sleep(120)
+
+    down_load_speed, up_load_speed = Nvg599Class().run_speed_test_from_android_termux(remote_ip)
+    tst_android_speed_file.writelines(
+        'Band 5 Download Speed:' + down_load_speed + 'Band 5 Upload speed:' + up_load_speed + '\n\n')
+
+    nvg_599_dut.disable_enable_wifi_2_4g('On')
+    sleep(120)
+    tst_android_speed_file.writelines('-------------------------------------------------------------------------------------' + '\n')
+    tst_android_speed_file.writelines('-------------------------------------------------------------------------------------' + '\n')
+    tst_android_speed_file.writelines('\n')
+    tst_android_speed_file.close()
+
 # -pfp-
 # deprecated
+############################## DEPRECATED   ####################################################################################################
 def tst_ping_rg_power_level_orig(nvg_599_dut, band, percentage, remote_ip, number_of_pings):
     print('testing ping after power level changes')
     #band = 'band2'
@@ -633,57 +675,38 @@ def tst_ping_rg_power_level_orig(nvg_599_dut, band, percentage, remote_ip, numbe
     band = 'band2'
     nvg_599_dut.set_wifi_power_level(band, percentage)
 
-#pau    #nvg_599_dut.set_wifi_power_level(band, percentage)   l
 from datetime import datetime
 
+#Nvg599Class().run_speed_test_from_android_termux("192.168.1.93")
+#exit()
 #now = datetime.today().strftime("%B %d, %Y,%H:%M")
-#print(now)
-#exit()
-#update_rg ='/home/palmer/Downloads/nvg599-9.2.2h13d13_1.1.bin'
 nvg_599_dut = Nvg599Class()
-#'192.168.1.94'
-#tst_ping_rg_power_level(nvg_599_dut, 'band2', '100', '192.168.1.94', '20')
+tst_android_speed_test(nvg_599_dut, '192.168.1.93')
+#tst_ping_rg_power_level(nvg_599_dut, '192.168.1.93', '20')
+exit()
+#nvg_599_dut.ui_set_wifi_password('Custom Password', '1111111111')
 tst_ping_rg_power_level(nvg_599_dut, '192.168.1.94', '20')
-exit()
+#nvg_599_dut.ui_enable_guest_network_and_set_password_ssid()
 
-
-#nvg_599_dut.enable_guest_network_and_set_password_ssid()
-#exit()
-
-# must be 'Off' or 'On'
-# nvg_599_dut.disable_enable_wifi_5g('On')
-#def tst_ping_rg_power_level(nvg_599_dut, band, powerlevel, remote_ip, number_of_pings):
-tst_ping_rg_power_level(nvg_599_dut, 'band2', 100 , '192.168.1.94', 20)
-
-#tst_ping_rg_power_level(nvg_599_dut, 'band5', 100 , '192.168.1.94', 20)
-exit()
-#nvg_599_dut.update_rg(update_rg)
+upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d13_1.1.bin'
+nvg_599_dut.upgrade_rg(upgrade_rg_file)
+sleep(300)
+upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d14_1.1.bin'
+nvg_599_dut.upgrade_rg(upgrade_rg_file)
 sleep(300)
 nvg_599_dut.factory_reset_rg()
 sleep(120)
+test_dfs(nvg_599_dut)
+tst_ping_rg_power_level(nvg_599_dut, '192.168.1.94', '20')
+nvg_599_dut.ui_enable_guest_network_and_set_password_ssid()
+exit()
 
-
-
-
-
-#dfs_file = open('dfs_file.txt','a')
-#test_dfs(nvg_599_dut,dfs_file)
 #wifi_password_script = "1111111111"
 #custom_security = "Custom Password"
 #set_wifi_return_code = nvg_599_dut.ui_set_wifi_password(custom_security, wifi_password_script)
 #print('******** set_wifi_return_code: ' + set_wifi_return_code)
 
 
-# band2  idicating that the band2 radio  power is being changed (else band5) and a number 1-100
-band = 'band2'
-percentage = 100
-#nvg_599_dut.set_wifi_power_level(band, percentage)
-#band = 'band5'
-#percentage = 100
-#nvg_599_dut.set_wifi_power_level(band, percentage)
-remote_ip = "192.168.1.94"
-number_of_pings = 20
-# return min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss
 
 min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss  = nvg_599_dut.ping_from_local_host(remote_ip, number_of_pings)
 print('min:'+ min_ping + ' max:' + max_ping)
@@ -712,10 +735,6 @@ ping_file.close()
 exit()
 ########################################################################################################3
 
-# nvg_599_dut.update_rg(update_rg)
-#sleep(300)
-#nvg_599_dut.factory_reset_rg()
-#exit()
 #nvg_599_dut.enable_guest_network_and_set_password_ssid()
 
 #device_dict = nvg_599_dut.ui_get_device_list()
