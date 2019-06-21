@@ -695,8 +695,8 @@ class Nvg599Class(GatewayClass):
             #  except NoSuchElementException:
             #      print('No Input errors displayed- Continuing')
 
-    def update_rg(self, update_bin_file):
-        print('in update_rg')
+    def upgrade_rg(self, update_bin_file):
+        print('in upgrade_rg')
         print("in ui_get_device_list ")
         home_link = self.session.find_element_by_link_text("Diagnostics")
         home_link.click()
@@ -1640,7 +1640,7 @@ class Nvg599Class(GatewayClass):
 
     #    ################################################
 
-    def disable_enable_wifi_2_4_and_5g_wifi(self):
+    def ui_disable_enable_wifi_2_4_and_5g_wifi(self):
         print('in disable_enable_wifi_2_4_and_5g_wifi')
         rg_url = 'http://192.168.1.254/'
         # session = webdriver.Chrome()
@@ -1723,9 +1723,8 @@ class Nvg599Class(GatewayClass):
         return ussidsecurity_value, default_password
 
     def ui_set_wifi_password(self, security, password):
-        print('in ui_set_password')
+        print('Setting  pasword:  ui_set_password')
         rg_url = 'http://192.168.1.254/'
-        # session = webdriver.Chrome()
         self.session.get(rg_url)
         status_link = self.session.find_element_by_link_text("Home Network")
         status_link.click()
@@ -1735,12 +1734,6 @@ class Nvg599Class(GatewayClass):
         sleep(2)
         self.check_if_dac_required()
         ussidsecurity_select = Select(self.session.find_element_by_id("ussidsecurity"))
-
-        # for options in ussidsecurity_select.options:
-        #    print('option:' + str(options.text))
-        #    print('security:' + security)
-        # sleep(10)
-        # ussidsecurity_select.select_by_value(security)
         ussidsecurity_select.select_by_visible_text(security)
         if security == "Custom Password":
             password_input = self.session.find_element_by_id("password")
@@ -1750,75 +1743,9 @@ class Nvg599Class(GatewayClass):
         sleep(10)
         submit.click()
         print('password len before check:' + str(len(password)))
-        print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         self.check_for_wifi_warning()
         return_str = self.check_for_wifi_warning()
         return return_str
-
-        # selected = ussidsecurity_value.option.value(security)
-        # for options in ussidsecurity_select.options:
-        #     print('option:' + str(options.text))
-        #     #if options.text == security:
-        #     #    options.click()
-        # # ussidsecurity_select.select_by_index(0)
-        # # ussidsecurity_select.options
-        # password_input = self.session.find_element_by_id("password")
-        # password_input.clear()
-        # password_input.send_keys(password)
-        # submit = self.session.find_element_by_name("Save")
-        # sleep(10)
-        # submit.click()
-        # print('password before check:' + str(len(password)))
-        # print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-        # self.check_for_wifi_warning()
-        #
-        # exit()
-
-        # for option in ussidsecurity_select.find_elements_by_tag_name('option'):
-        #     print('text:' + str(option.text))
-        #     if option.text == security:
-        #         option.click()
-        # sleep(10)
-        # exit()
-        # for option in ussidsecurity_select.find_elements_by_tag_name('option'):
-        #     print('text:' + str(option.text))
-        #     # if option.text == "Default Password":
-        #     if option.text == "Default Password":
-        #         option.click()
-        #         # if the text is not Defaut Password then it must be Custom Password
-        #         # logic is simpler is we set the option to Custom Password
-        #         # I think by clicking on it it is selected
-        # password_input = self.session.find_element_by_id("password")
-        # password_input.clear()
-        # password_input.send_keys(password)
-        #
-        # submit = self.session.find_element_by_name("Save")
-        # sleep(10)
-        # submit.click()
-        # self.check_for_wifi_warning()
-
-        # print('current password is: ' + password_input.get_attribute("value"))
-        # default_password = password_input.get_attribute("value")
-        # java_script = 'document.getElementsById("ussidsecurity").setAttribute("value","1234567890")'
-        # java_script = 'document.getElementsByName("security")[0].click()'
-        # self.session.execute_script(java_script)
-        # exit()
-
-        # if we are setting the password then we have to make sure that the use default is not set
-        # channel_select = self.session.find_element_by_id("ochannelplusauto")
-        # print('found ochannel')
-        # print('channel', channel)
-        # bandwidth_select.select_by_value(bandwidth)
-        # for option in channel_select.find_elements_by_tag_name('option'):
-        #   if option.text == channel:
-        #       option.click()
-        # self.session.execute_script('document.getElementsById("password").setAttribute("value","1234567890")')
-        # password_input.set_attribute("value","12345678")
-        # print('new password is: ' + password_input.get_attribute("value"))
-        # new_password = password_input.get_attribute("value")
-        # submit = self.session.find_element_by_name("Save")
-        # submit.click()
-        # return new_password
 
     def ui_get_wifi_info(self):
         print('in ui_get_wifi_info')
@@ -2032,6 +1959,9 @@ class Nvg599Class(GatewayClass):
         speed_test_output = ssh_client.before
         # print(ssh_client.before)
         print('after conversion ti string', speed_test_output)
+        # this is waht I added
+        ssh_client.sendline('exit')
+
         # exit()
         # ssh.connect(hostname=speed_test_ip, username=UN, password=PW)
         # ssh_client.connect(hostname=speed_test_ip, port = 8022,  timeout=30)
@@ -2069,54 +1999,7 @@ class Nvg599Class(GatewayClass):
         up_load_speed = speed_test_groups.group(2)
         return down_load_speed, up_load_speed
 
-        # ssh_session = pexpect.spawn("ssh -p 8022 " + speed_test_ip, encoding='utf-8', timeout=120)
-        # rint('speedtestip',speed_test_ip)
-        # exit()
-        # out = subprocess.check_output("ssh -p -t -t 8022  " + speed_test_ip + ' bash -s', shell=True).decode("utf-8")
-        # result = os.system(cmd)
-        # print('out===========\n', out)
-        # exit()
-        #
-        # ssh_session.expect("$")
-        # print('1', ssh_session.before)
-        # sleep(2)
-        #
-        # ssh_session.sendline('date')
-        # #self.device_access_code = None
-        #
-        # ssh_session.expect("$")
-        # print('2', ssh_session.before)
-        #
-        # ssh_session.sendline('speedtest')
-        # sleep(10)
-        # # ssh_session.expect(".*Mbits.*Mbits\/s")
-        # ssh_session.sendline()
-        # ssh_session.expect("$")
-        # print('3', ssh_session.before)
-        # speed_test_ouput = ssh_session.before
-        # # speed_test_regex = re.compile(r'.*Download:\s+(\w+)\s+.*Upload:\s+(\w+)',re.DOTALL)
-        # speed_test_regex = re.compile(r'(Download:\s+\w+\.\w+\s+\w+).*(Upload:\s+\w+\.\w+\s+\w+)', re.DOTALL)
-        # speed_test_groups = speed_test_regex.search(speed_test_ouput)
-        # print(speed_test_groups.group(1))
-        # print(speed_test_groups.group(2))
-        # down_load_speed = speed_test_groups.group(1)
-        # up_load_speed = speed_test_groups.group(2)
-        # ssh_session.close()
 
-        # return down_load_speed, up_load_speed
-        # exit()
-        # statusInfoRegEx = re.compile(r'Model\s(\w+)')
-        # mo1 = statusInfoRegEx.search(statusOutput)
-        # print('in_speedtest_cli')
-        # cmd='ping -c1 192.168.1.254'
-        # result = os.system(cmd)
-        # print ('result:',result)
-        # start = time.time()
-        # print("hello")
-        # end = time.time()
-        # print(end - start)
-
-    # @staticmethod
 
     @staticmethod
     def nmcli_test():
@@ -2134,7 +2017,11 @@ class Nvg599Class(GatewayClass):
         # out, err = out.communicate()
         # out = check_output(["ping ", "-c3 ", "localhost"]).decode("utf-8")
         # out = check_output(["ls -la"].decode("utf-8").shell=True)
-        out = subprocess.check_output("ping -c"+ str(number_of_pings) + " " + remote_ip, shell=True).decode("utf-8")
+        try:
+            out = subprocess.check_output("ping -c"+ str(number_of_pings) + " " + remote_ip, shell=True).decode("utf-8")
+        except subprocess.CalledProcessError as e:
+            print('ping error', e)
+            return '0','0','0','0','0','0','0'
         # result = os.system(cmd)
         print('out===========\n', out)
         print('endout1===========\n')
