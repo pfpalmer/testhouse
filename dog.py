@@ -680,22 +680,30 @@ from datetime import datetime
 #Nvg599Class().run_speed_test_from_android_termux("192.168.1.93")
 #exit()
 #now = datetime.today().strftime("%B %d, %Y,%H:%M")
-nvg_599_dut = Nvg599Class()
-tst_android_speed_test(nvg_599_dut, '192.168.1.93')
-#tst_ping_rg_power_level(nvg_599_dut, '192.168.1.93', '20')
+#nvg_599_dut = Nvg599Class()
+
+ip_of_4920 = '192.168.1.67'
+Nvg599Class.set_4920_to_factory_default(ip_of_4920)
+
 exit()
+
+
+#tst_android_speed_test(nvg_599_dut, '192.168.1.93')
+#tst_ping_rg_power_level(nvg_599_dut, '192.168.1.93', '20')
+#exit()
 #nvg_599_dut.ui_set_wifi_password('Custom Password', '1111111111')
-tst_ping_rg_power_level(nvg_599_dut, '192.168.1.94', '20')
+#tst_ping_rg_power_level(nvg_599_dut, '192.168.1.94', '20')
 #nvg_599_dut.ui_enable_guest_network_and_set_password_ssid()
 
-upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d13_1.1.bin'
-nvg_599_dut.upgrade_rg(upgrade_rg_file)
-sleep(300)
-upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d14_1.1.bin'
-nvg_599_dut.upgrade_rg(upgrade_rg_file)
-sleep(300)
+#upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d13_1.1.bin'
+#nvg_599_dut.upgrade_rg(upgrade_rg_file)
+#sleep(300)
+#upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d14_1.1.bin'
+#nvg_599_dut.upgrade_rg(upgrade_rg_file)
+#sleep(300)
 nvg_599_dut.factory_reset_rg()
-sleep(120)
+sleep(300)
+exit()
 test_dfs(nvg_599_dut)
 tst_ping_rg_power_level(nvg_599_dut, '192.168.1.94', '20')
 nvg_599_dut.ui_enable_guest_network_and_set_password_ssid()

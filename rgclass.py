@@ -4,8 +4,12 @@ import subprocess
 from pexpect import pxssh
 from socket import timeout
 # from subprocess import check_output
-# from selenium.webdriver.common.by import By
+from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+
 import urllib.request
 from urllib.error import URLError, HTTPError
 # import url
@@ -50,19 +54,19 @@ nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53
 
 airties_4920_defaults = {
     '88:41:FC:86:64:D6': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '2',
-                          'state': 'None', ' default_ssid':'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
+                          'state': 'None', ' default_ssid': 'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'airties_1_2g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
     '88:41:FC:86:64:D4': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '5',
-                          'state': 'None',  ' default_ssid':'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
+                          'state': 'None',  ' default_ssid': 'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None',  'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'airties_1_5g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
     '88:41:FC:C3:56:C2': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '2',
-                          'state': 'None', ' default_ssid':'AirTies_Air4920_33N3', 'default_pw': 'wthchc7344',
+                          'state': 'None', ' default_ssid': 'AirTies_Air4920_33N3', 'default_pw': 'wthchc7344',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', ' ip': 'None',
                           'device_test_name': 'airties_2_2g', 'name': 'ATT_4920_C356C0', 'location': 'master_bedroom'},
     '88:41:FC:C3:56:C0': {'device_type': 'airties_4920', 'oper_sys': 'tbd',  'radio': 'abg', 'band': '5',
-                          'state': 'None',  ' default_ssid':'AirTies_Air4920_33N3', 'default_pw': 'wthchc7344',
+                          'state': 'None', 'default_ssid': 'AirTies_Air4920_33N3', 'default_pw': 'wthchc7344',
                           'address_type': 'None', 'port ': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'airties_2_5g', 'name': 'tbd', 'location': 'master_bedroom'},}
 
@@ -236,6 +240,56 @@ class Nvg599Class(GatewayClass):
         pass
 
 # pfp
+
+    def set_4920_to_factory_default(ip_of_4920):
+        print('setting 4920 with ip:' + ip_of_4920 + ' to factory default' )
+        global nvg_info
+        airties_url = 'http://192.168.1.67/'
+        #rg_url = 'http://192.168.1.254/'
+        airties_session = webdriver.Chrome()
+        airties_session.get(airties_url)
+        session_id = airties_session.session_id
+        print(str(session_id))
+        # airties_session.implicitly_wait(10)
+        # // *[ @ id = "mainlevel"] / li[3] / a
+        # # advanced_settings_link = airties_session.find_element_by_xpath('// *[ @ id = "mainlevel"] / li[3] / a')
+
+        airties_session.switch_to.frame(airties_session.find_element_by_css_selector("frame[name=menuFrame"))
+
+        wait = WebDriverWait(airties_session,10)
+        # advanced_link = wait.until(EC.element_to_be_clickable((By.XPATH,'// *[ @ id = "mainlevel"] / li[3] /a')))
+        wait.until(EC.element_to_be_clickable((By.XPATH,'// *[ @ id = "mainlevel"] / li[3] /a'))).click()
+        #sleep(20)
+        # advanced_link.click()
+        # advanced_settings_link = airties_session.find_element_by_partial_link_text("ADVANCED")
+        sleep(10)
+        #html > frameset > frameset > frame: nth - child(2)
+        #advanced_settings_link = airties_session.find_element_by_link_text("ADVANCED SETTINGS")
+        tools_link = airties_session.find_element_by_link_text("TOOLS")
+        tools_link.click()
+        # airties_session.refresh()
+        sleep(10)
+        airties_session.switch_to.default_content()
+        airties_session.switch_to.frame(airties_session.find_element_by_css_selector("frame[name=mainFrame"))
+        #airties_session.refresh()
+        wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__ML_restore_factory_defaults"]'))).click()
+        alert = airties_session.switch_to_alert()
+        alert.accept()
+        sleep(20)
+
+        #// *[ @ id = "__ML_restore_factory_defaults"]
+        #// *[ @ id = "__ML_restore_factory_defaults"]
+        #restore_factory_defaults = airties_session.find_element_by_xpath('//*[@id="__ML_restore_factory_defaults"]')
+        #restore_factory_defaults = airties_session.find_element_by_name("Restore Factory Defaults")
+
+        # restore_factory_defaults.click()
+        sleep(10)
+        exit()
+        #class ="globalLargeButton ui-button ui-widget ui-state-default ui-corner-all buttonOptional" id="__ML_restore_factory_defaults" onclick="ClickFacrotyDefaults()" role="button" aria-disabled="false" >
+
+        #status_link = self.session.find_element_by_link_text("System Information")
+
+
     def set_fixed_ip_allocation(self):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
         home_network_link = self.session.find_element_by_link_text("Home Network")
@@ -259,7 +313,7 @@ class Nvg599Class(GatewayClass):
         for tr in table_rows:
             # mac = tr.find_elements_by_xpath(".//td[1]/text()")
             name = tr.find_elements_by_xpath(".//td")[0].text
-            mac = (tr.find_elements_by_xpath(".//td")[1].text).upper()
+            mac = tr.find_elements_by_xpath(".//td")[1].text.upper()
             status = tr.find_elements_by_xpath(".//td")[2].text
             allocation = tr.find_elements_by_xpath(".//td")[3].text
             action = tr.find_elements_by_xpath(".//td")[4].click()
@@ -303,7 +357,7 @@ class Nvg599Class(GatewayClass):
 
         for tr in table_body_rows:
             # print("table body row is", table_body_rows[0])
-            #print("table body row is", tr)
+            # print("table body row is", tr)
             cells = tr.findAll('td')
             print('cells:',cells)
             print('cell1:', cells[1].get_text())
@@ -353,7 +407,7 @@ class Nvg599Class(GatewayClass):
                 # This means that we may have to update the UI IP to match the staitc IP in the table
                 mac_present_static_info = test_house_devices_static_info.get(wifi_ui_mac_present)
 
-                if i==1:
+                if i == 1:
                     print('cell mac from ui is:>' + cell.text + '<')
                     wifi_ui_mac_present = (cell.text).upper()
                     print('wifi_mac_present:', wifi_ui_mac_present)
@@ -607,7 +661,7 @@ class Nvg599Class(GatewayClass):
                 print("wi-fi regular warning change... Continue")
                 return return_string
 
-# I think this shoudl only be used for the password testcases
+# I think this is only be used for the password testcases
     def check_for_wifi_warning(self):
         print('in check_for_wifi_warning ')
         # warning = self.session.find_element_by_name("ReturnWarned")
@@ -723,8 +777,6 @@ class Nvg599Class(GatewayClass):
                 print("Duration timer:", str(end - start))
                 sleep(20)
                 break
-            # except:
-            # need to check if this works
             except TimeoutError:
                 print('Not ready, sleeping 10 seconds')
                 sleep(10)
