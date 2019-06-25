@@ -780,7 +780,7 @@ class Nvg599Class(GatewayClass):
             except TimeoutError:
                 print('Not ready, sleeping 10 seconds')
                 sleep(10)
-                print('time' + str(time.time()))
+                print('time: ' + str(time.time()))
                 continue
 
             except (HTTPError, URLError) as e:
@@ -1347,7 +1347,12 @@ class Nvg599Class(GatewayClass):
         self.turn_off_wi_fi_security_protection_cli()
         # not sure why this failed
         self.enable_parental_control()
-        # not sure why this failed
+
+        # added this, lets see if it works
+        self.session.close()
+        rg_url = 'http://192.168.1.254/'
+        session = webdriver.Chrome()
+        session.get(rg_url)
         sleep(60)
         self.enable_guest_network_and_set_password_ssid()
 
@@ -2060,7 +2065,16 @@ class Nvg599Class(GatewayClass):
         #output = subprocess.check_output(['ls', '-l'])
         for line in output.splitlines():
             print('out===========\n', line)
-# paul palmer
+
+        # this command lists all the visble APS
+        # iwlist wlp2s0 s
+        # this command turns off the current Wfi connect
+        # nmcli con down ATTqbrAnYs
+
+        # this command connects to the wifi , it generates an 802.1x supplicant fail message but seems to work
+        # sudo nmcli device wifi connect AirTies_Air4920_33N3 wthchc7344
+
+    # paul palmer
     def ping_from_local_host(self, remote_ip, number_of_pings=20):
         print('ping ' + remote_ip + ' from_local_host')
         #ping_file = open('ping_file.txt', 'a')
