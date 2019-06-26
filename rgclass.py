@@ -56,7 +56,7 @@ airties_4920_defaults = {
     '88:41:FC:86:64:D6': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '2',
                           'state': 'None', ' default_ssid': 'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
-                          'device_test_name': 'airties_1_2g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
+                          'device_test_name':'airties_1_2g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
     '88:41:FC:86:64:D4': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '5',
                           'state': 'None',  ' default_ssid': 'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None',  'rssi': 'None', 'ip': 'None',
@@ -218,6 +218,7 @@ class Nvg599Class(GatewayClass):
         self.session = None
         self.init_info = False
         self.telnet_cli_session = None
+        self.airties_ap_cli_session = None
         global nvg_info
         # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
         self.software_version = None
@@ -235,11 +236,12 @@ class Nvg599Class(GatewayClass):
         print("in Nvg599Class__init")
         self.init_info = True
         self.mesh_connected_clents = {}
+        self.rg_url = 'http://192.168.1.254/'
 
     def remote_webserver(self):
         pass
 
-# pfp
+# pfp1
 
     def set_4920_to_factory_default(ip_of_4920):
         print('setting 4920 with ip:' + ip_of_4920 + ' to factory default' )
@@ -1530,13 +1532,70 @@ class Nvg599Class(GatewayClass):
             return self.session
 
 
-#
+#  pfp
+    def wps_pair_default_airties(self,airties_network):
+        print('Clicking on WPS button')
+        # rg_url = 'http://192.168.1.254/'
+        self.session.get(self.rg_url)
+        status_link = self.session.find_element_by_link_text("Home Network")
+        status_link.click()
+        sleep(2)
+        home_network_link = self.session.find_element_by_link_text("Wi-Fi")
+        home_network_link.click()
+        sleep(2)
+        self.check_if_dac_required()
+        wps_button = self.session.find_element_by_name("pb1")
+        wps_button.click()
+        self.session.close()
+
+        cmd = "nmcli con down ATTqbrAnYs"
+        # cmd = "nmcli con down AirTies_SmartMesh_4PNF"
+
+        #output = subprocess.check_output(['nmcli', 'r'],shell=True)
+        output = subprocess.check_output(cmd, shell=True)
+        for line in output.splitlines():
+            print('out1  ===========\n', line)
+        sleep(10)
+        #cmd = "nmcli con down ATTqbrAnYs"
+        # cmd = "nmcli device wifi connect AirTies_SmartMesh_4PNF kykfmk8997"
+        # use  the password from the table
+        # cmd = "nmcli device wifi connect " + airties_network + " kykfmk8997"
+        cmd = "nmcli connect up " + airties_network
+
+        #output = subprocess.check_output(['nmcli', 'r'],shell=True)
+        output = subprocess.check_output(cmd, shell=True)
+        for line in output.splitlines():
+           print('out2===========\n', line)
+
+        self.airties_ap_cli_session = pexpect.spawn("telnet 192.168.2.254", encoding='utf-8')
+        self.airties_ap_cli_session.expect('ogin:')
+        self.airties_ap_cli_session.sendline('root')
+        self.airties_ap_cli_session.expect("#")
+        self.airties_ap_cli_session.sendline('basbaglan')
+        self.airties_ap_cli_session.expect("#")
+        self.airties_ap_cli_session.sendline('exit')
+        self.airties_ap_cli_session.close()
+
+        cmd = "nmcli con down AirTies_SmartMesh_4PNF"
+        output = subprocess.check_output(cmd, shell=True)
+
+        print('output from SmartMesh down',output)
+        # cmd = "nmcli device wifi connect ATTqbrAnYs ggtxstgwipcg"
+        cmd = "nmcli connect up ATTqbrAnYs"
+
+        output = subprocess.check_output(cmd, shell=True)
+        print('output from reconnect',output)
+
+        # rg_url = 'http://192.168.1.254/'
+        self.session = webdriver.Chrome()
+        self.session.get(self.rg_url)
+        sleep(30)
+
 
 
     def set_wifi_power_level(self, band, percentage):
         print('Adjusting ' + band + ' wifi power level to ' + str(percentage) + '%')
         rg_url = 'http://192.168.1.254/'
-        # session = webdriver.Chrome()
         self.session.get(rg_url)
         status_link = self.session.find_element_by_link_text("Home Network")
         status_link.click()
@@ -1593,8 +1652,7 @@ class Nvg599Class(GatewayClass):
         wi_fi_2_4 = self.session.find_element_by_name("owl80211on")
 
         for option in wi_fi_2_4.find_elements_by_tag_name('option'):
-            # this is problematic line
-            #if option.text == "Off":
+            # The value passed in would be either Off or On
             if option.text == off_on:
                 option.click()
                 break
@@ -1603,11 +1661,6 @@ class Nvg599Class(GatewayClass):
         sleep(10)
         submit.click()
         self.check_for_wifi_security_and_regular_warning()
-        #
-        #
-        #
-        #
-        #
         # self.check_for_wifi_security_and_regular_warning()
         # self.session.implicitly_wait(5)
         # wi_fi_2_4 = self.session.find_element_by_name("owl80211on")
@@ -1636,7 +1689,6 @@ class Nvg599Class(GatewayClass):
     def disable_enable_wifi_5g(self,off_on):
         #print('in disable_enable_wifi_2_4_and_5g_wifi')
         print('disable_enable_wifi_5g_wifi, setting 5G to:' + off_on)
-
         rg_url = 'http://192.168.1.254/'
         # session = webdriver.Chrome()
         self.session.get(rg_url)
@@ -1663,7 +1715,7 @@ class Nvg599Class(GatewayClass):
         wi_fi_5_g = self.session.find_element_by_name("twl80211on")
         # wi_fi_5_g.click()
         for option in wi_fi_5_g.find_elements_by_tag_name('option'):
-            #if option.text == "Off":
+            # if option.text == "Off":
             if option.text == off_on:
                 option.click()
                 break
@@ -1693,9 +1745,7 @@ class Nvg599Class(GatewayClass):
         # submit.click()
         self.check_for_wifi_security_and_regular_warning()
         # self.check_for_wifi_warning()
-
-
-    #    ################################################
+        ################################################
 
     def ui_disable_enable_wifi_2_4_and_5g_wifi(self):
         print('in disable_enable_wifi_2_4_and_5g_wifi')
@@ -2060,16 +2110,26 @@ class Nvg599Class(GatewayClass):
 
     @staticmethod
     def nmcli_test():
-        command = 'nmcli c'
-        output = subprocess.check_output(['nmcli', 'c'])
-        #output = subprocess.check_output(['ls', '-l'])
+        # command = 'nmcli c'
+        # cmd = "nmcli r all"
+        cmd = "nmcli con down ATTqbrAnYs"
+        #output = subprocess.check_output(['nmcli', 'r'],shell=True)
+        output = subprocess.check_output(cmd, shell=True)
         for line in output.splitlines():
-            print('out===========\n', line)
+            print('out  dog  ===========\n', line)
+        sleep(10)
+        #cmd = "nmcli con down ATTqbrAnYs"
+        cmd = "nmcli device wifi connect AirTies_SmartMesh_4PNF kykfmk8997"
+        #output = subprocess.check_output(['nmcli', 'r'],shell=True)
+        output = subprocess.check_output(cmd, shell=True)
+        for line in output.splitlines():
+           print('out  dog  ===========\n', line)
 
+        # 'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
         # this command lists all the visble APS
         # iwlist wlp2s0 s
         # this command turns off the current Wfi connect
-        # nmcli con down ATTqbrAnYs
+
 
         # this command connects to the wifi , it generates an 802.1x supplicant fail message but seems to work
         # sudo nmcli device wifi connect AirTies_Air4920_33N3 wthchc7344

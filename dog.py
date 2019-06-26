@@ -696,11 +696,15 @@ from datetime import datetime
 
 
 nvg_599_dut = Nvg599Class()
-upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d9_1.1.bin'
-nvg_599_dut.upgrade_rg(upgrade_rg_file)
-sleep(300)
-nvg_599_dut.factory_reset_rg()
-sleep(300)
+#upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d9_1.1.bin'
+#nvg_599_dut.upgrade_rg(upgrade_rg_file)
+#sleep(300)
+#nvg_599_dut.factory_reset_rg()
+#sleep(300)
+#rg_url = 'http://192.168.1.254/'
+#nvg_599_dut.wps_button_click(rg_url)
+airties_ap_net = "AirTies_SmartMesh_4PNF"
+nvg_599_dut.wps_pair_default_airties(airties_ap_net)
 exit()
 
 #
