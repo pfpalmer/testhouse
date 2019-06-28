@@ -42,14 +42,19 @@ from datetime import datetime
 # /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I
 
 nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
-                                'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4', 'wiFi': 'c2cmybt25dey',
-                                'ssid': 'xxxxxx'},
+                                'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4', 'wifi_pw': 'c2cmybt25dey',
+                                'ssid': 'xxxxxx', 'ssid_1': 'xxxxx_REPLACEME_1', 'ssid_1_pw': 'xxxx',
+                                'ssid_2': 'xxxxxxxxxxx_REPLACEME_2', 'ssid_2_pw': 'ssid_2_pw_xxxx'},
+
             "277427577103760": {'model': 'nvg599', 'device_access_code': '<<01%//4&/', 'magic': 'ggtxstgwipcg',
-                                'mac2g': 'fc:51:a4:2f:25:90', 'mac5g':
-                                'fc:51:a4:2f:25:94', 'wiFi': 'nsrmpr59rxwv', 'ssid': 'ATTqbrAnYs'},
+                                'mac2g': 'fc:51:a4:2f:25:90', 'mac5g':'fc:51:a4:2f:25:94', 'wifi_pw': 'nsrmpr59rxwv',
+                                'ssid': 'ATTqbrAnYs', 'ssid1': 'ATTqbrAnYs_REPLACEME_1', 'ssid_1_pw': 'REPLACEME1',
+                                'ssid_2': 'ATTqbrAnYs_REPLACEME_2', 'ssid_2_pw': 'REPLACEME2'},
+
             "35448081188192":   {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
-                                 'mac2g': '20:3d:66:49:85:61', 'mac5g': '11:22:33:44:55:66', 'wifi': 'eeh4jxmh7q26',
-                                 'ssid': 'ATT4ujR48s'}}
+                                 'mac2g': '20:3d:66:49:85:61', 'mac5g': '11:22:33:44:55:66', 'wifi_pw': 'eeh4jxmh7q26',
+                                 'ssid': 'ATT4ujR48s', 'ssid_1_pw': 'xxxxxxxxx',
+                                 'ssid2': 'xxxxxxxxxxx_REPLACEME_2', 'ssid_2_pw': 'ssid2_pw_xxxx'}}
 
 
 airties_4920_defaults = {
@@ -255,9 +260,7 @@ class Nvg599Class(GatewayClass):
         # airties_session.implicitly_wait(10)
         # // *[ @ id = "mainlevel"] / li[3] / a
         # # advanced_settings_link = airties_session.find_element_by_xpath('// *[ @ id = "mainlevel"] / li[3] / a')
-
         airties_session.switch_to.frame(airties_session.find_element_by_css_selector("frame[name=menuFrame"))
-
         wait = WebDriverWait(airties_session,10)
         # advanced_link = wait.until(EC.element_to_be_clickable((By.XPATH,'// *[ @ id = "mainlevel"] / li[3] /a')))
         wait.until(EC.element_to_be_clickable((By.XPATH,'// *[ @ id = "mainlevel"] / li[3] /a'))).click()
@@ -282,15 +285,8 @@ class Nvg599Class(GatewayClass):
         #// *[ @ id = "__ML_restore_factory_defaults"]
         #// *[ @ id = "__ML_restore_factory_defaults"]
         #restore_factory_defaults = airties_session.find_element_by_xpath('//*[@id="__ML_restore_factory_defaults"]')
-        #restore_factory_defaults = airties_session.find_element_by_name("Restore Factory Defaults")
 
-        # restore_factory_defaults.click()
         sleep(10)
-        exit()
-        #class ="globalLargeButton ui-button ui-widget ui-state-default ui-corner-all buttonOptional" id="__ML_restore_factory_defaults" onclick="ClickFacrotyDefaults()" role="button" aria-disabled="false" >
-
-        #status_link = self.session.find_element_by_link_text("System Information")
-
 
     def set_fixed_ip_allocation(self):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
@@ -1344,19 +1340,22 @@ class Nvg599Class(GatewayClass):
         #
         sleep(120)
         self.turn_off_supplicant_cli()
+        # sleep(120)
         self.enable_sshd_ssh_cli()
+        # sleep(120)
         self.conf_tr69_eco_url()
+        # sleep(120)
         self.turn_off_wi_fi_security_protection_cli()
+        sleep(120)
         # not sure why this failed
         self.enable_parental_control()
-
+        self.enable_guest_network_and_set_password_ssid()
         # added this, lets see if it works
         self.session.close()
         rg_url = 'http://192.168.1.254/'
         session = webdriver.Chrome()
         session.get(rg_url)
         sleep(60)
-        self.enable_guest_network_and_set_password_ssid()
 
     def get_ui_home_network_status_value(self, value_requested):
         print('in get_ui_home_network_status_value)')
@@ -1624,9 +1623,9 @@ class Nvg599Class(GatewayClass):
             sleep(10)
             submit.click()
 
-        #submit = self.session.find_element_by_name("Save")
-        #sleep(2)
-        #submit.click()
+        # submit = self.session.find_element_by_name("Save")
+        # sleep(2)
+        # submit.click()
         self.check_for_wifi_security_and_regular_warning()
             # self.check_for_wifi_warning()
 
@@ -2239,6 +2238,7 @@ class Nvg599Class(GatewayClass):
         telnet_cli_session.expect(">")
         telnet_cli_session.sendline('magic')
         telnet_cli_session.expect("UNLOCKED>")
+        sleep(120)
         return telnet_cli_session
 
     @staticmethod
@@ -2332,6 +2332,60 @@ class Nvg599Class(GatewayClass):
         self.session.expect("log-spv.*]:")
         print('tr69 enbled for ECO')
         self.session.close()
+
+
+# #pfp
+#     @staticmethod
+#     def get_tr69_ssid_status_cli(ssid):
+#         telnet_cli_session = login_nvg_599_cli()
+#         telnet_cli_session.sendline('magic')
+#         telnet_cli_session.expect("UNLOCKED>")
+#         telnet_cli_session.sendline('tr69 tr69 GetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.' + ssid + '.Enable')
+#         telnet_cli_session.expect(".*UNLOCKED>")
+#         status_output = telnet_cli_session.before
+#         status_info_reg_ex = re.compile(r'Enable\s(\d)')
+#         status = status_info_reg_ex.search(status_output)
+#         print('returning SSID:' + ssid + ' Status:' + status )
+#         telnet_cli_session.close()
+    #
+# pfp
+    def get_tr69_auto_setup_ssid_status_cli(self, ssid):
+        self.telnet_cli_session = self.login_nvg_599_cli()
+        self.telnet_cli_session.sendline('magic')
+        self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
+        self.telnet_cli_session.sendline('tr69 GetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.' + str(ssid) + '.Enable')
+        self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
+        status_output = self.telnet_cli_session.before
+        print('status_output:' + status_output)
+        status_info_reg_ex = re.compile(r'Enable\s(\d)')
+        status = status_info_reg_ex.search(status_output)
+        status1 = status.group(1)
+        print('returning SSID:' + str(ssid) + ' Status:' + str(status1))
+        self.telnet_cli_session.close()
+        return str(status)
+
+    def set_tr69_auto_setup_ssid_cli(self, ssid):
+        self.telnet_cli_session = self.login_nvg_599_cli()
+        self.telnet_cli_session.sendline('magic')
+        self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.' + str(ssid) + '.Enable = 1')
+        self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.' + str(ssid) + '.BeaconAdvertisementEnabled = 1')
+        self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.' + str(ssid) + '.SSIDAdvertisementEnabled= 1')
+        self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
+        self.telnet_cli_session.close()
+
+
+    @staticmethod
+    def enable_tr69xx__cli(self):
+        self.telnet_cli_session = self.login_nvg_599_cli()
+        self.telnet_cli_session.sendline('magic')
+        self.telnet_cli_session.expect("UNLOCKED>")
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.X_0000C5_Debug.SshdEnabled=1')
+        self.telnet_cli_session.expect("successful.*>")
+        print('Enabled tr69 SshdEnabled=1')
+        self.telnet_cli_session.close()
 
     def enable_sshd_ssh_cli(self):
         self.telnet_cli_session = self.login_nvg_599_cli()

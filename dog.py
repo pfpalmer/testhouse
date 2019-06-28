@@ -604,7 +604,8 @@ def tst_ping_rg_power_level(nvg_599_dut, remote_ip, number_of_pings):
 
 
 def tst_android_speed_test(nvg_599_dut, remote_ip):
-# def tst_ping_rg_power_level(nvg_599_dut, remote_ip, number_of_pings):
+    # this test logins to the remote android device and executes a speed test
+    # def tst_ping_rg_power_level(nvg_599_dut, remote_ip, number_of_pings):
     tst_android_speed_file = open('tst_android_speed_test.txt', 'a')
     tst_android_speed_file.writelines('tst_android_speed_test: Remote IP:' + remote_ip + '\n')
     now = datetime.today().strftime("%B %d, %Y,%H:%M")
@@ -696,15 +697,26 @@ from datetime import datetime
 
 
 nvg_599_dut = Nvg599Class()
-#upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d9_1.1.bin'
+#upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d16_1.1.bin'
 #nvg_599_dut.upgrade_rg(upgrade_rg_file)
 #sleep(300)
 #nvg_599_dut.factory_reset_rg()
 #sleep(300)
-#rg_url = 'http://192.168.1.254/'
-#nvg_599_dut.wps_button_click(rg_url)
-airties_ap_net = "AirTies_SmartMesh_4PNF"
-nvg_599_dut.wps_pair_default_airties(airties_ap_net)
+#nvg_599_dut.enable_guest_network_and_set_password_ssid()
+ssid = 3
+nvg_599_dut.set_tr69_auto_setup_ssid_cli(ssid)
+ssid = 4
+nvg_599_dut.set_tr69_auto_setup_ssid_cli(ssid)
+#nvg_599_dut.enable_guest_network_and_set_password_ssid()
+exit()
+nvg_599_dut.factory_reset_rg()
+sleep(300)
+nvg_599_dut.enable_guest_network_and_set_password_ssid()
+
+# rg_url = 'http://192.168.1.254/'
+# nvg_599_dut.wps_button_click(rg_url)
+# airties_ap_net = "AirTies_SmartMesh_4PNF"
+# nvg_599_dut.wps_pair_default_airties(airties_ap_net)
 exit()
 
 #
@@ -747,7 +759,6 @@ Nvg599Class.nmcli_test()
 exit()
 ########################################################################################################3
 
-#nvg_599_dut.enable_guest_network_and_set_password_ssid()
 
 #device_dict = nvg_599_dut.ui_get_device_list()
 #print('device_dict:', device_dict)
