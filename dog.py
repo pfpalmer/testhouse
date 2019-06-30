@@ -697,6 +697,38 @@ from datetime import datetime
 
 
 nvg_599_dut = Nvg599Class()
+show_ip_lan_dict = nvg_599_dut.get_rg_sh_ip_lan_info_cli()
+print('dognnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn')
+
+# # self.ip_lan_connections_dict_cli[connected_device_mac] = {}
+# ip_lan_connections_dict_cli[connected_device_mac] = {}
+# ip_lan_connections_dict_cli[connected_device_mac]["IP"] = connected_device_ip
+# ip_lan_connections_dict_cli[connected_device_mac]["Name"] = connected_device_name
+# ip_lan_connections_dict_cli[connected_device_mac]["State"] = connected_device_status
+# ip_lan_connections_dict_cli[connected_device_mac]["DHCP"] = connected_device_dhcp
+# ip_lan_connections_dict_cli[connected_device_mac]["Port"] = connected_device_port
+# # self.telnet_cli_session.close()
+# telnet_cli_session.close()
+print(type(show_ip_lan_dict))
+pprint.pprint(show_ip_lan_dict, width = 1)
+print('dognnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn')
+
+for ip_lan_entry in show_ip_lan_dict:
+    airties_4920_ip_list= {}
+    if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
+        print(ip_lan_entry)
+        # add this to a list which airties_4920
+        print(show_ip_lan_dict[ip_lan_entry]["IP"])
+
+# def set_4920_to_factory_default(ip_of_4920):
+# for each ip in 4920_ip_list
+#print(type(show_ip_lan_dict))
+#pprint.pprint(show_ip_lan_dict, width = 1)
+exit()
+
+
+
+nvg_599_dut = Nvg599Class()
 #upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d16_1.1.bin'
 #nvg_599_dut.upgrade_rg(upgrade_rg_file)
 #sleep(300)
@@ -732,8 +764,8 @@ exit()
 
 
 
-min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss  = nvg_599_dut.ping_from_local_host(remote_ip, number_of_pings)
-print('min:'+ min_ping + ' max:' + max_ping)
+# min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss  = nvg_599_dut.ping_from_local_host(remote_ip, number_of_pings)
+# print('min:'+ min_ping + ' max:' + max_ping)
 
 ping_file = open('ping_file_with_power_change_test.txt', 'a')
 
@@ -741,14 +773,14 @@ ping_file = open('ping_file_with_power_change_test.txt', 'a')
 now = datetime.today().strftime("%B %d, %Y,%H:%M")
 #ping_file.writelines('Ping ' + remote_ip + ' RG Pwr %:' + str(percentage) +  ' Sent:' + sent + ' Received:' + received + ' Percent loss:' + loss + '%' + ' Date:' + now + '\n')
 ping_file.writelines('Date:' + now + '599 FW Ver:' + nvg_599_dut.software_version + ' Ser. No:' + nvg_599_dut.serial_number + '\n')
-ping_file.writelines('Ping ' + remote_ip + ' RG Pwr %:' + str(percentage) +  ' Sent:' + sent + ' Received:' + received + ' Percent loss:' + loss + '%\n')
-#ping_file.writelines('Date:' + now + ' Ping ' + remote_ip + ' RG Pwr %:' + str(percentage) +  ' Sent:' + sent + ' Received:' + received + ' Percent loss:' + loss + '%\n')
+# ping_file.writelines('Ping ' + remote_ip + ' RG Pwr %:' + str(percentage) +  ' Sent:' + sent + ' Received:' + received + ' Percent loss:' + loss + '%\n')
+# ping_file.writelines('Date:' + now + ' Ping ' + remote_ip + ' RG Pwr %:' + str(percentage) +  ' Sent:' + sent + ' Received:' + received + ' Percent loss:' + loss + '%\n')
 
 # ping_file.writelines("599 FW Ver:" + nvg_599_dut.software_version + " Ser. No:" +
 #                      nvg_599_dut.serial_number + '  min_ping:' + min_ping + '  avg_ping:' + avg_ping +
 #                      '  max_ping:' + max_ping + '  max dev:' + mdev_ping +'\n')
 
-ping_file.writelines('Minimum:' + min_ping + ' Average::' + avg_ping + ' Maximum:' + max_ping + ' max dev:' + mdev_ping +'\n')
+# ping_file.writelines('Minimum:' + min_ping + ' Average::' + avg_ping + ' Maximum:' + max_ping + ' max dev:' + mdev_ping +'\n')
 
 # ping_file.writelines('Date:' + now + " 599 FW Ver:" + nvg_599_dut.software_version + " Ser. No:" +
 #                      nvg_599_dut.serial_number + '  min_ping:' + min_ping + '  avg_ping:' + avg_ping +
