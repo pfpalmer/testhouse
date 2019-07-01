@@ -247,11 +247,31 @@ class Nvg599Class(GatewayClass):
         pass
 
 # pfp1
+    @staticmethod
+    # def set_all_4920s_to_factory_default(self):
+    def set_all_4920s_to_factory_default():
 
-    def set_4920_to_factory_default(ip_of_4920):
+        # show_ip_lan_dict = self.get_rg_sh_ip_lan_info_cli()
+        show_ip_lan_dict = Nvg599Class.get_rg_sh_ip_lan_info_cli()
+
+        # airties_4920_ip_list = []
+        for ip_lan_entry in show_ip_lan_dict:
+            if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
+                # print(ip_lan_entry)
+                # add this to a list which airties_4920
+                print('in for loop' + show_ip_lan_dict[ip_lan_entry]["IP"])
+                # airties_4920_ip_list.append(show_ip_lan_dict[ip_lan_entry]["IP"])
+                # self.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
+                Nvg599Class.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
+
+
+    def set_4920_to_factory_default(self, ip_of_4920):
+        # print('setting 4920 with ip:' + ip_of_4920 + ' to factory default' )
         print('setting 4920 with ip:' + ip_of_4920 + ' to factory default' )
+
         global nvg_info
-        airties_url = 'http://192.168.1.67/'
+        airties_url = 'http://' + ip_of_4920 + '/'
+        print('airties_url' + airties_url)
         #rg_url = 'http://192.168.1.254/'
         airties_session = webdriver.Chrome()
         airties_session.get(airties_url)
@@ -1301,6 +1321,9 @@ class Nvg599Class(GatewayClass):
         # self.session.find_element_by_css_selector(".cssbtn[value='Reset Device...']").click()
         print('Resetting to factory defaults now')
         sleep(10)
+
+        self.session.close()
+
         start = time.time()
         print("starting timer:" + str(start))
         loop = 1
@@ -1349,12 +1372,15 @@ class Nvg599Class(GatewayClass):
         sleep(120)
         # not sure why this failed
         self.enable_parental_control()
+
+        rg_url = 'http://192.168.1.254/'
+        self.session = webdriver.Chrome()
+        self.session.get(rg_url)
+
         self.enable_guest_network_and_set_password_ssid()
         # added this, lets see if it works
-        self.session.close()
-        rg_url = 'http://192.168.1.254/'
-        session = webdriver.Chrome()
-        session.get(rg_url)
+        # self.session.close()
+
         sleep(60)
 
     def get_ui_home_network_status_value(self, value_requested):
@@ -1532,6 +1558,8 @@ class Nvg599Class(GatewayClass):
 
 
 #  pfp
+
+    # palmer@palmer-Latitude-E5450:~$ nmcli dev wifi | grep AirTies
     def wps_pair_default_airties(self,airties_network):
         print('Clicking on WPS button')
         # rg_url = 'http://192.168.1.254/'
@@ -1545,7 +1573,11 @@ class Nvg599Class(GatewayClass):
         self.check_if_dac_required()
         wps_button = self.session.find_element_by_name("pb1")
         wps_button.click()
-        self.session.close()
+
+
+        # why do I want o close
+
+        # self.session.close()
 
         cmd = "nmcli con down ATTqbrAnYs"
         # cmd = "nmcli con down AirTies_SmartMesh_4PNF"
@@ -1585,9 +1617,11 @@ class Nvg599Class(GatewayClass):
         output = subprocess.check_output(cmd, shell=True)
         print('output from reconnect',output)
 
+
+
         # rg_url = 'http://192.168.1.254/'
-        self.session = webdriver.Chrome()
-        self.session.get(self.rg_url)
+        # self.session = webdriver.Chrome()
+        # self.session.get(self.rg_url)
         sleep(30)
 
 
@@ -2378,13 +2412,42 @@ class Nvg599Class(GatewayClass):
 
 
     @staticmethod
-    def enable_tr69xx__cli(self):
+    def enable_ipv6_via_tr69_cli(self):
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect("UNLOCKED>")
-        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.X_0000C5_Debug.SshdEnabled=1')
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IP.X_ATT_IPv6EnableLAN=TRUE')
         self.telnet_cli_session.expect("successful.*>")
-        print('Enabled tr69 SshdEnabled=1')
+
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.2.DNSServers=10.8.200.16,10.8.50.251')
+        self.telnet_cli_session.expect("successful.*>")
+
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.2.DNSOverrideAllowed=FALSE')
+        self.telnet_cli_session.expect("successful.*>")
+
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IP.IPv6Enable=1')
+        self.telnet_cli_session.expect("successful.*>")
+
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IPv6rd.Enable=1')
+        self.telnet_cli_session.expect("successful.*>")
+
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IPv6rd.InterfaceSetting.1.SPIPv6Prefix=2001:470:8c13::/48')
+        self.telnet_cli_session.expect("successful.*>")
+
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IPv6rd.InterfaceSetting.1.IPv4MaskLength=20')
+        self.telnet_cli_session.expect("successful.*>")
+
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IPv6rd.InterfaceSetting.1.BorderRelayIPv4Addresses=10.8.50.126')
+        self.telnet_cli_session.expect("successful.*>")
+
+
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IPv6rd.InterfaceSetting.1.AllTrafficToBorderRelay=1')
+        self.telnet_cli_session.expect("successful.*>")
+
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IPv6rd.InterfaceSetting.1.X_ATT_ConfigurationSource=CWMP')
+        self.telnet_cli_session.expect("successful.*>")
+
+        print('Enabled IPV6 via cli tr69')
         self.telnet_cli_session.close()
 
     def enable_sshd_ssh_cli(self):

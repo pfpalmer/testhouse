@@ -296,7 +296,6 @@ import numpy as np
 # import matplotlib.pyplot as plt
 from pylab import *
 
-#
 def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_names):
     now = datetime.today().isoformat()
     start_time = datetime.today().strftime("%b-%d-%Y--%H:%M")
@@ -601,8 +600,6 @@ def tst_ping_rg_power_level(nvg_599_dut, remote_ip, number_of_pings):
     #band = 'band2'
     nvg_599_dut.set_wifi_power_level('band5', '100')
 
-
-
 def tst_android_speed_test(nvg_599_dut, remote_ip):
     # this test logins to the remote android device and executes a speed test
     # def tst_ping_rg_power_level(nvg_599_dut, remote_ip, number_of_pings):
@@ -678,77 +675,99 @@ def tst_ping_rg_power_level_orig(nvg_599_dut, band, percentage, remote_ip, numbe
 
 from datetime import datetime
 
-#Nvg599Class().run_speed_test_from_android_termux("192.168.1.93")
-#exit()
-#now = datetime.today().strftime("%B %d, %Y,%H:%M")
+#
+# nvg_599_dut = Nvg599Class()
 
-#ip_of_4920 = '192.168.1.67'
-#Nvg599Class.set_4920_to_factory_default(ip_of_4920)
-# Nvg599Class.nmcli_test()
+# #nvg_599_dut.set_all_4920s_to_factory_default()
+# Nvg599Class.set_all_4920s_to_factory_default()
+#
+# exit()
+# nvg_599_dut = Nvg599Class()
+# show_ip_lan_dict = nvg_599_dut.get_rg_sh_ip_lan_info_cli()
+# print('dognnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn')
+# # rg_url = 'http://192.168.1.254/'
+#
+# # # self.ip_lan_connections_dict_cli[connected_device_mac] = {}
+# # ip_lan_connections_dict_cli[connected_device_mac] = {}
+# # ip_lan_connections_dict_cli[connected_device_mac]["IP"] = connected_device_ip
+# # ip_lan_connections_dict_cli[connected_device_mac]["Name"] = connected_device_name
+# # ip_lan_connections_dict_cli[connected_device_mac]["State"] = connected_device_status
+# # ip_lan_connections_dict_cli[connected_device_mac]["DHCP"] = connected_device_dhcp
+# # ip_lan_connections_dict_cli[connected_device_mac]["Port"] = connected_device_port
+# # # self.telnet_cli_session.close()
+# # telnet_cli_session.close()
+# #print(type(show_ip_lan_dict))
+# pprint.pprint(show_ip_lan_dict, width = 1)
+# print('dognnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn')
+# airties_4920_ip_list = []
+# for ip_lan_entry in show_ip_lan_dict:
+#     if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
+#         print(ip_lan_entry)
+#         # add this to a list which airties_4920
+#         print('in for loop' + show_ip_lan_dict[ip_lan_entry]["IP"])
+#         airties_4920_ip_list.append(show_ip_lan_dict[ip_lan_entry]["IP"])
+# print('dogccccccccccccccccccccccnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn')
+# print(*airties_4920_ip_list,sep='\n')
+# sleep(10)
+#
+# for i in  range(len(airties_4920_ip_list)):
+#     print('list', airties_4920_ip_list[i])
+#
 # exit()
 
-
-#tst_android_speed_test(nvg_599_dut, '192.168.1.93')
-#tst_ping_rg_power_level(nvg_599_dut, '192.168.1.93', '20')
-#exit()
-#nvg_599_dut.ui_set_wifi_password('Custom Password', '1111111111')
-#tst_ping_rg_power_level(nvg_599_dut, '192.168.1.94', '20')
-#nvg_599_dut.ui_enable_guest_network_and_set_password_ssid()
-
-
 nvg_599_dut = Nvg599Class()
-show_ip_lan_dict = nvg_599_dut.get_rg_sh_ip_lan_info_cli()
-print('dognnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn')
-
-# # self.ip_lan_connections_dict_cli[connected_device_mac] = {}
-# ip_lan_connections_dict_cli[connected_device_mac] = {}
-# ip_lan_connections_dict_cli[connected_device_mac]["IP"] = connected_device_ip
-# ip_lan_connections_dict_cli[connected_device_mac]["Name"] = connected_device_name
-# ip_lan_connections_dict_cli[connected_device_mac]["State"] = connected_device_status
-# ip_lan_connections_dict_cli[connected_device_mac]["DHCP"] = connected_device_dhcp
-# ip_lan_connections_dict_cli[connected_device_mac]["Port"] = connected_device_port
-# # self.telnet_cli_session.close()
-# telnet_cli_session.close()
-print(type(show_ip_lan_dict))
-pprint.pprint(show_ip_lan_dict, width = 1)
-print('dognnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn')
-
-for ip_lan_entry in show_ip_lan_dict:
-    airties_4920_ip_list= {}
-    if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
-        print(ip_lan_entry)
-        # add this to a list which airties_4920
-        print(show_ip_lan_dict[ip_lan_entry]["IP"])
-
-# def set_4920_to_factory_default(ip_of_4920):
-# for each ip in 4920_ip_list
-#print(type(show_ip_lan_dict))
-#pprint.pprint(show_ip_lan_dict, width = 1)
-exit()
-
-
-
-nvg_599_dut = Nvg599Class()
-#upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d16_1.1.bin'
-#nvg_599_dut.upgrade_rg(upgrade_rg_file)
-#sleep(300)
+nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, 36)
 #nvg_599_dut.factory_reset_rg()
 #sleep(300)
+exit()
 #nvg_599_dut.enable_guest_network_and_set_password_ssid()
+#nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, 36)
+ssid = 3
+nvg_599_dut.set_tr69_auto_setup_ssid_cli(ssid)
+ssid = 4
+nvg_599_dut.set_tr69_auto_setup_ssid_cli(ssid)
+
+
+#nvg_599_dut.enable_guest_network_and_set_password_ssid()
+#rg_url = 'http://192.168.1.254/'
+#nvg_599_dut.wps_pair_default_airties(rg_url)
+airties_ap_net = "AirTies_SmartMesh_4PNF"
+nvg_599_dut.wps_pair_default_airties(airties_ap_net)
+sleep(300)
+airties_ap_net = "AirTies_Air4920_33N3"
+nvg_599_dut.wps_pair_default_airties(airties_ap_net)
+# wps_pair_default_airties(airties_ap_net)
+
+# nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, 100)
+nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, 36)
+
+
+exit()
+upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d17_1.1.bin'
+nvg_599_dut.upgrade_rg(upgrade_rg_file)
+sleep(300)
+nvg_599_dut.factory_reset_rg()
+sleep(300)
+nvg_599_dut.enable_guest_network_and_set_password_ssid()
 ssid = 3
 nvg_599_dut.set_tr69_auto_setup_ssid_cli(ssid)
 ssid = 4
 nvg_599_dut.set_tr69_auto_setup_ssid_cli(ssid)
 #nvg_599_dut.enable_guest_network_and_set_password_ssid()
-exit()
-nvg_599_dut.factory_reset_rg()
-sleep(300)
-nvg_599_dut.enable_guest_network_and_set_password_ssid()
+rg_url = 'http://192.168.1.254/'
+nvg_599_dut.wps_button_click(rg_url)
+airties_ap_net = "AirTies_SmartMesh_4PNF"
+nvg_599_dut.wps_pair_default_airties(airties_ap_net)
 
-# rg_url = 'http://192.168.1.254/'
-# nvg_599_dut.wps_button_click(rg_url)
-# airties_ap_net = "AirTies_SmartMesh_4PNF"
-# nvg_599_dut.wps_pair_default_airties(airties_ap_net)
+sleep(300)
+nvg_599_dut.wps_button_click(rg_url)
+airties_ap_net = "AirTies_Air4920_33N3"
+# wps_pair_default_airties(airties_ap_net)
+
+# nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, 100)
+nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, 36)
+
+
 exit()
 
 #
