@@ -30,9 +30,10 @@ from rgclass import Nvg599Class
 # from rgclass import DFS_CHANNELS
 # from rgclass import  test_house_devices_static_info
 
-NON_DFS_CHANNELS = {36,40,44,48,149,153,157,161,165}
-DFS_CHANNELS     = {52,56,60,64,100,104,108,112,116,132,136,140,144}
-ALL_BAND5_CHANNELS = {36, 40, 44, 48,52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144, 149, 153, 157, 161, 165}
+NON_DFS_CHANNELS = {36, 40, 44, 48, 149, 153, 157, 161, 165}
+DFS_CHANNELS     = {52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144}
+ALL_BAND5_CHANNELS = {36, 40, 44, 48,52, 56, 60, 64, 100, 104, 108, 112,
+                      116, 132, 136, 140, 144, 149, 153, 157, 161, 165}
 
 # from rgclass import  NON_DFS_CHANNELS
 # from rgclass import  DFS_CHANNELS
@@ -40,6 +41,7 @@ ALL_BAND5_CHANNELS = {36, 40, 44, 48,52, 56, 60, 64, 100, 104, 108, 112, 116, 13
 # Check the 5G channel used. If none DFS , set to DFS and note the setting
 # enter the command to simulate radar detection
 # verify that the channel changes to a non DFS channel
+
 def test_dfs(nvg_599_dut,):
     global NON_DFS_CHANNELS
     global DFS_CHANNELS
@@ -85,7 +87,7 @@ def test_dfs(nvg_599_dut,):
     current_5g_channel = nvg_599_dut.get_ui_home_network_status_value("ui_channel_5g")
     current_5g_channel = int(current_5g_channel)
 
-    print('current_5g_channel',current_5g_channel)
+    print('current_5g_channel', current_5g_channel)
     # after the test we expect the channel to have been changed to a non DFS channel
 
     if current_5g_channel in NON_DFS_CHANNELS:
@@ -106,22 +108,12 @@ def test_dfs(nvg_599_dut,):
     else:
         print('test failed:Channel found:',current_5g_channel,' expected non DFS channel')
         print('current_5g_channel', current_5g_channel)
-        #exit()
         result = "Current 5G:" + str(current_5g_channel) + " is a DFS channel\n"
-        #result_str = str(result)
-
         print("result string  -dbg",result)
         #results_file.write("Current 5G:" ,current_5g_channel," is not a DFS channel\n")
         dfs_results_file.write(result)
 
-# def tst_599_nvg_init():
-#     nvg_599_dut = Nvg599Class()
-#     url = 'http://192.168.1.254/'
-#     nvg_599_dut.session = webdriver.Chrome()
-#     nvg_599_dut.session.get(url)
-#     return nvg_599_dut
-
-def tst_speed_test(nvg_599_dut,results_file,test_ip):
+def tst_speed_test(nvg_599_dut, results_file,test_ip):
     print('in tst_speed_test')
     now = datetime.today().isoformat()
     results_file.write("Test Title:tst_speed_tst Execution time:")
@@ -143,7 +135,7 @@ def tst_speed_test(nvg_599_dut,results_file,test_ip):
     results_file.write("\n")
     results_file.write("\n")
 
-def tst_ping_ip(nvg_599_dut,ping_history_file, remote_ip):
+def tst_ping_ip(nvg_599_dut, ping_history_file, remote_ip):
     print('in tst_ping')
     #ping_history_file  = open('ping_history_file.txt', 'a+')
     ping_history_file  = open(ping_history_file, 'a+')
@@ -152,15 +144,15 @@ def tst_ping_ip(nvg_599_dut,ping_history_file, remote_ip):
     ping_history_file.write(now)
     ping_history_file.write("\n")
     min,avg,max,mdev = nvg_599_dut.ping_from_local_host(remote_ip)
-    min_str = 'Min time: '+ min
+    min_str = 'Min time: ' + min
     ping_history_file.write(min_str)
 
     ping_history_file.write("\n")
-    avg_str = 'Avg time: '+ avg
+    avg_str = 'Avg time: ' + avg
     ping_history_file.write(avg_str)
 
     ping_history_file.write("\n")
-    max_str = 'Max time:'+ max
+    max_str = 'Max time:' + max
     ping_history_file.write(max_str)
 
     ping_history_file.write("\n")
@@ -171,12 +163,11 @@ def tst_ping_ip(nvg_599_dut,ping_history_file, remote_ip):
     print('min: ', min)
     print('avg: ', avg)
     print('max: ', max)
-    print('mdev:',mdev)
+    print('mdev:', mdev)
 
 def test_ping_device_name(device_name_to_ping):
 #    sh_ip_lan_dict = Nvg599Class.get_rg_sh_ip_lan_info_cli('arris-Latitude-MBR')
     sh_ip_lan_dict = Nvg599Class.get_rg_sh_ip_lan_info_cli()
-
     print('dict type' + str(type(sh_ip_lan_dict)))
     for key in sh_ip_lan_dict:
         #print('key----------------------------------------------' + key)
@@ -184,12 +175,8 @@ def test_ping_device_name(device_name_to_ping):
             print('found it ' + sh_ip_lan_dict[key]['Name'])
             print('IP is: ' + sh_ip_lan_dict[key]['IP'])
             # we use the  mac from the IP table to get the radio band
-            sh_wi_cl_dict = Nvg599Class.cli_sh_wi_all_clients()
+            # sh_wi_cl_dict = Nvg599Class.cli_sh_wi_all_clients()
             nvg_599_dut.ping_from_local_host(sh_ip_lan_dict[key]['IP'])
-
-            # nvg_599_dut.cli_sh_wi_clients()
-    # def cli_sh_wi_clients(self):
-    # print('dict is ' + str(sh_ip_lan_dict))
 
 def test_channel_channelband_combinations(band5_channel_list, band5_bandwidth_list,ip_to_ping, result_file_name):
     nvg_599_dut = Nvg599Class()
@@ -221,28 +208,7 @@ def test_channel_channelband_combinations(band5_channel_list, band5_bandwidth_li
             channel_band_file.writelines('Channel:' + str(band5_channel_list[band5_channel]) + " Bandwidth:"  + str(band5_bandwidth_list[band5_bandwidth]) + ' Ping result:' + str(ping_results) + '\n')
         #                     self.serial_number + '  min_ping:' + min_ping + '  avg_ping:' +
         #                     '  max_ping:' + max_ping + '  max dev:' + mdev_ping)
-        #ping_file.writelines('\n')
     channel_band_file.close()
-
-#
-# firmware_599_available =['/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin',
-#     '/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin'
-#     '/home/palmer/Downloads/nvg599-9.2.2h12d10_1.1.bin',
-#     '/home/palmer/Downloads/nvg599-9.2.2h12d13_1.1.bin',
-#     '/home/palmer/Downloads/nvg599-9.2.2h13d1_1.1.bin'
-#     '/home/palmer/Downloads/nvg599-9.2.2h13d2_1.1.bin'
-#     '/home/palmer/Downloads/nvg599-9.2.2h13d3_1.1.bin'
-#     '/home/palmer/Downloads/nvg599-9.2.2h13d4_1.1.bin'
-#
-#                          ]
-#
-firmware_599_names_test =[
-'nvg599-9.2.2h12d9_1.1',
-'nvg599-9.2.2h13d4_1.1']
-#
-#                          ]
-
-#upgrade_file = 'sadf'
 
 
 def test_comprehension(firmware_599_available):
@@ -255,26 +221,75 @@ def test_comprehension(firmware_599_available):
     print('upper case:', upper_case)
     result = []
 
-def test_rg_upgrade(nvg_599_dut, firmware_599_available):
-    upgrade_status = nvg_599_dut.update_rg(firmware_599_available)
-    #nvg_599_dut.ping_from_local_host('192.168.1.67')
-    # nvg_599_dut.ping_from_local_host('192.168.1.67')
-
-#def test_rg_upgrade(nvg_599_dut(nvg_599_dut, upgrade_file):#    pass
-#     print('in test_rg_upgrade')
-#     upgrade_status = nvg_599_dut.update_rg(upgrade_file)
-
-
+##################################################################################
+# use of round function example
 # x = 13.73333
 # x_round = round(x)
 # print('x_round:',x_round)
-# exit()
+##################################################################################
 
 
 import matplotlib.pyplot as plt
 import matplotlib.image as img
 
 #
+# firmware_599_available =['/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin',
+#     '/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin'
+#     '/home/palmer/Downloads/nvg599-9.2.2h12d10_1.1.bin',
+#     '/home/palmer/Downloads/nvg599-9.2.2h12d13_1.1.bin',
+#     '/home/palmer/Downloads/nvg599-9.2.2h13d1_1.1.bin'
+#     '/home/palmer/Downloads/nvg599-9.2.2h13d2_1.1.bin'
+#     '/home/palmer/Downloads/nvg599-9.2.2h13d3_1.1.bin'
+#     '/home/palmer/Downloads/nvg599-9.2.2h13d4_1.1.bin'                         ]
+
+
+def speed_test_graph_2_devices_plt():
+    tablet_download_list = [27.7, 28.9, 27.6, 27.1, 30.1, 29.2, 30.6, 28.1, 29.0, 26.2]
+    note8_download_list = [55.3, 54.4, 50.1, 58.2, 48.8, 41.1, 44.0, 44.0, 50.5, 51.7]
+    tablet_upload_list = [2.4, 2.3, 2.4, 2.4, 2.1, 2.3, 2.1, 2.2, 2.4, 2.1]
+    note8_upload_list = [2.1, 2.1, 2.0, 2.1, 2.4, 2.1, 2.01, 2.1, 2.2, 1.9]
+    plt.figure("Test House Speedtest results for NVG 599", figsize=(8, 7))
+    # x_label_list = ['9.2.2h12d9','9.2.2h12d10','9.2.2h12d13','9.2.2h13d1 ',
+    # '9.2.2h13d2','9.2.2h13d3', '9.2.2h13d4','9.2.2h13d5','9.2.2h13d6']
+    # start number,stop number, steps
+    ty = arange(1.0, 11.0, 1)
+    # tx =  arange(1.0, 10.0, 1)
+    # plt.xticks([1,2,3,4,5,6,7,8,9])
+    # plt.xticks([1,2,3,4,5,6,7,8,9],x_label_list,rotation='vertical')
+    # plt.subplots(2,1,sharey=True)
+
+    subplot(2, 1, 1)
+    plt.ylabel('Speed in MBPS')
+    title('NVG 599 Download Speed')
+    plt.ylim([10, 70])
+    plot(ty, tablet_download_list, 'g')
+    plot(ty, note8_download_list, 'b')
+    plt.grid()
+    #
+    # plt.legend(bbox_to_anchor=(1, -1.2), ncol=1)
+    # plt.legend(bbox_to_anchor=(1, -1.2), ncol=1)
+
+    subplot(2, 1, 2)
+    title('NVG 599 Upload Speed')
+    plt.ylabel('Speed in MBPS')
+    plt.xlabel('Firmware')
+    plt.xticks([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], firmware_599_names, rotation='vertical')
+
+    plt.ylim([0, 4])
+
+    plot(ty, tablet_upload_list, 'b', label="Samsung Note8 5 G")
+    plot(ty, note8_upload_list, 'g', label="Samsung Tablet 2.4 G")
+    plt.legend(bbox_to_anchor=(1, -1.0), ncol=1)
+    plt.grid()
+    # plt.tight_layout()
+    plt.subplots_adjust(left=0.1, right=0.9, bottom=0.4, top=0.9, hspace=0.4)
+    plt.legend(bbox_to_anchor=(1, -1.2), ncol=1)
+    # now = datetime.today().isoformat()
+    # now = datetime.today().isoformat()
+    # channel_band_file.write(now + ""Test Title:Channel/Channel band test:" +"\n")
+    plt.savefig("/home/palmer/Downloads/speedtest:")
+    show()
+
 # note8_file.write("Speedtest results for Samsung Note 8:" + "\n")
 # note8_file.write(now + "\n")
 # tablet_file.write("Speedtest results for Samsung Tablet:" + "\n")
@@ -296,12 +311,14 @@ import numpy as np
 # import matplotlib.pyplot as plt
 from pylab import *
 
+# used with plt graphing
 def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_names):
+    ''' returns tablet_download_list, tablet_upload_list, note8_download_list, note8_upload_list'''
     now = datetime.today().isoformat()
     start_time = datetime.today().strftime("%b-%d-%Y--%H:%M")
     # x = [1, 2, 3, 4, 5, 6, 7, 8]
-    note8_file_name = "note8_" + start_time +'.txt'
-    tablet_file_name = "tablet_" + start_time +'.txt'
+    note8_file_name = "note8_" + start_time + '.txt'
+    tablet_file_name = "tablet_" + start_time + '.txt'
 
     # note8_file = open('note_file.txt', 'a')
     # tablet_file = open('tablet_file.txt', 'a')
@@ -324,14 +341,13 @@ def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_
         print('in firmware loop ******************* firmware' + str(firmware))
         nvg_599_dut.update_rg(firmware)
         sleep(300)
-        #.67 is  the tablet
-        #speed_test_result_tuple_tablet = Nvg599Class.run_speed_test_from_android_termux("192.168.1.67")
+        # .67 is  the tablet
+        # speed_test_result_tuple_tablet = Nvg599Class.run_speed_test_from_android_termux("192.168.1.67")
         ping_results = nvg_599_dut.ping_check('192.168.1.67')
         a,b = Nvg599Class.run_speed_test_from_android_termux("192.168.1.67")
         print('Tablet ---------------------------------------------firmware:' + str(firmware))
-
         # print("speed_test_result_tuple:", speed_test_result_tuple_tablet)
-        #for a, b in speed_test_result_tuple_tablet:
+        # for a, b in speed_test_result_tuple_tablet:
         print('tablet download speed: ' + a + ' Upload speed:' + b)
         tablet_download_list.append(a)
         tablet_upload_list.append(b)
@@ -416,7 +432,6 @@ def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_
     return tablet_download_list, tablet_upload_list, note8_download_list, note8_upload_list
 
 
-
 # now = datetime.today().isoformat()
 # start_time = datetime.today().strftime("%b-%d-%Y--%H:%M")
 # x = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -440,16 +455,16 @@ firmware_599_names = [
         ]
 
 firmware_599_available = ['/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin',
-                        '/home/palmer/Downloads/nvg599-9.2.2h12d10_1.1.bin',
-                        '/home/palmer/Downloads/nvg599-9.2.2h12d13_1.1.bin',
-                        '/home/palmer/Downloads/nvg599-9.2.2h13d1_1.1.bin',
-                        '/home/palmer/Downloads/nvg599-9.2.2h13d2_1.1.bin',
-                        '/home/palmer/Downloads/nvg599-9.2.2h13d3_1.1.bin',
-                        '/home/palmer/Downloads/nvg599-9.2.2h13d4_1.1.bin',
-                        '/home/palmer/Downloads/nvg599-9.2.2h13d5_1.1.bin',
-                        '/home/palmer/Downloads/nvg599-9.2.2h13d6_1.1.bin',
-                        '/home/palmer/Downloads/nvg599-9.2.2h13d7_1.1.bin',
-                        '/home/palmer/Downloads/nvg599-9.2.2h13d8_1.1.bin',
+                          '/home/palmer/Downloads/nvg599-9.2.2h12d10_1.1.bin',
+                         '/home/palmer/Downloads/nvg599-9.2.2h12d13_1.1.bin',
+                         '/home/palmer/Downloads/nvg599-9.2.2h13d1_1.1.bin',
+                         '/home/palmer/Downloads/nvg599-9.2.2h13d2_1.1.bin',
+                         '/home/palmer/Downloads/nvg599-9.2.2h13d3_1.1.bin',
+                         '/home/palmer/Downloads/nvg599-9.2.2h13d4_1.1.bin',
+                         '/home/palmer/Downloads/nvg599-9.2.2h13d5_1.1.bin',
+                         '/home/palmer/Downloads/nvg599-9.2.2h13d6_1.1.bin',
+                         '/home/palmer/Downloads/nvg599-9.2.2h13d7_1.1.bin',
+                         '/home/palmer/Downloads/nvg599-9.2.2h13d8_1.1.bin',
                           ]
 
 # from string
@@ -479,22 +494,10 @@ firmware_599_available = ['/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin',
 #     pickle.dump(note8_upload_list, open("mypickle.p","wb"))
 #     new_pickle= pickle.load( open("mypickle.p","rb"))
 #     print('new_pickle',new_pickle)
-#
-#
-#
 # pickle_test()
 # print('done')
 # exit()
 
-
-#date = datetime.datetime.strptime(date,"%m%d%Y")
-
-# def datetimetest():
-#     now = datetime.today().isoformat()
-
-
-# datetimetest()
-# exit()
 # return min_ping, avg_ping, max_ping, mdev_ping
 #mina, avga, maxa, mdeva  =  nvg_599_dut.ping_from_local_host("192.168.1.70")
 #print('min:' + str(mina) + ' max:' + str(maxa) +  ' avg: ' + avga)
@@ -504,18 +507,13 @@ firmware_599_available = ['/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin',
 #now = datetime.today().isofor.strftime('%Y-%m-%d')mat()
 #now = datetime.today().strftime("%I:%M%p on %B %d, %Y")
 #now = datetime.today().strftime("%B %d, %Y,%I:%Mp")
+# ################  This is the one I want
+# now = datetime.today().strftime("%B %d, %Y,%H:%M")
+# ########################################
+# now.strftime('%m-%d-%y %H:%M:')
 
-
-
-#################  This is the one I want
-#now = datetime.today().strftime("%B %d, %Y,%H:%M")
-#########################################
-#now.strftime('%m-%d-%y %H:%M:')
-
-#-pfp-
 def tst_ping_rg_power_level(nvg_599_dut, remote_ip, number_of_pings):
 # def tst_ping_rg_power_level(nvg_599_dut, remote_ip, number_of_pings):
-
     ping_file = open('tst_ping_with_power_change.txt', 'a')
     ping_file.writelines('tst_ping_rg_power_level' + '\n')
     now = datetime.today().strftime("%B %d, %Y,%H:%M")
@@ -530,7 +528,6 @@ def tst_ping_rg_power_level(nvg_599_dut, remote_ip, number_of_pings):
 
     nvg_599_dut.disable_enable_wifi_5g('Off')
     sleep(120)
-    #nvg_599_dut.ping_from_local_host(remote_ip, number_of_pings=20)
     min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss = nvg_599_dut.ping_from_local_host(remote_ip,number_of_pings)
     print('min:' + min_ping + ' max:' + max_ping)
 
@@ -637,14 +634,7 @@ def tst_android_speed_test(nvg_599_dut, remote_ip):
 ############################## DEPRECATED   ####################################################################################################
 def tst_ping_rg_power_level_orig(nvg_599_dut, band, percentage, remote_ip, number_of_pings):
     print('testing ping after power level changes')
-    #band = 'band2'
-    #percentage = 100
-    #nvg_599_dut.set_wifi_power_level(band, percentage)
-    #band = 'band5'
-    #percentage = 100
-    #nvg_599_dut.set_wifi_power_level(band, percentage)
-    #remote_ip = "192.168.1.94"
-    #number_of_pings = 20
+
     if band == 'band2':
         nvg_599_dut.disable_enable_wifi_2_4g('On')
         nvg_599_dut.disable_enable_wifi_5g('Off')
@@ -675,47 +665,38 @@ def tst_ping_rg_power_level_orig(nvg_599_dut, band, percentage, remote_ip, numbe
 
 from datetime import datetime
 
-#
-# nvg_599_dut = Nvg599Class()
 
-# #nvg_599_dut.set_all_4920s_to_factory_default()
-# Nvg599Class.set_all_4920s_to_factory_default()
-#
+############################################  -pfp-
+
+
+# speed_test_graph_2_devices_plt()
 # exit()
-# nvg_599_dut = Nvg599Class()
-# show_ip_lan_dict = nvg_599_dut.get_rg_sh_ip_lan_info_cli()
-# print('dognnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn')
-# # rg_url = 'http://192.168.1.254/'
-#
-# # # self.ip_lan_connections_dict_cli[connected_device_mac] = {}
-# # ip_lan_connections_dict_cli[connected_device_mac] = {}
-# # ip_lan_connections_dict_cli[connected_device_mac]["IP"] = connected_device_ip
-# # ip_lan_connections_dict_cli[connected_device_mac]["Name"] = connected_device_name
-# # ip_lan_connections_dict_cli[connected_device_mac]["State"] = connected_device_status
-# # ip_lan_connections_dict_cli[connected_device_mac]["DHCP"] = connected_device_dhcp
-# # ip_lan_connections_dict_cli[connected_device_mac]["Port"] = connected_device_port
-# # # self.telnet_cli_session.close()
-# # telnet_cli_session.close()
-# #print(type(show_ip_lan_dict))
-# pprint.pprint(show_ip_lan_dict, width = 1)
-# print('dognnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn')
-# airties_4920_ip_list = []
-# for ip_lan_entry in show_ip_lan_dict:
-#     if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
-#         print(ip_lan_entry)
-#         # add this to a list which airties_4920
-#         print('in for loop' + show_ip_lan_dict[ip_lan_entry]["IP"])
-#         airties_4920_ip_list.append(show_ip_lan_dict[ip_lan_entry]["IP"])
-# print('dogccccccccccccccccccccccnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn')
-# print(*airties_4920_ip_list,sep='\n')
-# sleep(10)
-#
-# for i in  range(len(airties_4920_ip_list)):
-#     print('list', airties_4920_ip_list[i])
-#
-# exit()
+
 
 nvg_599_dut = Nvg599Class()
+upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d18_1.1.bin'
+# upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h12d15_1.1.bin'
+# upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h2d23_1.1.bin'
+nvg_599_dut.upgrade_rg(upgrade_rg_file)
+#sleep(300)
+# nvg_599_dut.factory_reset_rg()
+# sleep(300)
+# airties_ap_net = "AirTies_Air4920_33N3"
+# nvg_599_dut.wps_pair_default_airties(airties_ap_net)
+exit()
+
+ssid = 3
+nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid)
+ssid = 4
+nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid)
+exit()
+
+
+ssid = 3
+nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid)
+ssid = 4
+nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid)
+exit()
 nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, 36)
 #nvg_599_dut.factory_reset_rg()
 #sleep(300)
@@ -723,14 +704,10 @@ exit()
 #nvg_599_dut.enable_guest_network_and_set_password_ssid()
 #nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, 36)
 ssid = 3
-nvg_599_dut.set_tr69_auto_setup_ssid_cli(ssid)
+nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid)
 ssid = 4
-nvg_599_dut.set_tr69_auto_setup_ssid_cli(ssid)
+nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid)
 
-
-#nvg_599_dut.enable_guest_network_and_set_password_ssid()
-#rg_url = 'http://192.168.1.254/'
-#nvg_599_dut.wps_pair_default_airties(rg_url)
 airties_ap_net = "AirTies_SmartMesh_4PNF"
 nvg_599_dut.wps_pair_default_airties(airties_ap_net)
 sleep(300)
@@ -740,7 +717,6 @@ nvg_599_dut.wps_pair_default_airties(airties_ap_net)
 
 # nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, 100)
 nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, 36)
-
 
 exit()
 upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d17_1.1.bin'
@@ -822,9 +798,6 @@ exit()
 #nvg_599_dut.turn_off_supplicant_cli()
 
 #nvg_599_dut.set_fixed_ip_allocation()
-
-
-
 #nvg_599_dut.enable_guest_network_and_set_password_ssid()
 #Nvg599Class().run_speed_test_from_android_termux("192.168.1.70")
 #test_rg_upgrade_speedtest(nvg_599_dut,firmware_599_available,firmware_599_names)
@@ -832,51 +805,6 @@ exit()
 #import datetime
 #date = datetime.datetime.strptime(date, "%m%d%Y")
 # from pylab import *
-tablet_download_list = [27.7, 28.9, 27.6, 27.1, 30.1 ,29.2 ,30.6, 28.1, 29.0, 26.2]
-note8_download_list =  [55.3, 54.4, 50.1, 58.2, 48.8, 41.1, 44.0, 44.0, 50.5, 51.7]
-tablet_upload_list =   [2.4, 2.3 ,2.4, 2.4, 2.1, 2.3, 2.1, 2.2, 2.4, 2.1]
-note8_upload_list =    [2.1, 2.1, 2.0, 2.1, 2.4, 2.1, 2.01, 2.1, 2.2, 1.9]
-plt.figure("Test House Speedtest results for NVG 599",figsize=(8, 7))
-# x_label_list = ['9.2.2h12d9','9.2.2h12d10','9.2.2h12d13','9.2.2h13d1 ', '9.2.2h13d2','9.2.2h13d3', '9.2.2h13d4','9.2.2h13d5','9.2.2h13d6']
-# start number,stop number, steps
-ty =  arange(1.0, 11.0, 1)
-# tx =  arange(1.0, 10.0, 1)
-# plt.xticks([1,2,3,4,5,6,7,8,9])
-# plt.xticks([1,2,3,4,5,6,7,8,9],x_label_list,rotation='vertical')
-#plt.subplots(2,1,sharey=True)
-
-subplot(2,1,1)
-plt.ylabel('Speed in MBPS')
-title('NVG 599 Download Speed')
-plt.ylim([10,70])
-plot(ty,tablet_download_list,'g')
-plot(ty,note8_download_list,'b')
-plt.grid()
-#
-#plt.legend(bbox_to_anchor=(1, -1.2), ncol=1)
-#plt.legend(bbox_to_anchor=(1, -1.2), ncol=1)
-
-subplot(2,1,2)
-title('NVG 599 Upload Speed')
-plt.ylabel('Speed in MBPS')
-plt.xlabel('Firmware')
-plt.xticks([1,2,3,4,5,6,7,8,9,10],firmware_599_names,rotation='vertical')
-
-plt.ylim([0,4])
-
-plot(ty,tablet_upload_list,'b', label = "Samsung Note8 5 G")
-plot(ty,note8_upload_list,'g', label = "Samsung Tablet 2.4 G")
-plt.legend(bbox_to_anchor=(1,-1.0), ncol=1)
-plt.grid()
-#plt.tight_layout()
-plt.subplots_adjust(left=0.1, right=0.9, bottom=0.4, top=0.9, hspace=0.4)
-plt.legend(bbox_to_anchor=(1, -1.2), ncol=1)
-#now = datetime.today().isoformat()
-# now = datetime.today().isoformat()
-#channel_band_file.write(now + ""Test Title:Channel/Channel band test:" +"\n")
-plt.savefig("/home/palmer/Downloads/speedtest:")
-show()
-exit()
 
 speed_test_result_list = []
 # download, upload = Nvg599Class.run_speed_test_from_android_termux("192.168.1.70")
@@ -894,21 +822,15 @@ for a,b in speed_test_result_list:
     up_load.append(b)
 
 import matplotlib.pyplot as plt
-nvg_599_dut = Nvg599Class()
-test_rg_upgrade("/home/palmer/Downloads/nvg599-9.2.2h13d5_1.1.bin")
-exit()
-#nvg_599_dut.factory_test()
-#exit()
-#nvg_599_dut.enable_sshd_ssh_cli()
-#nvg_599_dut.turn_off_supplicant_cli()
-#nvg_599_dut.conf_tr69_eco_url()
-#url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
-#nvg_599_dut.factory_reset_rg()
-#nvg_599_dut.enable_parental_control()
-#nvg_599_dut.turn_off_wi_fi_security_protection_cli()
-#dfs_file = open('dfs_file.txt','a')
-#nvg_599_dut.factory_reset_rg()
-#exit()
+# nvg_599_dut.enable_sshd_ssh_cli()
+# nvg_599_dut.turn_off_supplicant_cli()
+# nvg_599_dut.conf_tr69_eco_url()
+# url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
+# nvg_599_dut.factory_reset_rg()
+# nvg_599_dut.enable_parental_control()
+# nvg_599_dut.turn_off_wi_fi_security_protection_cli()
+# dfs_file = open('dfs_file.txt','a')
+# nvg_599_dut.factory_reset_rg()
 
 # the default  url is "http://192.168.1.254/cgi-bin/home.ha"
 # nvg_599_dut.factory_reset_rg()
@@ -979,7 +901,6 @@ set_wifi_return_code = nvg_599_dut.ui_set_wifi_password(custom_security, passwor
 print('******** set_wifi_return_code: ' + str(set_wifi_return_code))
 print('############################################')
 
-
 dfs_file = open('dfs_file.txt','a')
 test_dfs(nvg_599_dut,dfs_file)
 
@@ -1032,19 +953,19 @@ channel_band_file.close()
 # nvg_599_dut.ui_set_band_bandwith_channel('5g', band5_bandwidth, band5_channel)
 
 exit()
-#remote_driver = nvg_599_dut.remote_webserver()
-#remote_driver.get("http://www.firefox.com")
-#nvg_599_dut.enable_sshd_ssh_cli()
-#nvg_599_dut.turn_off_supplicant_cli()
-#nvg_599_dut.conf_tr69_eco_url()
-#url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
-#nvg_599_dut.factory_reset_rg(url_to_check)
-#nvg_599_dut.enable_parental_control()
-#nvg_599_dut.turn_off_wi_fi_security_protection_cli()
-#dfs_file = open('dfs_file.txt','a')
-#test_dfs(nvg_599_dut,dfs_file)
+# remote_driver = nvg_599_dut.remote_webserver()
+# remote_driver.get("http://www.firefox.com")
+# nvg_599_dut.enable_sshd_ssh_cli()
+# nvg_599_dut.turn_off_supplicant_cli()
+# nvg_599_dut.conf_tr69_eco_url()
+# url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
+# nvg_599_dut.factory_reset_rg(url_to_check)
+# nvg_599_dut.enable_parental_control()
+# nvg_599_dut.turn_off_wi_fi_security_protection_cli()
+# dfs_file = open('dfs_file.txt','a')
+# test_dfs(nvg_599_dut,dfs_file)
 # Nvg599Class.factory_test()
-#dfs_file.close()
+# dfs_file.close()
 # nvg_599_dut.poc_for_youtube()
 exit()
 
@@ -1159,35 +1080,34 @@ exit()
 
 
 # airTiesTerm = pexpect.spawn("telnet 192.168.1.67")
-#sleep(1)
-#airTiesTerm.expect("ogin:")
-#airTiesTerm.sendline('root')
-#airTiesTerm.expect("#")
+# sleep(1)
+# airTiesTerm.expect("ogin:")
+# airTiesTerm.sendline('root')
+# airTiesTerm.expect("#")
 
-#airTiesTerm.sendline('wl -i wl0 chanspec')
-#airTiesTerm.expect("#")
-#airTies2GResult=airTiesTerm.before
-#print(airTies2GResult)
-#airTies2GChannel = airTies2GResult.split()[-2]
-#print("2G",airTies2GChannel)
-#print("")
-#airTiesTerm.sendline('wl -i wl1 chanspec')
-#irTiesTerm.expect("#")
-#airTies5GResult=airTiesTerm.before
-#airTies5GChannelInfo = airTies5GResult.split()[-2]
-#print("5GInfo",airTies5GChannelInfo)
-#airTies5GChannel =airTies5GChannelInfo.split("/")[0]
-#print("5G Channel,airTies5GChannel)
-#airTies5GBandwidth =airTies5GChannelInfo.split("/")[1]
-#print("5G Bandwidth",airTies5GBandwidth)
-#resultFile.close()
+# airTiesTerm.sendline('wl -i wl0 chanspec')
+# airTiesTerm.expect("#")
+# airTies2GResult=airTiesTerm.before
+# print(airTies2GResult)
+# airTies2GChannel = airTies2GResult.split()[-2]
+# print("2G",airTies2GChannel)
+# print("")
+# airTiesTerm.sendline('wl -i wl1 chanspec')
+# airTiesTerm.expect("#")
+# airTies5GResult=airTiesTerm.before
+# airTies5GChannelInfo = airTies5GResult.split()[-2]
+# print("5GInfo",airTies5GChannelInfo)
+# airTies5GChannel =airTies5GChannelInfo.split("/")[0]
+# print("5G Channel,airTies5GChannel)
+# airTies5GBandwidth =airTies5GChannelInfo.split("/")[1]
+# print("5G Bandwidth",airTies5GBandwidth)
+# resultFile.close()
 print("###############################################################################")
 print("###############################################################################")
 
-#Channel = myresult.split()[-2]
 
-list2G=[1,2,3,4,5,6,7,8,9,10,11]
-list5G=[36,40,44,48,52,56,60,64,100,104,108,112,116,1132,136,140,144,149,153,161]
+list2G=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+list5G=[36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 1132, 136, 140, 144, 149, 153, 161]
 list2GLite=[1]
 list5GLite=[36]
 
@@ -1278,8 +1198,8 @@ airTiesTerm.logfile= sys.stdout
 # channelResultContents = channelResultFP.read()
 # channelResultFP.close()
 
-#resultFile.close()
-#sleep(1)
+# resultFile.close()
+# sleep(1)
 
 # Note that, for Python 3 compatibility reasons, we are using spawnu and
 # importing unicode_literals (above). spawnu accepts Unicode input and
@@ -1356,12 +1276,12 @@ sleep(1)
 
 from time import sleep
 from selenium import webdriver
-
 import pexpect
 import re
 #import serial
 
-# driver = webdriverhttps://www.waketech.edu/programs-courses/credit/electrical-systems-technology/degrees-pathways.Chrome('/usr/local/bin/chromedriver')
+# driver = webdriverhttps://www.waketech.edu/programs-courses/credit/electrical-systems-technology/degrees-pathways.
+# Chrome('/usr/local/bin/chromedriver')
 driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
 # driver.get('http://www.google.com')
 driver.get('http://192.168.1.254')
@@ -1398,7 +1318,6 @@ child = pexpect.spawn("ssh root@192.168.1.254")
 sleep(1)
 # exit()
 
-
 child.expect("assword:")
 child.sendline('alcatel')
 # child.sendline('*<#/53#1/2')
@@ -1411,9 +1330,6 @@ exit()
 # driver = webdriver.firefox('/home/palmer/.local/lib/python2.7/site-packages/chromedriver')
 # driver = webdriver.chrome()
 # browser.get('https://www.google.com')
-
-#ain.
-# If anyone wants to send me a version using a single regex I'd be happy to see it.
 days = '0'
 hours = '0'
 mins = '0'
@@ -1639,121 +1555,3 @@ if 'min' in duration:
     p.match = re.search(r'([0-9]+)\s+min', duration)
     mins = str(int(p.match.group(1)))
 
-# Print the parsed fields in CSV format.
-# print('days, hours, minutes, users, cpu avg 1 min, cpu avg 5 min, cpu avg 15 min')
-# print('%s, %s, %s, %s, %s, %s, %s' % (days, hours, mins, users, av1, av5, av15))
-
-#
-# print("Turning off supplicant")
-# ip = "192.168.1.254"
-# password = '<#/53#1/2'
-# child = pexpect.spawn("telnet " "192.168.1.254")
-# sleep(1)
-# # exit()
-# child.expect("ogin:")
-# child.sendline("admin")
-#
-# child.expect("assword:")
-# child.sendline('*<#/53#1/2')
-# child.expect(">")
-#
-# child.sendline('magic')
-# child.expect(">")
-#
-# child.sendline('conf')
-# child.expect(">>")
-#
-# child.sendline('system supplicant')
-# child.expect(">>")
-#
-# child.sendline('set')
-# child.expect(" off | on ]:")
-#
-# child.sendline('off')
-#
-# from time import sleep
-# from selenium import webdriver
-#
-# import pexpect
-# import re
-#
-# # driver = webdriverhttps://www.waketech.edu/programs-courses/credit/electrical-systems-technology/degrees-pathways.Chrome('/usr/local/bin/chromedriver')
-# driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
-# # driver.get('http://www.google.com')
-# driver.get('http://192.168.1.254')
-# driver.implicitly_wait(20)
-# # driver.find_elements_by_tag_name("Settings") // this is for 599
-# driver.find_element_by_link_text("Settings").click()
-#
-# # driver.findElement(By.linkText("Home Network")).click()
-# driver.implicitly_wait(20)
-#
-# driver.find_element_by_link_text("LAN").click()
-# driver.implicitly_wait(20)
-# # driver.maximize_window()
-#
-# driver.find_element_by_link_text("Wi-Fi").click()
-# driver.implicitly_wait(20)
-#
-# password = driver.find_element_by_id("ADM_PASSWORD")
-#
-# password.send_keys("8>1769&295")
-#
-# driver.find_element_by_class_name('button').click()
-# # driver.find_element_by_xpath("//button[@value='Submit']").click()
-# # button.click()
-#
-# driver.implicitly_wait(20)
-#
-# # ENter device access code
-#
-# sleep(30)
-# driver.quit()
-#
-# exit()
-#
-# # child = pexpect.spawn("ssh root@192.168.1.254")
-# sleep(1)
-# # exit()
-#
-#
-# child.expect("assword:")
-# child.sendline('alcatel')
-# # child.sendline('*<#/53#1/2')
-# print("logged in to host")
-# child.expect("#")
-# child.sendline('exit')
-# sleep(5)
-# # driver.webdriver.quit()
-# exit()
-# # driver = webdriver.firefox('/home/palmer/.local/lib/python2.7/site-packages/chromedriver')
-# #
-# # unicode_literals makes all string literals in this script Unicode by default.
-# p = pexpect.spawnu('uptime')
-#
-# # This parses uptime output into the major groups using regex group matching.
-# p.expect(
-#     r'up\s+(.*?),\s+([0-9]+) users?,\s+load averages?: ([0-9]+\.[0-9][0-9]),?\s+([0-9]+\.[0-9][0-9]),?\s+([0-9]+\.[0-9][0-9])')
-# duration, users, av1, av5, av15 = p.match.groups()
-#
-# # The duration is a little harder to parse because of all the different
-# # styles of uptime. I'm sure there is a way to do this all at once with
-# # one single regex, but I bet it would be hard to read and maintain.
-# # # If anyone wants to send me a version using a single regex I'd be happy to see it.
-# # days = '0'
-# # hours = '0'
-# # mins = '0'
-# # if 'day' in duration:
-# #     p.match = re.search(r'([0-9]+)\s+day', duration)
-# #     days = str(int(p.match.group(1)))
-# # if ':' in duration:
-#     p.match = re.search('([0-9]+):([0-9]+)', duration)
-#     hours = str(int(p.match.group(1)))
-#     mins = str(int(p.match.group(2)))
-# if 'min' in duration:
-#     p.match = re.search(r'([0-9]+)\s+min', duration)
-#     mins = str(int(p.match.group(1)))
-#
-# # Print the parsed fields in CSV format.
-# # print('days, hours, minutes, users, cpu avg 1 min, cpu avg 5 min, cpu avg 15 min')
-# # print('%s, %s, %s, %s, %s, %s, %s' % (days, hours, mins, users, av1, av5, av15))

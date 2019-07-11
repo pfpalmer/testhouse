@@ -47,7 +47,7 @@ nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53
                                 'ssid_2': 'xxxxxxxxxxx_REPLACEME_2', 'ssid_2_pw': 'ssid_2_pw_xxxx'},
 
             "277427577103760": {'model': 'nvg599', 'device_access_code': '<<01%//4&/', 'magic': 'ggtxstgwipcg',
-                                'mac2g': 'fc:51:a4:2f:25:90', 'mac5g':'fc:51:a4:2f:25:94', 'wifi_pw': 'nsrmpr59rxwv',
+                                'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wifi_pw': 'nsrmpr59rxwv',
                                 'ssid': 'ATTqbrAnYs', 'ssid1': 'ATTqbrAnYs_REPLACEME_1', 'ssid_1_pw': 'REPLACEME1',
                                 'ssid_2': 'ATTqbrAnYs_REPLACEME_2', 'ssid_2_pw': 'REPLACEME2'},
 
@@ -59,21 +59,21 @@ nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53
 
 airties_4920_defaults = {
     '88:41:FC:86:64:D6': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '2',
-                          'state': 'None', ' default_ssid': 'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
+                          'state': 'None', 'default_ssid': 'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
-                          'device_test_name':'airties_1_2g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
+                          'device_test_name': 'airties_1_2g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
     '88:41:FC:86:64:D4': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '5',
-                          'state': 'None',  ' default_ssid': 'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
+                          'state': 'None',  'default_ssid': 'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None',  'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'airties_1_5g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
     '88:41:FC:C3:56:C2': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '2',
-                          'state': 'None', ' default_ssid': 'AirTies_Air4920_33N3', 'default_pw': 'wthchc7344',
+                          'state': 'None', 'default_ssid': 'AirTies_Air4920_33N3', 'default_pw': 'wthchc7344',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', ' ip': 'None',
                           'device_test_name': 'airties_2_2g', 'name': 'ATT_4920_C356C0', 'location': 'master_bedroom'},
     '88:41:FC:C3:56:C0': {'device_type': 'airties_4920', 'oper_sys': 'tbd',  'radio': 'abg', 'band': '5',
                           'state': 'None', 'default_ssid': 'AirTies_Air4920_33N3', 'default_pw': 'wthchc7344',
                           'address_type': 'None', 'port ': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
-                          'device_test_name': 'airties_2_5g', 'name': 'tbd', 'location': 'master_bedroom'},}
+                          'device_test_name': 'airties_2_5g', 'name': 'ATT_4920_C356C0', 'location': 'master_bedroom'}, }
 
 
 test_house_devices_static_info = {
@@ -166,7 +166,9 @@ class GatewayClass:
 
         msg['From'] = 'leandertesthouse@gmail.com'
         msg['To'] = 'pfpalmer@gmail.com'
-        gmail_password = "1329brome"
+        # gmail_password = "1329brome"
+        gmail_password = "%%45A7A&akBc"
+        # %%45A7A&akBc
         gmail_user = 'leandertesthouse@gmail.com'
 
         try:
@@ -246,7 +248,24 @@ class Nvg599Class(GatewayClass):
     def remote_webserver(self):
         pass
 
-# pfp1
+    @staticmethod
+    # def set_all_4920s_to_factory_default(self):
+    def get_ip_list_of_4920s():
+        air_ties_ip_list= []
+
+        show_ip_lan_dict = Nvg599Class.get_rg_sh_ip_lan_info_cli()
+
+        # airties_4920_ip_list = []
+        for ip_lan_entry in show_ip_lan_dict:
+            if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
+                # print(ip_lan_entry)
+                # add this to a list which airties_4920
+                print('in for loop' + show_ip_lan_dict[ip_lan_entry]["IP"])
+                # airties_4920_ip_list.append(show_ip_lan_dict[ip_lan_entry]["IP"])
+                # self.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
+                Nvg599Class.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
+
+    # pfp1
     @staticmethod
     # def set_all_4920s_to_factory_default(self):
     def set_all_4920s_to_factory_default():
@@ -262,17 +281,17 @@ class Nvg599Class(GatewayClass):
                 print('in for loop' + show_ip_lan_dict[ip_lan_entry]["IP"])
                 # airties_4920_ip_list.append(show_ip_lan_dict[ip_lan_entry]["IP"])
                 # self.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
-                Nvg599Class.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
+                airties_ip = show_ip_lan_dict[ip_lan_entry]["IP"]
+                # Nvg599Class.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
+                Nvg599Class.set_4920_to_factory_default(airties_ip)
 
 
     def set_4920_to_factory_default(self, ip_of_4920):
         # print('setting 4920 with ip:' + ip_of_4920 + ' to factory default' )
-        print('setting 4920 with ip:' + ip_of_4920 + ' to factory default' )
-
+        print('setting 4920 with ip:' + ip_of_4920 + ' to factory default')
         global nvg_info
         airties_url = 'http://' + ip_of_4920 + '/'
         print('airties_url' + airties_url)
-        #rg_url = 'http://192.168.1.254/'
         airties_session = webdriver.Chrome()
         airties_session.get(airties_url)
         session_id = airties_session.session_id
@@ -281,33 +300,32 @@ class Nvg599Class(GatewayClass):
         # // *[ @ id = "mainlevel"] / li[3] / a
         # # advanced_settings_link = airties_session.find_element_by_xpath('// *[ @ id = "mainlevel"] / li[3] / a')
         airties_session.switch_to.frame(airties_session.find_element_by_css_selector("frame[name=menuFrame"))
-        wait = WebDriverWait(airties_session,10)
+        wait = WebDriverWait(airties_session, 10)
         # advanced_link = wait.until(EC.element_to_be_clickable((By.XPATH,'// *[ @ id = "mainlevel"] / li[3] /a')))
-        wait.until(EC.element_to_be_clickable((By.XPATH,'// *[ @ id = "mainlevel"] / li[3] /a'))).click()
-        #sleep(20)
+        wait.until(EC.element_to_be_clickable((By.XPATH, '// *[ @ id = "mainlevel"] / li[3] /a'))).click()
+        # sleep(20)
         # advanced_link.click()
         # advanced_settings_link = airties_session.find_element_by_partial_link_text("ADVANCED")
         sleep(10)
-        #html > frameset > frameset > frame: nth - child(2)
-        #advanced_settings_link = airties_session.find_element_by_link_text("ADVANCED SETTINGS")
+        # html > frameset > frameset > frame: nth - child(2)
+        # advanced_settings_link = airties_session.find_element_by_link_text("ADVANCED SETTINGS")
         tools_link = airties_session.find_element_by_link_text("TOOLS")
         tools_link.click()
         # airties_session.refresh()
         sleep(10)
         airties_session.switch_to.default_content()
         airties_session.switch_to.frame(airties_session.find_element_by_css_selector("frame[name=mainFrame"))
-        #airties_session.refresh()
+        # airties_session.refresh()
         wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__ML_restore_factory_defaults"]'))).click()
         alert = airties_session.switch_to_alert()
         alert.accept()
         sleep(20)
-
-        #// *[ @ id = "__ML_restore_factory_defaults"]
-        #// *[ @ id = "__ML_restore_factory_defaults"]
-        #restore_factory_defaults = airties_session.find_element_by_xpath('//*[@id="__ML_restore_factory_defaults"]')
-
+        # // *[ @ id = "__ML_restore_factory_defaults"]
+        # // *[ @ id = "__ML_restore_factory_defaults"]
+        # restore_factory_defaults = airties_session.find_element_by_xpath('//*[@id="__ML_restore_factory_defaults"]')
         sleep(10)
 
+    # review this incomplete method
     def set_fixed_ip_allocation(self):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
         home_network_link = self.session.find_element_by_link_text("Home Network")
@@ -317,7 +335,7 @@ class Nvg599Class(GatewayClass):
         wi_fi_link.click()
         sleep(2)
         self.check_if_dac_required()
-        test_mac = '5c:f8:a1:a6:6b:b2'
+        # test_mac = '5c:f8:a1:a6:6b:b2'
         # allocate_link = self.session.find_element_by_xpath("//tr//td//td[name()='Allocate_7c:64:56:b8:2f:30']/..")
         # allocate_link = self.session.find_element_by_xpath("//td[text()='Allocate_7c:64:56:b8:2f:30']")
         # allocate_link = self.session.find_element_by_xpath("//table[@class='grid table100']//tr[contains(td[2],
@@ -350,14 +368,14 @@ class Nvg599Class(GatewayClass):
                     submit.click()
                     break
 
-            exit()
+            #exit()
             print('name:', name)
             print('mac:', mac)
             print('status:', status)
             print('allocation:', allocation)
             print('action type:', type(action))
             sleep(10)
-            exit()
+            # exit()
 
             # cells = tr.findAll('td')
             # print('cells:', cells)
@@ -377,7 +395,7 @@ class Nvg599Class(GatewayClass):
             # print("table body row is", table_body_rows[0])
             # print("table body row is", tr)
             cells = tr.findAll('td')
-            print('cells:',cells)
+            print('cells:', cells)
             print('cell1:', cells[1].get_text())
             print('cell2:', cells[2].get_text())
             print('cell3:', cells[3].get_text())
@@ -399,7 +417,7 @@ class Nvg599Class(GatewayClass):
             cells = tr.find_all("td")
             exit()
 
-            cells= tr.find_all("td")
+            cells = tr.find_all("td")
             # print('cells:',cells)
             # print('cell1:',cells[1].text())
             # print('cell2:',cells[2].get_text())
@@ -427,13 +445,14 @@ class Nvg599Class(GatewayClass):
 
                 if i == 1:
                     print('cell mac from ui is:>' + cell.text + '<')
-                    wifi_ui_mac_present = (cell.text).upper()
+                    wifi_ui_mac_present = cell.text.upper()
                     print('wifi_mac_present:', wifi_ui_mac_present)
                     # if the key is present it means that the device is known.
                     for key in test_house_devices_static_info.keys():
                         # print('key:', key)
                         if key == wifi_ui_mac_present:
-                            print('device_test_name', test_house_devices_static_info[wifi_ui_mac_present]['device_test_name'])
+                            print('device_test_name',
+                                  test_house_devices_static_info[wifi_ui_mac_present]['device_test_name'])
                             print('device_test_name', test_house_devices_static_info[wifi_ui_mac_present]['ip'])
                             test_house_ip = test_house_devices_static_info[wifi_ui_mac_present]['ip']
                             print('th', test_house_ip)
@@ -442,7 +461,8 @@ class Nvg599Class(GatewayClass):
             print('----------------------------------------')
     # '8C:45:00:9F:82:9D': {'device_type': ' Galaxy-S9', 'oper_sys': 'Android 9', 'radio': 'abg', 'band': '5',
     #                       'state': 'None',
-    #                       'address_type': 'fixed', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': '192.168.1.67',
+    #                       'address_type': 'fixed', 'port': 'None', 'ssid': 'None', 'rssi': 'None',
+    #                       'ip': '192.168.1.67',
     #                       'device_test_name': 'fixed_s9', 'name': 'palmer_Latitude-E5450',
     #                       'location': 'tbd'},
 
@@ -500,7 +520,7 @@ class Nvg599Class(GatewayClass):
         band2_ssid = band2_ssid_entry.get_attribute('value')
         band2_password_entry = self.session.find_element_by_name("okey1")
         band2_password = band2_password_entry.get_attribute('value')
-        return band2_ssid, guest_ssid, band5_ssid, band2_password
+        return band2_ssid, guest_ssid, band5_ssid, band2_password, guest_password, band5_password
 
     def set_ui_ssid(self, ssid_band5, ssid_guest, ssid_band2):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
@@ -1556,11 +1576,12 @@ class Nvg599Class(GatewayClass):
             self.check_if_wifi_warning_displayed()
             return self.session
 
-
-#  pfp
-
     # palmer@palmer-Latitude-E5450:~$ nmcli dev wifi | grep AirTies
-    def wps_pair_default_airties(self,airties_network):
+    # I think I have to diable the wired connection on the RG. Then
+
+    def wps_pair_default_airties(self, airties_network):
+        # nmcli connection down id "Wired connection 1
+        #  nmcli connection show --active
         print('Clicking on WPS button')
         # rg_url = 'http://192.168.1.254/'
         self.session.get(self.rg_url)
@@ -1573,31 +1594,65 @@ class Nvg599Class(GatewayClass):
         self.check_if_dac_required()
         wps_button = self.session.find_element_by_name("pb1")
         wps_button.click()
-
-
         # why do I want o close
-
         # self.session.close()
-
         cmd = "nmcli con down ATTqbrAnYs"
+
+        try:
+            output = subprocess.check_output(cmd, shell=True)
+        except subprocess.CalledProcessError as e:
+            print(e.output)
+        else:
+            print(output)
+        # output = subprocess.check_output(cmd, shell=True)
+
+        # airties_4920_defaults = {
+        #     '88:41:FC:86:64:D6': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '2',
+        #                           'state': 'None', 'default_ssid': 'AirTies_SmartMesh_4PNF',
+        #                           'default_pw': 'kykfmk8997',
+        #                           'address_type': 'None', 'port': 'None', 'ssid': 'None',
+        #                           'rssi': 'None', 'ip': 'None',
+
+        for key in airties_4920_defaults:
+            if airties_4920_defaults[key]['default_ssid'] == airties_network:
+                print(airties_4920_defaults[key]['default_pw'])
+                cmd = "nmcli device wifi connect " + airties_network + " " + "password " +\
+                      airties_4920_defaults[key]['default_pw']
+                # may not need the password
+                # cmd = "nmcli device wifi connect " + airties_network
+
+                print('basbaglan dbg: ' + str(cmd))
+
+                # may add this to all these calls to subprocess,check_output
+
+                try:
+                    output = subprocess.check_output(cmd, shell=True)
+                except subprocess.CalledProcessError as e:
+                    print(e.output)
+
+                else:
+                    for line in output.splitlines():
+                        print('out1  ===========\n', line)
+                    sleep(10)
+
         # cmd = "nmcli con down AirTies_SmartMesh_4PNF"
 
-        #output = subprocess.check_output(['nmcli', 'r'],shell=True)
-        output = subprocess.check_output(cmd, shell=True)
-        for line in output.splitlines():
-            print('out1  ===========\n', line)
-        sleep(10)
-        #cmd = "nmcli con down ATTqbrAnYs"
+        # output = subprocess.check_output(['nmcli', 'r'],shell=True)
+        # output = subprocess.check_output(cmd, shell=True)
+        # for line in output.splitlines():
+        #     print('out1  ===========\n', line)
+        # sleep(10)
+        # cmd = "nmcli con down ATTqbrAnYs"
         # cmd = "nmcli device wifi connect AirTies_SmartMesh_4PNF kykfmk8997"
         # use  the password from the table
         # cmd = "nmcli device wifi connect " + airties_network + " kykfmk8997"
         cmd = "nmcli connect up " + airties_network
 
-        #output = subprocess.check_output(['nmcli', 'r'],shell=True)
+        # output = subprocess.check_output(['nmcli', 'r'],shell=True)
         output = subprocess.check_output(cmd, shell=True)
         for line in output.splitlines():
-           print('out2===========\n', line)
-
+            print('out2===========\n', line)
+        sleep(10)
         self.airties_ap_cli_session = pexpect.spawn("telnet 192.168.2.254", encoding='utf-8')
         self.airties_ap_cli_session.expect('ogin:')
         self.airties_ap_cli_session.sendline('root')
@@ -1606,25 +1661,17 @@ class Nvg599Class(GatewayClass):
         self.airties_ap_cli_session.expect("#")
         self.airties_ap_cli_session.sendline('exit')
         self.airties_ap_cli_session.close()
-
-        cmd = "nmcli con down AirTies_SmartMesh_4PNF"
+        cmd = "nmcli con down " + airties_network
+        # cmd = "nmcli con down AirTies_SmartMesh_4PNF"
         output = subprocess.check_output(cmd, shell=True)
 
-        print('output from SmartMesh down',output)
+        print('output from SmartMesh down', output)
         # cmd = "nmcli device wifi connect ATTqbrAnYs ggtxstgwipcg"
         cmd = "nmcli connect up ATTqbrAnYs"
 
         output = subprocess.check_output(cmd, shell=True)
-        print('output from reconnect',output)
-
-
-
-        # rg_url = 'http://192.168.1.254/'
-        # self.session = webdriver.Chrome()
-        # self.session.get(self.rg_url)
+        print('output from reconnect', output)
         sleep(30)
-
-
 
     def set_wifi_power_level(self, band, percentage):
         print('Adjusting ' + band + ' wifi power level to ' + str(percentage) + '%')
@@ -1661,11 +1708,10 @@ class Nvg599Class(GatewayClass):
         # sleep(2)
         # submit.click()
         self.check_for_wifi_security_and_regular_warning()
-            # self.check_for_wifi_warning()
+        # self.check_for_wifi_warning()
 
     # This needs an enable disable ar
 
-    #  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     def disable_enable_wifi_2_4g(self, off_on):
         print('disable_enable_wifi_2_4, setting 2.4G to:' + off_on)
         rg_url = 'http://192.168.1.254/'
@@ -1719,8 +1765,8 @@ class Nvg599Class(GatewayClass):
 
     #   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     # parm must be Off or On with capitalized firs
-    def disable_enable_wifi_5g(self,off_on):
-        #print('in disable_enable_wifi_2_4_and_5g_wifi')
+    def disable_enable_wifi_5g(self, off_on):
+        # print('in disable_enable_wifi_2_4_and_5g_wifi')
         print('disable_enable_wifi_5g_wifi, setting 5G to:' + off_on)
         rg_url = 'http://192.168.1.254/'
         # session = webdriver.Chrome()
@@ -1965,12 +2011,12 @@ class Nvg599Class(GatewayClass):
 # tr69 SetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth=X_0000C5_40MHz
 # InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth X_0000C5_80MH
     @staticmethod
-    def wait_for_ssh_to_be_ready(host, port, timeout, retry_interval):
+    def wait_for_ssh_to_be_ready(host, port, timeout_parm, retry_interval):
         print('in wait_for_ssh_to_be_read')
         client = paramiko.client.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         retry_interval = float(retry_interval)
-        my_timeout = int(timeout)
+        my_timeout = int(timeout_parm)
         timeout_start = time.time()
         while time.time() < timeout_start + my_timeout:
             time.sleep(retry_interval)
@@ -2027,9 +2073,10 @@ class Nvg599Class(GatewayClass):
     def get_wifi_info_from_android_termux(wifi_info_ip):
         print('in get_wifi_connection_info_from_android_termux')
         ssh_client = pxssh.pxssh(timeout=100, encoding='ascii', maxread=5000, options={"StrictHostKeyChecking": "no"})
-        ssh_client.PROMPT='r[#$]'
+        ssh_client.PROMPT = 'r[#$]'
         # ssh_client.login(wifi_info_ip, username='None', port=8022, auto_prompt_reset='False', sync_multiplier=5)
-        ssh_client.login(wifi_info_ip, username='None', port=8022, original_prompt=r'[#$]', auto_prompt_reset=False, sync_multiplier=5, quiet=False,login_timeout=10)
+        ssh_client.login(wifi_info_ip, username='None', port=8022, original_prompt=r'[#$]',
+                         auto_prompt_reset=False, sync_multiplier=5, quiet=False, login_timeout=10)
         # ssh_client.PROMPT='\$
         ssh_client.prompt()
         # ssh_client.expect(".*x11-repo")
@@ -2045,7 +2092,7 @@ class Nvg599Class(GatewayClass):
         # ssh_client.prompt()
         # print('logfile', ssh_client.logfile_read )
 
-        #ssh_client.expect(".*\$ ")
+        # ssh_client.expect(".*\$ ")
         # print('2', ssh_client.before)
 
         # ssh_client.prompt()
@@ -2086,7 +2133,8 @@ class Nvg599Class(GatewayClass):
         # ssh_client= pxssh.pxssh()
         # ssh_client = pxssh.pxssh(options={"StrictHostKeyChecking": "no","AutoPromptReset": "True"})
         # not sure if this is defined like this
-        # ssh_client = pxssh.pxssh(timeout=200, encoding='utf-8',options={"StrictHostKeyChecking": "no","AutoPromptReset": "True"})
+        # ssh_client = pxssh.pxssh(timeout=200,
+        # encoding='utf-8',options={"StrictHostKeyChecking": "no","AutoPromptReset": "True"})
         # ssh_client = pxssh.pxssh(timeout=200, encoding='utf-8')
 
         ssh_client = pxssh.pxssh(timeout=300, encoding='utf-8', options={"StrictHostKeyChecking": "no"})
@@ -2139,53 +2187,50 @@ class Nvg599Class(GatewayClass):
         up_load_speed = speed_test_groups.group(2)
         return down_load_speed, up_load_speed
 
-
-
     @staticmethod
     def nmcli_test():
         # command = 'nmcli c'
         # cmd = "nmcli r all"
         cmd = "nmcli con down ATTqbrAnYs"
-        #output = subprocess.check_output(['nmcli', 'r'],shell=True)
+        # output = subprocess.check_output(['nmcli', 'r'],shell=True)
         output = subprocess.check_output(cmd, shell=True)
         for line in output.splitlines():
             print('out  dog  ===========\n', line)
         sleep(10)
-        #cmd = "nmcli con down ATTqbrAnYs"
+        # cmd = "nmcli con down ATTqbrAnYs"
         cmd = "nmcli device wifi connect AirTies_SmartMesh_4PNF kykfmk8997"
-        #output = subprocess.check_output(['nmcli', 'r'],shell=True)
+        # output = subprocess.check_output(['nmcli', 'r'],shell=True)
         output = subprocess.check_output(cmd, shell=True)
         for line in output.splitlines():
-           print('out  dog  ===========\n', line)
+            print('out  nmcli test  ===========\n', line)
 
         # 'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
         # this command lists all the visble APS
         # iwlist wlp2s0 s
         # this command turns off the current Wfi connect
-
-
         # this command connects to the wifi , it generates an 802.1x supplicant fail message but seems to work
         # sudo nmcli device wifi connect AirTies_Air4920_33N3 wthchc7344
 
-    # paul palmer
-    def ping_from_local_host(self, remote_ip, number_of_pings=20):
+    @staticmethod
+    def ping_from_local_host(remote_ip, number_of_pings=20):
         print('ping ' + remote_ip + ' from_local_host')
-        #ping_file = open('ping_file.txt', 'a')
+        # ping_file = open('ping_file.txt', 'a')
         # out = subprocess.Popen("ping  -c3 localhost",stdout=subprocess.PIPE,stderr=subprocess.STDOUT, shell=True)
         # out = subprocess.Popen(["ping ", "-c3"," localhost"], stdout=subprocess.PIPE)
         # out, err = out.communicate()
         # out = check_output(["ping ", "-c3 ", "localhost"]).decode("utf-8")
         # out = check_output(["ls -la"].decode("utf-8").shell=True)
         try:
-            out = subprocess.check_output("ping -c"+ str(number_of_pings) + " " + remote_ip, shell=True).decode("utf-8")
+            out = subprocess.check_output("ping -c" + str(number_of_pings) + " " +
+                                          remote_ip, shell=True).decode("utf-8")
         except subprocess.CalledProcessError as e:
             print('ping error', e)
-            return '0','0','0','0','0','0','0'
+            return '0', '0', '0', '0', '0', '0', '0'
         # result = os.system(cmd)
         print('out===========\n', out)
         print('endout1===========\n')
         # pingInfoRegEx = re.compile(r'.*=\s(\w+)/(\w+)/(\w+)/(\w+)',re.DOTALL)
-        #ping_statistics = re.compile(r'statistics ---.*(\d+)\spackets\.*(\d+)\sreceived',re.DOTALL)
+        # ping_statistics = re.compile(r'statistics ---.*(\d+)\spackets\.*(\d+)\sreceived',re.DOTALL)
         ping_info_reg_ex = re.compile(r'rtt.*?=\s(\d+\.\d+)/(\d+\.\d+)/(\d+\.\d+)/(\d+\.\d+)')
         print('out2===========\n', out)
         print('endout2===========\n')
@@ -2198,22 +2243,18 @@ class Nvg599Class(GatewayClass):
         min_ping = mo1.group(1)
         print('min' + min_ping)
         # sleep(10)
-
         avg_ping = mo1.group(2)
         print('avg' + avg_ping)
         # sleep(10)
-
         max_ping = mo1.group(3)
         print('max' + max_ping)
         # sleep(10)
-
-
         mdev_ping = mo1.group(4)
         print('mdev' + mdev_ping)
 
         ping_statistics = re.compile(r'statistics ---\s(\d+)\spackets.*\s(\d+)\sreceived,\s(\d+)%')
         stats = ping_statistics.search(out)
-        #print('sent:>' + stats.group(1))
+        # print('sent:>' + stats.group(1))
         print('sent:>' + stats.group(1) + ' received:' + stats.group(2) + 'loss:' + stats.group(3))
         sent = stats.group(1)
         print('sent' + sent)
@@ -2226,7 +2267,8 @@ class Nvg599Class(GatewayClass):
         # sleep(10)
         return min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss
 
-    def ping_check(self, remote_ip):
+    @staticmethod
+    def ping_check(remote_ip):
         print('In ping_check')
         # out = subprocess.check_output("ping -c10 " + remote_ip, shell=True).decode("utf-8")
         try:
@@ -2234,7 +2276,6 @@ class Nvg599Class(GatewayClass):
             ping_info_reg_ex = re.compile(r'(\d+.*loss)')
             ping_status = ping_info_reg_ex.search(out)
             print('ping result:', ping_status.group(1))
-
             return ping_status.group(1)
         except subprocess.CalledProcessError as e:
             print('ping error:', e.output)
@@ -2367,27 +2408,28 @@ class Nvg599Class(GatewayClass):
         print('tr69 enbled for ECO')
         self.session.close()
 
-
 # #pfp
 #     @staticmethod
 #     def get_tr69_ssid_status_cli(ssid):
 #         telnet_cli_session = login_nvg_599_cli()
 #         telnet_cli_session.sendline('magic')
 #         telnet_cli_session.expect("UNLOCKED>")
-#         telnet_cli_session.sendline('tr69 tr69 GetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.' + ssid + '.Enable')
+#         telnet_cli_session.sendline('tr69 tr69 GetParameterValues InternetGatewayDevice.
+    #         LANDevice.1.WLANConfiguration.' + ssid + '.Enable')
 #         telnet_cli_session.expect(".*UNLOCKED>")
 #         status_output = telnet_cli_session.before
 #         status_info_reg_ex = re.compile(r'Enable\s(\d)')
 #         status = status_info_reg_ex.search(status_output)
 #         print('returning SSID:' + ssid + ' Status:' + status )
 #         telnet_cli_session.close()
-    #
 # pfp
+
     def get_tr69_auto_setup_ssid_status_cli(self, ssid):
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
-        self.telnet_cli_session.sendline('tr69 GetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.' + str(ssid) + '.Enable')
+        self.telnet_cli_session.sendline('tr69 GetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
+                                         + str(ssid) + '.Enable')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         status_output = self.telnet_cli_session.before
         print('status_output:' + status_output)
@@ -2398,18 +2440,20 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.close()
         return str(status)
 
-    def set_tr69_auto_setup_ssid_cli(self, ssid):
+    def set_auto_setup_ssid_via_tr69_cli(self, ssid):
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
-        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.' + str(ssid) + '.Enable = 1')
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
+                                         + str(ssid) + '.Enable = 1')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
-        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.' + str(ssid) + '.BeaconAdvertisementEnabled = 1')
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
+                                         + str(ssid) + '.BeaconAdvertisementEnabled = 1')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
-        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.' + str(ssid) + '.SSIDAdvertisementEnabled= 1')
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
+                                         + str(ssid) + '.SSIDAdvertisementEnabled= 1')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.close()
-
 
     @staticmethod
     def enable_ipv6_via_tr69_cli(self):
@@ -2419,10 +2463,12 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IP.X_ATT_IPv6EnableLAN=TRUE')
         self.telnet_cli_session.expect("successful.*>")
 
-        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.2.DNSServers=10.8.200.16,10.8.50.251')
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.WANDevice.1.'
+                                         'WANConnectionDevice.1.WANIPConnection.2.DNSServers=10.8.200.16,10.8.50.251')
         self.telnet_cli_session.expect("successful.*>")
 
-        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.2.DNSOverrideAllowed=FALSE')
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.WANDevice.1.'
+                                         'WANConnectionDevice.1.WANIPConnection.2.DNSOverrideAllowed=FALSE')
         self.telnet_cli_session.expect("successful.*>")
 
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IP.IPv6Enable=1')
@@ -2431,20 +2477,24 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IPv6rd.Enable=1')
         self.telnet_cli_session.expect("successful.*>")
 
-        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IPv6rd.InterfaceSetting.1.SPIPv6Prefix=2001:470:8c13::/48')
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IPv6rd.'
+                                         'InterfaceSetting.1.SPIPv6Prefix=2001:470:8c13::/48')
         self.telnet_cli_session.expect("successful.*>")
 
-        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IPv6rd.InterfaceSetting.1.IPv4MaskLength=20')
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IPv6rd'
+                                         '.InterfaceSetting.1.IPv4MaskLength=20')
         self.telnet_cli_session.expect("successful.*>")
 
-        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IPv6rd.InterfaceSetting.1.BorderRelayIPv4Addresses=10.8.50.126')
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IPv6rd'
+                                         '.InterfaceSetting.1.BorderRelayIPv4Addresses=10.8.50.126')
         self.telnet_cli_session.expect("successful.*>")
 
-
-        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IPv6rd.InterfaceSetting.1.AllTrafficToBorderRelay=1')
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IPv6rd''.'
+                                         'InterfaceSetting.1.AllTrafficToBorderRelay=1')
         self.telnet_cli_session.expect("successful.*>")
 
-        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IPv6rd.InterfaceSetting.1.X_ATT_ConfigurationSource=CWMP')
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.IPv6rd.'
+                                         'InterfaceSetting.1.X_ATT_ConfigurationSource=CWMP')
         self.telnet_cli_session.expect("successful.*>")
 
         print('Enabled IPV6 via cli tr69')
@@ -2566,7 +2616,6 @@ class Nvg599Class(GatewayClass):
                                          "Profile.9.Scheduler.7.UsageDuration=86400")
         self.telnet_cli_session.expect("successful.*UNLOCKED>")
         print("Enabled_parental_contol")
-
 
     def conf_tr69_eco_url(self):
         self.telnet_cli_session = self.login_nvg_599_cli()
