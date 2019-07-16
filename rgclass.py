@@ -8,6 +8,8 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+# from selenium.webdriver.support import expected_conditions as ec
+
 
 
 import urllib.request
@@ -73,7 +75,8 @@ airties_4920_defaults = {
     '88:41:FC:C3:56:C0': {'device_type': 'airties_4920', 'oper_sys': 'tbd',  'radio': 'abg', 'band': '5',
                           'state': 'None', 'default_ssid': 'AirTies_Air4920_33N3', 'default_pw': 'wthchc7344',
                           'address_type': 'None', 'port ': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
-                          'device_test_name': 'airties_2_5g', 'name': 'ATT_4920_C356C0', 'location': 'master_bedroom'}, }
+                          'device_test_name': 'airties_2_5g', 'name': 'ATT_4920_C356C0',
+                          'location': 'master_bedroom'}, }
 
 
 test_house_devices_static_info = {
@@ -248,31 +251,11 @@ class Nvg599Class(GatewayClass):
     def remote_webserver(self):
         pass
 
-    @staticmethod
+    # @staticmethod
     # def set_all_4920s_to_factory_default(self):
-    def get_ip_list_of_4920s():
-        air_ties_ip_list= []
-
-        show_ip_lan_dict = Nvg599Class.get_rg_sh_ip_lan_info_cli()
-
-        # airties_4920_ip_list = []
-        for ip_lan_entry in show_ip_lan_dict:
-            if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
-                # print(ip_lan_entry)
-                # add this to a list which airties_4920
-                print('in for loop' + show_ip_lan_dict[ip_lan_entry]["IP"])
-                # airties_4920_ip_list.append(show_ip_lan_dict[ip_lan_entry]["IP"])
-                # self.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
-                Nvg599Class.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
-
-    # pfp1
-    @staticmethod
-    # def set_all_4920s_to_factory_default(self):
-    def set_all_4920s_to_factory_default():
-
+    def set_all_4920s_to_factory_default(self):
         # show_ip_lan_dict = self.get_rg_sh_ip_lan_info_cli()
         show_ip_lan_dict = Nvg599Class.get_rg_sh_ip_lan_info_cli()
-
         # airties_4920_ip_list = []
         for ip_lan_entry in show_ip_lan_dict:
             if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
@@ -283,8 +266,7 @@ class Nvg599Class(GatewayClass):
                 # self.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
                 airties_ip = show_ip_lan_dict[ip_lan_entry]["IP"]
                 # Nvg599Class.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
-                Nvg599Class.set_4920_to_factory_default(airties_ip)
-
+                Nvg599Class.set_4920_to_factory_default(self, airties_ip)
 
     def set_4920_to_factory_default(self, ip_of_4920):
         # print('setting 4920 with ip:' + ip_of_4920 + ' to factory default' )
@@ -319,11 +301,25 @@ class Nvg599Class(GatewayClass):
         wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__ML_restore_factory_defaults"]'))).click()
         alert = airties_session.switch_to_alert()
         alert.accept()
-        sleep(20)
+        sleep(200)
         # // *[ @ id = "__ML_restore_factory_defaults"]
         # // *[ @ id = "__ML_restore_factory_defaults"]
         # restore_factory_defaults = airties_session.find_element_by_xpath('//*[@id="__ML_restore_factory_defaults"]')
-        sleep(10)
+
+    # @staticmethod
+    # et_all_4920s_to_factory_default(sself):
+    def get_ip_list_of_4920s(self):
+        air_ties_ip_list = []
+        show_ip_lan_dict = Nvg599Class.get_rg_sh_ip_lan_info_cli()
+        # airties_4920_ip_list = []
+        for ip_lan_entry in show_ip_lan_dict:
+            if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
+                # print(ip_lan_entry)
+                # add this to a list which airties_4920
+                print('in for loop' + show_ip_lan_dict[ip_lan_entry]["IP"])
+                # airties_4920_ip_list.append(show_ip_lan_dict[ip_lan_entry]["IP"])
+                self.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
+                # Nvg599Class.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
 
     # review this incomplete method
     def set_fixed_ip_allocation(self):
@@ -368,7 +364,6 @@ class Nvg599Class(GatewayClass):
                     submit.click()
                     break
 
-            #exit()
             print('name:', name)
             print('mac:', mac)
             print('status:', status)
@@ -1343,8 +1338,11 @@ class Nvg599Class(GatewayClass):
         sleep(10)
 
         self.session.close()
-
         start = time.time()
+
+        # dog = time.time()
+        # print('time: ' + str(round(dog)))
+
         print("starting timer:" + str(start))
         loop = 1
         while loop == 1:
@@ -1353,7 +1351,7 @@ class Nvg599Class(GatewayClass):
                 urllib.request.urlopen(test_req, timeout=60)
                 # response.read().decode("utf-8", 'ignore')
                 end = time.time()
-                print("Duration timer:", str(end - start))
+                print("Duration time till login:", str(round(end - start)))
                 sleep(20)
                 break
             # except:
@@ -1367,7 +1365,7 @@ class Nvg599Class(GatewayClass):
             except (HTTPError, URLError) as e:
                 print('HTTP Error: ' + str(e))
                 sleep(10)
-                print('time' + str(time.time()))
+                print('time' + str(round(time.time())))
                 continue
             except timeout:
                 print('Socket timeout error')
@@ -1379,9 +1377,9 @@ class Nvg599Class(GatewayClass):
                 #   continue
 
         end = time.time()
-        print("in outer duration in seconds:", end - start)
+        print("Duration in seconds:", str(round(end - start)))
         #
-        sleep(120)
+        sleep(300)
         self.turn_off_supplicant_cli()
         # sleep(120)
         self.enable_sshd_ssh_cli()
@@ -2439,19 +2437,64 @@ class Nvg599Class(GatewayClass):
         print('returning SSID:' + str(ssid) + ' Status:' + str(status1))
         self.telnet_cli_session.close()
         return str(status)
+    #ddog
+    def get_auto_setup_ssid_via_tr69_cli_authentication(self, ssid,expected_authentication_type):
+        self.telnet_cli_session = self.login_nvg_599_cli()
+        self.telnet_cli_session.sendline('magic')
+        self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
+        self.telnet_cli_session.sendline('tr69 GetParameterValues InternetGatewayDevice.LANDevice.1.'
+                                         'WLANConfiguration.3.X_0000C5_Authentication')
+        self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
+        print('Getting ssid:' + str(ssid) +  ' authentication type')
 
-    def set_auto_setup_ssid_via_tr69_cli(self, ssid):
+        status_output = self.telnet_cli_session.before
+        status_info_reg_ex = re.compile(r'Authentication\s(\w+)',re.DOTALL)
+        authentication_type = status_info_reg_ex.search(status_output)
+        print('status_output' + str(status_output))
+        # print('tr69 authentication_type:' + str(authentication_type))
+
+        print('expected Authentication type:' + str(expected_authentication_type))
+        tr69_auth_type = authentication_type.group(1)
+        print('tr69 Authentication type:' + str(tr69_auth_type))
+
+        if tr69_auth_type == expected_authentication_type:
+            print('Pass-------------------')
+
+        # self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
+        self.telnet_cli_session.close()
+        return tr69_auth_type
+
+        # status_info_reg_ex = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',
+        #                                 re.DOTALL)
+        # mo1 = status_info_reg_ex.search(status_output)
+        #
+        #
+        # status_info_reg_ex = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',
+        #                                 re.DOTALL)
+        # mo1 = status_info_reg_ex.search(status_output)
+        # return mo1.group(2)
+
+        # self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
+        #                                  + str(ssid) + '.BeaconAdvertisementEnabled = 1')
+        # self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
+        # self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
+        #                                  + str(ssid) + '.SSIDAdvertisementEnabled= 1')
+        # self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
+        # self.telnet_cli_session.close()
+
+    def set_auto_setup_ssid_via_tr69_cli(self, ssid_number):
+        print('Enabling tr69 auto_setup for ssid number:' + str(ssid_number))
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
-                                         + str(ssid) + '.Enable = 1')
+                                         + str(ssid_number) + '.Enable = 1')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
-                                         + str(ssid) + '.BeaconAdvertisementEnabled = 1')
+                                         + str(ssid_number) + '.BeaconAdvertisementEnabled = 1')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
-                                         + str(ssid) + '.SSIDAdvertisementEnabled= 1')
+                                         + str(ssid_number) + '.SSIDAdvertisementEnabled= 1')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.close()
 
