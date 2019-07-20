@@ -659,8 +659,7 @@ from datetime import datetime
 # speed_test_graph_2_devices_plt()
 
 
-# ddog
-
+#####################################  top ddog
 nvg_599_dut = Nvg599Class()
 # start = time.time()
 # sleep(10)
@@ -669,26 +668,8 @@ nvg_599_dut = Nvg599Class()
 # # round_dog = round(start)
 # #print('time: ' + str(time.time()))
 # print('time: ' + str(round(end - start)))
-#
-#
-# exit()
-ssid = 3
-nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid)
-ssid = 4
-nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid)
 
-exit()
-
-
-nvg_599_dut.factory_reset_rg()
-sleep(300)
-exit()
-ssid = 3
-expected_authentication_type = 'WPA2PSKAuthentication'
-nvg_599_dut.get_auto_setup_ssid_via_tr69_cli_authentication(ssid,expected_authentication_type)
-exit()
-
-upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d20_1.1.bin'
+upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d22_1.1.bin'
 # upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h12d15_1.1.bin'
 # upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h2d23_1.1.bin'
 nvg_599_dut.upgrade_rg(upgrade_rg_file)
