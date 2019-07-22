@@ -2185,6 +2185,77 @@ class Nvg599Class(GatewayClass):
         up_load_speed = speed_test_groups.group(2)
         return down_load_speed, up_load_speed
 
+    ##  -pfp-
+    # nmcli connection delete id xATT2anR4b8
+    #  nmcli connection show
+    #  nmcli connection show --active
+    # nmcli con down "Wired connection 1"
+    @staticmethod
+    def nmcli_get_connections():
+        # command = 'nmcli c'
+        # cmd = "nmcli r all"
+        cmd = "nmcli connection show "
+        # output = subprocess.check_output(['nmcli', 'r'],shell=True)
+        output = subprocess.check_output(cmd, shell=True)
+        connection_list = []
+        active_connection_list = []
+        # output = output.decode('utf-8')
+        # tmp_list = []
+        for line in output.splitlines():
+            line = line.decode('utf-8')
+            # tmp_list = []
+            # print(line)
+            # print('-----------------------------')
+            tmp_list = line.split()
+            if tmp_list[0] == 'Wired':
+                wired_name = tmp_list[0] + " " + tmp_list[1] + " " + tmp_list[2]
+                # print('wired_name:', wired_name)
+                connection_list.append(wired_name)
+                if tmp_list[5] == "--":
+                    continue
+                else:
+                    active_connection_list.append(tmp_list[5])
+            else:
+                connection_list.append(tmp_list[0])
+                if tmp_list[3] == "--":
+                    continue
+                else:
+                    active_connection_list.append(tmp_list[3])
+
+        print('connection list', *connection_list)
+
+
+        print('active connection list', *active_connection_list)
+
+            #print(tmp_list[0])
+        # sleep(10)
+        # cmd = "nmcli con down ATTqbrAnYs"
+        #cmd = "nmcli device wifi connect AirTies_SmartMesh_4PNF kykfmk8997"
+
+    @staticmethod
+    def nmcli_set_eth_connection():
+        # command = 'nmcli c'
+        # cmd = "nmcli r all"
+        cmd = "nmcli con down ATTqbrAnYs"
+        # output = subprocess.check_output(['nmcli', 'r'],shell=True)
+        output = subprocess.check_output(cmd, shell=True)
+        for line in output.splitlines():
+            print('out  dog  ===========\n', line)
+        sleep(10)
+        # cmd = "nmcli con down ATTqbrAnYs"
+        cmd = "nmcli device wifi connect AirTies_SmartMesh_4PNF kykfmk8997"
+        # output = subprocess.check_output(['nmcli', 'r'],shell=True)
+        output = subprocess.check_output(cmd, shell=True)
+        for line in output.splitlines():
+            print('out  nmcli test  ===========\n', line)
+
+        # 'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
+        # this command lists all the visble APS
+        # iwlist wlp2s0 s
+        # this command turns off the current Wfi connect
+        # this command connects to the wifi , it generates an 802.1x supplicant fail message but seems to work
+        # sudo nmcli device wifi connect AirTies_Air4920_33N3 wthchc7344
+
     @staticmethod
     def nmcli_test():
         # command = 'nmcli c'

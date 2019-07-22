@@ -661,6 +661,9 @@ from datetime import datetime
 
 #####################################  top ddog
 nvg_599_dut = Nvg599Class()
+nvg_599_dut.nmcli_get_connections()
+exit()
+
 # start = time.time()
 # sleep(10)
 # end = time.time()
