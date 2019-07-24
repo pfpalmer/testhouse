@@ -220,6 +220,7 @@ def test_comprehension(firmware_599_available):
     upper_case = [item.upper() for item in firmware_599_available]
     print('upper case:', upper_case)
 
+
 ##################################################################################
 # use of round function example
 # x = 13.73333
@@ -621,46 +622,243 @@ def tst_android_speed_test(nvg_599_dut, remote_ip):
 # -pfp-
 # deprecated
 ############################## DEPRECATED   ####################################################################################################
-def tst_ping_rg_power_level_orig(nvg_599_dut, band, percentage, remote_ip, number_of_pings):
-    print('testing ping after power level changes')
-
-    if band == 'band2':
-        nvg_599_dut.disable_enable_wifi_2_4g('On')
-        nvg_599_dut.disable_enable_wifi_5g('Off')
-    else:
-        # this is band 5
-        nvg_599_dut.disable_enable_wifi_5g('On')
-        nvg_599_dut.disable_enable_wifi_2_4g('Off')
-    nvg_599_dut.set_wifi_power_level(band, percentage)
-    min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss = nvg_599_dut.ping_from_local_host(remote_ip,
-                                                    number_of_pings)
-    print('min:' + min_ping + ' max:' + max_ping)
-    ping_file = open('ping_file_with_power_change_test.txt', 'a')
-    now = datetime.today().strftime("%B %d, %Y,%H:%M")
-    ping_file.writelines('Date:' + now + '  599 FW Ver:' + nvg_599_dut.software_version + '  Ser. No:' + nvg_599_dut.serial_number + '\n')
-    ping_file.writelines('Band:' + band + '  Ping: ' + remote_ip + '  RG Pwr:' + str(percentage) + '%' +
-                         '  Sent:' + sent + '  Received:' + received + '  Percent loss:' + loss + '%\n')
-    ping_file.writelines(
-        'Minimum:' + min_ping + '  Average::' + avg_ping + '  Maximum:' + max_ping + ' Max dev:' + mdev_ping + '\n')
-    ping_file.writelines('\n')
-    ping_file.close()
-    nvg_599_dut.disable_enable_wifi_5g('On')
-    nvg_599_dut.disable_enable_wifi_2_4g('On')
-    band = 'band5'
-    percentage = 100
-    nvg_599_dut.set_wifi_power_level(band, percentage)
-    band = 'band2'
-    nvg_599_dut.set_wifi_power_level(band, percentage)
+# def tst_ping_rg_power_level_orig(nvg_599_dut, band, percentage, remote_ip, number_of_pings):
+#     print('testing ping after power level changes')
+#
+#     if band == 'band2':
+#         nvg_599_dut.disable_enable_wifi_2_4g('On')
+#         nvg_599_dut.disable_enable_wifi_5g('Off')
+#     else:
+#         # this is band 5
+#         nvg_599_dut.disable_enable_wifi_5g('On')
+#         nvg_599_dut.disable_enable_wifi_2_4g('Off')
+#     nvg_599_dut.set_wifi_power_level(band, percentage)
+#     min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss = nvg_599_dut.ping_from_local_host(remote_ip,
+#                                                     number_of_pings)
+#     print('min:' + min_ping + ' max:' + max_ping)
+#     ping_file = open('ping_file_with_power_change_test.txt', 'a')
+#     now = datetime.today().strftime("%B %d, %Y,%H:%M")
+#     ping_file.writelines('Date:' + now + '  599 FW Ver:' + nvg_599_dut.software_version + '  Ser. No:' + nvg_599_dut.serial_number + '\n')
+#     ping_file.writelines('Band:' + band + '  Ping: ' + remote_ip + '  RG Pwr:' + str(percentage) + '%' +
+#                          '  Sent:' + sent + '  Received:' + received + '  Percent loss:' + loss + '%\n')
+#     ping_file.writelines(
+#         'Minimum:' + min_ping + '  Average::' + avg_ping + '  Maximum:' + max_ping + ' Max dev:' + mdev_ping + '\n')
+#     ping_file.writelines('\n')
+#     ping_file.close()
+#     nvg_599_dut.disable_enable_wifi_5g('On')
+#     nvg_599_dut.disable_enable_wifi_2_4g('On')
+#     band = 'band5'
+#     percentage = 100
+#     nvg_599_dut.set_wifi_power_level(band, percentage)
+#     band = 'band2'
+#     nvg_599_dut.set_wifi_power_level(band, percentage)
 
 from datetime import datetime
 
+def test_auto_ssid_default_tr69_values(nvg_599_dut, ssid, rf, rfa):
+    default_tr69_auto_ssid_values = nvg_599_dut.get_tr69_auto_ssid(ssid)
+    test_status = "Pass"
+    if (default_tr69_auto_ssid_values.find('.' + ssid + '.Enable 0') != -1):
+        print('Pass ssid:' + ssid + ' Default set to 0')
+        rf.write('    Pass ssid:' + ssid + ' Default set to 0 \n')
+    else:
+        print('Fail ssid:' + ssid + ' default not set to 0')
+        rf.write('    Fail ssid:' + ssid + ' default not set to 0 \n')
+        test_status = "Fail"
 
-############################################  -pfp-
+        # return("Fail", "Default Enable not set to 0")
+
+    if (default_tr69_auto_ssid_values.find('.' + ssid + '.Status Disabled 0') != -1):
+        print('Pass ssid:' + ssid + ' Default Status set to Disabled')
+        rf.write('    Pass ssid:' + ssid + ' Default Status set to Disabled \n')
+    else:
+        print('Fail ssid:' + ssid + ' Default Status not set to Disabled')
+        rf.write('    Fail ssid:' + ssid + ' Default Status not set to Disabled \n')
+        test_status = "Fail"
+        # return ("Fail: SSID:" + ssid + " Status not set to Disabled")
+
+    if (default_tr69_auto_ssid_values.find('.' + ssid + '.SSID TBD') != -1):
+        print('Pass ssid:' + ssid + ' Default SSID set to TBD')
+        rf.write('    Pass ssid:' + ssid + ' Default SSID set to TBD \n')
+    else:
+        print('Fail ssid:' + ssid + ' Default SSID not set to TBD')
+        rf.write('    Fail ssid:' + ssid + ' Default SSID not set to TBD \n')
+        test_status = "Fail"
+
+        # return ('Fail: SSID:' + ssid + ' Default SSID not set to TBD')
+
+    if (default_tr69_auto_ssid_values.find('.' + ssid + '.X_0000C5_DefaultSSID TBD') != -1):
+        print('Pass ssid:' + ssid + ' Default SSID set to TBD')
+        rf.write('Pass ssid:' + ssid + ' Default SSID set to TBD \n')
+    else:
+        print('Fail ssid:' + ssid + ' Default SSID not set to TBD')
+        rf.write('    Fail ssid:' + ssid + ' Default SSID not set to TBD \n')
+        test_status = "Fail"
+
+        # return ('Fail: SSID:' + ssid + ' Default SSID not set to TBD')
+
+    if (default_tr69_auto_ssid_values.find('.' + ssid + '.SSID TBD') != -1):
+        print('Pass ssid:' + ssid + '  SSID set to TBD')
+        rf.write('    Pass ssid:' + ssid + '  SSID set to TBD \n')
+    else:
+        print('Fail ssid:' + ssid + ' SSID not set to TBD')
+        rf.write('    Fail ssid:' + ssid + ' SSID not set to TBD \n')
+        test_status = "Fail"
+
+        #return ('Fail: SSID:' + ssid + '  SSID not set to TBD')
+
+    if (default_tr69_auto_ssid_values.find('.' + ssid + '.X_0000C5_Encryption AESEncryption') != -1):
+        print('Pass ssid:' + ssid + ' Encryption set to AESEncryption')
+        rf.write('    Pass ssid:' + ssid + ' Encryption set to AESEncryption \n')
+    else:
+        print('Fail ssid:' + ssid + ' Default Encryption not set to AESEncryption')
+        rf.write('    Fail ssid:' + ssid + ' Default Encryption not set to AESEncryption \n')
+        test_status = "Fail"
+        # return ('Fail: SSID:' + ssid + '  Encryption not set to AESEncryption')
+
+    if (default_tr69_auto_ssid_values.find('.' + ssid + '.X_0000C5_Authentication WPA2PSKAuthentication') != -1):
+        print('Pass ssid:' + ssid + ' Authentication set to WPA2PSKAuthentication')
+        rf.write('    Pass ssid:' + ssid + ' Authentication set to WPA2PSKAuthentication \n')
+    else:
+        print('Fail ssid:' + ssid + ' Default Authentication not set to WPA2PSKAuthentication')
+        rf.write('    Fail ssid:' + ssid + ' Default Authentication not set to WPA2PSKAuthentication \n')
+        test_status = "Fail"
+        # return ('Fail: SSID:' + ssid + ' Default Authentication not set to WPA2PSKAuthentication')
+
+    if (default_tr69_auto_ssid_values.find('.' + ssid + '.X_0000C5_KepPassphrase TBD') != -1):
+        print('Pass ssid:' + ssid + ' Default KepPassphrase set to TBD')
+        rf.write('    Pass ssid:' + ssid + ' Default KepPassphrase set to TBD \n')
+    else:
+        print('Fail ssid:' + ssid + ' Default KepPassphrase not set to TBD')
+        rf.write('Fail ssid:' + ssid + ' Default KepPassphrase not set to TBD \n')
+        test_status = "Fail"
+
+        #return ('Fail: SSID:' + ssid + ' Default KepPassphrase not set to BD')
+
+    if (default_tr69_auto_ssid_values.find('.' + ssid + '.X_0000C5_MaxClients 3') != -1):
+        print('Pass ssid:' + ssid + ' Default MaxClients set to 3')
+        rf.write('    Pass ssid:' + ssid + ' Default MaxClients set to 3 \n')
+    else:
+        print('Fail ssid:' + ssid + ' Default MaxClients not set to 3')
+        rf.write('    Fail ssid:' + ssid + ' Default MaxClients not set to 3 \n')
+        test_status = "Fail"
+
+        #return ('Fail: SSID:' + ssid + ' Default KepPassphrase not set to BD')
+
+    if (default_tr69_auto_ssid_values.find('.' + ssid + '.SSIDAdvertisementEnabled 0') != -1):
+        print('Pass ssid:' + ssid + ' Default SSIDAdvertisementEnabled set to 0')
+        rf.write('    Pass ssid:' + ssid + ' Default SSIDAdvertisementEnabled set to 0 \n')
+    else:
+        print('Fail ssid:' + ssid + ' Default SSIDAdvertisementEnabled not set to 0')
+        rf.write('    Fail ssid:' + ssid + ' Default SSIDAdvertisementEnabled not set to 0 \n')
+        test_status = "Fail"
+
+        #return ('Fail: SSID:' + ssid + ' Default KepPassphrase not set to BD')
+    return test_status
+################# test area  #######################  -pfp-
+#         soup = BeautifulSoup(self.session.page_source, 'html.parser')
+
 # speed_test_graph_2_devices_plt()
-
-
-#####################################  top ddog
 nvg_599_dut = Nvg599Class()
+
+#ssid = "3"
+now = datetime.today().strftime("%B %d, %Y,%H:%M")
+rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
+rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
+rf.write(now + '\n')
+rfa.write(now + '\n')
+test_status = test_auto_ssid_default_tr69_values(nvg_599_dut,"3",rf,rfa)
+print('Test Status:' + test_status + '\n')
+rf.close()
+sleep(20)
+nvg_599_dut.email_test_results(rf)
+exit()
+status_page = nvg_599_dut.get_ui_home_network_status_page()
+print(status_page)
+exit()
+#
+# default_tr69_auto_ssid_values = nvg_599_dut.get_tr69_auto_ssid(ssid)
+# # print(default_tr69_auto_ssid_values)
+# #exit()
+# if (default_tr69_auto_ssid_values.find('.' + ssid + '.Enable 0') != -1):
+#     print('Pass ssid:' + ssid + ' default set to 0')
+# else:
+#     print('Fail ssid:' + ssid + ' default not set to 0')
+#
+# exit()
+
+# active_network_connections = []
+# network_connections = []
+#
+# active_network_connections, network_connections =  nvg_599_dut.nmcli_get_connections()
+# print('------------------------------------------\n')
+# print(*active_network_connections)
+# print('------------------------------------------\n')
+# print(network_connections)
+# print('------------------------------------------\n')
+#
+# exit()
+# rf = results file
+#rfa is results_file_archive
+#####################################  top ddog
+now = datetime.today().strftime("%B %d, %Y,%H:%M")
+results_file = open('results_file.txt', mode = 'w', encoding = 'utf-8')
+
+rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
+rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
+rf.write(now + '\n')
+rfa.write(now + '\n')
+
+results_file_archive  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
+results_file.write(now + '\n')
+results_file_archive.write(now + '\n')
+
+nvg_599_dut = Nvg599Class()
+upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d22_1.1.bin'
+# upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h12d15_1.1.bin'
+# upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h2d23_1.1.bin'
+test_status, duration = nvg_599_dut.upgrade_rg(upgrade_rg_file)
+sleep(300)
+results_file.write("Test Title: RG Upgrade :" + upgrade_rg_file + " Test case " + test_status  + "Duration:" + duration  +'\n')
+results_file_archive.write("Test Title: RG Upgrade :" + upgrade_rg_file + " Test case " + test_status  + "Duration:" + duration  +'\n')
+#results_file_archive.write("Test Title: RG Upgrade:" + upgrade_rg_file + " Pass " + '\n')
+nvg_599_dut.factory_reset_rg()
+sleep(300)
+results_file.write("Test Title: RG Factory Reset:" + " Pass " + '\n')
+results_file_archive.write("Test Title: RG Factory Reset:" + " Pass " + '\n')
+
+results_file.write("Test Title: RG Factory Reset: turn_off_supplicant_cli(): Pass \n")
+results_file_archive.write("Test Title: RG Factory Reset: turn_off_supplicant_cli(): Pass \n")
+
+results_file.write("Test Title: RG Factory Reset: enable_sshd_ssh_cli(): Pass \n")
+results_file_archive.write("Test Title: RG Factory Reset: enable_sshd_ssh_cli(): Pass \n")
+
+results_file.write("Test Title: RG Factory Reset: conf_tr69_eco_url(): Pass \n")
+results_file_archive.write("Test Title: RG Factory Reset: conf_tr69_eco_url(): Pass \n")
+
+results_file.write("Test Title: RG Factory Reset: turn_off_wi_fi_security_protection_cli(): Pass \n")
+results_file_archive.write("Test Title: RG Factory Reset: turn_off_wi_fi_security_protection_cli(): Pass \n")
+
+results_file.write("Test Title: RG Factory Reset: enable_parental_control():Pass \n")
+results_file_archive.write("Test Title: RG Factory Reset: enable_parental_control(): \n")
+
+ssid = 3
+nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid)
+results_file.write("Test Title: Auto SSID 3 setup: Pass")
+results_file_archive.write("Test Title: Auto SSID 3 setup: Pass")
+
+ssid = 4
+nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid)
+results_file.write("Test Title: Auto SSID 4 setup: Pass")
+results_file_archive.write("Test Title: Auto SSID 4 setup: Pass")
+results_file.close()
+results_file_archive.close()
+nvg_599_dut.email_test_results(results_file)
+sleep(30)
+
+exit()
+
+
 nvg_599_dut.nmcli_get_connections()
 exit()
 

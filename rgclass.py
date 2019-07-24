@@ -150,8 +150,9 @@ class GatewayClass:
 
     @staticmethod
     def email_test_results(text_file):
-        now = datetime.today().isoformat()
-        print('now')
+        now = datetime.today().strftime("%B %d, %Y,%H:%M")
+        # now = datetime.today().isoformat()
+        # print('now')
         subject_title = 'Test results:' + str(now)
         print('subject title', subject_title)
         if text_file is None:
@@ -517,6 +518,17 @@ class Nvg599Class(GatewayClass):
         band2_password = band2_password_entry.get_attribute('value')
         return band2_ssid, guest_ssid, band5_ssid, band2_password, guest_password, band5_password
 
+
+    # pfp-current
+    def get_ui_home_network_status_page(self):
+        # dianostics_link = browser.find_element_by_link_text("Diagnostics")
+        home_network_link = self.session.find_element_by_link_text("Home Network")
+        home_network_link.click()
+        status_link = self.session.find_element_by_link_text("Status")
+        status_link.click()
+        sleep(30)
+        return self.session.page_source
+
     def set_ui_ssid(self, ssid_band5, ssid_guest, ssid_band2):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
         home_network_link = self.session.find_element_by_link_text("Home Network")
@@ -823,12 +835,14 @@ class Nvg599Class(GatewayClass):
                 continue
             except timeout:
                 print('Socket timeout error')
+                return "Fail: socket timeout Error"
 
         end = time.time()
         print("upgrade duration in seconds:", round(end - start))
         sleep(2)
+        duration = round(end - start)
 
-        return "Upgrade compete"
+        return "Pass", duration
 
     def check_if_dac_required(self):
         try:
@@ -1378,6 +1392,7 @@ class Nvg599Class(GatewayClass):
 
         end = time.time()
         print("Duration in seconds:", str(round(end - start)))
+        duration = str(round(end - start))
         #
         sleep(300)
         self.turn_off_supplicant_cli()
@@ -1400,6 +1415,7 @@ class Nvg599Class(GatewayClass):
         # self.session.close()
 
         sleep(60)
+        return duration
 
     def get_ui_home_network_status_value(self, value_requested):
         print('in get_ui_home_network_status_value)')
@@ -2185,7 +2201,7 @@ class Nvg599Class(GatewayClass):
         up_load_speed = speed_test_groups.group(2)
         return down_load_speed, up_load_speed
 
-    ##  -pfp-
+    ##  -pfp- ddog
     # nmcli connection delete id xATT2anR4b8
     #  nmcli connection show
     #  nmcli connection show --active
@@ -2207,9 +2223,13 @@ class Nvg599Class(GatewayClass):
             # print(line)
             # print('-----------------------------')
             tmp_list = line.split()
+            if tmp_list[0] == 'NAME':
+                continue
+            if tmp_list[0] == 'NAME':
+                continue
             if tmp_list[0] == 'Wired':
                 wired_name = tmp_list[0] + " " + tmp_list[1] + " " + tmp_list[2]
-                # print('wired_name:', wired_name)
+                print('wired_name:', wired_name)
                 connection_list.append(wired_name)
                 if tmp_list[5] == "--":
                     continue
@@ -2220,12 +2240,13 @@ class Nvg599Class(GatewayClass):
                 if tmp_list[3] == "--":
                     continue
                 else:
-                    active_connection_list.append(tmp_list[3])
+                    active_connection_list.append(tmp_list[0])
 
-        print('connection list', *connection_list)
+        # print('connection list', *connection_list)
 
+        # print('active connection list', *active_connection_list)
 
-        print('active connection list', *active_connection_list)
+        return connection_list,active_connection_list
 
             #print(tmp_list[0])
         # sleep(10)
@@ -2438,6 +2459,7 @@ class Nvg599Class(GatewayClass):
         self.up_time = mo1.group(3)
         self.session.close()
 
+
     def setup_tr69_url(self):
         self.session = self.login_nvg_599_cli()
         self.session.sendline('magic')
@@ -2508,7 +2530,7 @@ class Nvg599Class(GatewayClass):
         print('returning SSID:' + str(ssid) + ' Status:' + str(status1))
         self.telnet_cli_session.close()
         return str(status)
-    #ddog
+    #
     def get_auto_setup_ssid_via_tr69_cli_authentication(self, ssid,expected_authentication_type):
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
@@ -2870,6 +2892,16 @@ class Nvg599Class(GatewayClass):
             # self.telnet_cli_session.close()
         telnet_cli_session.close()
         return ip_lan_connections_dict_cli
+
+    # current
+    def get_tr69_auto_ssid(self,ssid):
+        self.telnet_cli_session = self.login_nvg_599_cli()
+        self.telnet_cli_session.sendline('magic')
+        self.telnet_cli_session.expect("UNLOCKED>")
+        self.telnet_cli_session.sendline('tr69 GetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.' + ssid + '.')
+        self.telnet_cli_session.expect("UNLOCKED>")
+        tr69_auto_ssid_default = self.telnet_cli_session.before
+        return tr69_auto_ssid_default
 
 # class Nvg_5268_Class(GatewayClass):
 #     def __init__(self):
