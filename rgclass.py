@@ -519,8 +519,62 @@ class Nvg599Class(GatewayClass):
         return band2_ssid, guest_ssid, band5_ssid, band2_password, guest_password, band5_password
 
 
-    # pfp-current
-    def get_ui_home_network_status_page(self):
+    # -pfp-current
+    def get_home_network_ip_allocation_page_source(self):
+        # dianostics_link = browser.find_element_by_link_text("Diagnostics")
+        home_network_link = self.session.find_element_by_link_text("Firewall")
+        home_network_link.click()
+        status_link = self.session.find_element_by_link_text("NAT/Gaming")
+        status_link.click()
+        self.check_if_dac_required()
+        status_link = self.session.find_element_by_link_text("IP Allocation")
+        status_link.click()
+        sleep(30)
+        return self.session.page_source
+
+    def get_home_network_ip_allocation_page_source(self):
+        # dianostics_link = browser.find_element_by_link_text("Diagnostics")
+        home_network_link = self.session.find_element_by_link_text("Home Network")
+        home_network_link.click()
+        status_link = self.session.find_element_by_link_text("Wi-Fi")
+        status_link.click()
+        self.check_if_dac_required()
+        status_link = self.session.find_element_by_link_text("IP Allocation")
+        status_link.click()
+        sleep(30)
+        return self.session.page_source
+
+    def get_home_network_mac_filtering_page_source(self):
+        # dianostics_link = browser.find_element_by_link_text("Diagnostics")
+        home_network_link = self.session.find_element_by_link_text("Home Network")
+        home_network_link.click()
+        status_link = self.session.find_element_by_link_text("Wi-Fi")
+        status_link.click()
+        self.check_if_dac_required()
+        status_link = self.session.find_element_by_link_text("MAC Filtering")
+        status_link.click()
+        sleep(30)
+        return self.session.page_source
+
+    def get_ui_device_status_page_source(self):
+        # dianostics_link = browser.find_element_by_link_text("Diagnostics")
+        home_network_link = self.session.find_element_by_link_text("Device")
+        home_network_link.click()
+        status_link = self.session.find_element_by_link_text("Source")
+        status_link.click()
+        sleep(30)
+        return self.session.page_source
+
+    def get_ui_device_list_page_source(self):
+        # dianostics_link = browser.find_element_by_link_text("Diagnostics")
+        home_network_link = self.session.find_element_by_link_text("Device")
+        home_network_link.click()
+        status_link = self.session.find_element_by_link_text("Device List")
+        status_link.click()
+        sleep(30)
+        return self.session.page_source
+
+    def get_ui_home_network_status_page_source(self):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
         home_network_link = self.session.find_element_by_link_text("Home Network")
         home_network_link.click()
@@ -2254,7 +2308,7 @@ class Nvg599Class(GatewayClass):
         #cmd = "nmcli device wifi connect AirTies_SmartMesh_4PNF kykfmk8997"
 
     @staticmethod
-    def nmcli_set_eth_connection():
+    def nmcli_set_connection(nmcli_connection_name, command):
         # command = 'nmcli c'
         # cmd = "nmcli r all"
         cmd = "nmcli con down ATTqbrAnYs"
@@ -2499,7 +2553,6 @@ class Nvg599Class(GatewayClass):
         print('tr69 enbled for ECO')
         self.session.close()
 
-# #pfp
 #     @staticmethod
 #     def get_tr69_ssid_status_cli(ssid):
 #         telnet_cli_session = login_nvg_599_cli()
@@ -2513,7 +2566,7 @@ class Nvg599Class(GatewayClass):
 #         status = status_info_reg_ex.search(status_output)
 #         print('returning SSID:' + ssid + ' Status:' + status )
 #         telnet_cli_session.close()
-# pfp
+#
 
     def get_tr69_auto_setup_ssid_status_cli(self, ssid):
         self.telnet_cli_session = self.login_nvg_599_cli()

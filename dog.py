@@ -652,7 +652,6 @@ def tst_android_speed_test(nvg_599_dut, remote_ip):
 #     nvg_599_dut.set_wifi_power_level(band, percentage)
 #     band = 'band2'
 #     nvg_599_dut.set_wifi_power_level(band, percentage)
-
 from datetime import datetime
 
 def test_auto_ssid_default_tr69_values(nvg_599_dut, ssid, rf, rfa):
@@ -725,15 +724,15 @@ def test_auto_ssid_default_tr69_values(nvg_599_dut, ssid, rf, rfa):
         test_status = "Fail"
         # return ('Fail: SSID:' + ssid + ' Default Authentication not set to WPA2PSKAuthentication')
 
-    if (default_tr69_auto_ssid_values.find('.' + ssid + '.X_0000C5_KepPassphrase TBD') != -1):
-        print('Pass ssid:' + ssid + ' Default KepPassphrase set to TBD')
-        rf.write('    Pass ssid:' + ssid + ' Default KepPassphrase set to TBD \n')
+    if (default_tr69_auto_ssid_values.find('.' + ssid + '.X_0000C5_KePasysphrase TBD') != -1):
+        print('Pass ssid:' + ssid + ' Default KeyPassphrase set to TBD')
+        rf.write('    Pass ssid:' + ssid + ' Default KeyPassphrase set to TBD \n')
     else:
-        print('Fail ssid:' + ssid + ' Default KepPassphrase not set to TBD')
-        rf.write('Fail ssid:' + ssid + ' Default KepPassphrase not set to TBD \n')
+        print('Fail ssid:' + ssid + ' Default KeyPassphrase not set to TBD')
+        rf.write('    Fail ssid:' + ssid + ' Default KeyPassphrase not set to TBD \n')
         test_status = "Fail"
 
-        #return ('Fail: SSID:' + ssid + ' Default KepPassphrase not set to BD')
+        #return ('Fail: SSID:' + ssid + ' Default KeyPassphrase not set to BD')
 
     if (default_tr69_auto_ssid_values.find('.' + ssid + '.X_0000C5_MaxClients 3') != -1):
         print('Pass ssid:' + ssid + ' Default MaxClients set to 3')
@@ -743,7 +742,7 @@ def test_auto_ssid_default_tr69_values(nvg_599_dut, ssid, rf, rfa):
         rf.write('    Fail ssid:' + ssid + ' Default MaxClients not set to 3 \n')
         test_status = "Fail"
 
-        #return ('Fail: SSID:' + ssid + ' Default KepPassphrase not set to BD')
+        #return ('Fail: SSID:' + ssid + ' Default KeyPassphrase not set to BD')
 
     if (default_tr69_auto_ssid_values.find('.' + ssid + '.SSIDAdvertisementEnabled 0') != -1):
         print('Pass ssid:' + ssid + ' Default SSIDAdvertisementEnabled set to 0')
@@ -755,11 +754,43 @@ def test_auto_ssid_default_tr69_values(nvg_599_dut, ssid, rf, rfa):
 
         #return ('Fail: SSID:' + ssid + ' Default KepPassphrase not set to BD')
     return test_status
+
+def test_verify_auto_info_not_present_in_ui(nvg_599_dut, rf, rfa):
+    status_page = nvg_599_dut.get_ui_home_network_status_page_source()
+    # print(status_page)
+    # default_tr69_auto_ssid_values = nvg_599_dut.get_tr69_auto_ssid(ssid)
+    test_status = "Pass"
+    if (status_page.find('172.16') == -1):
+        print('Pass: 172.16 not found in status page')
+        rf.write('    Pass: 172.16 not found in status page')
+    else:
+        print('Fail: 172.16  found in status page')
+        rf.write('    Fail: 172.16  found in status page')
+        test_status = "Fail"
+
+    status_page = nvg_599_dut.get_home_network_ip_allocation_page_source()
+
+    if (status_page.find('172.16') == -1):
+        print('Pass: 172.16.x.x  not found in IP allocation page')
+        rf.write('    Pass: 172.16.x.x  not found in IP allocation page')
+    else:
+        print('Fail: 172.16.x.x  found in IP allocation page')
+        rf.write('    Fail: 172.16  found in status page')
+        test_status = "Fail"
+        # return("Fail", "Default Enable not set to 0")
+    return test_status
+        # return ("Fail: SSID:" + ssid + " Status not set to Disabled")
+
 ################# test area  #######################  -pfp-
 #         soup = BeautifulSoup(self.session.page_source, 'html.parser')
 
 # speed_test_graph_2_devices_plt()
 nvg_599_dut = Nvg599Class()
+
+#source = nvg_599_dut.get_home_network_ip_allocation_page_source()
+#print(source)
+#exit()
+
 
 #ssid = "3"
 now = datetime.today().strftime("%B %d, %Y,%H:%M")
@@ -767,12 +798,32 @@ rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
 rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
 rf.write(now + '\n')
 rfa.write(now + '\n')
+rf.write('Test title:test_auto_ssid_3_default_tr69_values \n')
 test_status = test_auto_ssid_default_tr69_values(nvg_599_dut,"3",rf,rfa)
-print('Test Status:' + test_status + '\n')
+rf.write('    ' + test_status + '\n')
+print('    Test Status:' + test_status + '\n')
+rf.write('\n')
+print('\n')
+
+rf.write('Test title:test_auto_ssid_4_default_tr69_values \n')
+test_status = test_auto_ssid_default_tr69_values(nvg_599_dut,"4",rf,rfa)
+rf.write('    ' + test_status + '\n')
+print('    Test Status:' + test_status + '\n')
+rf.write('\n')
+print('\n')
+
+rf.write('Test title:test_verify_auto_ssid_info_not_present_in_ui \n')
+test_status = test_verify_auto_info_not_present_in_ui(nvg_599_dut,rf,rfa)
+rf.write(test_status + '\n')
+
 rf.close()
+rfa.close()
 sleep(20)
 nvg_599_dut.email_test_results(rf)
 exit()
+
+
+
 status_page = nvg_599_dut.get_ui_home_network_status_page()
 print(status_page)
 exit()
