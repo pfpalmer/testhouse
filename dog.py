@@ -785,11 +785,69 @@ def test_verify_auto_info_not_present_in_ui(nvg_599_dut, rf, rfa):
 #         soup = BeautifulSoup(self.session.page_source, 'html.parser')
 
 # speed_test_graph_2_devices_plt()
+# nvg_599_dut = Nvg599Class()
+upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h12d10_1.1.bin'
+now = datetime.today().strftime("%B %d, %Y,%H:%M")
+rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
+rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
+rf.write(now + '\n')
+rfa.write(now + '\n')
 nvg_599_dut = Nvg599Class()
+# upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h12d15_1.1.bin'
+# upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h2d23_1.1.bin'
+
+
+test_status, duration = nvg_599_dut.upgrade_rg(upgrade_rg_file)
+sleep(300)
+# rf.write("Test Title: RG Upgrade :" + upgrade_rg_file + " Test case " + test_status  + "Duration:" + str(duration)  +'\n')
+# rfa.write("Test Title: RG Upgrade :" + upgrade_rg_file + " Test case " + test_status  + "Duration:" + str(duration)  +'\n')
+# #results_file_archive.write("Test Title: RG Upgrade:" + upgrade_rg_file + " Pass " + '\n')
+nvg_599_dut.factory_reset_rg(rf,rfa)
+sleep(100)
+rf.close()
+rfa.close()
+nvg_599_dut.email_test_results(rf)
+exit()
+
+
+
+
+
+rf.write("Test Title: RG Factory Reset:" + " Pass " + '\n')
+rfa.write("Test Title: RG Factory Reset:" + " Pass " + '\n')
+
+rf.write("Test Title: RG Factory Reset: turn_off_supplicant_cli(): Pass \n")
+rfa.write("Test Title: RG Factory Reset: turn_off_supplicant_cli(): Pass \n")
+
+rf.write("Test Title: RG Factory Reset: enable_sshd_ssh_cli(): Pass \n")
+rfa.write("Test Title: RG Factory Reset: enable_sshd_ssh_cli(): Pass \n")
+
+rf.write("Test Title: RG Factory Reset: conf_tr69_eco_url(): Pass \n")
+rfa.write("Test Title: RG Factory Reset: conf_tr69_eco_url(): Pass \n")
+
+rf.write("Test Title: RG Factory Reset: turn_off_wi_fi_security_protection_cli(): Pass \n")
+rfa.write("Test Title: RG Factory Reset: turn_off_wi_fi_security_protection_cli(): Pass \n")
+
+rf.write("Test Title: RG Factory Reset: enable_parental_control():Pass \n")
+rfa.write("Test Title: RG Factory Reset: enable_parental_control(): \n")
+rf.close()
+rfa.close()
+nvg_599_dut.email_test_results(rf)
+sleep(30)
+exit()
+
+
+
+
+
+nmcli_connection = "Wired"
+nvg_599_dut.nmcli_set_connection(nmcli_connection, "down")
+sleep(5)
+nvg_599_dut.nmcli_set_connection(nmcli_connection, "up")
 
 #source = nvg_599_dut.get_home_network_ip_allocation_page_source()
 #print(source)
-#exit()
+exit()
 
 
 #ssid = "3"
@@ -874,25 +932,25 @@ results_file.write("Test Title: RG Upgrade :" + upgrade_rg_file + " Test case " 
 results_file_archive.write("Test Title: RG Upgrade :" + upgrade_rg_file + " Test case " + test_status  + "Duration:" + duration  +'\n')
 #results_file_archive.write("Test Title: RG Upgrade:" + upgrade_rg_file + " Pass " + '\n')
 nvg_599_dut.factory_reset_rg()
-sleep(300)
-results_file.write("Test Title: RG Factory Reset:" + " Pass " + '\n')
-results_file_archive.write("Test Title: RG Factory Reset:" + " Pass " + '\n')
-
-results_file.write("Test Title: RG Factory Reset: turn_off_supplicant_cli(): Pass \n")
-results_file_archive.write("Test Title: RG Factory Reset: turn_off_supplicant_cli(): Pass \n")
-
-results_file.write("Test Title: RG Factory Reset: enable_sshd_ssh_cli(): Pass \n")
-results_file_archive.write("Test Title: RG Factory Reset: enable_sshd_ssh_cli(): Pass \n")
-
-results_file.write("Test Title: RG Factory Reset: conf_tr69_eco_url(): Pass \n")
-results_file_archive.write("Test Title: RG Factory Reset: conf_tr69_eco_url(): Pass \n")
-
-results_file.write("Test Title: RG Factory Reset: turn_off_wi_fi_security_protection_cli(): Pass \n")
-results_file_archive.write("Test Title: RG Factory Reset: turn_off_wi_fi_security_protection_cli(): Pass \n")
-
-results_file.write("Test Title: RG Factory Reset: enable_parental_control():Pass \n")
-results_file_archive.write("Test Title: RG Factory Reset: enable_parental_control(): \n")
-
+sleep(100)
+# results_file.write("Test Title: RG Factory Reset:" + " Pass " + '\n')
+# results_file_archive.write("Test Title: RG Factory Reset:" + " Pass " + '\n')
+#
+# results_file.write("Test Title: RG Factory Reset: turn_off_supplicant_cli(): Pass \n")
+# results_file_archive.write("Test Title: RG Factory Reset: turn_off_supplicant_cli(): Pass \n")
+#
+# results_file.write("Test Title: RG Factory Reset: enable_sshd_ssh_cli(): Pass \n")
+# results_file_archive.write("Test Title: RG Factory Reset: enable_sshd_ssh_cli(): Pass \n")
+#
+# results_file.write("Test Title: RG Factory Reset: conf_tr69_eco_url(): Pass \n")
+# results_file_archive.write("Test Title: RG Factory Reset: conf_tr69_eco_url(): Pass \n")
+#
+# results_file.write("Test Title: RG Factory Reset: turn_off_wi_fi_security_protection_cli(): Pass \n")
+# results_file_archive.write("Test Title: RG Factory Reset: turn_off_wi_fi_security_protection_cli(): Pass \n")
+#
+# results_file.write("Test Title: RG Factory Reset: enable_parental_control():Pass \n")
+# results_file_archive.write("Test Title: RG Factory Reset: enable_parental_control(): \n")
+exit()
 ssid = 3
 nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid)
 results_file.write("Test Title: Auto SSID 3 setup: Pass")

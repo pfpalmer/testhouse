@@ -462,7 +462,7 @@ class Nvg599Class(GatewayClass):
     #                       'device_test_name': 'fixed_s9', 'name': 'palmer_Latitude-E5450',
     #                       'location': 'tbd'},
 
-    def enable_guest_network_and_set_password_ssid(self):
+    def enable_guest_network_and_set_password_ssid(self,rf, rfa):
         print('in enable_guest_network_and_set_password_ssid')
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
         home_network_link = self.session.find_element_by_link_text("Home Network")
@@ -1379,7 +1379,7 @@ class Nvg599Class(GatewayClass):
     # def factory_reset_rg(self, rg_url="http://192.168.1.254/cgi-bin/home.ha"):
     # we have to assume that the default RG IP is 192.168.1.254
 
-    def factory_reset_rg(self):
+    def factory_reset_rg(self,rf,rfa):
         # the default is the usual default RG IP
         self.factory_reset = 1
         # url = 'http://192.168.1.254/'
@@ -1445,26 +1445,29 @@ class Nvg599Class(GatewayClass):
                 #   continue
 
         end = time.time()
+        duration = str(round(end - start))
         print("Duration in seconds:", str(round(end - start)))
+        rf.write("  RG Factory Reset Duration:" + duration + " Pass " + '\n')
+        rfa.write("  RG Factory Reset Duration:" + duration + " Pass " + '\n')
         duration = str(round(end - start))
         #
         sleep(300)
-        self.turn_off_supplicant_cli()
+        self.turn_off_supplicant_cli(rf, rfa)
         # sleep(120)
-        self.enable_sshd_ssh_cli()
+        self.enable_sshd_ssh_cli(rf, rfa)
         # sleep(120)
-        self.conf_tr69_eco_url()
+        self.conf_tr69_eco_url(rf, rfa)
         # sleep(120)
-        self.turn_off_wi_fi_security_protection_cli()
+        self.turn_off_wi_fi_security_protection_cli(rf, rfa)
         sleep(120)
         # not sure why this failed
-        self.enable_parental_control()
+        self.enable_parental_control(rf, rfa)
 
         rg_url = 'http://192.168.1.254/'
         self.session = webdriver.Chrome()
         self.session.get(rg_url)
 
-        self.enable_guest_network_and_set_password_ssid()
+        self.enable_guest_network_and_set_password_ssid(rf, rfa)
         # added this, lets see if it works
         # self.session.close()
 
@@ -2311,18 +2314,21 @@ class Nvg599Class(GatewayClass):
     def nmcli_set_connection(nmcli_connection_name, command):
         # command = 'nmcli c'
         # cmd = "nmcli r all"
-        cmd = "nmcli con down ATTqbrAnYs"
+        cmd = "nmcli con " + command + " " + nmcli_connection_name
         # output = subprocess.check_output(['nmcli', 'r'],shell=True)
         output = subprocess.check_output(cmd, shell=True)
         for line in output.splitlines():
-            print('out  dog  ===========\n', line)
-        sleep(10)
-        # cmd = "nmcli con down ATTqbrAnYs"
-        cmd = "nmcli device wifi connect AirTies_SmartMesh_4PNF kykfmk8997"
-        # output = subprocess.check_output(['nmcli', 'r'],shell=True)
-        output = subprocess.check_output(cmd, shell=True)
-        for line in output.splitlines():
-            print('out  nmcli test  ===========\n', line)
+            print('cmd output', line)
+        sleep(3)
+
+
+        # exit()
+        # # cmd = "nmcli con down ATTqbrAnYs"
+        # cmd = "nmcli device wifi connect AirTies_SmartMesh_4PNF kykfmk8997"
+        # # output = subprocess.check_output(['nmcli', 'r'],shell=True)
+        # output = subprocess.check_output(cmd, shell=True)
+        # for line in output.splitlines():
+        #     print('out  nmcli test  ===========\n', line)
 
         # 'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
         # this command lists all the visble APS
@@ -2628,7 +2634,7 @@ class Nvg599Class(GatewayClass):
         # self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         # self.telnet_cli_session.close()
 
-    def set_auto_setup_ssid_via_tr69_cli(self, ssid_number):
+    def set_auto_setup_ssid_via_tr69_cli(self, ssid_number, rf, rfa):
         print('Enabling tr69 auto_setup for ssid number:' + str(ssid_number))
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
@@ -2642,8 +2648,12 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
                                          + str(ssid_number) + '.SSIDAdvertisementEnabled= 1')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
+        rf.write("    Enabled auto ssid " + ssid_number + '\n')
+        rfa.write("    Enabled auto ssid" + ssid_number + '\n')
         self.telnet_cli_session.close()
 
+
+    # IPV6 is not currently available in the test house
     @staticmethod
     def enable_ipv6_via_tr69_cli(self):
         self.telnet_cli_session = self.login_nvg_599_cli()
@@ -2689,12 +2699,14 @@ class Nvg599Class(GatewayClass):
         print('Enabled IPV6 via cli tr69')
         self.telnet_cli_session.close()
 
-    def enable_sshd_ssh_cli(self):
+    def enable_sshd_ssh_cli(self, rf, rfa):
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect("UNLOCKED>")
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.X_0000C5_Debug.SshdEnabled=1')
         self.telnet_cli_session.expect("successful.*>")
+        rf.write("    Enabled Sshd" + '\n')
+        rfa.write("    Enabled Sshd" + '\n')
         print('Enabled tr69 SshdEnabled=1')
         self.telnet_cli_session.close()
 
@@ -2717,7 +2729,7 @@ class Nvg599Class(GatewayClass):
                 continue
 
 # incomplete there are profiles to add
-    def enable_parental_control(self):
+    def enable_parental_control(self, rf, rfa):
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect("UNLOCKED>")
@@ -2804,9 +2816,11 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.sendline("tr69 set InternetGatewayDevice.LANDevice.1.X_ATT_PC.TOD."
                                          "Profile.9.Scheduler.7.UsageDuration=86400")
         self.telnet_cli_session.expect("successful.*UNLOCKED>")
+        rf.write("    Enabled parental control" + '\n')
+        rfa.write("    Enabled parental control" + '\n')
         print("Enabled_parental_contol")
 
-    def conf_tr69_eco_url(self):
+    def conf_tr69_eco_url(self, rf, rfa):
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect("UNLOCKED>")
@@ -2847,10 +2861,12 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.expect(">>")
         self.telnet_cli_session.sendline('save')
         self.telnet_cli_session.expect(">>")
+        rf.write("    Configured TR69 ECO" + '\n')
+        rfa.write("    Configured TR69 ECO" + '\n')
         print('Configured TR069 ECO url')
         self.telnet_cli_session.close()
 
-    def turn_off_supplicant_cli(self):
+    def turn_off_supplicant_cli(self, rf, rfa):
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect("UNLOCKED>")
@@ -2867,10 +2883,12 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.sendline('exit')
         self.telnet_cli_session.expect("UNLOCKED>")
         self.telnet_cli_session.sendline('exit all')
+        rf.write("    Turned off supplicant" + '\n')
+        rfa.write("    Turned off supplicant" + " Pass " + '\n')
         print('Turned off system supplicant')
         self.telnet_cli_session.close()
 
-    def turn_off_wi_fi_security_protection_cli(self):
+    def turn_off_wi_fi_security_protection_cli(self, rf, rfa):
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect("UNLOCKED>")
@@ -2883,6 +2901,8 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.sendline('apply')
         self.telnet_cli_session.expect("\\(nsh\\) ")
         self.telnet_cli_session.sendline('exit all')
+        rf.write("    Turned off WiFi security protection" + '\n')
+        rfa.write("    Turned off WiFi security protection" + '\n')
         print('Turned off WiFi security protection')
         self.telnet_cli_session.close()
 
