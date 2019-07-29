@@ -778,12 +778,43 @@ def test_verify_auto_info_not_present_in_ui(nvg_599_dut, rf, rfa):
     return test_status
         # return ("Fail: SSID:" + ssid + " Status not set to Disabled")
 
+
+def test_speedtest_from_android(nvg_599_dut,rf, rfa ):
+    nvg_599_dut.login_nvg_599_cli()
+    ip_lan_info_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
+    for x, y in ip_lan_info_dict.items():
+        print(x, y)
+    note_8_ip = ip_lan_info_dict['b8:d7:af:aa:27:c3']['IP']
+    galaxy_s9_ip = ip_lan_info_dict['8c:45:00:9f:82:9d']['IP']
+    print('note8 ip', str(note_8_ip))
+    print('galaxy  ip', str(galaxy_s9_ip))
+    nvg_599_dut.execute_speedtest_from_android_termux(note_8_ip, rf, rfa)
+    # for x, y in ip_lan_info_dict.items():
+    #    print(x, y)
+    # exit()
+    # return ip_lan_info_dict
+
 ################# test area  #######################  -pfp-
+nvg_599_dut = Nvg599Class()
+rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
+rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
+test_speedtest_from_android(nvg_599_dut, rf, rfa)
+
+#ip_lan_info_dict = execute_speedtest_from_android_termux(nvg_599_dut,rf rfa)
+#ip_lan_info_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
+
+
+# pprint.pprint(ip_lan_info_dict)
+
+# test_speedtest_from_android()
+exit()
+
+
 rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
 rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
 nvg_599_dut = Nvg599Class()
-
-nvg_599_dut.run_speed_test_from_android_termux("192.168.1.80", rf, rfa)
+ip_lan_info_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
+# nvg_599_dut.run_speed_test_from_android_termux("192.168.1.80", rf, rfa)
 # nvg_599_dut.run_speed_test_from_android_termux("192.168.1.122")
 exit()
 
@@ -1270,7 +1301,7 @@ band2, guest, band5 = nvg_599_dut.get_ui_ssid()
 print('band 2: '+ band2 + '  guest: '+ guest + '  band5: ' + band5)
 
 exit()
-show_ip_lan_dict = nvg_599_dut.get_rg_sh_ip_lan_info_cli()
+show_ip_lan_dict = nvg_599_dut.cli_sh_rg_ip_lan_info_cli()
 
 print(type(show_ip_lan_dict))
 pprint.pprint(show_ip_lan_dict, width = 1)

@@ -1132,10 +1132,7 @@ class Nvg599Class(GatewayClass):
     def cli_sh_wi_all_clients():
         global test_house_devices_static_info
         print("In cli_sh_wi_all_clients")
-        # Nvg599Class
-        # self.telnet_cli_session = self.login_nvg_599_cli()
         telnet_cli_session = Nvg599Class.static_login_nvg_599_cli()
-
         telnet_cli_session.sendline("show wi clients")
         telnet_cli_session.expect('OCKED>')
         show_wi_client_str = telnet_cli_session.before
@@ -1371,10 +1368,6 @@ class Nvg599Class(GatewayClass):
 
         self.session.close()
         start = time.time()
-
-        # dog = time.time()
-        # print('time: ' + str(round(dog)))
-
         print("starting timer:" + str(start))
         loop = 1
         while loop == 1:
@@ -1434,7 +1427,6 @@ class Nvg599Class(GatewayClass):
         self.enable_guest_network_and_set_password_ssid(rf, rfa)
         # added this, lets see if it works
         # self.session.close()
-
         sleep(60)
         return duration
 
@@ -1536,10 +1528,6 @@ class Nvg599Class(GatewayClass):
 
     def ui_set_band_bandwith_channel(self, band, bandwidth, channel):
         global nvg_info
-
-        # band_selected = band
-        # channel_selected = channel
-        # bandwidth_selected = bandwidth
         print("in ui_set_band_bandwith_channel ")
         # we assume that this
         # url = 'http://192.168.1.254/'
@@ -2154,8 +2142,8 @@ class Nvg599Class(GatewayClass):
         #  #up_load_speed = wifi_info_groups.group(2)
 
     @staticmethod
-    def run_speed_test_from_android_termux(speed_test_ip, rf, rfa):
-        print('in run_speed_test_from_android_termux')
+    def execute_speedtest_from_android_termux(speed_test_ip, rf, rfa):
+        print('execute_speedtest_from_android_termux')
         # prompt = '\$\s+'
         # prompt = '\$'
         # sort of works-----------
@@ -2169,13 +2157,23 @@ class Nvg599Class(GatewayClass):
         # ssh_client = pxssh.pxssh(timeout=200,
         # encoding='utf-8',options={"StrictHostKeyChecking": "no","AutoPromptReset": "True"})
         # ssh_client = pxssh.pxssh(timeout=200, encoding='utf-8')
+        print('1')
 
-        ssh_client = pxssh.pxssh(timeout=300, encoding='utf-8', options={"StrictHostKeyChecking": "no"})
+        ssh_client = pxssh.pxssh(timeout=100, encoding='utf-8', options={"StrictHostKeyChecking": "no"})
         hostname = speed_test_ip
-        ssh_client.login(hostname, username=None, port=8022)
+        # ssh_client.login(hostname, username=None, port=8022)
+        try:
+            ssh_client.login(hostname, username=None, sync_multiplier=5, port=8022)
+        except pxssh.ExceptionPxssh as e:
+            print('pxssh failed to login')
+            print(str(e))
+        print('2')
         ssh_client.prompt()
+        print('3')
         ssh_client.sendline('speedtest  --server 5024')
+        print('4')
         ssh_client.prompt()
+        print('5')
         # speed_test_output_b = ssh_client.before
         speed_test_output = ssh_client.before
         # print(ssh_client.before)
@@ -2403,7 +2401,6 @@ class Nvg599Class(GatewayClass):
 
     def login_nvg_599_cli(self):
         print('In login_nvg_cli')
-
         self.telnet_cli_session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
         self.telnet_cli_session.expect("ogin:")
         self.telnet_cli_session.sendline('admin')
@@ -2416,6 +2413,7 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect(">")
         return self.telnet_cli_session
+
 
     @staticmethod
     def static_login_nvg_599_cli():
@@ -2882,10 +2880,12 @@ class Nvg599Class(GatewayClass):
         mo1 = status_info_reg_ex.search(status_output)
         return mo1.group(2)
 
-    @staticmethod
-    def get_rg_sh_ip_lan_info_cli():
+    # @staticmethod
+    def cli_sh_rg_ip_lan_info(self):
         # telnet_cli_session =self.login_nvg_599_cli()
-        telnet_cli_session = Nvg599Class.static_login_nvg_599_cli()
+        # telnet_cli_session = Nvg599Class.static_login_nvg_599_cli()
+        telnet_cli_session = Nvg599Class.login_nvg_599_cli(self)
+
         # self.telnet_cli_session. sendline("show ip lan")
         telnet_cli_session. sendline("show ip lan")
         # self.telnet_cli_session.expect('>')
