@@ -174,9 +174,7 @@ class GatewayClass:
         gmail_password = "%%45A7A&akBc"
         # %%45A7A&akBc
         gmail_user = 'leandertesthouse@gmail.com'
-
         try:
-
             with smtplib.SMTP('smtp.gmail.com', 587) as smtp_server:
                 smtp_server.ehlo()
                 smtp_server.starttls()
@@ -185,40 +183,6 @@ class GatewayClass:
                 print('message sent successfully')
         except smtplib.SMTPException as e:
             print('failed to send email' + str(e))
-
-# this version has no subject when received
-#     def email_test_results_deprecated(self, text_file):
-#         print('in email_test_results')
-# #        gmail_password="arris123"
-#         gmail_password = "1329brome"
-#
-#         gmail_user = 'leandertesthouse@gmail.com'
-#         to = palmer@gmail.com'
-#         sent_from = 'leandertesthouse:'
-#         subject = 'Test results'
-# #      body = "Results:" + channelResultContents
-#         body = "Results:" + text_file
-#         email_text = """
-#         From:%s
-#         To:%s
-#         Subject:%s
-#
-#         %s
-#         """ % (sent_from, to, subject, body)
-#
-#         try:
-#             server = smtplib.SMTP('smtp.gmail.com', 587)
-#             server.ehlo()
-#             server.starttls()
-#             server.login(gmail_user, gmail_password)
-#             # email_text = 'Subject:{}\n\nbody'.format(subject)
-#             server.sendmail(sent_from, to, email_text)
-#             sleep(2)
-#             server.quit()
-#             print("im the email section ====================")
-#         except smtplib.SMTPException as e:
-#             print('failed to send email' + str(e))
-
 
 class Nvg599Class(GatewayClass):
     def __init__(self):
@@ -518,8 +482,6 @@ class Nvg599Class(GatewayClass):
         band2_password = band2_password_entry.get_attribute('value')
         return band2_ssid, guest_ssid, band5_ssid, band2_password, guest_password, band5_password
 
-
-    # -pfp-current
     def get_home_network_ip_allocation_page_source(self):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
         home_network_link = self.session.find_element_by_link_text("Firewall")
@@ -848,7 +810,7 @@ class Nvg599Class(GatewayClass):
             #  except NoSuchElementException:
             #      print('No Input errors displayed- Continuing')
 
-    def upgrade_rg(self, update_bin_file):
+    def upgrade_rg(self, update_bin_file,rf, rfa):
         print('in upgrade_rg')
         print("in ui_get_device_list ")
         home_link = self.session.find_element_by_link_text("Diagnostics")
@@ -892,11 +854,14 @@ class Nvg599Class(GatewayClass):
                 return "Fail: socket timeout Error"
 
         end = time.time()
-        print("upgrade duration in seconds:", round(end - start))
-        sleep(2)
         duration = round(end - start)
-
-        return "Pass", duration
+        print("upgrade duration in seconds:", duration)
+        rf.write("    RG  Upgrade to:" + update_bin_file + " Pass " + '\n')
+        rfa.write("    RG  Upgrade to:" + update_bin_file + " Pass " + '\n')
+        rf.write("        RG  Upgrade Duration:" + str(duration) + '\n')
+        rfa.write("        RG  Upgrade Duration:" + str(duration)  + '\n')
+        sleep(2)
+        return "Pass"
 
     def check_if_dac_required(self):
         try:
@@ -937,7 +902,6 @@ class Nvg599Class(GatewayClass):
 #         self.telnet_cli_session.expect('OCKED>')
 #         show_wi_client_str = self.telnet_cli_session.before
 #         self.telnet_cli_session.close()
-#         print('------------------------------------------------------\n')
 #         print('------------------------------------------------------\n')
 #         # dividing on macs
 #         wi_reg_ex = re.compile(r'(?:[0-9a-fA-F]:?){12}.*?\n.*\n.*\n.*\n')
@@ -1811,7 +1775,6 @@ class Nvg599Class(GatewayClass):
         sleep(10)
         submit.click()
         self.check_for_wifi_security_and_regular_warning()
-        # self.check_for_wifi_security_and_regular_warning()
         # self.session.implicitly_wait(5)
         # wi_fi_2_4 = self.session.find_element_by_name("owl80211on")
         # wi_fi_2_4.click()
@@ -1834,8 +1797,7 @@ class Nvg599Class(GatewayClass):
         # self.check_for_wifi_security_and_regular_warning()
         # # self.check_for_wifi_warning()
 
-    #   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    # parm must be Off or On with capitalized firs
+    # parm must be Off or On with capitalized first letter
     def disable_enable_wifi_5g(self, off_on):
         # print('in disable_enable_wifi_2_4_and_5g_wifi')
         print('disable_enable_wifi_5g_wifi, setting 5G to:' + off_on)
@@ -2192,7 +2154,7 @@ class Nvg599Class(GatewayClass):
         #  #up_load_speed = wifi_info_groups.group(2)
 
     @staticmethod
-    def run_speed_test_from_android_termux(speed_test_ip):
+    def run_speed_test_from_android_termux(speed_test_ip, rf, rfa):
         print('in run_speed_test_from_android_termux')
         # prompt = '\$\s+'
         # prompt = '\$'
@@ -2217,7 +2179,7 @@ class Nvg599Class(GatewayClass):
         # speed_test_output_b = ssh_client.before
         speed_test_output = ssh_client.before
         # print(ssh_client.before)
-        print('after conversion ti string', speed_test_output)
+        print('after conversion to string', speed_test_output)
         # this is waht I added
         ssh_client.sendline('exit')
 
@@ -2252,10 +2214,13 @@ class Nvg599Class(GatewayClass):
         # speed_test_regex = re.compile(r'(Download:\s+\w+\.\w+\s+\w+).*(Upload:\s+\w+\.\w+\s+\w+)', re.DOTALL)
         speed_test_regex = re.compile(r'Download:\s+(\d+\.\d+)\s+\w+.*Upload:\s+(\d+\.\d+)\s+\w+', re.DOTALL)
         speed_test_groups = speed_test_regex.search(speed_test_output)
-        print('download:', speed_test_groups.group(1))
-        print('upload:', speed_test_groups.group(2))
-        down_load_speed = speed_test_groups.group(1)
-        up_load_speed = speed_test_groups.group(2)
+        try:
+            print('download:', speed_test_groups.group(1))
+            print('upload:', speed_test_groups.group(2))
+            down_load_speed = speed_test_groups.group(1)
+            up_load_speed = speed_test_groups.group(2)
+        except AttributeError:
+            print("something wrong- go to cleanup routine")
         return down_load_speed, up_load_speed
 
     ##  -pfp- ddog

@@ -390,15 +390,12 @@ def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_
         #     note8_file.write("firmware:" + str(firmware) + "download:" + a + "Upload:" + b + "\n")
         #     sleep(60)
 
-    # note8_file.close()
     # tablet_file.close()
     # tablet_download_list
     # note8_download_list
     plt.figure("Test House Speedtest results for NVG 599 ", figsize=(8, 7))
     ty = arange(1.0, 12.0, 1)
 #    ty = arange(1.0, 10.0, 1)
-
-    #
     subplot(2, 1, 1)
     plt.ylabel('Speed in MBPS')
     title('NVG 599 Download Speed')
@@ -782,23 +779,37 @@ def test_verify_auto_info_not_present_in_ui(nvg_599_dut, rf, rfa):
         # return ("Fail: SSID:" + ssid + " Status not set to Disabled")
 
 ################# test area  #######################  -pfp-
-#         soup = BeautifulSoup(self.session.page_source, 'html.parser')
+rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
+rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
+nvg_599_dut = Nvg599Class()
 
-# speed_test_graph_2_devices_plt()
-# nvg_599_dut = Nvg599Class()
-upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h12d10_1.1.bin'
+nvg_599_dut.run_speed_test_from_android_termux("192.168.1.80", rf, rfa)
+# nvg_599_dut.run_speed_test_from_android_termux("192.168.1.122")
+exit()
+
+
+
+
+send_email = 1
+upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h12d16_1.1.bin'
 now = datetime.today().strftime("%B %d, %Y,%H:%M")
 rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
 rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
 rf.write(now + '\n')
 rfa.write(now + '\n')
-nvg_599_dut = Nvg599Class()
-# upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h12d15_1.1.bin'
-# upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h2d23_1.1.bin'
-
-
-test_status, duration = nvg_599_dut.upgrade_rg(upgrade_rg_file)
+test_status = nvg_599_dut.upgrade_rg(upgrade_rg_file,rf, rfa)
+print ("test status:" + test_status)
 sleep(300)
+nvg_599_dut.factory_reset_rg(rf,rfa)
+sleep(100)
+rf.close()
+rfa.close()
+if send_email == 1:
+    nvg_599_dut.email_test_results(rf)
+rf.close()
+rfa.close()
+
+exit()
 # rf.write("Test Title: RG Upgrade :" + upgrade_rg_file + " Test case " + test_status  + "Duration:" + str(duration)  +'\n')
 # rfa.write("Test Title: RG Upgrade :" + upgrade_rg_file + " Test case " + test_status  + "Duration:" + str(duration)  +'\n')
 # #results_file_archive.write("Test Title: RG Upgrade:" + upgrade_rg_file + " Pass " + '\n')
