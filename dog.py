@@ -793,106 +793,118 @@ def test_speedtest_from_android(nvg_599_dut,rf, rfa ):
     #    print(x, y)
     # exit()
     # return ip_lan_info_dict
+def test_rg_upgrade(nvg_599_dut, upgrade_file_path, rf, rfa):
+    #upgrade_rg_file = '/home/palmer/Downloads/nvg599-9.2.2h13d23_1.1.bin'
+    test_status = nvg_599_dut.upgrade_rg(upgrade_rg_file, rf, rfa)
+    if test_status == "Fail":
+        rf.write('    Fail: Upgrade failed')
+        # nvg_599_dut.session_cleanup()
+        return "Fail"
+    else:
+        rf.write('    Pass: RG upgraded to:' + upgrade_file_path)
+        sleep(300)
+        return "Pass"
+
+def test_factory_reset(nvg_599_dut,rf,rfa):
+    test_status = nvg_599_dut.factory_reset_rg(rf, rfa)
+    if test_status == "Fail":
+        rf.write('    Fail: Factory reset failed')
+        nvg_599_dut.session_cleanup()
+        return "Fail"
+    else:
+        sleep(200)
+        return "Pass"
 
 ################# test area  #######################  -pfp-
-nvg_599_dut = Nvg599Class()
-rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
-rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
-test_speedtest_from_android(nvg_599_dut, rf, rfa)
+# nvg_599_dut = Nvg599Class()
+# send_email = 1
+# rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
+# rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
+# test_status = test_speedtest_from_android(nvg_599_dut, rf, rfa)
+# if test_status == "Fail":
+#     # here we want to cleanup and relaunch a new session
+#     # to prepare for the next testcase
+#     print('test_speedtest_from_android test case failed')
+#
+#
+# rf.close()
+# rfa.close()
+# if send_email == 1:
+#     nvg_599_dut.email_test_results(rf)
+#
+# #ip_lan_info_dict = execute_speedtest_from_android_termux(nvg_599_dut,rf rfa)
+# #ip_lan_info_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
+#
+#
+# # pprint.pprint(ip_lan_info_dict)
+#
+# # test_speedtest_from_android()
+# exit()
 
-#ip_lan_info_dict = execute_speedtest_from_android_termux(nvg_599_dut,rf rfa)
-#ip_lan_info_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
 
 
-# pprint.pprint(ip_lan_info_dict)
-
-# test_speedtest_from_android()
-exit()
-
-
-rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
-rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
-nvg_599_dut = Nvg599Class()
-ip_lan_info_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
-# nvg_599_dut.run_speed_test_from_android_termux("192.168.1.80", rf, rfa)
-# nvg_599_dut.run_speed_test_from_android_termux("192.168.1.122")
-exit()
-
+#
+# send_email = 1
+#
+# rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
+# rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
+# nvg_599_dut = Nvg599Class()
+# ssid = 3
+# nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid, rf, rfa)
+# rf.write("Test Title: Auto SSID 3 setup: Pass")
+# rfa.write("Test Title: Auto SSID 3 setup: Pass")
+#
+# ssid = 4
+# nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid, rf, rfa)
+# rf.write("Test Title: Auto SSID 4 setup: Pass")
+# rfa.write("Test Title: Auto SSID 4 setup: Pass")
+# rf.close()
+# rfa.close()
+# if send_email == 1:
+#     nvg_599_dut.email_test_results(rf)
+#
+# exit()
 
 
 
 send_email = 1
-upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h12d16_1.1.bin'
-now = datetime.today().strftime("%B %d, %Y,%H:%M")
 rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
 rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
+now = datetime.today().strftime("%B %d, %Y,%H:%M")
 rf.write(now + '\n')
 rfa.write(now + '\n')
-test_status = nvg_599_dut.upgrade_rg(upgrade_rg_file,rf, rfa)
-print ("test status:" + test_status)
-sleep(300)
-nvg_599_dut.factory_reset_rg(rf,rfa)
-sleep(100)
+nvg_599_dut = Nvg599Class()
+#upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d23_1.1.bin'
+
+
+test_rg_upgrade(nvg_599_dut, '/home/palmer/Downloads/nvg599-9.2.2h13d23_1.1.bin', rf, rfa)
+test_factory_reset(nvg_599_dut, rf, rfa)
+# test_status = nvg_599_dut.upgrade_rg(upgrade_rg_file,rf, rfa)
+#nvg_599_dut.factory_reset_rg(rf,rfa)
+
+ssid = 3
+nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid, rf, rfa)
+rf.write("Test Title: Auto SSID 3 setup: Pass")
+rfa.write("Test Title: Auto SSID 3 setup: Pass")
+ssid = 4
+nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid, rf, rfa)
+rf.write("Test Title: Auto SSID 4 setup: Pass")
+rfa.write("Test Title: Auto SSID 4 setup: Pass")
 rf.close()
 rfa.close()
 if send_email == 1:
     nvg_599_dut.email_test_results(rf)
-rf.close()
-rfa.close()
 
 exit()
-# rf.write("Test Title: RG Upgrade :" + upgrade_rg_file + " Test case " + test_status  + "Duration:" + str(duration)  +'\n')
-# rfa.write("Test Title: RG Upgrade :" + upgrade_rg_file + " Test case " + test_status  + "Duration:" + str(duration)  +'\n')
-# #results_file_archive.write("Test Title: RG Upgrade:" + upgrade_rg_file + " Pass " + '\n')
-nvg_599_dut.factory_reset_rg(rf,rfa)
-sleep(100)
-rf.close()
-rfa.close()
-nvg_599_dut.email_test_results(rf)
-exit()
 
-
-
-
-
-rf.write("Test Title: RG Factory Reset:" + " Pass " + '\n')
-rfa.write("Test Title: RG Factory Reset:" + " Pass " + '\n')
-
-rf.write("Test Title: RG Factory Reset: turn_off_supplicant_cli(): Pass \n")
-rfa.write("Test Title: RG Factory Reset: turn_off_supplicant_cli(): Pass \n")
-
-rf.write("Test Title: RG Factory Reset: enable_sshd_ssh_cli(): Pass \n")
-rfa.write("Test Title: RG Factory Reset: enable_sshd_ssh_cli(): Pass \n")
-
-rf.write("Test Title: RG Factory Reset: conf_tr69_eco_url(): Pass \n")
-rfa.write("Test Title: RG Factory Reset: conf_tr69_eco_url(): Pass \n")
-
-rf.write("Test Title: RG Factory Reset: turn_off_wi_fi_security_protection_cli(): Pass \n")
-rfa.write("Test Title: RG Factory Reset: turn_off_wi_fi_security_protection_cli(): Pass \n")
-
-rf.write("Test Title: RG Factory Reset: enable_parental_control():Pass \n")
-rfa.write("Test Title: RG Factory Reset: enable_parental_control(): \n")
-rf.close()
-rfa.close()
-nvg_599_dut.email_test_results(rf)
-sleep(30)
-exit()
-
-
-
-
-
+######################################################################################################
+######################  Experimental code  below #####################
 nmcli_connection = "Wired"
 nvg_599_dut.nmcli_set_connection(nmcli_connection, "down")
 sleep(5)
 nvg_599_dut.nmcli_set_connection(nmcli_connection, "up")
 
-#source = nvg_599_dut.get_home_network_ip_allocation_page_source()
-#print(source)
-exit()
 
-
-#ssid = "3"
 now = datetime.today().strftime("%B %d, %Y,%H:%M")
 rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
 rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
@@ -922,8 +934,6 @@ sleep(20)
 nvg_599_dut.email_test_results(rf)
 exit()
 
-
-
 status_page = nvg_599_dut.get_ui_home_network_status_page()
 print(status_page)
 exit()
@@ -938,20 +948,6 @@ exit()
 #
 # exit()
 
-# active_network_connections = []
-# network_connections = []
-#
-# active_network_connections, network_connections =  nvg_599_dut.nmcli_get_connections()
-# print('------------------------------------------\n')
-# print(*active_network_connections)
-# print('------------------------------------------\n')
-# print(network_connections)
-# print('------------------------------------------\n')
-#
-# exit()
-# rf = results file
-#rfa is results_file_archive
-#####################################  top ddog
 now = datetime.today().strftime("%B %d, %Y,%H:%M")
 results_file = open('results_file.txt', mode = 'w', encoding = 'utf-8')
 
@@ -965,16 +961,26 @@ results_file.write(now + '\n')
 results_file_archive.write(now + '\n')
 
 nvg_599_dut = Nvg599Class()
-upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d22_1.1.bin'
-# upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h12d15_1.1.bin'
-# upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h2d23_1.1.bin'
-test_status, duration = nvg_599_dut.upgrade_rg(upgrade_rg_file)
+upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d23_1.1.bin'
+test_status, duration = nvg_599_dut.upgrade_rg(upgrade_rg_file, rf, rfa)
 sleep(300)
 results_file.write("Test Title: RG Upgrade :" + upgrade_rg_file + " Test case " + test_status  + "Duration:" + duration  +'\n')
 results_file_archive.write("Test Title: RG Upgrade :" + upgrade_rg_file + " Test case " + test_status  + "Duration:" + duration  +'\n')
 #results_file_archive.write("Test Title: RG Upgrade:" + upgrade_rg_file + " Pass " + '\n')
-nvg_599_dut.factory_reset_rg()
+# nvg_599_dut.factory_reset_rg()
 sleep(100)
+
+
+
+ssid = 3
+nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid)
+results_file.write("Test Title: Auto SSID 3 setup: Pass")
+results_file_archive.write("Test Title: Auto SSID 3 setup: Pass")
+
+ssid = 4
+nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid)
+results_file.write("Test Title: Auto SSID 4 setup: Pass")
+results_file_archive.write("Test Title: Auto SSID 4 setup: Pass")
 # results_file.write("Test Title: RG Factory Reset:" + " Pass " + '\n')
 # results_file_archive.write("Test Title: RG Factory Reset:" + " Pass " + '\n')
 #

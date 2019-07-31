@@ -426,7 +426,7 @@ class Nvg599Class(GatewayClass):
     #                       'device_test_name': 'fixed_s9', 'name': 'palmer_Latitude-E5450',
     #                       'location': 'tbd'},
 
-    def enable_guest_network_and_set_password_ssid(self,rf, rfa):
+    def enable_guest_network_and_set_password_ssid(self, rf, rfa):
         print('in enable_guest_network_and_set_password_ssid')
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
         home_network_link = self.session.find_element_by_link_text("Home Network")
@@ -481,18 +481,6 @@ class Nvg599Class(GatewayClass):
         band2_password_entry = self.session.find_element_by_name("okey1")
         band2_password = band2_password_entry.get_attribute('value')
         return band2_ssid, guest_ssid, band5_ssid, band2_password, guest_password, band5_password
-
-    def get_home_network_ip_allocation_page_source(self):
-        # dianostics_link = browser.find_element_by_link_text("Diagnostics")
-        home_network_link = self.session.find_element_by_link_text("Firewall")
-        home_network_link.click()
-        status_link = self.session.find_element_by_link_text("NAT/Gaming")
-        status_link.click()
-        self.check_if_dac_required()
-        status_link = self.session.find_element_by_link_text("IP Allocation")
-        status_link.click()
-        sleep(30)
-        return self.session.page_source
 
     def get_home_network_ip_allocation_page_source(self):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
@@ -810,9 +798,8 @@ class Nvg599Class(GatewayClass):
             #  except NoSuchElementException:
             #      print('No Input errors displayed- Continuing')
 
-    def upgrade_rg(self, update_bin_file,rf, rfa):
+    def upgrade_rg(self, update_bin_file, rf, rfa):
         print('in upgrade_rg')
-        print("in ui_get_device_list ")
         home_link = self.session.find_element_by_link_text("Diagnostics")
         home_link.click()
         status_link = self.session.find_element_by_link_text("Update")
@@ -859,7 +846,7 @@ class Nvg599Class(GatewayClass):
         rf.write("    RG  Upgrade to:" + update_bin_file + " Pass " + '\n')
         rfa.write("    RG  Upgrade to:" + update_bin_file + " Pass " + '\n')
         rf.write("        RG  Upgrade Duration:" + str(duration) + '\n')
-        rfa.write("        RG  Upgrade Duration:" + str(duration)  + '\n')
+        rfa.write("        RG  Upgrade Duration:" + str(duration) + '\n')
         sleep(2)
         return "Pass"
 
@@ -2150,7 +2137,6 @@ class Nvg599Class(GatewayClass):
         # ssh_client = paramiko.SSHClient()
         # ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         # sleep(10)
-        # -------------------------------------
         # ssh_client= pxssh.pxssh()
         # ssh_client = pxssh.pxssh(options={"StrictHostKeyChecking": "no","AutoPromptReset": "True"})
         # not sure if this is defined like this
@@ -2164,9 +2150,15 @@ class Nvg599Class(GatewayClass):
         # ssh_client.login(hostname, username=None, port=8022)
         try:
             ssh_client.login(hostname, username=None, sync_multiplier=5, port=8022)
+            rf.write('    Logged in to ' + speed_test_ip)
+
         except pxssh.ExceptionPxssh as e:
             print('pxssh failed to login')
+            ssh_client.close()
+            rf.write('    Failed to log in to ' + speed_test_ip + "Aborting test")
+            rf.write('    Error:' +  str(e))
             print(str(e))
+            return "Fail"
         print('2')
         ssh_client.prompt()
         print('3')
@@ -2180,45 +2172,24 @@ class Nvg599Class(GatewayClass):
         print('after conversion to string', speed_test_output)
         # this is waht I added
         ssh_client.sendline('exit')
-
-        # exit()
-        # ssh.connect(hostname=speed_test_ip, username=UN, password=PW)
-        # ssh_client.connect(hostname=speed_test_ip, port = 8022,  timeout=30)
-        # ssh_client.connect(hostname=speed_test_ip, port = 8022,  timeout=30)
-# sort of works-----------
-#         Nvg599Class.wait_for_ssh_to_be_ready(speed_test_ip, '8022', '220', '10')
-#         ssh_client.connect(hostname=speed_test_ip, port=8022, timeout=120)
-        #  -------------------------------------
-        # loop = 1
-        # while loop == 1:
-        #     try:
-        #         ssh_client.connect(hostname=speed_test_ip, port = 8022,  timeout=120)
-        #     except socket.timeout as error:
-        #         print('socket timeout..',error)
-        #         continue
-        # ---------sort of works
-        # ssh_session = SSHClientInteraction(ssh_client, timeout=200, display=True)
-        # ssh_session.expect(prompt, timeout=200)
-        # Austin speedtest server is 5024, check speedtest --list for a complete listing
-        #
-        # ssh_session.send('speedtest  --server 5024')
-        # sleep(2)
-        # ssh_session.expect(prompt, timeout=200)
-        # speed_test_output = ssh_session.current_output_clean
-# sort of works
-        # ssh_client.sendline('speedtest  --server 5024')
-        # print('speedtest_output:   ',speed_test_output )
-        # speed_test_regex = re.compile(r'.*Download:\s+(\w+)\s+.*Upload:\s+(\w+)',re.DOTALL)
-        # speed_test_regex = re.compile(r'(Download:\s+\w+\.\w+\s+\w+).*(Upload:\s+\w+\.\w+\s+\w+)', re.DOTALL)
         speed_test_regex = re.compile(r'Download:\s+(\d+\.\d+)\s+\w+.*Upload:\s+(\d+\.\d+)\s+\w+', re.DOTALL)
         speed_test_groups = speed_test_regex.search(speed_test_output)
         try:
             print('download:', speed_test_groups.group(1))
+
             print('upload:', speed_test_groups.group(2))
+
             down_load_speed = speed_test_groups.group(1)
+            rf.write('    Download speed ' + down_load_speed)
+
             up_load_speed = speed_test_groups.group(2)
+            rf.write('    Upload speed ' + up_load_speed)
+
         except AttributeError:
-            print("something wrong- go to cleanup routine")
+            print("something wrong- closing ssh_client session")
+            ssh_client.close()
+            return "Fail"
+
         return down_load_speed, up_load_speed
 
     ##  -pfp- ddog
@@ -2611,8 +2582,8 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
                                          + str(ssid_number) + '.SSIDAdvertisementEnabled= 1')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
-        rf.write("    Enabled auto ssid " + ssid_number + '\n')
-        rfa.write("    Enabled auto ssid" + ssid_number + '\n')
+        rf.write("    Enabled auto ssid " + str(ssid_number) + '\n')
+        rfa.write("    Enabled auto ssid" + str(ssid_number) + '\n')
         self.telnet_cli_session.close()
 
 
@@ -2941,6 +2912,9 @@ class Nvg599Class(GatewayClass):
         tr69_auto_ssid_default = self.telnet_cli_session.before
         return tr69_auto_ssid_default
 
+
+    def session_cleanup(self):
+        pass
 # class Nvg_5268_Class(GatewayClass):
 #     def __init__(self):
 #         self.name = "Nvg_5268"
