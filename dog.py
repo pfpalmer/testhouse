@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
-
+from   rgclass import test_house_devices_static_info
 # import itertools
 import pprint
 from datetime import datetime
@@ -700,9 +700,7 @@ def test_auto_ssid_default_tr69_values(nvg_599_dut, ssid, rf, rfa):
         print('Fail ssid:' + ssid + ' SSID not set to TBD')
         rf.write('    Fail ssid:' + ssid + ' SSID not set to TBD \n')
         test_status = "Fail"
-
         #return ('Fail: SSID:' + ssid + '  SSID not set to TBD')
-
     if (default_tr69_auto_ssid_values.find('.' + ssid + '.X_0000C5_Encryption AESEncryption') != -1):
         print('Pass ssid:' + ssid + ' Encryption set to AESEncryption')
         rf.write('    Pass ssid:' + ssid + ' Encryption set to AESEncryption \n')
@@ -728,9 +726,7 @@ def test_auto_ssid_default_tr69_values(nvg_599_dut, ssid, rf, rfa):
         print('Fail ssid:' + ssid + ' Default KeyPassphrase not set to TBD')
         rf.write('    Fail ssid:' + ssid + ' Default KeyPassphrase not set to TBD \n')
         test_status = "Fail"
-
         #return ('Fail: SSID:' + ssid + ' Default KeyPassphrase not set to BD')
-
     if (default_tr69_auto_ssid_values.find('.' + ssid + '.X_0000C5_MaxClients 3') != -1):
         print('Pass ssid:' + ssid + ' Default MaxClients set to 3')
         rf.write('    Pass ssid:' + ssid + ' Default MaxClients set to 3 \n')
@@ -738,9 +734,7 @@ def test_auto_ssid_default_tr69_values(nvg_599_dut, ssid, rf, rfa):
         print('Fail ssid:' + ssid + ' Default MaxClients not set to 3')
         rf.write('    Fail ssid:' + ssid + ' Default MaxClients not set to 3 \n')
         test_status = "Fail"
-
         #return ('Fail: SSID:' + ssid + ' Default KeyPassphrase not set to BD')
-
     if (default_tr69_auto_ssid_values.find('.' + ssid + '.SSIDAdvertisementEnabled 0') != -1):
         print('Pass ssid:' + ssid + ' Default SSIDAdvertisementEnabled set to 0')
         rf.write('    Pass ssid:' + ssid + ' Default SSIDAdvertisementEnabled set to 0 \n')
@@ -748,7 +742,6 @@ def test_auto_ssid_default_tr69_values(nvg_599_dut, ssid, rf, rfa):
         print('Fail ssid:' + ssid + ' Default SSIDAdvertisementEnabled not set to 0')
         rf.write('    Fail ssid:' + ssid + ' Default SSIDAdvertisementEnabled not set to 0 \n')
         test_status = "Fail"
-
         #return ('Fail: SSID:' + ssid + ' Default KepPassphrase not set to BD')
     return test_status
 
@@ -779,16 +772,47 @@ def test_verify_auto_info_not_present_in_ui(nvg_599_dut, rf, rfa):
         # return ("Fail: SSID:" + ssid + " Status not set to Disabled")
 
 
-def test_speedtest_from_android(nvg_599_dut,rf, rfa ):
+def get_upgrade_file_from_my_win10(nvg_599_dut,win10_laptop, test_house_devices_static_info,  rf, rfa ):
+    print('get_upgrade_file_from win10_laptop')
+    rf.write('get_upgrade_file_from win10_laptop' + '\n')
+
+
+def test_speedtest_from_android(nvg_599_dut,device, test_house_devices_static_info,  rf, rfa ):
+    print('in android speed test   device is:' + str(device))
+    rf.write('test_speedtest_from_android' + '\n')
+
+    # if device == 'Galaxy-Note8':
+    # first get the mac of the device from the dict of known test house devices
+    for key in test_house_devices_static_info:
+        print('key :' + str(key) + 'device: ' + str(test_house_devices_static_info[key]['device_type']))
+
+        if test_house_devices_static_info[key]['device_type'] == device:
+            device_mac = key
+            print('device mac:' + str(device_mac))
+            break
+
     nvg_599_dut.login_nvg_599_cli()
     ip_lan_info_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
+    # first translate the device name to a mac using the
+
     for x, y in ip_lan_info_dict.items():
         print(x, y)
-    note_8_ip = ip_lan_info_dict['b8:d7:af:aa:27:c3']['IP']
-    galaxy_s9_ip = ip_lan_info_dict['8c:45:00:9f:82:9d']['IP']
-    print('note8 ip', str(note_8_ip))
-    print('galaxy  ip', str(galaxy_s9_ip))
-    nvg_599_dut.execute_speedtest_from_android_termux(note_8_ip, rf, rfa)
+
+    # if 'b8:d7:af:aa:27:c3' in ip_lan_info_dict:
+    if device_mac in ip_lan_info_dict:
+        # note_8_ip = ip_lan_info_dict['b8:d7:af:aa:27:c3']['IP']
+        device_ip = ip_lan_info_dict[device_mac]['IP']
+        print('device ip:' + str(device_ip))
+
+    else:
+        rf.write('    Android device IP not present in cli command sh ip lan, Aborting test')
+        print('Android device IP not present in cli command sh ip lan')
+        return "Fail"
+
+    # galaxy_s9_ip = ip_lan_info_dict['8c:45:00:9f:82:9d']['IP']
+    # print('device ip', str(device_ip))
+    # print('galaxy  ip', str(galaxy_s9_ip))
+    nvg_599_dut.execute_speedtest_from_android_termux(device_ip, rf, rfa)
     # for x, y in ip_lan_info_dict.items():
     #    print(x, y)
     # exit()
@@ -864,30 +888,55 @@ def test_factory_reset(nvg_599_dut,rf,rfa):
 #     nvg_599_dut.email_test_results(rf)
 #
 # exit()
-
+nvg_599_dut = Nvg599Class()
+nvg_599_dut.login_nvg_cli()
+print(str(nvg_599_dut.device_access_code))
+sleep(20)
+exit()
 
 
 send_email = 1
 rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
 rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
 now = datetime.today().strftime("%B %d, %Y,%H:%M")
-rf.write(now + '\n')
+rf.write('RG Test run:' + now + '\n')
 rfa.write(now + '\n')
 nvg_599_dut = Nvg599Class()
 #upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d23_1.1.bin'
-
-
-test_rg_upgrade(nvg_599_dut, '/home/palmer/Downloads/nvg599-9.2.2h13d23_1.1.bin', rf, rfa)
+# These android devices should be able to run the cli speed test
+# Galaxy-Note8,Galaxy-S9,Galaxy-Tab-A
+#test_rg_upgrade(nvg_599_dut, '/home/palmer/Downloads/nvg599-9.2.2h13d25_1.1.bin', rf, rfa)
 test_factory_reset(nvg_599_dut, rf, rfa)
-# test_status = nvg_599_dut.upgrade_rg(upgrade_rg_file,rf, rfa)
-#nvg_599_dut.factory_reset_rg(rf,rfa)
-
-ssid = 3
-nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid, rf, rfa)
+nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(3, rf, rfa)
 rf.write("Test Title: Auto SSID 3 setup: Pass")
 rfa.write("Test Title: Auto SSID 3 setup: Pass")
-ssid = 4
-nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid, rf, rfa)
+#ssid = 4
+nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(4, rf, rfa)
+rf.write("Test Title: Auto SSID 4 setup: Pass")
+rfa.write("Test Title: Auto SSID 4 setup: Pass")
+test_speedtest_from_android(nvg_599_dut, 'Galaxy-Note8', test_house_devices_static_info, rf, rfa)
+rf.close()
+rfa.close()
+if send_email == 1:
+    nvg_599_dut.email_test_results(rf)
+
+exit()
+
+
+# set the file at to the file to use
+test_rg_upgrade(nvg_599_dut, '/home/palmer/Downloads/nvg599-9.2.2h13d25_1.1.bin', rf, rfa)
+test_factory_reset(nvg_599_dut, rf, rfa)
+
+
+# test_status = nvg_599_dut.upgrade_rg(upgrade_rg_fitest_house_devices_static_infole,rf, rfa)
+#nvg_599_dut.factory_reset_rg(rf,rfa)
+
+#ssid = 3
+nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(3, rf, rfa)
+rf.write("Test Title: Auto SSID 3 setup: Pass")
+rfa.write("Test Title: Auto SSID 3 setup: Pass")
+#ssid = 4
+nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(4, rf, rfa)
 rf.write("Test Title: Auto SSID 4 setup: Pass")
 rfa.write("Test Title: Auto SSID 4 setup: Pass")
 rf.close()
