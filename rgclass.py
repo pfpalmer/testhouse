@@ -57,7 +57,7 @@ nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53
                                  'mac2g': '20:3d:66:49:85:61', 'mac5g': '11:22:33:44:55:66', 'wifi_pw': 'eeh4jxmh7q26',
                                  'ssid': 'ATT4ujR48s', 'ssid_1_pw': 'xxxxxxxxx',
                                  'ssid2': 'xxxxxxxxxxx_REPLACEME_2', 'ssid_2_pw': 'ssid2_pw_xxxx'}}
-
+# *7<#56*2<2
 
 airties_4920_defaults = {
     '88:41:FC:86:64:D6': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '2',
@@ -100,12 +100,10 @@ test_house_devices_static_info = {
                           'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'ubuntu_1', 'name': 'arris-Latitude-MBR', 'location': 'tbd'},
-
     'F4:5C:89:9D:F1:4F': {'device_type': 'macbook_pro', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '5',
                           'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'mac_book_1', 'name': 'macbook-mbr', 'location': 'master_bedroom'},
-
     '34:E6:D7:2B:CD:7C': {'device_type': 'ubuntu_laptop', 'oper_sys': '18.04',  'radio': 'abg', 'band': '5',
                           'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
@@ -121,12 +119,12 @@ test_house_devices_static_info = {
                           'state': 'None',
                           'address_type': 'fixed', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': '192.168.1.66',
                           'device_test_name': 'fixed_motox', 'name': 'palmer_Latitude-E5450', 'location': 'tbd'},
-    'B8:D7:AF:AA:27:C3': {'device_type': 'Galaxy-Note8', 'oper_sys': 'Android 9', 'radio': 'abg', 'band': '5',
+    'b8:d7:af:aa:27:c3': {'device_type': 'Galaxy-Note8', 'oper_sys': 'Android 9', 'radio': 'abg', 'band': '5',
                           'state': 'None',
                           'address_type': 'fixed', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': '192.168.1.67',
                           'device_test_name': 'fixed_note8', 'name': 'palmer_Latitude-E5450',
                           'location': 'tdb'},
-    '8C:45:00:9F:82:9D': {'device_type': ' Galaxy-S9', 'oper_sys': 'Android 9', 'radio': 'abg', 'band': '5',
+    '8C:45:00:9F:82:9D': {'device_type': 'Galaxy-S9', 'oper_sys': 'Android 9', 'radio': 'abg', 'band': '5',
                           'state': 'None',
                           'address_type': 'fixed', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': '192.168.1.67',
                           'device_test_name': 'fixed_s9', 'name': 'palmer_Latitude-E5450',
@@ -148,11 +146,79 @@ class GatewayClass:
         self.ip = None
         self.serial_number = None
 
+        self.ip = "192.168.1.254"
+        self.device_access_code = None
+        self.model = None
+        self.session = None
+        self.init_info = False
+        self.telnet_cli_session = None
+        self.airties_ap_cli_session = None
+        global nvg_info
+        # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
+        self.software_version = None
+        self.mac_address = None
+        self.last_reboot_time = None
+        self.current_date = None
+        self.hardware_version = None
+        self.serial_number = None
+        self.factory_reset = None
+        # self.cli_rg_connected_clients_dict = {}
+        # self.ui_rg_connected_clients_dict = {}
+        self.ip_lan_connections_dict_cli = {}
+        self.get_ui_system_information()
+        self.device_access_code = nvg_info[self.serial_number]['device_access_code']
+        print("in Nvg599Class__init")
+        self.init_info = True
+        self.mesh_connected_clents = {}
+        self.rg_url = 'http://192.168.1.254/'
+
+    def get_ui_system_information(self):
+        print('in get_ui_system_information)')
+        global nvg_info
+        rg_url = 'http://192.168.1.254/'
+        self.session = webdriver.Chrome()
+        self.session.get(rg_url)
+        status_link = self.session.find_element_by_link_text("System Information")
+        status_link.click()
+        sleep(2)
+        soup = BeautifulSoup(self.session.page_source, 'html.parser')
+        sleep(5)
+        this = soup.find_all('th')
+        for th in this:
+            if th.text == "Model Number":
+                print("model:", th.next_sibling.next_sibling.text)
+                self.model = th.next_sibling.next_sibling.text
+            if th.text == "Serial Number":
+                self.serial_number = th.next_sibling.next_sibling.text
+                print("serial Number is:", self.serial_number)
+                # print ("nvg serial number dict",nvg_info[self.serial_number])
+                # print("nvg access code", nvg_info[self.serial_number]['device_access_code'])
+                # tmp_dac = nvg_info[self.serial_number]['device_access_code']
+                # self.device_access_code = tmp_dac
+                self.device_access_code = nvg_info[self.serial_number]['device_access_code']
+                print("dac is:", self.device_access_code)
+            if th.text == "Software Version":
+                print(th.next_sibling.next_sibling.text)
+                self.software_version = th.next_sibling.next_sibling.text
+            if th.text == "MAC Address":
+                print(th.next_sibling.next_sibling.text)
+                self.mac_address = th.next_sibling.next_sibling.text
+            if th.text == "Time Since Last Reboot":
+                print(th.next_sibling.next_sibling.text)
+                self.last_reboot_time = th.next_sibling.next_sibling.text
+            if th.text == "Current Date/Time":
+                print(th.next_sibling.next_sibling.text)
+                self.current_date = th.next_sibling.next_sibling.text
+            if th.text == "Hardware Version":
+                print(th.next_sibling.next_sibling.text)
+                self.hardware_version = th.next_sibling.next_sibling.text
+
+        sleep(2)
+
     @staticmethod
     def email_test_results(text_file):
         now = datetime.today().strftime("%B %d, %Y,%H:%M")
         # now = datetime.today().isoformat()
-        # print('now')
         subject_title = 'Test results:' + str(now)
         print('subject title', subject_title)
         if text_file is None:
@@ -184,34 +250,49 @@ class GatewayClass:
         except smtplib.SMTPException as e:
             print('failed to send email' + str(e))
 
+    def login_nvg_cli(self):
+        print('In login_nvg_cli')
+        self.telnet_cli_session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
+        self.telnet_cli_session.expect("ogin:")
+        self.telnet_cli_session.sendline('admin')
+        self.telnet_cli_session.expect("ord:")
+        #  self.telnet_cli_session.sendline('<<01%//4&/')
+        #  self.telnet_cli_session.sendline('9==5485?6<')
+        nvg_dac = self.device_access_code
+        self.telnet_cli_session.sendline(nvg_dac)
+        self.telnet_cli_session.expect(">")
+        self.telnet_cli_session.sendline('magic')
+        self.telnet_cli_session.expect(">")
+        return self.telnet_cli_session
+
 class Nvg599Class(GatewayClass):
     def __init__(self):
         super(self.__class__, self).__init__()
-        self.ip = "192.168.1.254"
-        self.device_access_code = None
-        self.model = None
-        self.session = None
-        self.init_info = False
-        self.telnet_cli_session = None
-        self.airties_ap_cli_session = None
-        global nvg_info
-        # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
-        self.software_version = None
-        self.mac_address = None
-        self.last_reboot_time = None
-        self.current_date = None
-        self.hardware_version = None
-        self.serial_number = None
-        self.factory_reset = None
-        # self.cli_rg_connected_clients_dict = {}
-        # self.ui_rg_connected_clients_dict = {}
-        self.ip_lan_connections_dict_cli = {}
-        self.get_ui_system_information()
-        self.device_access_code = nvg_info[self.serial_number]['device_access_code']
-        print("in Nvg599Class__init")
-        self.init_info = True
-        self.mesh_connected_clents = {}
-        self.rg_url = 'http://192.168.1.254/'
+        # self.ip = "192.168.1.254"
+        # self.device_access_code = None
+        # self.model = None
+        # self.session = None
+        # self.init_info = False
+        # self.telnet_cli_session = None
+        # self.airties_ap_cli_session = None
+        # global nvg_info
+        # # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
+        # self.software_version = None
+        # self.mac_address = None
+        # self.last_reboot_time = None
+        # self.current_date = None
+        # self.hardware_version = None
+        # self.serial_number = None
+        # self.factory_reset = None
+        # # self.cli_rg_connected_clients_dict = {}
+        # # self.ui_rg_connected_clients_dict = {}
+        # self.ip_lan_connections_dict_cli = {}
+        # self.get_ui_system_information()
+        # self.device_access_code = nvg_info[self.serial_number]['device_access_code']
+        # print("in Nvg599Class__init")
+        # self.init_info = True
+        # self.mesh_connected_clents = {}
+        # self.rg_url = 'http://192.168.1.254/'
 
     def remote_webserver(self):
         pass
@@ -220,7 +301,7 @@ class Nvg599Class(GatewayClass):
     # def set_all_4920s_to_factory_default(self):
     def set_all_4920s_to_factory_default(self):
         # show_ip_lan_dict = self.get_rg_sh_ip_lan_info_cli()
-        show_ip_lan_dict = Nvg599Class.get_rg_sh_ip_lan_info_cli()
+        show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info()
         # airties_4920_ip_list = []
         for ip_lan_entry in show_ip_lan_dict:
             if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
@@ -275,7 +356,7 @@ class Nvg599Class(GatewayClass):
     # et_all_4920s_to_factory_default(sself):
     def get_ip_list_of_4920s(self):
         air_ties_ip_list = []
-        show_ip_lan_dict = Nvg599Class.get_rg_sh_ip_lan_info_cli()
+        show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(self)
         # airties_4920_ip_list = []
         for ip_lan_entry in show_ip_lan_dict:
             if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
@@ -847,7 +928,7 @@ class Nvg599Class(GatewayClass):
         rfa.write("    RG  Upgrade to:" + update_bin_file + " Pass " + '\n')
         rf.write("        RG  Upgrade Duration:" + str(duration) + '\n')
         rfa.write("        RG  Upgrade Duration:" + str(duration) + '\n')
-        sleep(2)
+        sleep(200)
         return "Pass"
 
     def check_if_dac_required(self):
@@ -1403,7 +1484,7 @@ class Nvg599Class(GatewayClass):
         self.conf_tr69_eco_url(rf, rfa)
         # sleep(120)
         self.turn_off_wi_fi_security_protection_cli(rf, rfa)
-        sleep(120)
+        sleep(20)
         # not sure why this failed
         self.enable_parental_control(rf, rfa)
 
@@ -1412,8 +1493,8 @@ class Nvg599Class(GatewayClass):
         self.session.get(rg_url)
 
         self.enable_guest_network_and_set_password_ssid(rf, rfa)
-        # added this, lets see if it works
-        # self.session.close()
+
+
         sleep(60)
         return duration
 
@@ -1966,7 +2047,7 @@ class Nvg599Class(GatewayClass):
 
         self.check_if_dac_required()
 
-    def get_ui_system_information(self):
+    def xget_ui_system_information(self):
         print('in get_ui_system_information)')
         global nvg_info
         rg_url = 'http://192.168.1.254/'
@@ -2078,6 +2159,7 @@ class Nvg599Class(GatewayClass):
         return down_load_speed, up_load_speed
 
     @staticmethod
+    # this doesn't return anythin useful
     def get_wifi_info_from_android_termux(wifi_info_ip):
         print('in get_wifi_connection_info_from_android_termux')
         ssh_client = pxssh.pxssh(timeout=100, encoding='ascii', maxread=5000, options={"StrictHostKeyChecking": "no"})
@@ -2150,7 +2232,7 @@ class Nvg599Class(GatewayClass):
         # ssh_client.login(hostname, username=None, port=8022)
         try:
             ssh_client.login(hostname, username=None, sync_multiplier=5, port=8022)
-            rf.write('    Logged in to ' + speed_test_ip)
+            rf.write('    Logged in to ' + speed_test_ip + '\n')
 
         except pxssh.ExceptionPxssh as e:
             print('pxssh failed to login')
@@ -2180,19 +2262,20 @@ class Nvg599Class(GatewayClass):
             print('upload:', speed_test_groups.group(2))
 
             down_load_speed = speed_test_groups.group(1)
-            rf.write('    Download speed ' + down_load_speed)
+            rf.write('    Download speed ' + down_load_speed + '\n')
 
             up_load_speed = speed_test_groups.group(2)
-            rf.write('    Upload speed ' + up_load_speed)
+            rf.write('    Upload speed ' + up_load_speed + '\n')
 
         except AttributeError:
             print("something wrong- closing ssh_client session")
+            down_load_speed = 'Fail'
+            up_load_speed = 'Fail'
+            # return down_load_speed, up_load_speed
+        finally:
             ssh_client.close()
-            return "Fail"
+            return down_load_speed, up_load_speed
 
-        return down_load_speed, up_load_speed
-
-    ##  -pfp- ddog
     # nmcli connection delete id xATT2anR4b8
     #  nmcli connection show
     #  nmcli connection show --active
@@ -2370,6 +2453,21 @@ class Nvg599Class(GatewayClass):
 
             return ping_fail_return
 
+    def tftp_get_file_cli(self,remote_file):
+        print('tftp_get_file')
+        self.telnet_cli_session = pexpect.spawn("tftp connect 192.168.1.254", encoding='utf-8')
+        self.telnet_cli_session.expect("ogin:")
+        self.telnet_cli_session.sendline('admin')
+        self.telnet_cli_session.expect("ord:")
+        #  self.telnet_cli_session.sendline('<<01%//4&/')
+        #  self.telnet_cli_session.sendline('9==5485?6<')
+        nvg_dac = self.device_access_code
+        self.telnet_cli_session.sendline(nvg_dac)
+        self.telnet_cli_session.expect(">")
+        self.telnet_cli_session.sendline('magic')
+        self.telnet_cli_session.expect(">")
+        return self.telnet_cli_session
+# pfp ******  moved to parent class
     def login_nvg_599_cli(self):
         print('In login_nvg_cli')
         self.telnet_cli_session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
@@ -2852,6 +2950,8 @@ class Nvg599Class(GatewayClass):
         return mo1.group(2)
 
     # @staticmethod
+
+    # ************
     def cli_sh_rg_ip_lan_info(self):
         # telnet_cli_session =self.login_nvg_599_cli()
         # telnet_cli_session = Nvg599Class.static_login_nvg_599_cli()
