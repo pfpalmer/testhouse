@@ -22,8 +22,6 @@ import sys
 from time import sleep
 # from datetime import datetime
 import datetime
-
-
 import pexpect
 from rgclass import Nvg599Class
 # from rgclass import NON_DFS_CHANNELS
@@ -120,7 +118,7 @@ def tst_speed_test(nvg_599_dut, results_file, test_ip):
     results_file.write("Test Title:tst_speed_tst Execution time:")
     results_file.write(now)
     results_file.write("\n")
-    down_load_speed,up_load_speed = nvg_599_dut.speed_test_cli(test_ip)
+    down_load_speed, up_load_speed = nvg_599_dut.speed_test_cli(test_ip)
     print('Download speed:', down_load_speed, 'Upload speed:', up_load_speed)
     speed = 'Download speed:' + down_load_speed + ' Upload speed:' + up_load_speed
     results_file.write(speed)
@@ -144,31 +142,31 @@ def tst_ping_ip(nvg_599_dut, ping_history_file, remote_ip):
     ping_history_file.write("Test Title:tst_ping Execution time:")
     ping_history_file.write(now)
     ping_history_file.write("\n")
-    min,avg,max,mdev = nvg_599_dut.ping_from_local_host(remote_ip)
+    min_ping,avg_ping,max_ping,mdev_ping = nvg_599_dut.ping_from_local_host(remote_ip)
     min_str = 'Min time: ' + min
     ping_history_file.write(min_str)
 
     ping_history_file.write("\n")
-    avg_str = 'Avg time: ' + avg
+    avg_str = 'Avg time: ' + avg_ping
     ping_history_file.write(avg_str)
 
     ping_history_file.write("\n")
-    max_str = 'Max time:' + max
+    max_str = 'Max time:' + max_ping
     ping_history_file.write(max_str)
 
     ping_history_file.write("\n")
-    mdev_str = 'mdev time:' + mdev
+    mdev_str = 'mdev time:' + mdev_ping
     ping_history_file.write(mdev_str)
 
     ping_history_file.write("\n")
-    print('min: ', min)
-    print('avg: ', avg)
-    print('max: ', max)
-    print('mdev:', mdev)
+    print('min: ', min_ping)
+    print('avg: ', avg_ping)
+    print('max: ', max_ping)
+    print('mdev:', mdev_ping)
+    return "Pass"
 
-
-def test_ping_device_name(device_name_to_ping):
-    sh_ip_lan_dict = Nvg599Class.get_rg_sh_ip_lan_info_cli()
+def test_ping_device_name(nvg_599_dut, device_name_to_ping):
+    sh_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(nvg_599_dut)
     print('dict type' + str(type(sh_ip_lan_dict)))
     for key in sh_ip_lan_dict:
         # print('key----------------------------------------------' + key)
@@ -181,7 +179,6 @@ def test_ping_device_name(device_name_to_ping):
 
 def test_channel_channelband_combinations(band5_channel_list, band5_bandwidth_list,ip_to_ping, result_file_name):
     nvg_599_dut = Nvg599Class()
-
     # ui_set_band_bandwith_channel(self, band, bandwidth, channel):
     channel_band_file = open(result_file_name, 'a')
     now = datetime.today().isoformat()
@@ -560,7 +557,7 @@ def tst_ping_rg_power_level(nvg_599_dut, remote_ip, number_of_pings):
     print('xxx3')
     nvg_599_dut.set_wifi_power_level('band5', '50')
     sleep(120)
-    min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss = nvg_599_dut.ping_from_local_host(remote_ip,number_of_pings)
+    min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss = nvg_599_dut.ping_from_local_host(remote_ip, number_of_pings)
 
     ping_file.writelines('Band:' + 'band5' + '  Ping: ' + remote_ip + '  RG Pwr: 50%' +
                      '  Sent:' + sent + '  Received:' + received + '  Percent loss:' + loss + '%\n')
@@ -570,18 +567,18 @@ def tst_ping_rg_power_level(nvg_599_dut, remote_ip, number_of_pings):
     nvg_599_dut.set_wifi_power_level('band5', '100')
     # sleep(90)
 
-    ping_file.writelines('-------------------------------------------------------------------------------------' + '\n')
-    ping_file.writelines('-------------------------------------------------------------------------------------' + '\n')
+    ping_file.writelines('-----------------------------------------------------------------------------------' + '\n')
+    ping_file.writelines('----------------------------------------------------------------------------------' + '\n')
 
     ping_file.writelines('\n')
     ping_file.close()
 
     nvg_599_dut.disable_enable_wifi_5g('On')
     nvg_599_dut.disable_enable_wifi_2_4g('On')
-    #band = 'band5'
-    #percentage = 100
+    # band = 'band5'
+    # percentage = 100
     nvg_599_dut.set_wifi_power_level('band2', '100')
-    #band = 'band2'
+    # band = 'band2'
     nvg_599_dut.set_wifi_power_level('band5', '100')
 
 def tst_android_speed_test(nvg_599_dut, remote_ip):
@@ -745,31 +742,7 @@ def test_auto_ssid_default_tr69_values(nvg_599_dut, ssid, rf, rfa):
         #return ('Fail: SSID:' + ssid + ' Default KepPassphrase not set to BD')
     return test_status
 
-def test_verify_auto_info_not_present_in_ui(nvg_599_dut, rf, rfa):
-    status_page = nvg_599_dut.get_ui_home_network_status_page_source()
-    # print(status_page)
-    # default_tr69_auto_ssid_values = nvg_599_dut.get_tr69_auto_ssid(ssid)
-    test_status = "Pass"
-    if (status_page.find('172.16') == -1):
-        print('Pass: 172.16 not found in status page')
-        rf.write('    Pass: 172.16 not found in status page')
-    else:
-        print('Fail: 172.16  found in status page')
-        rf.write('    Fail: 172.16  found in status page')
-        test_status = "Fail"
 
-    status_page = nvg_599_dut.get_home_network_ip_allocation_page_source()
-
-    if (status_page.find('172.16') == -1):
-        print('Pass: 172.16.x.x  not found in IP allocation page')
-        rf.write('    Pass: 172.16.x.x  not found in IP allocation page')
-    else:
-        print('Fail: 172.16.x.x  found in IP allocation page')
-        rf.write('    Fail: 172.16  found in status page')
-        test_status = "Fail"
-        # return("Fail", "Default Enable not set to 0")
-    return test_status
-        # return ("Fail: SSID:" + ssid + " Status not set to Disabled")
 
 
 def get_upgrade_file_from_my_win10(nvg_599_dut,win10_laptop, test_house_devices_static_info,  rf, rfa ):
@@ -809,14 +782,9 @@ def test_speedtest_from_android(nvg_599_dut,device, test_house_devices_static_in
         print('Android device IP not present in cli command sh ip lan')
         return "Fail"
 
-    # galaxy_s9_ip = ip_lan_info_dict['8c:45:00:9f:82:9d']['IP']
-    # print('device ip', str(device_ip))
-    # print('galaxy  ip', str(galaxy_s9_ip))
     nvg_599_dut.execute_speedtest_from_android_termux(device_ip, rf, rfa)
-    # for x, y in ip_lan_info_dict.items():
-    #    print(x, y)
-    # exit()
-    # return ip_lan_info_dict
+    return "Pass"
+
 def test_rg_upgrade(nvg_599_dut, upgrade_file_path, rf, rfa):
     #upgrade_rg_file = '/home/palmer/Downloads/nvg599-9.2.2h13d23_1.1.bin'
     test_status = nvg_599_dut.upgrade_rg(upgrade_rg_file, rf, rfa)
@@ -839,62 +807,88 @@ def test_factory_reset(nvg_599_dut,rf,rfa):
         sleep(200)
         return "Pass"
 
+def setup_auto_ssid_via_tr69(nvg_599_dut,ssid, rf, rfa, test_name):
+    rf.write('Test ' + test_name + " " + ssid + '\n')
+    print('Test:' + test_name + " " +  ssid + '\n')
+    setup_status = nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid, rf, rfa, test_name)
+    if setup_status == "Fail":
+        rf.write('    Fail: Auto setup ssid' + str(ssid) + 'failed\n')
+    print('Test:' + test_name + " " + ssid + ":" + setup_status + '\n')
+    rf.write('     Test:' + test_name + " " + ssid + ":" + setup_status + '\n\n')
+
+
+def verify_auto_info_not_present_in_ui(nvg_599_dut, rf, rfa, test_name):
+    status_page = nvg_599_dut.get_ui_home_network_status_page_source()
+    rf.write('Test ' + test_name  + '\n')
+    print('Test:' + test_name  + '\n')
+    # default_tr69_auto_ssid_values = nvg_599_dut.get_tr69_auto_ssid(ssid)
+    test_status = "Pass"
+    if (status_page.find('172.16') == -1):
+        print('Pass: 172.16 not found in status page')
+        rf.write('     172.16 not found in status page:OK\n')
+    else:
+        print('Fail: 172.16  found in status page')
+        rf.write('     172.16  found in status page:Fail\n')
+        test_status = "Fail"
+    status_page = nvg_599_dut.get_home_network_ip_allocation_page_source()
+
+    if (status_page.find('172.16') == -1):
+        print('Pass: 172.16.x.x  not found in IP allocation page')
+        rf.write('     172.16.x.x  not found in IP allocation page:OK\n')
+    else:
+        print('Fail: 172.16.x.x  found in IP allocation page')
+        rf.write('     172.16  found in status page:Fail\n')
+        test_status = "Fail"
+        # return("Fail", "Default Enable not set to 0")
+    print('Test:' + test_name + ":" + test_status + '\n\n')
+    rf.write('     Test:' + test_name + ":" + test_status + '\n\n')
+
+def verify_auto_ssid_defaults_via_tr69(nvg_599_dut, ssid, rf, rfa, test_name):
+    tr69_output = nvg_599_dut.get_tr69_parameters_for_ssid('3', rf, rfa)
+    auto_ssid_defaults_status = "Pass"
+    rf.write('Test ' + test_name + " " + ssid + '\n')
+    print('Test:' + test_name + " " +  ssid + '\n')
+
+    if 'WLANConfiguration.' + ssid + '.Enable 0' in  tr69_output:
+        rf.write('     Found WLANConfiguration.' + ssid + '.Enable 0:OK\n')
+        print('Found WLANConfiguration.' + str(ssid) + '.Enable 0:OK')
+    else:
+        rf.write('     Found WLANConfiguration.' + str(ssid) + '.Enable 0: Not Found\n')
+        auto_ssid_defaults_status = "Fail"
+
+    if 'WLANConfiguration.' + ssid + '.SSID ATT4ujR48s_REPLACEME_' in  tr69_output:
+        rf.write('     Found SSID ATT4ujR48s_REPLACEME_:OK\n')
+        print('Found SSID ATT4ujR48s_REPLACEME_1:OK')
+    else:
+        rf.write('     SSID ATT4ujR48s_REPLACEME_: Not Found\n')
+        auto_ssid_defaults_status = "Fail"
+
+    if "KeyPassphrase REPLACEME" in  tr69_output:
+        rf.write('     Found KeyPassphrase REPLACEME:OK\n')
+        print('Found KeyPassphrase REPLACEME:OK')
+    else:
+        rf.write('     KeyPassphrase REPLACEME: Not Found\n')
+        auto_ssid_defaults_status = "Fail"
+
+    if "Authentication WPA2PSKAuthentication" in  tr69_output:
+        rf.write('     WPA2PSKAuthentication:OK\n')
+        print('Found WPA2PSKAuthentication:OK\n')
+    else:
+        rf.write('     WPA2PSKAuthentication: Not Found\n')
+        auto_ssid_defaults_status = "Fail"
+
+    if "MaxClients 3" in  tr69_output:
+        rf.write('     MaxClients 3:OK\n')
+        print('Found MaxClients 3:OK')
+    else:
+        rf.write('     MaxClients 3: Not Found\n')
+        auto_ssid_defaults_status = "Fail"
+
+    rf.write('     Test:' + test_name + " " + ssid + ":" + auto_ssid_defaults_status + '\n\n')
+    print('Test:' + test_name + " " + ssid + ":" + auto_ssid_defaults_status + '\n')
+
+    return auto_ssid_defaults_status
 ################# test area  #######################  -pfp-
-# nvg_599_dut = Nvg599Class()
-# send_email = 1
-# rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
-# rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
-# test_status = test_speedtest_from_android(nvg_599_dut, rf, rfa)
-# if test_status == "Fail":
-#     # here we want to cleanup and relaunch a new session
-#     # to prepare for the next testcase
-#     print('test_speedtest_from_android test case failed')
-#
-#
-# rf.close()
-# rfa.close()
-# if send_email == 1:
-#     nvg_599_dut.email_test_results(rf)
-#
-# #ip_lan_info_dict = execute_speedtest_from_android_termux(nvg_599_dut,rf rfa)
-# #ip_lan_info_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
-#
-#
-# # pprint.pprint(ip_lan_info_dict)
-#
-# # test_speedtest_from_android()
-# exit()
-
-
-
-#
-# send_email = 1
-#
-# rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
-# rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
-# nvg_599_dut = Nvg599Class()
-# ssid = 3
-# nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid, rf, rfa)
-# rf.write("Test Title: Auto SSID 3 setup: Pass")
-# rfa.write("Test Title: Auto SSID 3 setup: Pass")
-#
-# ssid = 4
-# nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid, rf, rfa)
-# rf.write("Test Title: Auto SSID 4 setup: Pass")
-# rfa.write("Test Title: Auto SSID 4 setup: Pass")
-# rf.close()
-# rfa.close()
-# if send_email == 1:
-#     nvg_599_dut.email_test_results(rf)
-#
-# exit()
-nvg_599_dut = Nvg599Class()
-nvg_599_dut.login_nvg_cli()
-print(str(nvg_599_dut.device_access_code))
-sleep(20)
-exit()
-
-
 send_email = 1
 rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
 rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
@@ -902,14 +896,42 @@ now = datetime.today().strftime("%B %d, %Y,%H:%M")
 rf.write('RG Test run:' + now + '\n')
 rfa.write(now + '\n')
 nvg_599_dut = Nvg599Class()
-#upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d23_1.1.bin'
+
+verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '3', rf, rfa, "verify_auto_ssid_defaults_via_tr69" )
+#print(' verify_auto_ssid_defaults_via_tr69 ssid:'  + status)
+
+verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '4', rf, rfa, "verify_auto_ssid_defaults_via_tr69")
+#print('verify_auto_ssid_defaults_via_tr69 ssid:' + status)
+
+setup_auto_ssid_via_tr69(nvg_599_dut, '3', rf, rfa, "setup_auto_ssid_via_tr69")
+
+setup_auto_ssid_via_tr69(nvg_599_dut, '4', rf, rfa, "setup_auto_ssid_via_tr69")
+
+verify_auto_info_not_present_in_ui(nvg_599_dut, rf, rfa, "verify_auto_info_not_present_in_ui")
+#status = nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(nvg_599_dut, "3", rf, rfa, 'nvg_599_dut.set_auto_setup_ssid_via_tr69_cli')
+# status = nvg_599_dut.set_auto_setup_ssid_via_tr69_cli("4", rf, rfa)
+
+#status = nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(nvg_599_dut, "4", rf, rfa, 'nvg_599_dut.set_auto_setup_ssid_via_tr69_cli')
+
+
+
+rf.close()
+rfa.close()
+exit()
+
+
+
+
+
+# upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d23_1.1.bin'
 # These android devices should be able to run the cli speed test
 # Galaxy-Note8,Galaxy-S9,Galaxy-Tab-A
 #test_rg_upgrade(nvg_599_dut, '/home/palmer/Downloads/nvg599-9.2.2h13d25_1.1.bin', rf, rfa)
-test_factory_reset(nvg_599_dut, rf, rfa)
-nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(3, rf, rfa)
-rf.write("Test Title: Auto SSID 3 setup: Pass")
-rfa.write("Test Title: Auto SSID 3 setup: Pass")
+# test_factory_reset(nvg_599_dut, rf, rfa)
+# test_setup_auto_ssid_via_tr69(nvg_599_dut,ssid,rf,rfa)
+# nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(3, rf, rfa)
+# rf.write("Test Title: Auto SSID 3 setup: Pass")
+# rfa.write("Test Title: Auto SSID 3 setup: Pass")
 #ssid = 4
 nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(4, rf, rfa)
 rf.write("Test Title: Auto SSID 4 setup: Pass")
@@ -922,7 +944,7 @@ if send_email == 1:
 
 exit()
 
-
+######################################################### end test area, clean up the junk below
 # set the file at to the file to use
 test_rg_upgrade(nvg_599_dut, '/home/palmer/Downloads/nvg599-9.2.2h13d25_1.1.bin', rf, rfa)
 test_factory_reset(nvg_599_dut, rf, rfa)
@@ -931,20 +953,8 @@ test_factory_reset(nvg_599_dut, rf, rfa)
 # test_status = nvg_599_dut.upgrade_rg(upgrade_rg_fitest_house_devices_static_infole,rf, rfa)
 #nvg_599_dut.factory_reset_rg(rf,rfa)
 
-#ssid = 3
-nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(3, rf, rfa)
-rf.write("Test Title: Auto SSID 3 setup: Pass")
-rfa.write("Test Title: Auto SSID 3 setup: Pass")
-#ssid = 4
-nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(4, rf, rfa)
-rf.write("Test Title: Auto SSID 4 setup: Pass")
-rfa.write("Test Title: Auto SSID 4 setup: Pass")
-rf.close()
-rfa.close()
-if send_email == 1:
-    nvg_599_dut.email_test_results(rf)
 
-exit()
+
 
 ######################################################################################################
 ######################  Experimental code  below #####################
@@ -1017,19 +1027,16 @@ results_file.write("Test Title: RG Upgrade :" + upgrade_rg_file + " Test case " 
 results_file_archive.write("Test Title: RG Upgrade :" + upgrade_rg_file + " Test case " + test_status  + "Duration:" + duration  +'\n')
 #results_file_archive.write("Test Title: RG Upgrade:" + upgrade_rg_file + " Pass " + '\n')
 # nvg_599_dut.factory_reset_rg()
-sleep(100)
-
-
-
-ssid = 3
-nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid)
-results_file.write("Test Title: Auto SSID 3 setup: Pass")
-results_file_archive.write("Test Title: Auto SSID 3 setup: Pass")
-
-ssid = 4
-nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid)
-results_file.write("Test Title: Auto SSID 4 setup: Pass")
-results_file_archive.write("Test Title: Auto SSID 4 setup: Pass")
+#
+# ssid = 3
+# nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid)
+# results_file.write("Test Title: Auto SSID 3 setup: Pass")
+# results_file_archive.write("Test Title: Auto SSID 3 setup: Pass")
+#
+# ssid = 4
+# nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid)
+# results_file.write("Test Title: Auto SSID 4 setup: Pass")
+# results_file_archive.write("Test Title: Auto SSID 4 setup: Pass")
 # results_file.write("Test Title: RG Factory Reset:" + " Pass " + '\n')
 # results_file_archive.write("Test Title: RG Factory Reset:" + " Pass " + '\n')
 #

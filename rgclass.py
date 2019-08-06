@@ -1,5 +1,4 @@
 # from itertools import count
-# from typing import Dict
 import subprocess
 from pexpect import pxssh
 from socket import timeout
@@ -8,16 +7,10 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-# from selenium.webdriver.support import expected_conditions as ec
-
-
-
 import urllib.request
 from urllib.error import URLError, HTTPError
 # import url
 import urllib3
-# import requests
-# import httplib2
 import pexpect
 import re
 import socket
@@ -138,14 +131,12 @@ DFS_CHANNELS = {52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144}
 ALL_BAND5_CHANNELS = {36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 132,
                       136, 140, 144, 149, 153, 157, 161, 165}
 
-
 class GatewayClass:
     def __init__(self):
         self.magic = None
         self.up_time = None
         self.ip = None
         self.serial_number = None
-
         self.ip = "192.168.1.254"
         self.device_access_code = None
         self.model = None
@@ -162,15 +153,81 @@ class GatewayClass:
         self.hardware_version = None
         self.serial_number = None
         self.factory_reset = None
-        # self.cli_rg_connected_clients_dict = {}
-        # self.ui_rg_connected_clients_dict = {}
         self.ip_lan_connections_dict_cli = {}
-        self.get_ui_system_information()
-        self.device_access_code = nvg_info[self.serial_number]['device_access_code']
+
         print("in Nvg599Class__init")
         self.init_info = True
         self.mesh_connected_clents = {}
         self.rg_url = 'http://192.168.1.254/'
+
+    @staticmethod
+    def email_test_results(text_file):
+        now = datetime.today().strftime("%B %d, %Y,%H:%M")
+        # now = datetime.today().isoformat()
+        subject_title = 'Test results:' + str(now)
+        print('subject title', subject_title)
+        if text_file is None:
+            pass
+        with open("results_file.txt") as fp:
+            # Create a text/plain message
+            msg = EmailMessage()
+            msg.set_content(fp.read())
+
+        print('in email_test_results1')
+        # me == the sender's email address
+        # you == the recipient's email address
+        msg['Subject'] = 'Test results'
+        # msg['Subject'] = subject_title
+
+        msg['From'] = 'leandertesthouse@gmail.com'
+        msg['To'] = 'pfpalmer@gmail.com'
+        # gmail_password = "1329brome"
+        gmail_password = "%%45A7A&akBc"
+        # %%45A7A&akBc
+        gmail_user = 'leandertesthouse@gmail.com'
+        try:
+            with smtplib.SMTP('smtp.gmail.com', 587) as smtp_server:
+                smtp_server.ehlo()
+                smtp_server.starttls()
+                smtp_server.login(gmail_user, gmail_password)
+                smtp_server.send_message(msg)
+                print('message sent successfully')
+        except smtplib.SMTPException as e:
+            print('failed to send email' + str(e))
+
+class Nvg599Class(GatewayClass):
+    def __init__(self):
+        super(self.__class__, self).__init__()
+        self.ip = "192.168.1.254"
+        self.device_access_code = None
+        self.model = None
+        self.session = None
+        self.init_info = False
+        self.telnet_cli_session = None
+        self.airties_ap_cli_session = None
+        global nvg_info
+        # # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
+        self.software_version = None
+        self.mac_address = None
+        self.last_reboot_time = None
+        self.current_date = None
+        self.hardware_version = None
+        self.serial_number = None
+        self.factory_reset = None
+        # # self.cli_rg_connected_clients_dict = {}
+        # # self.ui_rg_connected_clients_dict = {}
+        # self.ip_lan_connections_dict_cli = {}
+        self.get_ui_system_information()
+        self.device_access_code = nvg_info[self.serial_number]['device_access_code']
+        # print("in Nvg599Class__init")
+        # self.init_info = True
+        # self.mesh_connected_clents = {}
+        self.rg_url = 'http://192.168.1.254/'
+        self.get_ui_system_information()
+        self.device_access_code = nvg_info[self.serial_number]['device_access_code']
+
+    def remote_webserver(self):
+        pass
 
     def get_ui_system_information(self):
         print('in get_ui_system_information)')
@@ -215,40 +272,14 @@ class GatewayClass:
 
         sleep(2)
 
-    @staticmethod
-    def email_test_results(text_file):
-        now = datetime.today().strftime("%B %d, %Y,%H:%M")
-        # now = datetime.today().isoformat()
-        subject_title = 'Test results:' + str(now)
-        print('subject title', subject_title)
-        if text_file is None:
-            pass
-        with open("results_file.txt") as fp:
-            # Create a text/plain message
-            msg = EmailMessage()
-            msg.set_content(fp.read())
+    def test_temp_delete_me(self):
+        print('in get_ui_system_information)')
+        # global nvg_info
+        rg_url = 'http://192.168.1.254/'
+        self.session = webdriver.Chrome()
+        self.session.get(rg_url)
+        status_link = self.session.find_element_by_link_text("System Information")
 
-        print('in email_test_results1')
-        # me == the sender's email address
-        # you == the recipient's email address
-        msg['Subject'] = 'Test results'
-        # msg['Subject'] = subject_title
-
-        msg['From'] = 'leandertesthouse@gmail.com'
-        msg['To'] = 'pfpalmer@gmail.com'
-        # gmail_password = "1329brome"
-        gmail_password = "%%45A7A&akBc"
-        # %%45A7A&akBc
-        gmail_user = 'leandertesthouse@gmail.com'
-        try:
-            with smtplib.SMTP('smtp.gmail.com', 587) as smtp_server:
-                smtp_server.ehlo()
-                smtp_server.starttls()
-                smtp_server.login(gmail_user, gmail_password)
-                smtp_server.send_message(msg)
-                print('message sent successfully')
-        except smtplib.SMTPException as e:
-            print('failed to send email' + str(e))
 
     def login_nvg_cli(self):
         print('In login_nvg_cli')
@@ -264,44 +295,11 @@ class GatewayClass:
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect(">")
         return self.telnet_cli_session
-
-class Nvg599Class(GatewayClass):
-    def __init__(self):
-        super(self.__class__, self).__init__()
-        # self.ip = "192.168.1.254"
-        # self.device_access_code = None
-        # self.model = None
-        # self.session = None
-        # self.init_info = False
-        # self.telnet_cli_session = None
-        # self.airties_ap_cli_session = None
-        # global nvg_info
-        # # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
-        # self.software_version = None
-        # self.mac_address = None
-        # self.last_reboot_time = None
-        # self.current_date = None
-        # self.hardware_version = None
-        # self.serial_number = None
-        # self.factory_reset = None
-        # # self.cli_rg_connected_clients_dict = {}
-        # # self.ui_rg_connected_clients_dict = {}
-        # self.ip_lan_connections_dict_cli = {}
-        # self.get_ui_system_information()
-        # self.device_access_code = nvg_info[self.serial_number]['device_access_code']
-        # print("in Nvg599Class__init")
-        # self.init_info = True
-        # self.mesh_connected_clents = {}
-        # self.rg_url = 'http://192.168.1.254/'
-
-    def remote_webserver(self):
-        pass
-
     # @staticmethod
     # def set_all_4920s_to_factory_default(self):
     def set_all_4920s_to_factory_default(self):
         # show_ip_lan_dict = self.get_rg_sh_ip_lan_info_cli()
-        show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info()
+        show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(self)
         # airties_4920_ip_list = []
         for ip_lan_entry in show_ip_lan_dict:
             if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
@@ -355,7 +353,7 @@ class Nvg599Class(GatewayClass):
     # @staticmethod
     # et_all_4920s_to_factory_default(sself):
     def get_ip_list_of_4920s(self):
-        air_ties_ip_list = []
+        # air_ties_ip_list = []
         show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(self)
         # airties_4920_ip_list = []
         for ip_lan_entry in show_ip_lan_dict:
@@ -774,7 +772,6 @@ class Nvg599Class(GatewayClass):
         if wi_fi_warning:
             print("Wi-Fi Warning displayed ")
             # submit = self.session.find_element_by_name("ReturnWarned")
-
             displayed_text = self.session.page_source
             sleep(5)
             if "Wi-Fi security that is not recommended." in displayed_text:
@@ -1408,7 +1405,7 @@ class Nvg599Class(GatewayClass):
     # def factory_reset_rg(self, rg_url="http://192.168.1.254/cgi-bin/home.ha"):
     # we have to assume that the default RG IP is 192.168.1.254
 
-    def factory_reset_rg(self,rf,rfa):
+    def factory_reset_rg(self, rf, rfa):
         # the default is the usual default RG IP
         self.factory_reset = 1
         # url = 'http://192.168.1.254/'
@@ -1491,10 +1488,7 @@ class Nvg599Class(GatewayClass):
         rg_url = 'http://192.168.1.254/'
         self.session = webdriver.Chrome()
         self.session.get(rg_url)
-
         self.enable_guest_network_and_set_password_ssid(rf, rfa)
-
-
         sleep(60)
         return duration
 
@@ -2258,12 +2252,9 @@ class Nvg599Class(GatewayClass):
         speed_test_groups = speed_test_regex.search(speed_test_output)
         try:
             print('download:', speed_test_groups.group(1))
-
             print('upload:', speed_test_groups.group(2))
-
             down_load_speed = speed_test_groups.group(1)
             rf.write('    Download speed ' + down_load_speed + '\n')
-
             up_load_speed = speed_test_groups.group(2)
             rf.write('    Upload speed ' + up_load_speed + '\n')
 
@@ -2317,12 +2308,9 @@ class Nvg599Class(GatewayClass):
                     active_connection_list.append(tmp_list[0])
 
         # print('connection list', *connection_list)
-
         # print('active connection list', *active_connection_list)
-
         return connection_list,active_connection_list
-
-            #print(tmp_list[0])
+        # print(tmp_list[0])
         # sleep(10)
         # cmd = "nmcli con down ATTqbrAnYs"
         #cmd = "nmcli device wifi connect AirTies_SmartMesh_4PNF kykfmk8997"
@@ -2337,8 +2325,6 @@ class Nvg599Class(GatewayClass):
         for line in output.splitlines():
             print('cmd output', line)
         sleep(3)
-
-
         # exit()
         # # cmd = "nmcli con down ATTqbrAnYs"
         # cmd = "nmcli device wifi connect AirTies_SmartMesh_4PNF kykfmk8997"
@@ -2648,41 +2634,40 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.close()
         return tr69_auth_type
 
-        # status_info_reg_ex = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',
-        #                                 re.DOTALL)
-        # mo1 = status_info_reg_ex.search(status_output)
-        #
-        #
-        # status_info_reg_ex = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',
-        #                                 re.DOTALL)
-        # mo1 = status_info_reg_ex.search(status_output)
-        # return mo1.group(2)
+    def get_tr69_parameters_for_ssid(self, ssid_number, rf, rfa):
+        self.telnet_cli_session = self.login_nvg_599_cli()
+        self.telnet_cli_session.sendline('magic')
+        self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
+        self.telnet_cli_session.sendline('tr69 GetParameterValues InternetGatewayDevice.LANDevice.1.'
+                                         'WLANConfiguration.' + ssid_number + '.')
+        self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
+        tr69_output = self.telnet_cli_session.before
+        self.telnet_cli_session.close()
+        return tr69_output
 
-        # self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
-        #                                  + str(ssid) + '.BeaconAdvertisementEnabled = 1')
-        # self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
-        # self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
-        #                                  + str(ssid) + '.SSIDAdvertisementEnabled= 1')
-        # self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
-        # self.telnet_cli_session.close()
-
-    def set_auto_setup_ssid_via_tr69_cli(self, ssid_number, rf, rfa):
+    def set_auto_setup_ssid_via_tr69_cli(self, ssid_number, rf, rfa, test_name):
         print('Enabling tr69 auto_setup for ssid number:' + str(ssid_number))
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
                                          + str(ssid_number) + '.Enable = 1')
+        rf.write('     Set Enable.' + ssid_number + '.Enable 0:OK\n')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
                                          + str(ssid_number) + '.BeaconAdvertisementEnabled = 1')
+        rf.write('     Enable.' + ssid_number + 'BeaconAdvertisementEnabled:OK\n')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
                                          + str(ssid_number) + '.SSIDAdvertisementEnabled= 1')
+        rf.write('     Enable.' + ssid_number + 'SSIDAdvertisementEnabled:OK\n')
+
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
-        rf.write("    Enabled auto ssid " + str(ssid_number) + '\n')
-        rfa.write("    Enabled auto ssid" + str(ssid_number) + '\n')
+        # rf.write("    Enabled auto ssid " + str(ssid_number) + '\n')
+        rf.write('     Enable auto ssid' + ssid_number + ':OK\n')
+
         self.telnet_cli_session.close()
+        return "Pass"
 
 
     # IPV6 is not currently available in the test house
