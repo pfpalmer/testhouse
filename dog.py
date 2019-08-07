@@ -888,7 +888,13 @@ def verify_auto_ssid_defaults_via_tr69(nvg_599_dut, ssid, rf, rfa, test_name):
     print('Test:' + test_name + " " + ssid + ":" + auto_ssid_defaults_status + '\n')
 
     return auto_ssid_defaults_status
+
+
+
 ################# test area  #######################  -pfp-
+
+
+
 send_email = 1
 rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
 rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
@@ -896,6 +902,15 @@ now = datetime.today().strftime("%B %d, %Y,%H:%M")
 rf.write('RG Test run:' + now + '\n')
 rfa.write(now + '\n')
 nvg_599_dut = Nvg599Class()
+
+
+remote_file = "nvg589-2.2h13d25.bin"
+firmware_source_device = "test"
+
+nvg_599_dut.tftp_get_file_cli(firmware_source_device, remote_file)
+rf.close()
+rfa.close()
+exit()
 
 verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '3', rf, rfa, "verify_auto_ssid_defaults_via_tr69" )
 #print(' verify_auto_ssid_defaults_via_tr69 ssid:'  + status)

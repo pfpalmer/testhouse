@@ -2439,20 +2439,22 @@ class Nvg599Class(GatewayClass):
 
             return ping_fail_return
 
-    def tftp_get_file_cli(self,remote_file):
+    def tftp_get_file_cli(self, firmware_source_device, remote_file):
         print('tftp_get_file')
-        self.telnet_cli_session = pexpect.spawn("tftp connect 192.168.1.254", encoding='utf-8')
-        self.telnet_cli_session.expect("ogin:")
-        self.telnet_cli_session.sendline('admin')
-        self.telnet_cli_session.expect("ord:")
+        #self.telnet_cli_session = pexpect.spawn("tftp connect 192.168.1.254", encoding='utf-8')
+        source_ip = "192.168.1.65"
+        # not sure if the spawn source dir will work
+        self.telnet_cli_session = pexpect.spawn("tftp", encoding='utf-8', cwd="/home/palmer/Downloads")
+
+        self.telnet_cli_session.expect("tftp>")
+        self.telnet_cli_session.sendline('connect' + source_ip)
+        self.telnet_cli_session.expect("tftp>")
+        self.telnet_cli_session.sendline('get' + remote_file)
+        self.telnet_cli_session.expect("tftp>")
+
         #  self.telnet_cli_session.sendline('<<01%//4&/')
         #  self.telnet_cli_session.sendline('9==5485?6<')
-        nvg_dac = self.device_access_code
-        self.telnet_cli_session.sendline(nvg_dac)
-        self.telnet_cli_session.expect(">")
-        self.telnet_cli_session.sendline('magic')
-        self.telnet_cli_session.expect(">")
-        return self.telnet_cli_session
+
 # pfp ******  moved to parent class
     def login_nvg_599_cli(self):
         print('In login_nvg_cli')
