@@ -2439,21 +2439,45 @@ class Nvg599Class(GatewayClass):
 
             return ping_fail_return
 
+    def tftp_list_test(self, *file_list):
+        for x in file_list:
+            print(x)
+
+
+
     def tftp_get_file_cli(self, firmware_source_device, remote_file):
-        print('tftp_get_file')
+        print('in tftp_get_file')
         #self.telnet_cli_session = pexpect.spawn("tftp connect 192.168.1.254", encoding='utf-8')
+
+        sh_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
+
         source_ip = "192.168.1.65"
         # not sure if the spawn source dir will work
         self.telnet_cli_session = pexpect.spawn("tftp", encoding='utf-8', cwd="/home/palmer/Downloads")
 
         self.telnet_cli_session.expect("tftp>")
-        self.telnet_cli_session.sendline('connect' + source_ip)
+        print('remote 1\n'+ self.telnet_cli_session.before )
+        self.telnet_cli_session.sendline('connect ' + source_ip)
+        print('remote 2\n'+ self.telnet_cli_session.before )
         self.telnet_cli_session.expect("tftp>")
-        self.telnet_cli_session.sendline('get' + remote_file)
+        print('remote 3\n + self.telnet_cli_session.before ')
+        self.telnet_cli_session.sendline('get ' + remote_file)
         self.telnet_cli_session.expect("tftp>")
+        print('remote 4\n' + self.telnet_cli_session.before )
 
-        #  self.telnet_cli_session.sendline('<<01%//4&/')
-        #  self.telnet_cli_session.sendline('9==5485?6<')
+        # don't need this because file is downloaded where I want it to go
+        # cmd = 'mv ' + remote_file + ' /home/palmer/Downloads'
+        # print('remote file is ' + remote_file + '\n')
+        #
+        # try:
+        #     output = subprocess.check_output(cmd, shell=True)
+        # except subprocess.CalledProcessError as e:
+        #     print(e.output)
+        # else:
+        #     print(output)
+        #     print('file' + remote_file + ' moved to Downloads')
+        # #  self.telnet_cli_session.sendline('<<01%//4&/')
+        # #  self.telnet_cli_session.sendline('9==5485?6<')
 
 # pfp ******  moved to parent class
     def login_nvg_599_cli(self):

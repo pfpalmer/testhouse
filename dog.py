@@ -902,11 +902,16 @@ now = datetime.today().strftime("%B %d, %Y,%H:%M")
 rf.write('RG Test run:' + now + '\n')
 rfa.write(now + '\n')
 nvg_599_dut = Nvg599Class()
+nvg_599_dut.tftp_list_test("a1","a2","a3")
+rf.close()
+rfa.close()
+exit()
+
 
 
 remote_file = "nvg589-2.2h13d25.bin"
 firmware_source_device = "test"
-
+remote_file = "a1.txt"
 nvg_599_dut.tftp_get_file_cli(firmware_source_device, remote_file)
 rf.close()
 rfa.close()
