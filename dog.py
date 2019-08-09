@@ -884,10 +884,211 @@ def verify_auto_ssid_defaults_via_tr69(nvg_599_dut, ssid, rf, rfa, test_name):
         rf.write('     MaxClients 3: Not Found\n')
         auto_ssid_defaults_status = "Fail"
 
-    rf.write('     Test:' + test_name + " " + ssid + ":" + auto_ssid_defaults_status + '\n\n')
+    rf.write('     Test:' + test_name + " " + ssid + ":***" + auto_ssid_defaults_status + '***\n\n')
     print('Test:' + test_name + " " + ssid + ":" + auto_ssid_defaults_status + '\n')
 
     return auto_ssid_defaults_status
+
+def ping_gw_from_4920(nvg_599_dut,rf,rfa, test_name, airties_ip = 'Default'):
+    test_status = "Pass"
+    rf.write('Test ' + test_name + '\n')
+    print('Test:' + test_name + '\n')
+    # we ip_of_airties = None then we get the first associated 4920 IP.
+    # this is not needed here
+    ip_4920 = "None"
+    if airties_ip == 'Default':
+        ip_lan_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
+        for dict_key in ip_lan_dict:
+            if ("ATT_49"  in ip_lan_dict[dict_key]['Name']) and (ip_lan_dict[dict_key]['State'] == "on"):
+                ip_4920 = ip_lan_dict[dict_key]["IP"]
+                print('using this is 4920 ip =:' + str(ip_lan_dict[dict_key]["IP"]))
+
+        if ip_4920 == "None":
+             rf.write('    No Airties devices in IP lan: Fail\n')
+             print('No Airties devices in IP lan: Fail\n')
+             # No point in continuing
+             return "Fail"
+    else:
+        ip_4920 = airties_ip
+
+    airties_session = nvg_599_dut.static_login_4920(ip_4920)
+    airties_session.sendline('ping -c 4 192.168.1.254')
+    airties_session.expect('#')
+    ping_output = airties_session.before
+    print('ping output' + str(ping_output))
+
+    if "0% packet loss" in ping_output:
+        print('ping from  airties:' + str(ip_4920) + 'to RG succeeded' + str(ping_output))
+        rf.write('     ping from airties:' + str(ip_4920) + ' to RG 192.168.1.254 0% packet loss:OK\n\n')
+    else:
+        print('ping failed')
+        rf.write('     ping 192.168.1.254 failed:Fail\n\n')
+        test_status = "Fail"
+
+    airties_session.sendline('exit')
+    #
+    # nvg_599_dut.telnet_cli_session.close
+    return test_status
+
+def ping_airties_from_RG(nvg_599_dut,rf, rfa, test_name, airties_ip = 'Default'):
+    test_status = "Pass"
+    rf.write('Test ' + test_name + '\n')
+    print('Test:' + test_name + '\n')
+    # we ip_of_airties = None then we get the first associated 4920 IP.
+    # this is not needed here
+    ip_4920 = "None"
+    if airties_ip == 'Default':
+        ip_lan_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
+        for dict_key in ip_lan_dict:
+            if ("ATT_49"  in ip_lan_dict[dict_key]['Name']) and (ip_lan_dict[dict_key]['State'] == "on"):
+                ip_4920 = ip_lan_dict[dict_key]["IP"]
+                print('using this is 4920 ip =:' + str(ip_lan_dict[dict_key]["IP"]))
+
+        if ip_4920 == "None":
+             rf.write('    No Airties devices in IP lan: Fail\n')
+             print('No Airties devices in IP lan: Fail\n')
+             # No point in continuing
+             return "Fail"
+    else:
+        ip_4920 = airties_ip
+    nvg_cli_session = nvg_599_dut.login_nvg_599_cli()
+    # airties_session = nvg_599_dut.static_login_4920(ip_4920)
+    nvg_cli_session.sendline('ping -c 4 ' + ip_4920)
+    nvg_cli_session.expect("MAGIC/UNLOCKED>")
+    ping_output = nvg_cli_session.before
+    print('ping output pinging 4920 frm gw' + str(ping_output))
+
+    if "0% packet loss" in ping_output:
+        print('ping airties:' + str(ip_4920) + 'from RG succeeded' + str(ping_output))
+        rf.write('     ping to airties:' + str(ip_4920) + ' from RG 192.168.1.254 0% packet loss:OK\n\n')
+    else:
+        print('ping failed')
+        rf.write('     ping  to airties' + str(ip_4920) + 'from RG 192.168.1.254 failed:Fail\n\n')
+        test_status = "Fail"
+    nvg_cli_session.sendline('exit')
+    return test_status
+
+
+
+def verify_airties_build_verssions(nvg_599_dut,rf, rfa, test_name, correct_2g_fw = 'AT.922.13.2.61', correct_5g_fw = 'AT.922.13.2.61'):
+    test_status = "Pass"
+    rf.write('Test ' + test_name + '\n')
+    print('Test:' + test_name + '\n')
+    nvg_599_dut.login_nvg_599_cli()
+    nvg_599_dut.telnet_cli_session.sendline('!')
+    nvg_599_dut.telnet_cli_session.expect('#')
+    nvg_599_dut.telnet_cli_session.sendline('cat /airties/etc/buildversion')
+    nvg_599_dut.telnet_cli_session.expect('#')
+    fw_2g_output = nvg_599_dut.telnet_cli_session.before
+    print('2g>'+ str(fw_2g_output) + '<')
+    nvg_599_dut.telnet_cli_session.sendline('telnet 203.0.113.2')
+    nvg_599_dut.telnet_cli_session.expect('#')
+    nvg_599_dut.telnet_cli_session.sendline('/airties/usr/bin/fwversion')
+    nvg_599_dut.telnet_cli_session.expect('#')
+    fw_5g_output = nvg_599_dut.telnet_cli_session.before
+    print('5g>'+ str(fw_5g_output) + '<')
+    nvg_599_dut.telnet_cli_session.sendline('exit')
+    nvg_599_dut.telnet_cli_session.expect('#')
+    nvg_599_dut.telnet_cli_session.sendline('exit')
+    nvg_599_dut.telnet_cli_session.expect('>')
+
+
+    # if "0% packet loss" in ping_output:
+    #     print('ping succeeded' + str(ping_output))
+    #     rf.write('     ping 8.8.8.8 from GW 5g 0% packet loss:OK\n\n')
+    # else:
+    #     print('ping failed')
+    #     rf.write('     ping 8.8.8.8 failed:Fail\n\n')
+
+    nvg_599_dut.telnet_cli_session.sendline('exit')
+    nvg_599_dut.telnet_cli_session.expect('>')
+    #
+    # nvg_599_dut.telnet_cli_session.close
+    return test_status
+
+
+def verify_airties_hello_packet_count_increasing(nvg_599_dut,rf, rfa, test_name, airties_ip = 'Default'):
+    test_status = "Pass"
+    rf.write('Test ' + test_name + '\n')
+    print('Test:' + test_name + '\n')
+    # we ip_of_airties = None then we get the first associated 4920 IP.
+    # this is not needed here
+    ip_4920 = "None"
+    if airties_ip == 'Default':
+        ip_lan_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
+        for dict_key in ip_lan_dict:
+            if ("ATT_49"  in ip_lan_dict[dict_key]['Name']) and (ip_lan_dict[dict_key]['State'] == "on"):
+                ip_4920 = ip_lan_dict[dict_key]["IP"]
+                print('using this is 4920 ip =:' + str(ip_lan_dict[dict_key]["IP"]))
+
+        if ip_4920 == "None":
+             rf.write('    No Airties devices in IP lan: Fail\n')
+             print('No Airties devices in IP lan: Fail\n')
+             # No point in continuing
+             return "Fail"
+    else:
+        ip_4920 = airties_ip
+    airties_session = nvg_599_dut.static_login_4920(ip_4920)
+    airties_session.sendline('cat /proc/mesh-ng-topology | grep hello')
+    airties_session.expect('#')
+    hello_output = airties_session.before
+    print('hello output' + str(hello_output))
+    hello_count_reg_ex = re.compile(r'hello:\s+(\d+)')
+    mo1 = hello_count_reg_ex.search(hello_output)
+    first_count = int(mo1.group(1))
+    # first_count = str(mo1.group(1))
+
+    print('count is:' + str(mo1.group(1)))
+    sleep(5)
+
+    airties_session.sendline('cat /proc/mesh-ng-topology | grep hello')
+    airties_session.expect('#')
+    hello_output = airties_session.before
+    print('hello output' + str(hello_output))
+    hello_count_reg_ex = re.compile(r'hello:\s+(\d+)')
+    mo1 = hello_count_reg_ex.search(hello_output)
+    # second_count = str(mo1.group(1))
+    second_count = int(mo1.group(1))
+
+    if (second_count - first_count > 0):
+        print('checking hellos on airties: second hello count:' + str(second_count) + ' is greater than first hello count ' + str(first_count) + ':OK')
+        rf.write('     Hellos on airties: second hello count:' + str(second_count) + ' is greater than first hello count' + str(first_count) + ':OK\n\n')
+    else:
+        print(' hellos on airties: second hello count:' + str(second_count) + ' not greater than first hello count' + str(
+            first_count) + ':Fail')
+        rf.write('     Hellos on airties: second hello count:' + str(second_count) + ' not greater than first hello count' + str(
+            first_count) + ':Fail\n\n')
+        test_status = "Fail"
+
+    airties_session.sendline('exit')
+    return test_status
+
+
+
+def verify_google_ping_from_5g(nvg_599_dut,rf,rfa, test_name):
+    test_status = "Pass"
+    rf.write('Test ' + test_name + '\n')
+    print('Test:' + test_name + '\n')
+
+    nvg_599_dut.login_nvg_599_5g_cli()
+    nvg_599_dut.telnet_cli_session.sendline('ping -c 4 8.8.8.8')
+    nvg_599_dut.telnet_cli_session.expect('#')
+    ping_output = nvg_599_dut.telnet_cli_session.before
+
+    if "0% packet loss" in ping_output:
+        print('ping succeeded'+ str(ping_output))
+        rf.write('     ping 8.8.8.8 from GW 5g 0% packet loss:OK\n\n')
+    else:
+        print('ping failed')
+        rf.write('     ping 8.8.8.8 failed:Fail\n\n')
+
+    nvg_599_dut.telnet_cli_session.sendline('exit')
+    nvg_599_dut.telnet_cli_session.expect('>')
+    #
+    # nvg_599_dut.telnet_cli_session.close
+    return test_status
+
+
 
 
 
@@ -902,21 +1103,41 @@ now = datetime.today().strftime("%B %d, %Y,%H:%M")
 rf.write('RG Test run:' + now + '\n')
 rfa.write(now + '\n')
 nvg_599_dut = Nvg599Class()
-nvg_599_dut.tftp_list_test("a1","a2","a3")
+# nvg_599_dut.tftp_list_test("a1","a2","a3")
+# rf.close()
+# rfa.close()
+# exit()
+# set the file at to the file to use
+
+verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '3', rf, rfa, "verify_auto_ssid_defaults_via_tr69" )
+verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '4', rf, rfa, "verify_auto_ssid_defaults_via_tr69" )
+verify_google_ping_from_5g(nvg_599_dut, rf, rfa, "verify_google_ping_from_5g")
+ping_gw_from_4920(nvg_599_dut,rf,rfa, "ping_gw_from_4920")
+ping_airties_from_RG(nvg_599_dut, rf, rfa, "ping_airties_from_RG")
+verify_airties_hello_packet_count_increasing(nvg_599_dut, rf, rfa, "verify_airties_hello_packet_count_increasing")
+verify_airties_build_verssions(nvg_599_dut, rf, rfa, 'verify_airties_build_verssions')
+# test_rg_upgrade(nvg_599_dut, '/home/palmer/Downloads/nvg599-9.2.2h13d25_1.1.bin', rf, rfa)
+# test_factory_reset(nvg_599_dut, rf, rfa)
+
+
+#def tftp_get_file_cli(self,remote_file, *source_device_list):
+
+#remote_file = "nvg589-2.2h13d24.bin"
+#source_device_name = "LP-PPALMER"
+#remote_file = "a1.txt"
+#nvg_599_dut.tftp_get_file_cli(source_device_name, "nvg599-9.2.2h13d24_1.1.bin","nvg599-9.2.2h13d22_1.1.bin","nvg599-9.2.2h13d20_1.1.bin","nvg599-9.2.2h13d18_1.1.bin","nvg599-9.2.2h13d16_1.1.bin","nvg599-9.2.2h13d14_1.1.bin","nvg599-9.2.2h13d12_1.1.bin","nvg599-9.2.2h13d10_1.1.bin")
 rf.close()
 rfa.close()
 exit()
-
-
-
-remote_file = "nvg589-2.2h13d25.bin"
-firmware_source_device = "test"
-remote_file = "a1.txt"
-nvg_599_dut.tftp_get_file_cli(firmware_source_device, remote_file)
-rf.close()
-rfa.close()
-exit()
-
+# we first get the IP of an associated 4920.
+# if none availabe then exit with fail message
+# # self.ip_lan_connections_dict_cli[connected_device_mac] = {}
+# ip_lan_connections_dict_cli[connected_device_mac] = {}
+# ip_lan_connections_dict_cli[connected_device_mac]["IP"] = connected_device_ip
+# ip_lan_connections_dict_cli[connected_device_mac]["Name"] = connected_device_name
+# ip_lan_connections_dict_cli[connected_device_mac]["State"] = connected_device_status
+# ip_lan_connections_dict_cli[connected_device_mac]["DHCP"] = connected_device_dhcp
+# ip_lan_connections_dict_cli[connected_device_mac]["Port"] = connected_device_port
 verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '3', rf, rfa, "verify_auto_ssid_defaults_via_tr69" )
 #print(' verify_auto_ssid_defaults_via_tr69 ssid:'  + status)
 

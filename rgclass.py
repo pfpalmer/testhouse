@@ -2445,25 +2445,43 @@ class Nvg599Class(GatewayClass):
 
 
 
-    def tftp_get_file_cli(self, firmware_source_device, remote_file):
+    def tftp_get_file_cli(self,remote_file_source, *source_device_list):
         print('in tftp_get_file')
         #self.telnet_cli_session = pexpect.spawn("tftp connect 192.168.1.254", encoding='utf-8')
+        # self.ip_lan_connections_dict_cli[connected_device_mac] = {}
+        # ip_lan_connections_dict_cli[connected_device_mac] = {}
+        # ip_lan_connections_dict_cli[connected_device_mac]["IP"] = connected_device_ip
+        # ip_lan_connections_dict_cli[connected_device_mac]["Name"] = connected_device_name
+        # ip_lan_connections_dict_cli[connected_device_mac]["State"] = connected_device_status
+        # ip_lan_connections_dict_cli[connected_device_mac]["DHCP"] = connected_device_dhcp
+        # ip_lan_connections_dict_cli[connected_device_mac]["Port"] = connected_device_port
+        #
+        # print('source device name :' + source_device_name + '\n')
+        #
+        # sh_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
+        # for mac in sh_ip_lan_dict:
+        #     print('mac:' + mac +  '\n')
+        #     print('name:' + sh_ip_lan_dict[mac]['Name'] +  '\n')
+        #
+        #     if source_device_name == sh_ip_lan_dict[mac]['Name']:
+        #         print('found name' + sh_ip_lan_dict[mac]['Name'] + ' ip:' +sh_ip_lan_dict[mac]['IP'])
+        # exit()
 
-        sh_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
-
-        source_ip = "192.168.1.65"
-        # not sure if the spawn source dir will work
         self.telnet_cli_session = pexpect.spawn("tftp", encoding='utf-8', cwd="/home/palmer/Downloads")
 
-        self.telnet_cli_session.expect("tftp>")
-        print('remote 1\n'+ self.telnet_cli_session.before )
-        self.telnet_cli_session.sendline('connect ' + source_ip)
-        print('remote 2\n'+ self.telnet_cli_session.before )
-        self.telnet_cli_session.expect("tftp>")
-        print('remote 3\n + self.telnet_cli_session.before ')
-        self.telnet_cli_session.sendline('get ' + remote_file)
-        self.telnet_cli_session.expect("tftp>")
-        print('remote 4\n' + self.telnet_cli_session.before )
+        for remote_file in source_device_list:
+            source_ip = "192.168.1.65"
+            # not sure if the spawn source dir will work
+            # self.telnet_cli_session.expect("tftp>")
+            # print('remote 1\n'+ self.telnet_cli_session.before )
+            self.telnet_cli_session.sendline('connect ' + source_ip)
+            #print('remote 2\n'+ self.telnet_cli_session.before )
+            self.telnet_cli_session.expect("tftp>")
+            print('remote 3\n + self.telnet_cli_session.before ')
+            self.telnet_cli_session.sendline('get ' + remote_file)
+            self.telnet_cli_session.expect("tftp>", timeout=180)
+            print('remote 4\n' + self.telnet_cli_session.before )
+        self.telnet_cli_session.close()
 
         # don't need this because file is downloaded where I want it to go
         # cmd = 'mv ' + remote_file + ' /home/palmer/Downloads'
@@ -2479,7 +2497,25 @@ class Nvg599Class(GatewayClass):
         # #  self.telnet_cli_session.sendline('<<01%//4&/')
         # #  self.telnet_cli_session.sendline('9==5485?6<')
 
-# pfp ******  moved to parent class
+# pfp ******  moved to parent class forget it for now
+
+    def login_nvg_599_5g_cli(self):
+        print('In login_nvg_5g_cli')
+        self.telnet_cli_session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
+        self.telnet_cli_session.expect("ogin:")
+        self.telnet_cli_session.sendline('admin')
+        self.telnet_cli_session.expect("ord:")
+        #  self.telnet_cli_session.sendline('<<01%//4&/')
+        #  self.telnet_cli_session.sendline('9==5485?6<')
+        nvg_dac = self.device_access_code
+        self.telnet_cli_session.sendline(nvg_dac)
+        self.telnet_cli_session.expect(">")
+        self.telnet_cli_session.sendline('magic')
+        self.telnet_cli_session.expect(">")
+        self.telnet_cli_session.sendline('telnet 203.0.113.2')
+        self.telnet_cli_session.expect('#')
+        return self.telnet_cli_session
+
     def login_nvg_599_cli(self):
         print('In login_nvg_cli')
         self.telnet_cli_session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
@@ -2513,7 +2549,7 @@ class Nvg599Class(GatewayClass):
     @staticmethod
     def static_login_4920(ip_4920):
         print('In login_4920')
-        cli_session = pexpect.spawn("telnet" + ip_4920, encoding='utf-8')
+        cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
         cli_session.expect("ogin:")
         cli_session.sendline('admin')
         cli_session.expect("#")
@@ -2522,7 +2558,7 @@ class Nvg599Class(GatewayClass):
     @staticmethod
     def get_4920_ssid(ip_4920):
         print('In get_4920_ssid')
-        cli_session = pexpect.spawn("telnet" + ip_4920, encoding='utf-8')
+        cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
         cli_session.expect("ogin:")
         cli_session.sendline('admin')
         cli_session.expect("#")
