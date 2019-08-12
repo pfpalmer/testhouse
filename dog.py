@@ -787,7 +787,7 @@ def test_speedtest_from_android(nvg_599_dut,device, test_house_devices_static_in
 
 def test_rg_upgrade(nvg_599_dut, upgrade_file_path, rf, rfa):
     #upgrade_rg_file = '/home/palmer/Downloads/nvg599-9.2.2h13d23_1.1.bin'
-    test_status = nvg_599_dut.upgrade_rg(upgrade_rg_file, rf, rfa)
+    test_status = nvg_599_dut.upgrade_rg(upgrade_file_path, rf, rfa)
     if test_status == "Fail":
         rf.write('    Fail: Upgrade failed')
         # nvg_599_dut.session_cleanup()
@@ -797,7 +797,10 @@ def test_rg_upgrade(nvg_599_dut, upgrade_file_path, rf, rfa):
         sleep(300)
         return "Pass"
 
-def test_factory_reset(nvg_599_dut,rf,rfa):
+def test_factory_reset(nvg_599_dut,rf,rfa, test_name):
+    test_status = "Pass"
+    rf.write('Test ' + test_name + '\n')
+    print('Test:' + test_name + '\n')
     test_status = nvg_599_dut.factory_reset_rg(rf, rfa)
     if test_status == "Fail":
         rf.write('    Fail: Factory reset failed')
@@ -843,31 +846,42 @@ def verify_auto_info_not_present_in_ui(nvg_599_dut, rf, rfa, test_name):
     print('Test:' + test_name + ":" + test_status + '\n\n')
     rf.write('     Test:' + test_name + ":" + test_status + '\n\n')
 
-def verify_auto_ssid_defaults_via_tr69(nvg_599_dut, ssid, rf, rfa, test_name):
-    tr69_output = nvg_599_dut.get_tr69_parameters_for_ssid('3', rf, rfa)
+def verify_auto_ssid_defaults_via_tr69(nvg_599_dut, auto_ssid_number, default_ssid, default_pass_phrase,  rf, rfa, test_name):
+    tr69_output = nvg_599_dut.get_tr69_parameters_for_ssid(auto_ssid_number, rf, rfa)
     auto_ssid_defaults_status = "Pass"
-    rf.write('Test ' + test_name + " " + ssid + '\n')
-    print('Test:' + test_name + " " +  ssid + '\n')
+    rf.write('Test ' + test_name + " " + auto_ssid_number + '\n')
+    print('Test:' + test_name + " " +  auto_ssid_number + '\n')
 
-    if 'WLANConfiguration.' + ssid + '.Enable 0' in  tr69_output:
-        rf.write('     Found WLANConfiguration.' + ssid + '.Enable 0:OK\n')
-        print('Found WLANConfiguration.' + str(ssid) + '.Enable 0:OK')
+    if 'WLANConfiguration.' + auto_ssid_number + '.Enable 0' in  tr69_output:
+        rf.write('     Found WLANConfiguration.' + auto_ssid_number + '.Enable 0:OK\n')
+        print('Found WLANConfiguration.' + str(auto_ssid_number) + '.Enable 0:OK')
     else:
-        rf.write('     Found WLANConfiguration.' + str(ssid) + '.Enable 0: Not Found\n')
+        rf.write('     Found WLANConfiguration.' + str(auto_ssid_number) + '.Enable 0: Not Found\n')
         auto_ssid_defaults_status = "Fail"
 
-    if 'WLANConfiguration.' + ssid + '.SSID ATT4ujR48s_REPLACEME_' in  tr69_output:
-        rf.write('     Found SSID ATT4ujR48s_REPLACEME_:OK\n')
-        print('Found SSID ATT4ujR48s_REPLACEME_1:OK')
+
+    #if 'WLANConfiguration.' + auto_ssid_number + '.SSID' + default_ssid' in  tr69_output:
+    #if 'WLANConfiguration.' + auto_ssid_number + '.SSID ATT4ujR48s_REPLACEME_' in  tr69_output:
+
+    if 'WLANConfiguration.' + auto_ssid_number + '.SSID ' + default_ssid in  tr69_output:
+        #rf.write('     Found SSID ATT4ujR48s_REPLACEME_:OK\n')
+
+        rf.write('     Found ' + default_ssid + ':OK\n')
+        print('Found ' + default_ssid + ':OK\n')
     else:
-        rf.write('     SSID ATT4ujR48s_REPLACEME_: Not Found\n')
+        rf.write('     Default ssid ' + default_ssid + ':Not found\n')
+        print('Not found ' + default_ssid + ':Fail\n')
+
+        #rf.write('     SSID ATT4ujR48s_REPLACEME_: Not Found\n')
         auto_ssid_defaults_status = "Fail"
 
-    if "KeyPassphrase REPLACEME" in  tr69_output:
-        rf.write('     Found KeyPassphrase REPLACEME:OK\n')
-        print('Found KeyPassphrase REPLACEME:OK')
+    if "KeyPassphrase " + default_pass_phrase in  tr69_output:
+        rf.write('     Found KeyPassphrase ' + default_pass_phrase + ':OK\n')
+        print('Found KeyPassphrase ' + default_pass_phrase + ':OK')
     else:
-        rf.write('     KeyPassphrase REPLACEME: Not Found\n')
+        rf.write('     KeyPassphrase ' + default_pass_phrase + ': Not Found\n')
+        print('Not Found KeyPassphrase ' + default_pass_phrase + ':Fail')
+
         auto_ssid_defaults_status = "Fail"
 
     if "Authentication WPA2PSKAuthentication" in  tr69_output:
@@ -875,6 +889,8 @@ def verify_auto_ssid_defaults_via_tr69(nvg_599_dut, ssid, rf, rfa, test_name):
         print('Found WPA2PSKAuthentication:OK\n')
     else:
         rf.write('     WPA2PSKAuthentication: Not Found\n')
+        print('Not Found WPA2PSKAuthentication:Fail\n')
+
         auto_ssid_defaults_status = "Fail"
 
     if "MaxClients 3" in  tr69_output:
@@ -883,9 +899,10 @@ def verify_auto_ssid_defaults_via_tr69(nvg_599_dut, ssid, rf, rfa, test_name):
     else:
         rf.write('     MaxClients 3: Not Found\n')
         auto_ssid_defaults_status = "Fail"
+        print('Not Found MaxClients 3:Fail')
 
-    rf.write('     Test:' + test_name + " " + ssid + ":***" + auto_ssid_defaults_status + '***\n\n')
-    print('Test:' + test_name + " " + ssid + ":" + auto_ssid_defaults_status + '\n')
+    rf.write('     Test:' + test_name + " " + auto_ssid_number + ":***" + auto_ssid_defaults_status + '***\n\n')
+    print('Test:' + test_name + " " + auto_ssid_number + ":" + auto_ssid_defaults_status + '\n')
 
     return auto_ssid_defaults_status
 
@@ -930,7 +947,7 @@ def ping_gw_from_4920(nvg_599_dut,rf,rfa, test_name, airties_ip = 'Default'):
     # nvg_599_dut.telnet_cli_session.close
     return test_status
 
-def ping_airties_from_RG(nvg_599_dut,rf, rfa, test_name, airties_ip = 'Default'):
+def ping_airties_from_rg(nvg_599_dut,rf, rfa, test_name, airties_ip = 'Default'):
     test_status = "Pass"
     rf.write('Test ' + test_name + '\n')
     print('Test:' + test_name + '\n')
@@ -968,8 +985,6 @@ def ping_airties_from_RG(nvg_599_dut,rf, rfa, test_name, airties_ip = 'Default')
     nvg_cli_session.sendline('exit')
     return test_status
 
-
-
 def verify_airties_build_verssions(nvg_599_dut,rf, rfa, test_name, correct_2g_fw = 'AT.922.13.2.61', correct_5g_fw = 'AT.922.13.2.61'):
     test_status = "Pass"
     rf.write('Test ' + test_name + '\n')
@@ -992,7 +1007,6 @@ def verify_airties_build_verssions(nvg_599_dut,rf, rfa, test_name, correct_2g_fw
     nvg_599_dut.telnet_cli_session.sendline('exit')
     nvg_599_dut.telnet_cli_session.expect('>')
 
-
     # if "0% packet loss" in ping_output:
     #     print('ping succeeded' + str(ping_output))
     #     rf.write('     ping 8.8.8.8 from GW 5g 0% packet loss:OK\n\n')
@@ -1005,7 +1019,6 @@ def verify_airties_build_verssions(nvg_599_dut,rf, rfa, test_name, correct_2g_fw
     #
     # nvg_599_dut.telnet_cli_session.close
     return test_status
-
 
 def verify_airties_hello_packet_count_increasing(nvg_599_dut,rf, rfa, test_name, airties_ip = 'Default'):
     test_status = "Pass"
@@ -1063,13 +1076,10 @@ def verify_airties_hello_packet_count_increasing(nvg_599_dut,rf, rfa, test_name,
     airties_session.sendline('exit')
     return test_status
 
-
-
-def verify_google_ping_from_5g(nvg_599_dut,rf,rfa, test_name):
+def verify_google_ping_from_rg_5g(nvg_599_dut,rf,rfa, test_name):
     test_status = "Pass"
     rf.write('Test ' + test_name + '\n')
     print('Test:' + test_name + '\n')
-
     nvg_599_dut.login_nvg_599_5g_cli()
     nvg_599_dut.telnet_cli_session.sendline('ping -c 4 8.8.8.8')
     nvg_599_dut.telnet_cli_session.expect('#')
@@ -1108,16 +1118,28 @@ nvg_599_dut = Nvg599Class()
 # rfa.close()
 # exit()
 # set the file at to the file to use
+# source_device_name = "LP-PPALMER"
+# nvg_599_dut.tftp_get_file_cli(source_device_name, "nvg599-9.2.2h13d26_1.1.bin","nvg589-9.2.2h13d26_1.1.bin")
+# rf.close()
+# rfa.close()
+# exit()
 
-verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '3', rf, rfa, "verify_auto_ssid_defaults_via_tr69" )
-verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '4', rf, rfa, "verify_auto_ssid_defaults_via_tr69" )
-verify_google_ping_from_5g(nvg_599_dut, rf, rfa, "verify_google_ping_from_5g")
+# test_rg_upgrade(nvg_599_dut, '/home/palmer/Downloads/nvg599-9.2.2h13d26_1.1.bin', rf, rfa)
+# test_factory_reset(nvg_599_dut, rf, rfa, 'test_factory_reset')
+
+verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '3', 'ZipKey-PSK', 'Cirrent1',  rf, rfa, "verify_auto_ssid_defaults_via_tr69" )
+verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '4', 'ATTPOC', 'Ba1tshop', rf, rfa, "verify_auto_ssid_defaults_via_tr69" )
+verify_google_ping_from_rg_5g(nvg_599_dut, rf, rfa, "verify_google_ping_from_rg_5g")
 ping_gw_from_4920(nvg_599_dut,rf,rfa, "ping_gw_from_4920")
-ping_airties_from_RG(nvg_599_dut, rf, rfa, "ping_airties_from_RG")
+ping_airties_from_rg(nvg_599_dut, rf, rfa, "ping_airties_from_RG")
 verify_airties_hello_packet_count_increasing(nvg_599_dut, rf, rfa, "verify_airties_hello_packet_count_increasing")
 verify_airties_build_verssions(nvg_599_dut, rf, rfa, 'verify_airties_build_verssions')
-# test_rg_upgrade(nvg_599_dut, '/home/palmer/Downloads/nvg599-9.2.2h13d25_1.1.bin', rf, rfa)
-# test_factory_reset(nvg_599_dut, rf, rfa)
+
+rf.close()
+rfa.close()
+if send_email == 1:
+    nvg_599_dut.email_test_results(rf)
+exit()
 
 
 #def tftp_get_file_cli(self,remote_file, *source_device_list):
@@ -1126,9 +1148,7 @@ verify_airties_build_verssions(nvg_599_dut, rf, rfa, 'verify_airties_build_verss
 #source_device_name = "LP-PPALMER"
 #remote_file = "a1.txt"
 #nvg_599_dut.tftp_get_file_cli(source_device_name, "nvg599-9.2.2h13d24_1.1.bin","nvg599-9.2.2h13d22_1.1.bin","nvg599-9.2.2h13d20_1.1.bin","nvg599-9.2.2h13d18_1.1.bin","nvg599-9.2.2h13d16_1.1.bin","nvg599-9.2.2h13d14_1.1.bin","nvg599-9.2.2h13d12_1.1.bin","nvg599-9.2.2h13d10_1.1.bin")
-rf.close()
-rfa.close()
-exit()
+
 # we first get the IP of an associated 4920.
 # if none availabe then exit with fail message
 # # self.ip_lan_connections_dict_cli[connected_device_mac] = {}
@@ -1138,8 +1158,11 @@ exit()
 # ip_lan_connections_dict_cli[connected_device_mac]["State"] = connected_device_status
 # ip_lan_connections_dict_cli[connected_device_mac]["DHCP"] = connected_device_dhcp
 # ip_lan_connections_dict_cli[connected_device_mac]["Port"] = connected_device_port
-verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '3', rf, rfa, "verify_auto_ssid_defaults_via_tr69" )
-#print(' verify_auto_ssid_defaults_via_tr69 ssid:'  + status)
+# verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '3', rf, rfa, "verify_auto_ssid_defaults_via_tr69" )
+# print(' verify_auto_ssid_defaults_via_tr69 ssid:'  + status)
+######################################################### end test area, clean up the junk below
+# set the file at to the file to use
+# test_rg_upgrade(nvg_599_dut, '/home/palmer/Downloads/nvg599-9.2.2h13d25_1.1.bin', rf, rfa)
 
 verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '4', rf, rfa, "verify_auto_ssid_defaults_via_tr69")
 #print('verify_auto_ssid_defaults_via_tr69 ssid:' + status)
@@ -1185,14 +1208,14 @@ if send_email == 1:
 
 exit()
 
-######################################################### end test area, clean up the junk below
-# set the file at to the file to use
-test_rg_upgrade(nvg_599_dut, '/home/palmer/Downloads/nvg599-9.2.2h13d25_1.1.bin', rf, rfa)
-test_factory_reset(nvg_599_dut, rf, rfa)
 
 
-# test_status = nvg_599_dut.upgrade_rg(upgrade_rg_fitest_house_devices_static_infole,rf, rfa)
-#nvg_599_dut.factory_reset_rg(rf,rfa)
+
+
+
+
+
+
 
 
 
@@ -1261,8 +1284,11 @@ results_file.write(now + '\n')
 results_file_archive.write(now + '\n')
 
 nvg_599_dut = Nvg599Class()
-upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d23_1.1.bin'
-test_status, duration = nvg_599_dut.upgrade_rg(upgrade_rg_file, rf, rfa)
+
+upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d26_1.1.bin'
+#test_status, duration = nvg_599_dut.upgrade_rg(upgrade_rg_file, rf, rfa)
+test_status, duration = nvg_599_dut.upgrade_rg('/home/palmer/Downloads/nvg599-9.2.2h13d26_1.1.bin', rf, rfa)
+
 sleep(300)
 results_file.write("Test Title: RG Upgrade :" + upgrade_rg_file + " Test case " + test_status  + "Duration:" + duration  +'\n')
 results_file_archive.write("Test Title: RG Upgrade :" + upgrade_rg_file + " Test case " + test_status  + "Duration:" + duration  +'\n')
