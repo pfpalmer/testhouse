@@ -878,6 +878,8 @@ class Nvg599Class(GatewayClass):
 
     def upgrade_rg(self, update_bin_file, rf, rfa):
         print('in upgrade_rg')
+        sleep(10)
+        # exit()
         home_link = self.session.find_element_by_link_text("Diagnostics")
         home_link.click()
         status_link = self.session.find_element_by_link_text("Update")
