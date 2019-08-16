@@ -16,7 +16,7 @@ import re
 import socket
 import paramiko
 # from paramiko_expect import SSHClientInteraction
-
+import wget
 # import os
 # from selenium.webdriver.common.by import By
 # from selenium.webdriver.support.ui import WebDriverWait
@@ -47,7 +47,7 @@ nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53
                                 'ssid_2': 'ATTqbrAnYs_REPLACEME_2', 'ssid_2_pw': 'REPLACEME2'},
 
             "35448081188192":   {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
-                                 'mac2g': '20:3d:66:49:85:61', 'mac5g': '11:22:33:44:55:66', 'wifi_pw': 'eeh4jxmh7q26',
+                                 'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'wifi_pw': 'eeh4jxmh7q26',
                                  'ssid': 'ATT4ujR48s', 'ssid_1_pw': 'xxxxxxxxx',
                                  'ssid2': 'xxxxxxxxxxx_REPLACEME_2', 'ssid_2_pw': 'ssid2_pw_xxxx'}}
 # *7<#56*2<2
@@ -153,7 +153,7 @@ class GatewayClass:
         self.hardware_version = None
         self.serial_number = None
         self.factory_reset = None
-        self.ip_lan_connections_dict_cli = {}
+        #self.ip_lan_connections_dict_cli = {}  #################### -pfp-
 
         print("in Nvg599Class__init")
         self.init_info = True
@@ -1471,8 +1471,8 @@ class Nvg599Class(GatewayClass):
         end = time.time()
         duration = str(round(end - start))
         print("Duration in seconds:", str(round(end - start)))
-        rf.write("  RG Factory Reset Duration:" + duration + " Pass " + '\n')
-        rfa.write("  RG Factory Reset Duration:" + duration + " Pass " + '\n')
+        rf.write("  RG Factory Reset Duration:" + duration + '\n')
+        rfa.write("  RG Factory Reset Duration:" + duration + '\n')
         duration = str(round(end - start))
         #
         sleep(300)
@@ -1683,7 +1683,7 @@ class Nvg599Class(GatewayClass):
         wps_button.click()
         # why do I want o close
         # self.session.close()
-        cmd = "nmcli con down ATTqbrAnYs"
+        cmd = "nmcli con down ATTqbrAnYs"  # <------------------------
 
         try:
             output = subprocess.check_output(cmd, shell=True)
@@ -1754,11 +1754,13 @@ class Nvg599Class(GatewayClass):
 
         print('output from SmartMesh down', output)
         # cmd = "nmcli device wifi connect ATTqbrAnYs ggtxstgwipcg"
-        cmd = "nmcli connect up ATTqbrAnYs"
+        cmd = "nmcli connect up ATTqbrAnYs"  #-------------------------------------------------------???
 
         output = subprocess.check_output(cmd, shell=True)
         print('output from reconnect', output)
         sleep(30)
+
+
 
     def set_wifi_power_level(self, band, percentage):
         print('Adjusting ' + band + ' wifi power level to ' + str(percentage) + '%')
@@ -2567,6 +2569,7 @@ class Nvg599Class(GatewayClass):
         cli_session.sendline('wl -i wl1 status')
         cli_session.expect("#")
         status_output = cli_session.before
+        print(status_output)
         status_info_reg_ex = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',
                                         re.DOTALL)
         # statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
@@ -2684,7 +2687,6 @@ class Nvg599Class(GatewayClass):
         status_output = self.telnet_cli_session.before
         status_info_reg_ex = re.compile(r'Authentication\s(\w+)',re.DOTALL)
         authentication_type = status_info_reg_ex.search(status_output)
-        print('status_output' + str(status_output))
         # print('tr69 authentication_type:' + str(authentication_type))
 
         print('expected Authentication type:' + str(expected_authentication_type))
@@ -2986,6 +2988,79 @@ class Nvg599Class(GatewayClass):
         rfa.write("    Turned off WiFi security protection" + '\n')
         print('Turned off WiFi security protection')
         self.telnet_cli_session.close()
+
+    def get_rg_band2_status_cli(self):
+        print('in get_rg_band2_status_cli\n')
+        self.telnet_cli_session = self.login_nvg_599_cli()
+        self.telnet_cli_session.sendline('wl status')
+        self.telnet_cli_session.expect('>')
+        status_output = self.telnet_cli_session.before
+        band2_cli_dict = {}
+        status_info_reg_ex = re.compile(r'SSID:\s"(\w+)"\s*?Mode:\s(\w+)\s*?RSSI:\s(\d+).*?noise:\s-(\d+).*?Channel:\s(\d+).*?BSSID:\s(\w+:\w+:\w+:\w+:\w+:\w+)',re.DOTALL)
+        print('status_output' + str(status_output) + '\n')
+        mo1 = status_info_reg_ex.search(status_output)
+        # print('ssid:' + str(mo1.group(1)) + '\n')
+        # print('Mode:' + str(mo1.group(2)) + '\n')
+        # print('RSSI:' + str(mo1.group(3)) + '\n')
+        # print('noise:' + str(mo1.group(4)) + '\n')
+        # print('channel:' + str(mo1.group(5)) + '\n')
+        # print('BSSID:' + (str(mo1.group(6)).lower()) + '\n')
+        # sleep(5)
+        # exit()
+        mo1 = status_info_reg_ex.search(status_output)
+        band2_cli_dict['ssid']= str(mo1.group(1))
+        band2_cli_dict['mode']= str(mo1.group(2))
+        band2_cli_dict['rssi']= str(mo1.group(3))
+        band2_cli_dict['noise']= str(mo1.group(4))
+        band2_cli_dict['channel']= str(mo1.group(5))
+        band2_cli_dict['bssid']= str(mo1.group(6)).lower()
+        self.telnet_cli_session.close()
+        return band2_cli_dict
+
+    def get_rg_band5_status_cli(self):
+        print('in get_rg_band5_status_cli\n')
+        self.telnet_cli_session = self.login_nvg_599_5g_cli()
+        band5_cli_dict = {}
+        self.telnet_cli_session.sendline('wl status')
+        self.telnet_cli_session.expect('#')
+        status_output = self.telnet_cli_session.before
+        status_info_reg_ex = re.compile(r'SSID:\s"(\w+)"\s*?Mode:\s(\w+)\s*?RSSI:\s(\d+).*?noise:\s-(\d+).*?Channel:\s(\d+)/(\d+).*?BSSID:\s(\w+:\w+:\w+:\w+:\w+:\w+)',re.DOTALL)
+        print('status_output' + str(status_output) + '\n')
+        mo1 = status_info_reg_ex.search(status_output)
+        band5_cli_dict['ssid'] = str(mo1.group(1))
+        band5_cli_dict['mode'] = str(mo1.group(2))
+        band5_cli_dict['rssi'] = str(mo1.group(3))
+        band5_cli_dict['noise'] = str(mo1.group(4))
+        band5_cli_dict['channel'] = str(mo1.group(5))
+        band5_cli_dict['bandwidth'] = str(mo1.group(6))
+        band5_cli_dict['bssid'] = str(mo1.group()).lower()
+        self.telnet_cli_session.close()
+        return band5_cli_dict
+
+    import urllib.request
+    import tempfile
+    import shutil
+
+    def urllib_get_rg_file(self,rg_url_to_return,rf, rfa):
+        print('in url get')
+        #with urllib.request.urlopen('http://192.168.1.254/ATT/topology') as response:
+        with urllib.request.urlopen(rg_url_to_return) as response:
+
+            html_response  = response.read()
+            encoding = response.headers.get_content_charset('utf-8')
+            decoded_html = html_response.decode(encoding)
+            #print('decoded_html:' + decoded_html)
+            return decoded_html
+            # with open('/home/palmer/Downloads/newdog.txt', 'w') as fd:
+             #    fd.write(decoded_html)
+            #print(response.read())
+            #print('response.text' + response.text)
+            #print(respprint(onse.content())
+
+
+        # urllib.request.urlretrieve(rg_url, filename=url_temp_file)
+        # urllib.request.urlretrieve(rg_url)
+
 
     def get_rg_serial_number_cli(self):
         self.login_nvg_599_cli()

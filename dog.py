@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from   rgclass import test_house_devices_static_info
 # import itertools
 import pprint
+import wget
 from datetime import datetime
 
 import pickle
@@ -137,7 +138,7 @@ def tst_speed_test(nvg_599_dut, results_file, test_ip):
 def tst_ping_ip(nvg_599_dut, ping_history_file, remote_ip):
     print('in tst_ping')
     # ping_history_file  = open('ping_history_file.txt', 'a+')
-    ping_history_file  = open(ping_history_file, 'a+')
+    ping_history_file = open(ping_history_file, 'a+')
     now = datetime.today().isoformat()
     ping_history_file.write("Test Title:tst_ping Execution time:")
     ping_history_file.write(now)
@@ -336,7 +337,8 @@ def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_
         # .67 is  the tablet
         # speed_test_result_tuple_tablet = Nvg599Class.run_speed_test_from_android_termux("192.168.1.67")
         ping_results = nvg_599_dut.ping_check('192.168.1.67')
-        a,b = Nvg599Class.run_speed_test_from_android_termux("192.168.1.67")
+        # a,b = Nvg599Class.run_speed_test_from_android_termux("192.168.1.67")
+        a,b = nvg_599_dut.execute_speed_test_from_android_termux("192.168.1.67")
         print('Tablet ---------------------------------------------firmware:' + str(firmware))
         # print("speed_test_result_tuple:", speed_test_result_tuple_tablet)
         # for a, b in speed_test_result_tuple_tablet:
@@ -360,7 +362,7 @@ def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_
 
         # speed_test_result_tuple_note8 = Nvg599Class.run_speed_test_from_android_termux("192.168.1.70")
         ping_results = nvg_599_dut.ping_check('192.168.1.70')
-        a,b = Nvg599Class.run_speed_test_from_android_termux("192.168.1.70")
+        a,b = nvg_599_dut.execute_speed_test_from_android_termux("192.168.1.70")
         # for a, b in speed_test_result_tuple_note8:
         print('Note 8 ---------------------------------------------firmware:' + str(firmware))
         print('Note 8 download speed: ' + a + ' Upload speed:' + b)
@@ -404,7 +406,7 @@ def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_
     title('NVG 599 Upload Speed')
     plt.ylabel('Speed in MBPS')
     plt.xlabel('Firmware')
-    plt.xticks([1, 2, 3, 4, 5, 6, 7, 8, 9,10], firmware_599_names, rotation=' vertical')
+    plt.xticks([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], firmware_599_names, rotation = 'vertical')
 
     plot(ty, tablet_upload_list, 'b', label='Tablet')
     plot(ty, note8_upload_list, 'g', label='Note8')
@@ -413,7 +415,7 @@ def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_
     plt.grid()
     plt.tight_layout()
     plt.subplots_adjust(left=0.1, right=0.9, bottom=0.2, top=0.9)
-    now = datetime.today().isoformat()
+    # now = datetime.today().isoformat()
     plt.savefig("/home/palmer/Downloads/speedtest:" + start_time)
     plt.savefig("thisisit")
 
@@ -470,8 +472,8 @@ firmware_599_available = ['/home/palmer/Downloads/nvg599-9.2.2h12d9_1.1.bin',
 #   "supplicant_state": "COMPLETED""
 # }'
 
-#Nvg599Class.run_speed_test_from_android_termux('192.168.1.67')
-#Nvg599Class.get_wifi_info_from_android_termux('192.168.1.70')
+# Nvg599Class.run_speed_test_from_android_termux('192.168.1.67')
+# Nvg599Class.get_wifi_info_from_android_termux('192.168.1.70')
 
 
 # Nvg599Class.wait_for_ssh_to_be_ready('192.168.1.70', '8022', '20', '1')
@@ -591,7 +593,9 @@ def tst_android_speed_test(nvg_599_dut, remote_ip):
         '  Ser. No:' + nvg_599_dut.serial_number + '\n')
     nvg_599_dut.disable_enable_wifi_5g('Off')
     sleep(120)
-    down_load_speed, up_load_speed = Nvg599Class().run_speed_test_from_android_termux(remote_ip)
+    #down_load_speed, up_load_speed = Nvg599Class().execute_speed_test_from_android_termux(remote_ip)
+    down_load_speed, up_load_speed = nvg_599_dut.execute_speed_test_from_android_termux(remote_ip)
+
     tst_android_speed_file.writelines(
         'Band 2 Download Speed:' +  down_load_speed + 'Band 2 Upload speed:' + up_load_speed + '\n\n')
 
@@ -670,7 +674,7 @@ def test_auto_ssid_default_tr69_values(nvg_599_dut, ssid, rf, rfa):
         test_status = "Fail"
         # return ("Fail: SSID:" + ssid + " Status not set to Disabled")
 
-    if (default_tr69_auto_ssid_values.find('.' + ssid + '.SSID TBD') != -1):
+    if default_tr69_auto_ssid_values.find('.' + ssid + '.SSID TBD') != -1:
         print('Pass ssid:' + ssid + ' Default SSID set to TBD')
         rf.write('    Pass ssid:' + ssid + ' Default SSID set to TBD \n')
     else:
@@ -680,7 +684,7 @@ def test_auto_ssid_default_tr69_values(nvg_599_dut, ssid, rf, rfa):
 
         # return ('Fail: SSID:' + ssid + ' Default SSID not set to TBD')
 
-    if (default_tr69_auto_ssid_values.find('.' + ssid + '.X_0000C5_DefaultSSID TBD') != -1):
+    if default_tr69_auto_ssid_values.find('.' + ssid + '.X_0000C5_DefaultSSID TBD') != -1:
         print('Pass ssid:' + ssid + ' Default SSID set to TBD')
         rf.write('Pass ssid:' + ssid + ' Default SSID set to TBD \n')
     else:
@@ -690,7 +694,7 @@ def test_auto_ssid_default_tr69_values(nvg_599_dut, ssid, rf, rfa):
 
         # return ('Fail: SSID:' + ssid + ' Default SSID not set to TBD')
 
-    if (default_tr69_auto_ssid_values.find('.' + ssid + '.SSID TBD') != -1):
+    if default_tr69_auto_ssid_values.find('.' + ssid + '.SSID TBD') != -1:
         print('Pass ssid:' + ssid + '  SSID set to TBD')
         rf.write('    Pass ssid:' + ssid + '  SSID set to TBD \n')
     else:
@@ -796,18 +800,22 @@ def test_rg_upgrade(nvg_599_dut, upgrade_file_path, rf, rfa):
         rf.write('    Pass: RG upgraded to:' + upgrade_file_path)
         sleep(300)
         return "Pass"
-
-def test_factory_reset(nvg_599_dut,rf,rfa, test_name):
+# we don't expect factory reset to to fail, it should always return a duration
+def execute_factory_reset(nvg_599_dut,rf,rfa, test_name):
     test_status = "Pass"
     rf.write('Test ' + test_name + '\n')
     print('Test:' + test_name + '\n')
-    test_status = nvg_599_dut.factory_reset_rg(rf, rfa)
-    if test_status == "Fail":
-        rf.write('    Fail: Factory reset failed')
+    reset_duration = nvg_599_dut.factory_reset_rg(rf, rfa)
+    if reset_duration == "Fail":
+        #rf.write('    Fail: Factory reset failed')
+        print('Test:' + test_name + ":" + reset_duration + '\n\n')
+        rf.write('     Test:' + test_name + ":" + reset_duration + '\n\n')
         nvg_599_dut.session_cleanup()
         return "Fail"
     else:
         sleep(200)
+        print('Test:' + test_name + ":" + reset_duration + '\n\n')
+        rf.write('     Test:' + test_name + ":" + reset_duration + '\n\n')
         return "Pass"
 
 def setup_auto_ssid_via_tr69(nvg_599_dut,ssid, rf, rfa, test_name):
@@ -901,7 +909,7 @@ def verify_auto_ssid_defaults_via_tr69(nvg_599_dut, auto_ssid_number, default_ss
         auto_ssid_defaults_status = "Fail"
         print('Not Found MaxClients 3:Fail')
 
-    rf.write('     Test:' + test_name + " " + auto_ssid_number + ":***" + auto_ssid_defaults_status + '***\n\n')
+    rf.write('     Test:' + test_name + " " + auto_ssid_number + ":" + auto_ssid_defaults_status + '\n\n')
     print('Test:' + test_name + " " + auto_ssid_number + ":" + auto_ssid_defaults_status + '\n')
 
     return auto_ssid_defaults_status
@@ -985,7 +993,7 @@ def ping_airties_from_rg(nvg_599_dut,rf, rfa, test_name, airties_ip = 'Default')
     nvg_cli_session.sendline('exit')
     return test_status
 
-def verify_airties_build_verssions(nvg_599_dut,rf, rfa, test_name, correct_2g_fw = 'AT.922.13.2.61', correct_5g_fw = 'AT.922.13.2.61'):
+def verify_airties_build_versions(nvg_599_dut,rf, rfa, test_name, correct_2g_fw = 'AT.922.13.2.61', correct_5g_fw = 'AT.922.13.2.61'):
     test_status = "Pass"
     rf.write('Test ' + test_name + '\n')
     print('Test:' + test_name + '\n')
@@ -1099,13 +1107,82 @@ def verify_google_ping_from_rg_5g(nvg_599_dut,rf,rfa, test_name):
     return test_status
 
 
+from rgclass import nvg_info
+
+def url_att_topology_smoke(nvg_599_dut, url_to_return, rf, rfa, test_name):
+    test_status = "Pass"
+    rf.write('Test ' + test_name + '\n')
+    print('Test:' + test_name + '\n')
+    # decoded_html = nvg_599_dut.urllib_get_rg_file("http://192.168.1.254/ATT/topology", rf, rfa)
+    decoded_html = nvg_599_dut.urllib_get_rg_file(url_to_return, rf, rfa)
+    rg_serial_number = nvg_599_dut.serial_number
+    nvg_5g_mac = nvg_info[rg_serial_number]['mac5g']
+    print ('nvg_mac_5g: ' + str(nvg_5g_mac) + '\n')
+    print ('decoded: ' + str(decoded_html) +  '>end_decoded \n')
+
+    #topology_text  = re.search('.*?' + nvg_5g_mac + '.*?ipaddr=203.0.113.2',decoded_html)
+    #topology_text  = re.match('.*?' + nvg_5g_mac + '.*?ipaddr=203.0.113.2',re.escape(decoded_html))
+    ip_5g_side = "203.0.113.2"
+    # decoded_html = re.escape(decoded_html)
+    # topology_regex = re.compile('.*?' + (nvg_5g_mac + '.*?' + ip_5g_side))
+    #topology_regex = re.compile(r'ownaddr=' + (nvg_5g_mac + '.*?ipaddr=203.0.113.2'', re.DOTALL)
+    topology_regex = re.compile(r'ownaddr=' + (nvg_5g_mac) + '.*?ipaddr=203.0.113.2')
+
+    #topology_regex = re.compile(r'".*?" + nvg_5g_mac +',re.DOTALL)
+
+    mo1 =   topology_regex.search(decoded_html)
+
+    # status_info_reg_ex = re.compile(r'SSID:\s"(\w+)"\s*?Mode:\s(\w+)\s*?RSSI:\s(\d+).*?noise:\s-(\d+).*?Channel:\s(\d+)/(\d+).*?BSSID:\s(\w+:\w+:\w+:\w+:\w+:\w+)', re.DOTALL)
+    # print('status_output' + str(status_output) + '\n')
+    # mo1 = status_info_reg_ex.search(status_output)
 
 
 
-################# test area  #######################  -pfp-
+    print('mo1:' + mo1.group(1))
+   #  topology_text  = re.search(nvg_5g_mac + ,decoded_html)
+    #
+    # status_info_reg_ex = re.compile(rModel\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',
+    #                                 re.DOTALL)
+    # # statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
+    # # status InfoRegEx = re.compile(r'Model\s(\w+)')
+    # mo1 = status_info_reg_ex.search(status_output)
+    # return mo1
+
+
+    #topology_text  = re.search(r'(' + rg_serial_number +')',decoded_html)
+
+
+    #
+    # if topology_text == None:
+    #     print('topology file fails test')
+    # else:
+    #     print(topology_text)
+    # exit()
+    # print('type' + str(type(decoded_html))+ '\n')
+    # print('decoded_html' + decoded_html + '\n')
 
 
 
+
+
+    #with open('/home/palmer/Downloads/newdog.txt', 'w') as fd:
+        #d.write(decoded_html)
+
+# nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
+#                                 'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4', 'wifi_pw': 'c2cmybt25dey',
+#                                 'ssid': 'xxxxxx', 'ssid_1': 'xxxxx_REPLACEME_1', 'ssid_1_pw': 'xxxx',
+#                                 'ssid_2': 'xxxxxxxxxxx_REPLACEME_2', 'ssid_2_pw': 'ssid_2_pw_xxxx'},
+#
+#             "277427577103760": {'model': 'nvg599', 'device_access_code': '<<01%//4&/', 'magic': 'ggtxstgwipcg',
+#                                 'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wifi_pw': 'nsrmpr59rxwv',
+#                                 'ssid': 'ATTqbrAnYs', 'ssid1': 'ATTqbrAnYs_REPLACEME_1', 'ssid_1_pw': 'REPLACEME1',
+#                                 'ssid_2': 'ATTqbrAnYs_REPLACEME_2', 'ssid_2_pw': 'REPLACEME2'},
+#
+#             "35448081188192":   {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
+#                                  'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'wifi_pw': 'eeh4jxmh7q26',
+#                                  'ssid': 'ATT4ujR48s', 'ssid_1_pw': 'xxxxxxxxx',
+#                                  'ssid2': 'xxxxxxxxxxx_REPLACEME_2', 'ssid_2_pw': 'ssid2_pw_xxxx'}}
+# *7<#56*2<2
 send_email = 1
 rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
 rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')
@@ -1113,27 +1190,43 @@ now = datetime.today().strftime("%B %d, %Y,%H:%M")
 rf.write('RG Test run:' + now + '\n')
 rfa.write(now + '\n')
 nvg_599_dut = Nvg599Class()
-# nvg_599_dut.tftp_list_test("a1","a2","a3")
-# rf.close()
-# rfa.close()
-# exit()
+
+#def wget_rg_files(self, rg_url, destination_file_name, rf, rfa, rg_="192.168.1.254"):
+#url_temp_file = open('url_file', mode = 'w', encoding = 'utf-8')
+
+
+#nvg_599_dut.urllib_get_rg_file("http://192.168.1.254/ATT/topology", url_temp_file, rf, rfa)
+# url_temp_file.close()
+
+url_att_topology_smoke(nvg_599_dut,'http://192.168.1.254/ATT/topology',rf,rfa, 'url_att_topology_smoke')
+
+
+exit()
+
+band_5_wl_status_dict = nvg_599_dut.get_rg_band5_status_cli()
+print('---------------band_5_wl_status_dict:' + str(band_5_wl_status_dict['bssid']))
+print('---------------band_5_wl_st channel:' + str(band_5_wl_status_dict['channel']))
+print('---------------band_5_wl_stat--bw:' + str(band_5_wl_status_dict['bandwidth']))
+
+
+exit()
 # set the file at to the file to use
 # source_device_name = "LP-PPALMER"
 # nvg_599_dut.tftp_get_file_cli(source_device_name, "nvg599-9.2.2h13d26_1.1.bin","nvg589-9.2.2h13d26_1.1.bin")
-# rf.close()
-# rfa.close()
-# exit()
-
+#
 # test_rg_upgrade(nvg_599_dut, '/home/palmer/Downloads/nvg599-9.2.2h13d26_1.1.bin', rf, rfa)
-# test_factory_reset(nvg_599_dut, rf, rfa, 'test_factory_reset')
-
+execute_factory_reset(nvg_599_dut, rf, rfa, 'execute_factory_reset')
 verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '3', 'ZipKey-PSK', 'Cirrent1',  rf, rfa, "verify_auto_ssid_defaults_via_tr69" )
 verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '4', 'ATTPOC', 'Ba1tshop', rf, rfa, "verify_auto_ssid_defaults_via_tr69" )
+verify_auto_info_not_present_in_ui(nvg_599_dut, rf, rfa, "verify_auto_info_not_present_in_ui" )
 verify_google_ping_from_rg_5g(nvg_599_dut, rf, rfa, "verify_google_ping_from_rg_5g")
 ping_gw_from_4920(nvg_599_dut,rf,rfa, "ping_gw_from_4920")
 ping_airties_from_rg(nvg_599_dut, rf, rfa, "ping_airties_from_RG")
 verify_airties_hello_packet_count_increasing(nvg_599_dut, rf, rfa, "verify_airties_hello_packet_count_increasing")
-verify_airties_build_verssions(nvg_599_dut, rf, rfa, 'verify_airties_build_verssions')
+verify_airties_build_versions(nvg_599_dut, rf, rfa, 'verify_airties_build_versions')
+
+#airties_ap_net = "AirTies_SmartMesh_4PNF"
+#nvg_599_dut.wps_pair_default_airties(airties_ap_net)
 
 rf.close()
 rfa.close()
@@ -1183,10 +1276,6 @@ rf.close()
 rfa.close()
 exit()
 
-
-
-
-
 # upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d23_1.1.bin'
 # These android devices should be able to run the cli speed test
 # Galaxy-Note8,Galaxy-S9,Galaxy-Tab-A
@@ -1197,9 +1286,6 @@ exit()
 # rf.write("Test Title: Auto SSID 3 setup: Pass")
 # rfa.write("Test Title: Auto SSID 3 setup: Pass")
 #ssid = 4
-nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(4, rf, rfa)
-rf.write("Test Title: Auto SSID 4 setup: Pass")
-rfa.write("Test Title: Auto SSID 4 setup: Pass")
 test_speedtest_from_android(nvg_599_dut, 'Galaxy-Note8', test_house_devices_static_info, rf, rfa)
 rf.close()
 rfa.close()
@@ -1207,17 +1293,6 @@ if send_email == 1:
     nvg_599_dut.email_test_results(rf)
 
 exit()
-
-
-
-
-
-
-
-
-
-
-
 
 
 ######################################################################################################
@@ -1248,7 +1323,7 @@ rf.write('\n')
 print('\n')
 
 rf.write('Test title:test_verify_auto_ssid_info_not_present_in_ui \n')
-test_status = test_verify_auto_info_not_present_in_ui(nvg_599_dut,rf,rfa)
+test_status = verify_auto_info_not_present_in_ui(nvg_599_dut,rf,rfa)
 rf.write(test_status + '\n')
 
 rf.close()
@@ -1353,16 +1428,11 @@ exit()
 upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d22_1.1.bin'
 # upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h12d15_1.1.bin'
 # upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h2d23_1.1.bin'
-nvg_599_dut.upgrade_rg(upgrade_rg_file)
-sleep(300)
-nvg_599_dut.factory_reset_rg()
-sleep(300)
-ssid = 3
-nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid)
-ssid = 4
-nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid)
+
 # airties_ap_net = "AirTies_Air4920_33N3"
 # nvg_599_dut.wps_pair_default_airties(airties_ap_net)
+
+
 exit()
 
 
@@ -1994,8 +2064,6 @@ if 'min' in duration:
 # Print the parsed fields in CSV format.
 # print('days, hours, minutes, users, cpu avg 1 min, cpu avg 5 min, cpu avg 15 min')
 # print('%s, %s, %s, %s, %s, %s, %s' % (days, hours, mins, users, av1, av5, av15))
-
-
 print("Turning off supplicant")
 ip = "192.168.1.254"
 password = '<#/53#1/2'
