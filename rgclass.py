@@ -8,9 +8,12 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import urllib.request
+
+
+
 from urllib.error import URLError, HTTPError
 # import url
-import urllib3
+#import urllib3
 import pexpect
 import re
 import socket
@@ -37,19 +40,19 @@ from datetime import datetime
 # /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I
 
 nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
-                                'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4', 'wifi_pw': 'c2cmybt25dey',
-                                'ssid': 'xxxxxx', 'ssid_1': 'xxxxx_REPLACEME_1', 'ssid_1_pw': 'xxxx',
-                                'ssid_2': 'xxxxxxxxxxx_REPLACEME_2', 'ssid_2_pw': 'ssid_2_pw_xxxx'},
+                                'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4', 'ssid_pw': 'c2cmybt25dey',
+                                'ssid': 'xxxxxx', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
+                                'ssid_4': 'ATTPOC', 'ssid_4_pw': 'Ba1tshop'},
 
             "277427577103760": {'model': 'nvg599', 'device_access_code': '<<01%//4&/', 'magic': 'ggtxstgwipcg',
-                                'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wifi_pw': 'nsrmpr59rxwv',
-                                'ssid': 'ATTqbrAnYs', 'ssid1': 'ATTqbrAnYs_REPLACEME_1', 'ssid_1_pw': 'REPLACEME1',
-                                'ssid_2': 'ATTqbrAnYs_REPLACEME_2', 'ssid_2_pw': 'REPLACEME2'},
+                                'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'ssid_pw': 'nsrmpr59rxwv',
+                                'ssid': 'ATTqbrAnYs', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
+                                'ssid_4': 'ATTPOC', 'ssid_2_pw': 'Ba1tshop'},
 
             "35448081188192":   {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
-                                 'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'wifi_pw': 'eeh4jxmh7q26',
-                                 'ssid': 'ATT4ujR48s', 'ssid_1_pw': 'xxxxxxxxx',
-                                 'ssid2': 'xxxxxxxxxxx_REPLACEME_2', 'ssid_2_pw': 'ssid2_pw_xxxx'}}
+                                 'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'ssid_pw': 'eeh4jxmh7q26',
+                                 'ssid': 'ATT4ujR48s', 'ssid_3': 'ZipKey-PSK','ssid_3_pw': 'Cirrent1',
+                                 'ssid_4': 'ATTPOC', 'ssid_4_pw': 'Ba1tshop'}}
 # *7<#56*2<2
 
 airties_4920_defaults = {
@@ -229,11 +232,23 @@ class Nvg599Class(GatewayClass):
     def remote_webserver(self):
         pass
 
+
+
+    def webdrivertest(self):
+        self.session = webdriver.Chrome()
+        self.session = WebDriverWait(self.session, 4)
+
     def get_ui_system_information(self):
         print('in get_ui_system_information)')
         global nvg_info
         rg_url = 'http://192.168.1.254/'
+
         self.session = webdriver.Chrome()
+
+        #self.session = WebDriverWait(self.session, 1)
+
+
+
         self.session.get(rg_url)
         status_link = self.session.find_element_by_link_text("System Information")
         status_link.click()
@@ -1740,6 +1755,8 @@ class Nvg599Class(GatewayClass):
         for line in output.splitlines():
             print('out2===========\n', line)
         sleep(10)
+        # this is wrong becasue we want ot login to the airties not t he RG
+
         self.airties_ap_cli_session = pexpect.spawn("telnet 192.168.2.254", encoding='utf-8')
         self.airties_ap_cli_session.expect('ogin:')
         self.airties_ap_cli_session.sendline('root')
@@ -1759,7 +1776,6 @@ class Nvg599Class(GatewayClass):
         output = subprocess.check_output(cmd, shell=True)
         print('output from reconnect', output)
         sleep(30)
-
 
 
     def set_wifi_power_level(self, band, percentage):
@@ -2346,6 +2362,7 @@ class Nvg599Class(GatewayClass):
 
     @staticmethod
     def nmcli_test():
+        # nmcli connection show - -active
         # command = 'nmcli c'
         # cmd = "nmcli r all"
         cmd = "nmcli con down ATTqbrAnYs"
@@ -3044,12 +3061,11 @@ class Nvg599Class(GatewayClass):
     def urllib_get_rg_file(self,rg_url_to_return,rf, rfa):
         print('in url get')
         #with urllib.request.urlopen('http://192.168.1.254/ATT/topology') as response:
-        with urllib.request.urlopen(rg_url_to_return) as response:
-
+        with urllib.request.urlopen(rg_url_to_return, data = None ,timeout=3) as response:
             html_response  = response.read()
             encoding = response.headers.get_content_charset('utf-8')
             decoded_html = html_response.decode(encoding)
-            #print('decoded_html:' + decoded_html)
+            print('decoded_html:' + decoded_html)
             return decoded_html
             # with open('/home/palmer/Downloads/newdog.txt', 'w') as fd:
              #    fd.write(decoded_html)

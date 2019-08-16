@@ -6,6 +6,7 @@ from   rgclass import test_house_devices_static_info
 import pprint
 import wget
 from datetime import datetime
+# from selenium.webdriver.support.ui import WebDriverWait
 
 import pickle
 # import global.py
@@ -1113,71 +1114,139 @@ def url_att_topology_smoke(nvg_599_dut, url_to_return, rf, rfa, test_name):
     test_status = "Pass"
     rf.write('Test ' + test_name + '\n')
     print('Test:' + test_name + '\n')
-    # decoded_html = nvg_599_dut.urllib_get_rg_file("http://192.168.1.254/ATT/topology", rf, rfa)
     decoded_html = nvg_599_dut.urllib_get_rg_file(url_to_return, rf, rfa)
     rg_serial_number = nvg_599_dut.serial_number
     nvg_5g_mac = nvg_info[rg_serial_number]['mac5g']
     print ('nvg_mac_5g: ' + str(nvg_5g_mac) + '\n')
     print ('decoded: ' + str(decoded_html) +  '>end_decoded \n')
-
-    #topology_text  = re.search('.*?' + nvg_5g_mac + '.*?ipaddr=203.0.113.2',decoded_html)
-    #topology_text  = re.match('.*?' + nvg_5g_mac + '.*?ipaddr=203.0.113.2',re.escape(decoded_html))
     ip_5g_side = "203.0.113.2"
-    # decoded_html = re.escape(decoded_html)
-    # topology_regex = re.compile('.*?' + (nvg_5g_mac + '.*?' + ip_5g_side))
-    #topology_regex = re.compile(r'ownaddr=' + (nvg_5g_mac + '.*?ipaddr=203.0.113.2'', re.DOTALL)
-    topology_regex = re.compile(r'ownaddr=' + (nvg_5g_mac) + '.*?ipaddr=203.0.113.2')
+    #topology_regex = re.compile(r'(ownaddr=.*?ipaddr={})'.format(ip_5g_side))
+    topology_regex = re.compile(r'ownaddr=(\w+:\w+:\w+:\w+:\w+:\w+).*?(ipaddr={})'.format(ip_5g_side))
+    topology_text =   topology_regex.search(decoded_html)
+    print('rg_mac:' + topology_text.group(1))
+    rg_mac = topology_text.group(1)
+    print('ip:' + topology_text.group(2))
+    ip_5g = topology_text.group(2)
+    if topology_text == None:
+         print('topology file fails test')
+         rf.write('     topology file strings:ownaddr=' + rg_mac + 'and 5g side IP:' + ip_5g + 'not found:Fail\n\n')
+         test_status = "Fail"
+    else:
+        print(topology_text)
+        rf.write('     topology file strings:ownaddr=' + rg_mac + 'and 5g side IP:' + ip_5g + ' found :Pass\n\n')
+    return test_status
 
-    #topology_regex = re.compile(r'".*?" + nvg_5g_mac +',re.DOTALL)
+def url_att_route_smoke(nvg_599_dut, url_to_return, rf, rfa, test_name):
+    test_status = "Pass"
+    rf.write('Test ' + test_name + '\n')
+    print('Test:' + test_name + '\n')
+    # decoded_html = nvg_599_dut.urllib_get_rg_file("http://192.168.1.254/ATT/topology", rf, rfa)
+    decoded_html = nvg_599_dut.urllib_get_rg_file(url_to_return, rf, rfa)
+    rg_serial_number = nvg_599_dut.serial_number
+    nvg_5g_mac = nvg_info[rg_serial_number]['mac5g']
+    print('nvg_mac_5g: ' + str(nvg_5g_mac) + '\n')
+    print('decoded: ' + str(decoded_html) + '>end_decoded \n')
+    route_regex = re.compile(r'ownaddr=(\w+:\w+:\w+:\w+:\w+:\w+).*?(dest=\w+:\w+:\w+:\w+:\w+:\w+)')
+    route_text = route_regex.search(decoded_html)
+    print('rg_mac:' + route_text.group(1))
+    rg_mac = route_text.group(1)
+    print('ip:' + route_text.group(2))
+    dest_mac = route_text.group(2)
+    if route_text == None:
+        print('route file fails test')
+        rf.write('     route file strings:ownaddr=' + rg_mac + 'and dest mac::' + dest_mac + 'not found:Fail\n\n')
+        test_status = "Fail"
+    else:
+        print(route_text)
+        rf.write('     route file strings:ownaddr=' + rg_mac + 'and dest mac:' + dest_mac + ' found :Pass\n\n')
+    return test_status
 
-    mo1 =   topology_regex.search(decoded_html)
+def url_att_friendly_info_smoke(nvg_599_dut, url_to_return, rf, rfa, test_name):
+    test_status = "Pass"
+    rf.write('Test ' + test_name + '\n')
+    print('Test:' + test_name + '\n')
+    # decoded_html = nvg_599_dut.urllib_get_rg_file("http://192.168.1.254/ATT/topology", rf, rfa)
+    decoded_html = nvg_599_dut.urllib_get_rg_file(url_to_return, rf, rfa)
+    rg_serial_number = nvg_599_dut.serial_number
+    nvg_5g_mac = nvg_info[rg_serial_number]['mac5g']
+    print('nvg_mac_5g: ' + str(nvg_5g_mac) + '\n')
+    print('decoded: ' + str(decoded_html) + '>end_decoded \n')
+    friendly_regex = re.compile(r'ownaddr=(\w+:\w+:\w+:\w+:\w+:\w+).*?(friendlyname=\w+)')
+    friendly_text = friendly_regex.search(decoded_html)
+    print('rg_mac:' + friendly_text.group(1))
+    rg_mac = friendly_text.group(1)
+    print('ip:' + friendly_text.group(2))
+    friendlyname = friendly_text.group(2)
+    if friendly_text == None:
+        print('friendly-info file fails test')
+        rf.write('     friendly-info file strings:ownaddr=' + rg_mac + 'and friendly name::' + friendlyname + 'not found:Fail\n\n')
+        test_status = "Fail"
+    else:
+        print(friendly_text)
+        rf.write('     friendly-info file strings:ownaddr=' + rg_mac + 'and friendly name:' + friendlyname + ' found :Pass\n\n')
 
-    # status_info_reg_ex = re.compile(r'SSID:\s"(\w+)"\s*?Mode:\s(\w+)\s*?RSSI:\s(\d+).*?noise:\s-(\d+).*?Channel:\s(\d+)/(\d+).*?BSSID:\s(\w+:\w+:\w+:\w+:\w+:\w+)', re.DOTALL)
-    # print('status_output' + str(status_output) + '\n')
-    # mo1 = status_info_reg_ex.search(status_output)
+    return test_status
+
+def url_att_cca5g_smoke(nvg_599_dut, url_to_return, rf, rfa, test_name):
+    test_status = "Pass"
+    rf.write('Test ' + test_name + '\n')
+    print('Test:' + test_name + '\n')
+    # decoded_html = nvg_599_dut.urllib_get_rg_file("http://192.168.1.254/ATT/topology", rf, rfa)
+    # nvg_599_dut = WebDriverWait(nvg_599_dut, 10)
+    decoded_html = nvg_599_dut.urllib_get_rg_file(url_to_return, rf, rfa)
+    decoded_html = re.escape(decoded_html)
+    rg_serial_number = nvg_599_dut.serial_number
+    nvg_5g_mac = nvg_info[rg_serial_number]['mac5g']
+    print('nvg_mac_5g: ' + str(nvg_5g_mac) + '\n')
+    print('decoded: ' + str(decoded_html) + '>end_decoded \n')
+    cca5g_regex = re.compile(r'label.*?(data)')
+    cca5g_text = cca5g_regex.search(decoded_html)
+    #print('rg_mac:' + cca5g_text.group(1))
+    # cca5g = cca5g_text.group(1)
+    #print('ip:' + cca5g_text.group(2))
+    #friendlyname = friendly_text.group(2)
+    if cca5g_text == None:
+        print('cca5g file strings: "label" and "data" :not found:Fail')
+        rf.write('     cca5g file strings: "label" and "data" :not found:Fail\n\n')
+        test_status = "Fail"
+    else:
+        print('cca5g text:' + cca5g_text.group(1))
+        cca5g = cca5g_text.group(1)
+        print('cca5g file strings: "label" and "data" : found:Pass')
+        rf.write('     cca5g file strings:' + cca5g + ':found:Pass\n\n')
+    return test_status
+
+
+def url_att_steer_smoke(nvg_599_dut, url_to_return, rf, rfa, test_name):
+    test_status = "Pass"
+    rf.write('Test ' + test_name + '\n')
+    print('Test:' + test_name + '\n')
+    # decoded_html = nvg_599_dut.urllib_get_rg_file("http://192.168.1.254/ATT/topology", rf, rfa)
+    # nvg_599_dut = WebDriverWait(nvg_599_dut, 10)
+    decoded_html = nvg_599_dut.urllib_get_rg_file(url_to_return, rf, rfa)
+    #decoded_html = re.escape(decoded_html)
+    rg_serial_number = nvg_599_dut.serial_number
+    nvg_5g_mac = nvg_info[rg_serial_number]['mac5g']
+    print('steer: ' + str(nvg_5g_mac) + '\n')
+    print('decoded: ' + str(decoded_html) + '>end_decoded \n')
+    steer_regex = re.compile(r'ownaddr=(\w+:\w+:\w+:\w+:\w+:\w+).*?(steering)')
+    steer_text = steer_regex.search(decoded_html)
+    #print('rg_mac:' + cca5g_text.group(1))
+    # cca5g = cca5g_text.group(1)
+    #print('ip:' + cca5g_text.group(2))
+    #friendlyname = friendly_text.group(2)
+    if steer_text == None:
+        print('steer file  :not found:Fail')
+        rf.write('     steer file strings :not found:Fail\n\n')
+        test_status = "Fail"
+    else:
+        print('steer:' + steer_text.group(1))
+        print('steer file strings:' + steer_text.group(1) + ' ' + steer_text.group(2) + 'found:Pass')
+        rf.write('     steer file strings:' + steer_text.group(1) + ' ' + steer_text.group(2) +':found:Pass\n\n')
+    return test_status
 
 
 
-    print('mo1:' + mo1.group(1))
-   #  topology_text  = re.search(nvg_5g_mac + ,decoded_html)
-    #
-    # status_info_reg_ex = re.compile(rModel\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',
-    #                                 re.DOTALL)
-    # # statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
-    # # status InfoRegEx = re.compile(r'Model\s(\w+)')
-    # mo1 = status_info_reg_ex.search(status_output)
-    # return mo1
-
-
-    #topology_text  = re.search(r'(' + rg_serial_number +')',decoded_html)
-
-
-    #
-    # if topology_text == None:
-    #     print('topology file fails test')
-    # else:
-    #     print(topology_text)
-    # exit()
-    # print('type' + str(type(decoded_html))+ '\n')
-    # print('decoded_html' + decoded_html + '\n')
-
-
-
-
-
-    #with open('/home/palmer/Downloads/newdog.txt', 'w') as fd:
-        #d.write(decoded_html)
-
-# nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
-#                                 'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4', 'wifi_pw': 'c2cmybt25dey',
-#                                 'ssid': 'xxxxxx', 'ssid_1': 'xxxxx_REPLACEME_1', 'ssid_1_pw': 'xxxx',
-#                                 'ssid_2': 'xxxxxxxxxxx_REPLACEME_2', 'ssid_2_pw': 'ssid_2_pw_xxxx'},
-#
-#             "277427577103760": {'model': 'nvg599', 'device_access_code': '<<01%//4&/', 'magic': 'ggtxstgwipcg',
-#                                 'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'wifi_pw': 'nsrmpr59rxwv',
-#                                 'ssid': 'ATTqbrAnYs', 'ssid1': 'ATTqbrAnYs_REPLACEME_1', 'ssid_1_pw': 'REPLACEME1',
-#                                 'ssid_2': 'ATTqbrAnYs_REPLACEME_2', 'ssid_2_pw': 'REPLACEME2'},
-#
 #             "35448081188192":   {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
 #                                  'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'wifi_pw': 'eeh4jxmh7q26',
 #                                  'ssid': 'ATT4ujR48s', 'ssid_1_pw': 'xxxxxxxxx',
@@ -1191,15 +1260,13 @@ rf.write('RG Test run:' + now + '\n')
 rfa.write(now + '\n')
 nvg_599_dut = Nvg599Class()
 
-#def wget_rg_files(self, rg_url, destination_file_name, rf, rfa, rg_="192.168.1.254"):
-#url_temp_file = open('url_file', mode = 'w', encoding = 'utf-8')
-
-
-#nvg_599_dut.urllib_get_rg_file("http://192.168.1.254/ATT/topology", url_temp_file, rf, rfa)
-# url_temp_file.close()
-
 url_att_topology_smoke(nvg_599_dut,'http://192.168.1.254/ATT/topology',rf,rfa, 'url_att_topology_smoke')
-
+url_att_route_smoke(nvg_599_dut,'http://192.168.1.254/ATT/route',rf,rfa, 'url_att_route_smoke')
+url_att_friendly_info_smoke(nvg_599_dut,'http://192.168.1.254/ATT/friendly-info',rf,rfa, 'url_att_friendly_info_smoke')
+#url_att_cca5g_smoke(nvg_599_dut,'http://192.168.1.254/ATT/cca5g',rf,rfa, 'url_att_cca5g_smoke')
+url_att_steer_smoke(nvg_599_dut,'http://192.168.1.254/ATT/steer',rf,rfa, 'url_att_steer_smoke')
+rf.close()
+rfa.close()
 
 exit()
 
@@ -1220,6 +1287,8 @@ verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '3', 'ZipKey-PSK', 'Cirrent1',  
 verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '4', 'ATTPOC', 'Ba1tshop', rf, rfa, "verify_auto_ssid_defaults_via_tr69" )
 verify_auto_info_not_present_in_ui(nvg_599_dut, rf, rfa, "verify_auto_info_not_present_in_ui" )
 verify_google_ping_from_rg_5g(nvg_599_dut, rf, rfa, "verify_google_ping_from_rg_5g")
+
+# need to make sure 4920s are associated first
 ping_gw_from_4920(nvg_599_dut,rf,rfa, "ping_gw_from_4920")
 ping_airties_from_rg(nvg_599_dut, rf, rfa, "ping_airties_from_RG")
 verify_airties_hello_packet_count_increasing(nvg_599_dut, rf, rfa, "verify_airties_hello_packet_count_increasing")
