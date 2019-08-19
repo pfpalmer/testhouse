@@ -4,6 +4,10 @@ from __future__ import unicode_literals
 from   rgclass import test_house_devices_static_info
 # import itertools
 import pprint
+
+
+
+
 import wget
 from datetime import datetime
 # from selenium.webdriver.support.ui import WebDriverWait
@@ -416,13 +420,10 @@ def test_rg_upgrade_speedtest(nvg_599_dut, firmware_599_available, firmware_599_
     plt.grid()
     plt.tight_layout()
     plt.subplots_adjust(left=0.1, right=0.9, bottom=0.2, top=0.9)
-    # now = datetime.today().isoformat()
     plt.savefig("/home/palmer/Downloads/speedtest:" + start_time)
     plt.savefig("thisisit")
-
     show()
     return tablet_download_list, tablet_upload_list, note8_download_list, note8_upload_list
-
 
 # now = datetime.today().isoformat()
 # start_time = datetime.today().strftime("%b-%d-%Y--%H:%M")
@@ -663,7 +664,6 @@ def test_auto_ssid_default_tr69_values(nvg_599_dut, ssid, rf, rfa):
         print('Fail ssid:' + ssid + ' default not set to 0')
         rf.write('    Fail ssid:' + ssid + ' default not set to 0 \n')
         test_status = "Fail"
-
         # return("Fail", "Default Enable not set to 0")
 
     if (default_tr69_auto_ssid_values.find('.' + ssid + '.Status Disabled 0') != -1):
@@ -1081,7 +1081,6 @@ def verify_airties_hello_packet_count_increasing(nvg_599_dut,rf, rfa, test_name,
         rf.write('     Hellos on airties: second hello count:' + str(second_count) + ' not greater than first hello count' + str(
             first_count) + ':Fail\n\n')
         test_status = "Fail"
-
     airties_session.sendline('exit')
     return test_status
 
@@ -1252,6 +1251,30 @@ def url_att_steer_smoke(nvg_599_dut, url_to_return, rf, rfa, test_name):
 #                                  'ssid': 'ATT4ujR48s', 'ssid_1_pw': 'xxxxxxxxx',
 #                                  'ssid2': 'xxxxxxxxxxx_REPLACEME_2', 'ssid_2_pw': 'ssid2_pw_xxxx'}}
 # *7<#56*2<2
+
+#tree = ET.parse('/home/palmer/tmp/config00.xml')
+
+import xml.etree.ElementTree as ETree
+
+parser = ETree.XMLParser(encoding="utf-8")
+tree = ETree.parse("/home/palmer/tmp/config00.xml")
+#print(ETree.tostring(tree.getroot()))
+#mytreeroot = tree.getroot()
+#mytree = ETree.tostring(tree)
+print('1--------------------\n')
+print(ETree.tostring(tree.getroot()))
+root = tree.getroot()
+print('2---:' +  root.tag + '\n')
+peer_list = []
+for peer in root.iter('peer'):
+    print(str(peer.attrib['address']))
+    peer_list.append(peer.attrib['address'])
+print(peer_list)
+exit()
+
+
+
+
 send_email = 1
 rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
 rfa  = open('results_file.txt', mode = 'a', encoding = 'utf-8')

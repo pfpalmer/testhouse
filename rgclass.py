@@ -9,7 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import urllib.request
 
-
+import xml.etree.ElementTree as ET
 
 from urllib.error import URLError, HTTPError
 # import url
