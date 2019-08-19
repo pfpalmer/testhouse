@@ -156,7 +156,7 @@ class GatewayClass:
         self.hardware_version = None
         self.serial_number = None
         self.factory_reset = None
-        #self.ip_lan_connections_dict_cli = {}  #################### -pfp-
+        # self.ip_lan_connections_dict_cli = {}
 
         print("in Nvg599Class__init")
         self.init_info = True
@@ -198,6 +198,7 @@ class GatewayClass:
         except smtplib.SMTPException as e:
             print('failed to send email' + str(e))
 
+
 class Nvg599Class(GatewayClass):
     def __init__(self):
         super(self.__class__, self).__init__()
@@ -231,8 +232,6 @@ class Nvg599Class(GatewayClass):
 
     def remote_webserver(self):
         pass
-
-
 
     def webdrivertest(self):
         self.session = webdriver.Chrome()
@@ -295,7 +294,6 @@ class Nvg599Class(GatewayClass):
         self.session.get(rg_url)
         status_link = self.session.find_element_by_link_text("System Information")
 
-
     def login_nvg_cli(self):
         print('In login_nvg_cli')
         self.telnet_cli_session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
@@ -312,6 +310,7 @@ class Nvg599Class(GatewayClass):
         return self.telnet_cli_session
     # @staticmethod
     # def set_all_4920s_to_factory_default(self):
+
     def set_all_4920s_to_factory_default(self):
         # show_ip_lan_dict = self.get_rg_sh_ip_lan_info_cli()
         show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(self)
@@ -1771,12 +1770,11 @@ class Nvg599Class(GatewayClass):
 
         print('output from SmartMesh down', output)
         # cmd = "nmcli device wifi connect ATTqbrAnYs ggtxstgwipcg"
-        cmd = "nmcli connect up ATTqbrAnYs"  #-------------------------------------------------------???
-
+        cmd = "nmcli connect up ATTqbrAnYs"
+        # -------------------------------------------------------???
         output = subprocess.check_output(cmd, shell=True)
         print('output from reconnect', output)
         sleep(30)
-
 
     def set_wifi_power_level(self, band, percentage):
         print('Adjusting ' + band + ' wifi power level to ' + str(percentage) + '%')
@@ -2464,11 +2462,9 @@ class Nvg599Class(GatewayClass):
         for x in file_list:
             print(x)
 
-
-
-    def tftp_get_file_cli(self,remote_file_source, *source_device_list):
+    def tftp_get_file_cli(self, remote_file_source, *source_device_list):
         print('in tftp_get_file')
-        #self.telnet_cli_session = pexpect.spawn("tftp connect 192.168.1.254", encoding='utf-8')
+        # self.telnet_cli_session = pexpect.spawn("tftp connect 192.168.1.254", encoding='utf-8')
         # self.ip_lan_connections_dict_cli[connected_device_mac] = {}
         # ip_lan_connections_dict_cli[connected_device_mac] = {}
         # ip_lan_connections_dict_cli[connected_device_mac]["IP"] = connected_device_ip
@@ -2501,7 +2497,7 @@ class Nvg599Class(GatewayClass):
             print('remote 3\n + self.telnet_cli_session.before ')
             self.telnet_cli_session.sendline('get ' + remote_file)
             self.telnet_cli_session.expect("tftp>", timeout=180)
-            print('remote 4\n' + self.telnet_cli_session.before )
+            print('remote 4\n' + self.telnet_cli_session.before)
         self.telnet_cli_session.close()
 
         # don't need this because file is downloaded where I want it to go
@@ -2551,7 +2547,6 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect(">")
         return self.telnet_cli_session
-
 
     @staticmethod
     def static_login_nvg_599_cli():
@@ -3068,15 +3063,12 @@ class Nvg599Class(GatewayClass):
             print('decoded_html:' + decoded_html)
             return decoded_html
             # with open('/home/palmer/Downloads/newdog.txt', 'w') as fd:
-             #    fd.write(decoded_html)
-            #print(response.read())
-            #print('response.text' + response.text)
-            #print(respprint(onse.content())
-
-
+            #    fd.write(decoded_html)
+            # print(response.read())
+            # print('response.text' + response.text)
+            # print(respprint(onse.content())
         # urllib.request.urlretrieve(rg_url, filename=url_temp_file)
         # urllib.request.urlretrieve(rg_url)
-
 
     def get_rg_serial_number_cli(self):
         self.login_nvg_599_cli()
@@ -3089,9 +3081,6 @@ class Nvg599Class(GatewayClass):
         mo1 = status_info_reg_ex.search(status_output)
         return mo1.group(2)
 
-    # @staticmethod
-
-    # ************
     def cli_sh_rg_ip_lan_info(self):
         # telnet_cli_session =self.login_nvg_599_cli()
         # telnet_cli_session = Nvg599Class.static_login_nvg_599_cli()
@@ -3142,7 +3131,6 @@ class Nvg599Class(GatewayClass):
         telnet_cli_session.close()
         return ip_lan_connections_dict_cli
 
-    # current
     def get_tr69_auto_ssid(self,ssid):
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
@@ -3151,7 +3139,6 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.expect("UNLOCKED>")
         tr69_auto_ssid_default = self.telnet_cli_session.before
         return tr69_auto_ssid_default
-
 
     def session_cleanup(self):
         pass

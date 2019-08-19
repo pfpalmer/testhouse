@@ -1246,6 +1246,23 @@ def url_att_steer_smoke(nvg_599_dut, url_to_return, rf, rfa, test_name):
 
 
 
+def band5_att_peers_smoke(nvg_599_dut, absent_or_present, rf, rfa, test_name):
+    test_status = "Pass"
+    rf.write('Test ' + test_name + '\n')
+    print('Test:' + test_name + '\n')
+    # decoded_html = nvg_599_dut.urllib_get_rg_file("http://192.168.1.254/ATT/topology", rf, rfa)
+    # nvg_599_dut = WebDriverWait(nvg_599_dut, 10)
+    band5_cli_session  = nvg_599_dut.login_nvg_599_5g_cli()
+    band5_cli_session.sendline('cat /tmp/airtiesfs/aircdf-writable-config.xml.00')
+    band5_cli_session.expect('#')
+    status_output = band5_cli_session.before
+    status_info_reg_ex = re.compile(r'(<config\sversion.*?</config>)',re.DOTALL)
+    mo1 = status_info_reg_ex.search(status_output)
+    print(mo1.group())
+    rfa.write(mo1.group())
+
+#-------------------------------------------------****************************************************
+
 #             "35448081188192":   {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
 #                                  'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'wifi_pw': 'eeh4jxmh7q26',
 #                                  'ssid': 'ATT4ujR48s', 'ssid_1_pw': 'xxxxxxxxx',
@@ -1253,6 +1270,19 @@ def url_att_steer_smoke(nvg_599_dut, url_to_return, rf, rfa, test_name):
 # *7<#56*2<2
 
 #tree = ET.parse('/home/palmer/tmp/config00.xml')
+
+
+rf = open('results_file.txt', mode = 'w', encoding = 'utf-8')
+rfa  = open('test.txt', mode = 'w', encoding = 'utf-8')
+now = datetime.today().strftime("%B %d, %Y,%H:%M")
+rf.write('RG Test run:' + now + '\n')
+#rfa.write(now + '\n')
+nvg_599_dut = Nvg599Class()
+band5_att_peers_smoke(nvg_599_dut,'present',rf,rfa,'band5_att_peers_smoke')
+
+rf.close()
+rfa.close()
+exit()
 
 import xml.etree.ElementTree as ETree
 
