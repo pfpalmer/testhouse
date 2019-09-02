@@ -1,5 +1,6 @@
 # from itertools import count
 import subprocess
+from openpyxl import Workbook
 from pexpect import pxssh
 from socket import timeout
 # from subprocess import check_output
@@ -7,9 +8,11 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
+
 import urllib.request
 
-import xml.etree.ElementTree as ET
+from xml.etree.ElementTree import fromstring, ElementTree
 
 from urllib.error import URLError, HTTPError
 # import url
@@ -51,10 +54,10 @@ nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53
 
             "35448081188192":   {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
                                  'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'ssid_pw': 'eeh4jxmh7q26',
-                                 'ssid': 'ATT4ujR48s', 'ssid_3': 'ZipKey-PSK','ssid_3_pw': 'Cirrent1',
+                                 'ssid': 'ATT4ujR48s', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
                                  'ssid_4': 'ATTPOC', 'ssid_4_pw': 'Ba1tshop'}}
 # *7<#56*2<2
-
+# outside of func['88:41:fc:86:64:d7', '88:41:fc:c3:56:c3']
 airties_4920_defaults = {
     '88:41:FC:86:64:D6': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '2',
                           'state': 'None', 'default_ssid': 'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
@@ -133,6 +136,7 @@ NON_DFS_CHANNELS = {36, 40, 44, 48, 149, 153, 157, 161, 165}
 DFS_CHANNELS = {52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144}
 ALL_BAND5_CHANNELS = {36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 132,
                       136, 140, 144, 149, 153, 157, 161, 165}
+
 
 class GatewayClass:
     def __init__(self):
@@ -221,14 +225,15 @@ class Nvg599Class(GatewayClass):
         # # self.cli_rg_connected_clients_dict = {}
         # # self.ui_rg_connected_clients_dict = {}
         # self.ip_lan_connections_dict_cli = {}
-        self.get_ui_system_information()
-        self.device_access_code = nvg_info[self.serial_number]['device_access_code']
+        #self.get_ui_system_information()
+
         # print("in Nvg599Class__init")
         # self.init_info = True
         # self.mesh_connected_clents = {}
         self.rg_url = 'http://192.168.1.254/'
         self.get_ui_system_information()
         self.device_access_code = nvg_info[self.serial_number]['device_access_code']
+        self.default_rg_ssid = nvg_info[self.serial_number]['ssid']
 
     def remote_webserver(self):
         pass
@@ -241,13 +246,7 @@ class Nvg599Class(GatewayClass):
         print('in get_ui_system_information)')
         global nvg_info
         rg_url = 'http://192.168.1.254/'
-
         self.session = webdriver.Chrome()
-
-        #self.session = WebDriverWait(self.session, 1)
-
-
-
         self.session.get(rg_url)
         status_link = self.session.find_element_by_link_text("System Information")
         status_link.click()
@@ -286,16 +285,25 @@ class Nvg599Class(GatewayClass):
 
         sleep(2)
 
-    def test_temp_delete_me(self):
-        print('in get_ui_system_information)')
+    def check_for_system_info_page(self):
+        print('in check_for_system_info_page)')
         # global nvg_info
         rg_url = 'http://192.168.1.254/'
         self.session = webdriver.Chrome()
         self.session.get(rg_url)
-        status_link = self.session.find_element_by_link_text("System Information")
+        # status_link = self.session.find_element_by_link_text("System Information")
+        try:
+            # wi_fi_warning = self.session.find_element_by_class_name("warning")
+            status_link = self.session.find_element_by_link_text("System Information")
+        except NoSuchElementException:
+            print('Problem with Status link assuming UI is not up, ')
+            return_string = "Fail"
+            self.session.close()
+            return return_string
+
 
     def login_nvg_cli(self):
-        print('In login_nvg_cli')
+        print('In login_nvg_cli, enabling airties lib')
         self.telnet_cli_session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
         self.telnet_cli_session.expect("ogin:")
         self.telnet_cli_session.sendline('admin')
@@ -308,6 +316,19 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect(">")
         return self.telnet_cli_session
+    # @staticmethod
+    # def set_all_4920s_to_factory_default(self):
+
+
+    def login_nvg_cli_ssh(self):
+        print('In login_nvg_cli, enabling airties lib')
+        ssh_cli_session = pexpect.spawn("ssh remotessh@192.168.1.254", encoding='utf-8')
+        ssh_cli_session.expect("ord:")
+        ssh_cli_session.sendline('alcatel')
+        ssh_cli_session.expect(">")
+        ssh_cli_session.sendline('magic')
+        ssh_cli_session.expect(">")
+        return ssh_cli_session
     # @staticmethod
     # def set_all_4920s_to_factory_default(self):
 
@@ -351,7 +372,6 @@ class Nvg599Class(GatewayClass):
         # advanced_settings_link = airties_session.find_element_by_link_text("ADVANCED SETTINGS")
         tools_link = airties_session.find_element_by_link_text("TOOLS")
         tools_link.click()
-        # airties_session.refresh()
         sleep(10)
         airties_session.switch_to.default_content()
         airties_session.switch_to.frame(airties_session.find_element_by_css_selector("frame[name=mainFrame"))
@@ -360,12 +380,108 @@ class Nvg599Class(GatewayClass):
         alert = airties_session.switch_to_alert()
         alert.accept()
         sleep(200)
-        # // *[ @ id = "__ML_restore_factory_defaults"]
-        # // *[ @ id = "__ML_restore_factory_defaults"]
-        # restore_factory_defaults = airties_session.find_element_by_xpath('//*[@id="__ML_restore_factory_defaults"]')
+        # restore_factory_defaults = airties_session.find_element_by_xpath('//*[@id="__ML_restore_factory_defaults"]')       # pfp1
 
-    # @staticmethod
-    # et_all_4920s_to_factory_default(sself):
+    def upgrade_4920_firmware(self, ip_of_4920, update_bin_file, rf, rfa):
+        # print('setting 4920 with ip:' + ip_of_4920 + ' to factory default' )
+        print('setting 4920 with ip:' + ip_of_4920 + ' upgrading firmware:' + update_bin_file)
+        global nvg_info
+        airties_url = 'http://' + ip_of_4920 + '/'
+        print('airties_url' + airties_url)
+        airties_session = webdriver.Chrome()
+        airties_session.get(airties_url)
+        session_id = airties_session.session_id
+        print(str(session_id) + '\n\n')
+        airties_session.implicitly_wait(10)
+        airties_session.switch_to.default_content()
+
+        window_before = airties_session.window_handles[0]
+        airties_session.switch_to.frame(airties_session.find_element_by_css_selector("frame[name=menuFrame"))
+
+        # we need to click on this
+        # //*[@id="mainlevel"]/li[3]/a this is "advanced settings"
+        advanced_settings_link = airties_session.find_element_by_xpath('// *[ @ id = "mainlevel"] / li[3] / a')
+        advanced_settings_link.click()
+        sleep(5)
+        print('click on advanced settings \n\n ')
+
+        # i think this is tools  //*[@id="mainlevel"]/li[3]/ul/li[2]/ul/li/a
+        # advanced_settings_link = airties_session.find_element_by_xpath('// *[ @ id = "mainlevel"] / li[3] / a')
+        # advanced_settings_link.click()
+
+        # this is the tools link
+        tools_link = airties_session.find_element_by_xpath('// *[ @ id = "mainlevel"] / li[3] / ul / li[2] / a')
+        tools_link.click()
+        print('click on tools \n\n ')
+
+        sleep(5)
+
+        # # firm_ware_element = self.session.find_element_by_name("uploadfile")
+        # firm_ware_element = self.session.find_element_by_xpath("//*[@id='firmware']")
+        # firm_ware_element.send_keys(update_bin_file)
+        # submit = self.session.find_element_by_name("Update")
+        # submit.click()
+
+        # airties_session.refresh()
+        # firmware update link // *[ @ id = "mainlevel"] / li[3] / ul / li[2] / ul / li / a
+
+        # window_before = airties_session.window_handles[0]
+
+
+        firmware_update_link = airties_session.find_element_by_xpath('// *[ @ id = "mainlevel"] / li[3] / ul / li[2] / ul / li / a')
+        firmware_update_link.click()
+        print('click on firmware update \n\n ')
+        # airties_session.refresh()
+        sleep(5)
+        # window_before = airties_session.window_handles[0]
+        # airties_session.switch_to.default_content()
+        # handles = airties_session.window_handles
+        # print('number of handles is:' + str(len(handles)))
+        print(' no more handles talk')
+        # // *[ @ id = "__ML_uiUpgrade"]
+        # wait = WebDriverWait(airties_session, 10)
+        # wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_UploadFWFile_"]'))).click()
+        airties_session.switch_to.default_content()
+        sleep(5)
+        airties_session.switch_to.frame(airties_session.find_element_by_css_selector("frame[name=mainFrame"))
+        sleep(5)
+        choose_file =  airties_session.find_element_by_xpath('//*[@id="_UploadFWFile_"]')
+        choose_file.send_keys(update_bin_file)
+
+        upgrade = airties_session.find_element_by_name("upgrade")
+        upgrade.click()
+
+        WebDriverWait(airties_session, 600).until(EC.invisibility_of_element_located((By.ID, "progressbar")))
+        sleep(300)
+        # exit()
+        # wait = WebDriverWait(airties_session, 10)
+        # wait.until(EC.element_to_be_clickable((By.XPATH, '// *[ @ id = "mainlevel"] / li[3] /a'))).click()
+        # exit()
+        # window_after = airties_session.window_handles[1]
+        # airties_session.switch_to_window(window_after)
+
+        # airties_session.refresh()
+        # start = time.time()
+        # # print("starting 4920 upgrade  timer:" + str(start))
+        # print("starting switching")
+        # airties_session.switch_to.frame(airties_session.find_element_by_css_selector("frame[name=mainFrame"))
+        # sleep(60)
+        # exit()
+        # loop = 1
+        # while loop == 1:
+        #     try: airties_session.switch_to_window(window_after)
+        #     except NoSuchElementException:
+        #         break
+        #     else:
+        #         sleep(30)
+        #         print('sleeping30 secs')
+        #         continue
+        #
+        # airties_session.switch_to.default_content()
+        #
+        # sleep(200)
+        # return "Pass"
+
     def get_ip_list_of_4920s(self):
         # air_ties_ip_list = []
         show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(self)
@@ -429,7 +545,6 @@ class Nvg599Class(GatewayClass):
             print('action type:', type(action))
             sleep(10)
             # exit()
-
             # cells = tr.findAll('td')
             # print('cells:', cells)
             # print('cell1:', cells[1].get_text())
@@ -1683,6 +1798,23 @@ class Nvg599Class(GatewayClass):
     def wps_pair_default_airties(self, airties_network):
         # nmcli connection down id "Wired connection 1
         #  nmcli connection show --active
+
+        cmd = "nmcli dev wifi rescan"
+        try:
+            output = subprocess.check_output(cmd, shell=True)
+        except subprocess.CalledProcessError as e:
+            print(e.output)
+        else:
+            print(output)
+
+        cmd = "nmcli dev wifi"
+        try:
+            output = subprocess.check_output(cmd, shell=True)
+        except subprocess.CalledProcessError as e:
+            print(e.output)
+        else:
+            print('these are the networks' + output)
+        exit()
         print('Clicking on WPS button')
         # rg_url = 'http://192.168.1.254/'
         self.session.get(self.rg_url)
@@ -1697,7 +1829,10 @@ class Nvg599Class(GatewayClass):
         wps_button.click()
         # why do I want o close
         # self.session.close()
-        cmd = "nmcli con down ATTqbrAnYs"  # <------------------------
+        #  self.default_rg_ssid
+        # cmd = "nmcli con down ATTqbrAnYs"
+        cmd = "nmcli con down " + self.default_rg_ssid
+        print('the default rg ssid is:' + str(cmd))
 
         try:
             output = subprocess.check_output(cmd, shell=True)
@@ -1713,7 +1848,7 @@ class Nvg599Class(GatewayClass):
         #                           'default_pw': 'kykfmk8997',
         #                           'address_type': 'None', 'port': 'None', 'ssid': 'None',
         #                           'rssi': 'None', 'ip': 'None',
-
+        # we have to check to see if the airties network is present
         for key in airties_4920_defaults:
             if airties_4920_defaults[key]['default_ssid'] == airties_network:
                 print(airties_4920_defaults[key]['default_pw'])
@@ -1770,6 +1905,7 @@ class Nvg599Class(GatewayClass):
 
         print('output from SmartMesh down', output)
         # cmd = "nmcli device wifi connect ATTqbrAnYs ggtxstgwipcg"
+        # how do I know this?
         cmd = "nmcli connect up ATTqbrAnYs"
         # -------------------------------------------------------???
         output = subprocess.check_output(cmd, shell=True)
@@ -2225,6 +2361,7 @@ class Nvg599Class(GatewayClass):
     @staticmethod
     def execute_speedtest_from_android_termux(speed_test_ip, rf, rfa):
         print('execute_speedtest_from_android_termux')
+        rfa = "future"
         # prompt = '\$\s+'
         # prompt = '\$'
         # sort of works-----------
@@ -2250,7 +2387,7 @@ class Nvg599Class(GatewayClass):
             print('pxssh failed to login')
             ssh_client.close()
             rf.write('    Failed to log in to ' + speed_test_ip + "Aborting test")
-            rf.write('    Error:' +  str(e))
+            rf.write('    Error:' + str(e))
             print(str(e))
             return "Fail"
         print('2')
@@ -2266,6 +2403,7 @@ class Nvg599Class(GatewayClass):
         print('after conversion to string', speed_test_output)
         # this is waht I added
         ssh_client.sendline('exit')
+        down_load_speed, up_load_speed = 0, 0
         speed_test_regex = re.compile(r'Download:\s+(\d+\.\d+)\s+\w+.*Upload:\s+(\d+\.\d+)\s+\w+', re.DOTALL)
         speed_test_groups = speed_test_regex.search(speed_test_output)
         try:
@@ -2327,11 +2465,11 @@ class Nvg599Class(GatewayClass):
 
         # print('connection list', *connection_list)
         # print('active connection list', *active_connection_list)
-        return connection_list,active_connection_list
+        return connection_list, active_connection_list
         # print(tmp_list[0])
         # sleep(10)
         # cmd = "nmcli con down ATTqbrAnYs"
-        #cmd = "nmcli device wifi connect AirTies_SmartMesh_4PNF kykfmk8997"
+        # cmd = "nmcli device wifi connect AirTies_SmartMesh_4PNF kykfmk8997"
 
     @staticmethod
     def nmcli_set_connection(nmcli_connection_name, command):
@@ -2462,8 +2600,51 @@ class Nvg599Class(GatewayClass):
         for x in file_list:
             print(x)
 
-    def tftp_get_file_cli(self, remote_file_source, *source_device_list):
-        print('in tftp_get_file')
+
+    # we want to pass in a remote file source  in case we are getting  files from somewhere else-- do I need a put?
+    # def tftp_get_file_cli(self, remote_file_source, *source_device_list):
+
+    def tftp_get_file_cli(self, remote_file_source, firmware_to_get, rf, rfa):
+        result = "Pass"
+        print('in tftp_get_file \n\n')
+        show_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
+        print('show_ip_lan_dict:' + str(show_ip_lan_dict) + '\n\n')
+        #show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(self)
+        source_device_ip = 0
+        for ip_lan_entry in show_ip_lan_dict:
+            print('remote_source: ' + str(remote_file_source) + 'NAme:'  + str(show_ip_lan_dict[ip_lan_entry]["Name"]) + '\n\n')
+
+            if remote_file_source == show_ip_lan_dict[ip_lan_entry]["Name"]:
+                # print(ip_lan_entry)
+                # add this to a list which airties_4920
+                print('*****************in for loop' + show_ip_lan_dict[ip_lan_entry]["IP"] + '\n\n')
+                # airties_4920_ip_list.append(show_ip_lan_dict[ip_lan_entry]["IP"])
+                # self.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
+                source_device_ip = show_ip_lan_dict[ip_lan_entry]["IP"]
+        if source_device_ip == 0:
+            print('in didnt get the IP \n\n')
+
+            # this is an error
+            result = "Fail"
+
+        # remote_file_source
+        tftp_session = pexpect.spawn("tftp " +  str(source_device_ip), encoding="utf-8", cwd="/home/palmer/Downloads")
+            #     tftp_session = pexpect.spawn("tftp " + remote_file_source, encoding="utf-8", cwd="/home/palmer/Downloads")
+            #
+        print('in tftp_get_file1: ' + str(source_device_ip) +  '\n\n')
+
+        tftp_session.expect("tftp>")
+        print('in tftp_get_file2 \n\n')
+
+        tftp_session.sendline("get " + firmware_to_get)
+        print('in tftp_get_file3 \n\n')
+
+        tftp_session.expect("tftp>", timeout=60)
+        sleep(4)
+        print('remote 3:' + str(tftp_session.before) + '\n')
+        tftp_session.close()
+        return result
+            # Nvg599Class.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
         # self.telnet_cli_session = pexpect.spawn("tftp connect 192.168.1.254", encoding='utf-8')
         # self.ip_lan_connections_dict_cli[connected_device_mac] = {}
         # ip_lan_connections_dict_cli[connected_device_mac] = {}
@@ -2483,40 +2664,22 @@ class Nvg599Class(GatewayClass):
         #     if source_device_name == sh_ip_lan_dict[mac]['Name']:
         #         print('found name' + sh_ip_lan_dict[mac]['Name'] + ' ip:' +sh_ip_lan_dict[mac]['IP'])
         # exit()
-
-        self.telnet_cli_session = pexpect.spawn("tftp", encoding='utf-8', cwd="/home/palmer/Downloads")
-
-        for remote_file in source_device_list:
-            source_ip = "192.168.1.65"
-            # not sure if the spawn source dir will work
-            # self.telnet_cli_session.expect("tftp>")
-            # print('remote 1\n'+ self.telnet_cli_session.before )
-            self.telnet_cli_session.sendline('connect ' + source_ip)
-            #print('remote 2\n'+ self.telnet_cli_session.before )
-            self.telnet_cli_session.expect("tftp>")
-            print('remote 3\n + self.telnet_cli_session.before ')
-            self.telnet_cli_session.sendline('get ' + remote_file)
-            self.telnet_cli_session.expect("tftp>", timeout=180)
-            print('remote 4\n' + self.telnet_cli_session.before)
-        self.telnet_cli_session.close()
-
-        # don't need this because file is downloaded where I want it to go
-        # cmd = 'mv ' + remote_file + ' /home/palmer/Downloads'
-        # print('remote file is ' + remote_file + '\n')
         #
-        # try:
-        #     output = subprocess.check_output(cmd, shell=True)
-        # except subprocess.CalledProcessError as e:
-        #     print(e.output)
-        # else:
-        #     print(output)
-        #     print('file' + remote_file + ' moved to Downloads')
-        # #  self.telnet_cli_session.sendline('<<01%//4&/')
-        # #  self.telnet_cli_session.sendline('9==5485?6<')
+        # for remote_file in source_device_list:
+        #     # source_ip = "192.168.1.65"
+        #     # remote_file_source
+        #     # tftp_session = pexpect.spawn("tftp 192.168.1.65", encoding="utf-8", cwd="/home/palmer/Downloads")
+        #     tftp_session = pexpect.spawn("tftp " + remote_file_source, encoding="utf-8", cwd="/home/palmer/Downloads")
+        #
+        #     tftp_session.expect("tftp>")
+        #     tftp_session.sendline("get " + remote_file)
+        #     tftp_session.expect("tftp>")
+        #     sleep(4)
+        #     print('remote 3:' + str(tftp_session.before) + '\n')
+        # tftp_session.close()
 
 # pfp ******  moved to parent class forget it for now
-
-    def login_nvg_599_5g_cli(self):
+    def xxlogin_nvg_599_cli(self):
         print('In login_nvg_5g_cli')
         self.telnet_cli_session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
         self.telnet_cli_session.expect("ogin:")
@@ -2529,8 +2692,26 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.expect(">")
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect(">")
+
+        return self.telnet_cli_session
+
+    def login_nvg_599_band5_cli(self):
+        print('In login_nvg_5g_cli')
+        self.telnet_cli_session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
+        self.telnet_cli_session.expect("ogin:")
+        self.telnet_cli_session.sendline('admin')
+        self.telnet_cli_session.expect("ord:")
+        nvg_dac = self.device_access_code
+        self.telnet_cli_session.sendline(nvg_dac)
+        self.telnet_cli_session.expect(">")
+        self.telnet_cli_session.sendline('magic')
+        self.telnet_cli_session.expect(">")
         self.telnet_cli_session.sendline('telnet 203.0.113.2')
         self.telnet_cli_session.expect('#')
+        self.telnet_cli_session.sendline('export LD_LIBRARY_PATH=/lib:/airties/lib')
+        self.telnet_cli_session.expect("#")
+        self.telnet_cli_session.sendline('export PATH=$PATH:/airties/usr/sbin')
+        self.telnet_cli_session.expect("#")
         return self.telnet_cli_session
 
     def login_nvg_599_cli(self):
@@ -2616,7 +2797,6 @@ class Nvg599Class(GatewayClass):
         self.up_time = mo1.group(3)
         self.session.close()
 
-
     def setup_tr69_url(self):
         self.session = self.login_nvg_599_cli()
         self.session.sendline('magic')
@@ -2694,21 +2874,17 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.sendline('tr69 GetParameterValues InternetGatewayDevice.LANDevice.1.'
                                          'WLANConfiguration.3.X_0000C5_Authentication')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
-        print('Getting ssid:' + str(ssid) +  ' authentication type')
+        print('Getting ssid:' + str(ssid) + ' authentication type')
 
         status_output = self.telnet_cli_session.before
-        status_info_reg_ex = re.compile(r'Authentication\s(\w+)',re.DOTALL)
+        status_info_reg_ex = re.compile(r'Authentication\s(\w+)', re.DOTALL)
         authentication_type = status_info_reg_ex.search(status_output)
         # print('tr69 authentication_type:' + str(authentication_type))
-
         print('expected Authentication type:' + str(expected_authentication_type))
         tr69_auth_type = authentication_type.group(1)
         print('tr69 Authentication type:' + str(tr69_auth_type))
-
         if tr69_auth_type == expected_authentication_type:
             print('Pass-------------------')
-
-        # self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.close()
         return tr69_auth_type
 
@@ -2723,7 +2899,8 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.close()
         return tr69_output
 
-    def set_auto_setup_ssid_via_tr69_cli(self, ssid_number, rf, rfa, test_name):
+    def set_auto_setup_ssid_via_tr69_cli(self, ssid_number, max_clients, rf, rfa):
+        future = rfa
         print('Enabling tr69 auto_setup for ssid number:' + str(ssid_number))
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
@@ -2739,14 +2916,14 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
                                          + str(ssid_number) + '.SSIDAdvertisementEnabled= 1')
         rf.write('     Enable.' + ssid_number + 'SSIDAdvertisementEnabled:OK\n')
-
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
+                                         + str(ssid_number) + '.X_0000C5_MaxClients=' + max_clients)
+        # InternetGatewayDevice.LANDevice.1.WLANConfiguration.4..X_0000C5_MaxClients
         # rf.write("    Enabled auto ssid " + str(ssid_number) + '\n')
         rf.write('     Enable auto ssid' + ssid_number + ':OK\n')
-
         self.telnet_cli_session.close()
         return "Pass"
-
 
     # IPV6 is not currently available in the test house
     @staticmethod
@@ -3008,7 +3185,7 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.expect('>')
         status_output = self.telnet_cli_session.before
         band2_cli_dict = {}
-        status_info_reg_ex = re.compile(r'SSID:\s"(\w+)"\s*?Mode:\s(\w+)\s*?RSSI:\s(\d+).*?noise:\s-(\d+).*?Channel:\s(\d+).*?BSSID:\s(\w+:\w+:\w+:\w+:\w+:\w+)',re.DOTALL)
+        status_info_reg_ex = re.compile(r'SSID:\s"(\w+)"\s*?Mode:\s(\w+)\s*?RSSI:\s(\d+).*?noise:\s-(\d+).*?Channel:\s(\d+).*?BSSID:\s(\w+:\w+:\w+:\w+:\w+:\w+)', re.DOTALL)
         print('status_output' + str(status_output) + '\n')
         mo1 = status_info_reg_ex.search(status_output)
         # print('ssid:' + str(mo1.group(1)) + '\n')
@@ -3020,12 +3197,12 @@ class Nvg599Class(GatewayClass):
         # sleep(5)
         # exit()
         mo1 = status_info_reg_ex.search(status_output)
-        band2_cli_dict['ssid']= str(mo1.group(1))
-        band2_cli_dict['mode']= str(mo1.group(2))
-        band2_cli_dict['rssi']= str(mo1.group(3))
-        band2_cli_dict['noise']= str(mo1.group(4))
-        band2_cli_dict['channel']= str(mo1.group(5))
-        band2_cli_dict['bssid']= str(mo1.group(6)).lower()
+        band2_cli_dict['ssid'] = str(mo1.group(1))
+        band2_cli_dict['mode'] = str(mo1.group(2))
+        band2_cli_dict['rssi'] = str(mo1.group(3))
+        band2_cli_dict['noise'] = str(mo1.group(4))
+        band2_cli_dict['channel'] = str(mo1.group(5))
+        band2_cli_dict['bssid'] = str(mo1.group(6)).lower()
         self.telnet_cli_session.close()
         return band2_cli_dict
 
@@ -3049,15 +3226,11 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.close()
         return band5_cli_dict
 
-    import urllib.request
-    import tempfile
-    import shutil
-
-    def urllib_get_rg_file(self,rg_url_to_return,rf, rfa):
+    def urllib_get_rg_file(self, rg_url_to_return, rf, rfa):
         print('in url get')
-        #with urllib.request.urlopen('http://192.168.1.254/ATT/topology') as response:
-        with urllib.request.urlopen(rg_url_to_return, data = None ,timeout=3) as response:
-            html_response  = response.read()
+        # with urllib.request.urlopen('http://192.168.1.254/ATT/topology') as response:
+        with urllib.request.urlopen(rg_url_to_return, data = None, timeout = 3) as response:
+            html_response = response.read()
             encoding = response.headers.get_content_charset('utf-8')
             decoded_html = html_response.decode(encoding)
             print('decoded_html:' + decoded_html)
@@ -3131,7 +3304,7 @@ class Nvg599Class(GatewayClass):
         telnet_cli_session.close()
         return ip_lan_connections_dict_cli
 
-    def get_tr69_auto_ssid(self,ssid):
+    def get_tr69_auto_ssid(self, ssid):
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect("UNLOCKED>")
@@ -3140,10 +3313,49 @@ class Nvg599Class(GatewayClass):
         tr69_auto_ssid_default = self.telnet_cli_session.before
         return tr69_auto_ssid_default
 
+    from xml.etree.ElementTree import fromstring, ElementTree
+
+    def get_rg_airties_band5_wds_links(self, rf, rfa):
+        print('get_rg_airties_5g_wds_links')
+        # with urllib.request.urlopen('http://192.168.1.254/ATT/topology') as response:
+        band5_cli_session = self.login_nvg_599_band5_cli()
+        band5_cli_session.sendline('cat /tmp/airtiesfs/aircdf-writable-config.xml.00')
+        band5_cli_session.expect('#')
+        status_output = band5_cli_session.before
+        status_info_reg_ex = re.compile(r'(<config\sversion.*?</config>)', re.DOTALL)
+        mo1 = status_info_reg_ex.search(status_output)
+        # print(mo1.group())
+        tree = ElementTree(fromstring(mo1.group()))
+        # tree = ETree.fromstring(peers_xml)
+        # print(str(tree))
+        # print('1--------------------\n')
+        # print(ETree.tostring(tree.getroot()))
+        root = tree.getroot()
+        print('2---:' + root.tag + '\n')
+        peer_list = []
+        for peer in root.iter('peer'):
+            print(str(peer.attrib['address']))
+            peer_list.append(peer.attrib['address'])
+            # print(peer_list)
+            # rf.close()
+            # rfa.close()
+            # exit()
+            # rfa.write(mo1.group())
+            # return mo1.group()
+        return peer_list
+            #print('decoded_html:' + decoded_html)
+            #return decoded_html
+            # with open('/home/palmer/Downloads/newdog.txt', 'w') as fd:
+            #    fd.write(decoded_html)
+            # print(response.read())
+            # print('response.text' + response.text)
+            # print(respprint(onse.content())
+        # urllib.request.urlretrieve(rg_url, filename=url_temp_file)
+        # urllib.request.urlretrieve(rg_url)
+
     def session_cleanup(self):
         pass
 # class Nvg_5268_Class(GatewayClass):
 #     def __init__(self):
 #         self.name = "Nvg_5268"
 #      # rg5268 = pexpect.spawn("telnet 192.168.1.254")
-
