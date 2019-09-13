@@ -1,5 +1,6 @@
 # from itertools import count
 import subprocess
+from subprocess import Popen, PIPE
 from openpyxl import Workbook
 from pexpect import pxssh
 from socket import timeout
@@ -376,11 +377,11 @@ class Nvg599Class(GatewayClass):
         # restore_factory_defaults = airties_session.find_element_by_xpath
         # ('//*[@id="__ML_restore_factory_defaults"]')       # pfp1
 
-    def upgrade_4920_firmware(self, ip_of_4920, update_bin_file, rf, rfa):
-        # print('setting 4920 with ip:' + ip_of_4920 + ' to factory default' )
-        print('setting 4920 with ip:' + ip_of_4920 + ' upgrading firmware:' + update_bin_file)
+    def install_airties_firmware(self, airties_ip, update_bin_file, rf, rfa):
+        # print('setting 4920 with ip:' + ip_of_airties + ' to factory default' )
+        print('setting 4920 with ip:' + airties_ip + ' upgrading firmware:' + update_bin_file)
         global nvg_info
-        airties_url = 'http://' + ip_of_4920 + '/'
+        airties_url = 'http://' + airties_ip + '/'
         print('airties_url' + airties_url)
         airties_session = webdriver.Chrome()
         airties_session.get(airties_url)
@@ -415,13 +416,9 @@ class Nvg599Class(GatewayClass):
         # firm_ware_element.send_keys(update_bin_file)
         # submit = self.session.find_element_by_name("Update")
         # submit.click()
-
         # airties_session.refresh()
         # firmware update link // *[ @ id = "mainlevel"] / li[3] / ul / li[2] / ul / li / a
-
         # window_before = airties_session.window_handles[0]
-
-
         firmware_update_link = airties_session.find_element_by_xpath('// *[ @ id = "mainlevel"] / li[3] / ul / li[2] / ul / li / a')
         firmware_update_link.click()
         print('click on firmware update \n\n ')
@@ -998,6 +995,39 @@ class Nvg599Class(GatewayClass):
             #          print('special_bad_warning' + special_bad_warning)
             #  except NoSuchElementException:
             #      print('No Input errors displayed- Continuing')
+
+    def install_rg_cli(self, tftp_server_name, install_bin_file, rf, rfa):
+        print('in install_rg_cli')
+        test_status = 'Pass'
+        telnet_cli_session = self.login_nvg_599_cli()
+        # nvg_599_dut.login_nvg_599_cli()
+        ip_lan_info_dict = self.cli_sh_rg_ip_lan_info()
+        server_ip = "0.0.0.0"
+
+        for device_mac in ip_lan_info_dict:
+            if tftp_server_name == ip_lan_info_dict[device_mac]['Name']:
+                print('inputname:' + tftp_server_name + '  name_from_dict:' + ip_lan_info_dict[device_mac]['Name'] + '\n')
+                server_ip = ip_lan_info_dict[device_mac]['IP']
+
+        if server_ip != "0.0.0.0":
+                # note_8_ip = ip_lan_info_dict['b8:d7:af:aa:27:c3']['IP']
+                # device_ip = ip_lan_info_dict[device_mac]['IP']
+                rf.write('    TFTP server IP  present in cli command sh ip lan: ' + server_ip)
+                print('tftp server is present :' + str(server_ip))
+        else:
+            rf.write('    TFTP server IP not present in cli command sh ip lan, Aborting test')
+            print('TFTP  server IP not present in cli command sh ip lan')
+            test_status =  "Fail"
+            return test_status
+
+        telnet_cli_session.sendline("install " + server_ip + " " + install_bin_file)
+        telnet_cli_session.expect('confirm')
+        telnet_cli_session.sendline("yes")
+        # telnet_cli_session.expect('OCKED>')
+        sleep(300)
+        print('we woke up after 5 mins \n')
+
+        return test_status
 
     def upgrade_rg(self, update_bin_file, rf, rfa):
         print('in upgrade_rg')
@@ -2388,12 +2418,14 @@ class Nvg599Class(GatewayClass):
         # ssh_client = pxssh.pxssh(timeout=200, encoding='utf-8')
         print('1')
 
-        ssh_client = pxssh.pxssh(timeout=100, encoding='utf-8', options={"StrictHostKeyChecking": "no"})
+        ssh_client = pxssh.pxssh(timeout=200, encoding='utf-8', options={"StrictHostKeyChecking": "no"})
         hostname = speed_test_ip
         # ssh_client.login(hostname, username=None, port=8022)
         try:
-            ssh_client.login(hostname, username=None, sync_multiplier=5, port=8022)
+            # ssh_client.PROMPT='$'
+            ssh_client.login(hostname, username=None, auto_prompt_reset=True,  quiet=False, sync_multiplier=5, port=8022)
             rf.write('    Logged in to ' + speed_test_ip + '\n')
+            print("logged in to note8 \n")
 
         except pxssh.ExceptionPxssh as e:
             print('pxssh failed to login')
@@ -2403,6 +2435,7 @@ class Nvg599Class(GatewayClass):
             print(str(e))
             return "Fail"
         print('2')
+        print()
         ssh_client.prompt()
         print('3')
         ssh_client.sendline('speedtest  --server 5024')
@@ -2424,7 +2457,7 @@ class Nvg599Class(GatewayClass):
             down_load_speed = speed_test_groups.group(1)
             rf.write('    Download speed ' + down_load_speed + '\n')
             up_load_speed = speed_test_groups.group(2)
-            rf.write('    Upload speed ' + up_load_speed + '\n')
+            rf.write('    Upload speed ' + up_load_speed + '\n\n')
 
         except AttributeError:
             print("something wrong- closing ssh_client session")
@@ -2439,6 +2472,25 @@ class Nvg599Class(GatewayClass):
     #  nmcli connection show
     #  nmcli connection show --active
     # nmcli con down "Wired connection 1"
+
+    @staticmethod
+    def nmcli_get_active_connections():
+        # command = 'nmcli c'
+        # cmd = "nmcli r all"
+        cmd = "nmcli connection show --active "
+        # output = subprocess.check_output(['nmcli', 'r'],shell=True)
+        output = subprocess.check_output(cmd, shell=True)
+        connection_list = []
+        active_connection_list = []
+        # output = output.decode('utf-8')
+        # tmp_list = []
+        for line in output.splitlines():
+            line = line.decode('utf-8')
+            tmp_list = line.split()
+            if tmp_list[0] == 'NAME':
+                continue
+
+
     @staticmethod
     def nmcli_get_connections():
         # command = 'nmcli c'
@@ -2455,19 +2507,18 @@ class Nvg599Class(GatewayClass):
             # tmp_list = []
             # print(line)
             # print('-----------------------------')
+            nmcli_active_dict = {}
             tmp_list = line.split()
-            if tmp_list[0] == 'NAME':
-                continue
             if tmp_list[0] == 'NAME':
                 continue
             if tmp_list[0] == 'Wired':
                 wired_name = tmp_list[0] + " " + tmp_list[1] + " " + tmp_list[2]
                 print('wired_name:', wired_name)
                 connection_list.append(wired_name)
-                if tmp_list[5] == "--":
+                if tmp_list[3] == "--":
                     continue
                 else:
-                    active_connection_list.append(tmp_list[5])
+                    active_connection_list.append(tmp_list[0])
             else:
                 connection_list.append(tmp_list[0])
                 if tmp_list[3] == "--":
@@ -2489,7 +2540,20 @@ class Nvg599Class(GatewayClass):
         # cmd = "nmcli r all"
         cmd = "nmcli con " + command + " " + nmcli_connection_name
         # output = subprocess.check_output(['nmcli', 'r'],shell=True)
-        output = subprocess.check_output(cmd, shell=True)
+
+        # out = check_output(["ls -la"].decode("utf-8").shell=True)
+        try:
+            #out = subprocess.check_output("ping -c" + str(number_of_pings) + " " +
+            #                             remote_ip, shell=True).decode("utf-8")
+            output = subprocess.check_output(cmd, shell=True)
+
+        except subprocess.CalledProcessError as e:
+            print('ping error', e)
+            output= "ping fail"
+            return(output)
+
+
+        # output = subprocess.check_output(cmd, shell=True)
         for line in output.splitlines():
             print('cmd output', line)
         sleep(3)
@@ -2596,18 +2660,19 @@ class Nvg599Class(GatewayClass):
         # out = subprocess.check_output("ping -c10 " + remote_ip, shell=True).decode("utf-8")
         try:
             out = subprocess.check_output("ping -c10 " + remote_ip, shell=True).decode("utf-8")
+            print('ping out:' + out + '\n')
             ping_info_reg_ex = re.compile(r'(\d+.*loss)')
             ping_status = ping_info_reg_ex.search(out)
             print('ping result:', ping_status.group(1))
-            return ping_status.group(1)
+            return "Pass"
         except subprocess.CalledProcessError as e:
             print('ping error:', e.output)
-            e.returncode = 0
+            # e.returncode = 0
             ping_fail_str = str(e.output)
-            ping_fail_return = "Ping_failed:" + ping_fail_str
-            print('ping failed:')
+            ping_fail_return = "Ping_failed  ping fail str:" + ping_fail_str
+            print('ping failed:'+ ping_fail_str)
 
-            return ping_fail_return
+            return "Fail"
 
     def tftp_list_test(self, *file_list):
         for x in file_list:
@@ -2615,7 +2680,7 @@ class Nvg599Class(GatewayClass):
     # we want to pass in a remote file source  in case we are getting  files from somewhere else-- do I need a put?
     # def tftp_get_file_cli(self, remote_file_source, *source_device_list):
 
-    def tftp_get_file_cli(self, remote_file_source, firmware_to_get, rf, rfa):
+    def tftp_get_file_cli(self, tftp_server_name, firmware_to_get, rf, rfa):
         result = "Pass"
         print('in tftp_get_file \n\n')
         show_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
@@ -2623,9 +2688,9 @@ class Nvg599Class(GatewayClass):
         # show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(self)
         source_device_ip = 0
         for ip_lan_entry in show_ip_lan_dict:
-            print('remote_source: ' + str(remote_file_source) + 'NAme:'  + str(show_ip_lan_dict[ip_lan_entry]["Name"]) + '\n\n')
+            print('remote_source: ' + str(tftp_server_name) + 'Name:'  + str(show_ip_lan_dict[ip_lan_entry]["Name"]) + '\n\n')
 
-            if remote_file_source == show_ip_lan_dict[ip_lan_entry]["Name"]:
+            if tftp_server_name == show_ip_lan_dict[ip_lan_entry]["Name"]:
                 # print(ip_lan_entry)
                 print('*****************dbg for loop' + show_ip_lan_dict[ip_lan_entry]["IP"] + '\n\n')
                 source_device_ip = show_ip_lan_dict[ip_lan_entry]["IP"]
@@ -3400,9 +3465,83 @@ class Nvg599Class(GatewayClass):
         # urllib.request.urlretrieve(rg_url, filename=url_temp_file)
         # urllib.request.urlretrieve(rg_url)
 
+
+
     def session_cleanup(self):
         pass
 # class Nvg_5268_Class(GatewayClass):
 #     def __init__(self):
 #         self.name = "Nvg_5268"
 #      # rg5268 = pexpect.spawn("telnet 192.168.1.254")
+
+
+    from subprocess import Popen, PIPE
+
+    def enable_monitor_mode(self):
+        print('in enable monitor mode')
+
+        password = "pfpalmer"
+        proc = Popen("sudo -S  /etc/init.d/network-manager  start".split(), stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        proc.communicate(password.encode())
+        stdout = proc.communicate()[0]
+        print('stdout' + stdout)
+
+
+#        cmd = "sudo /etc/init.d/network-manager  stop"
+#         try:
+#             output = subprocess.check_output(cmd, shell=True)
+#         except subprocess.CalledProcessError as e:
+#             print(e.output)
+#         else:
+#             print(output)
+#
+#         cmd = "nmcli dev wifi"
+# palmer@palmer-Latitude-E5450:~$ sudo /etc/init.d/network-manager  stop
+# [sudo] password for palmer:
+# [ ok ] Stopping network-manager (via systemctl): network-manager.service.
+# palmer@palmer-Latitude-E5450:~$ sudo ifconfig wlp2s0 down
+
+# palmer@palmer-Latitude-E5450:~$ sudo iwconfig wlp2s0 mode monitor
+# palmer@palmer-Latitude-E5450:~$ sudo ifconfig wlp2s0 up
+# palmer@palmer-Latitude-E5450:~$ sudo ifconfig wlp2s0 channel 40
+# ^C
+# palmer@palmer-Latitude-E5450:~$ sudo iwconfig wlp2s0 channel 100
+# palmer@palmer-Latitude-E5450:~$ sudo /etc/init.d/network-manager  stop
+# [sudo] password for palmer:
+# [ ok ] Stopping network-manager (via systemctl): network-manager.service.
+# palmer@palmer-Latitude-E5450:~$ sudo ifconfig wlp2s0 down
+# palmer@palmer-Latitude-E5450:~$ sudo ifconfig wlp2s0 mode monitor
+# mode: Unknown host
+# ifconfig: `--help' gives usage information.
+# palmer@palmer-Latitude-E5450:~$ sudo iwconfig wlp2s0 mode monitor
+# palmer@palmer-Latitude-E5450:~$ sudo ifconfig wlp2s0 up
+# palmer@palmer-Latitude-E5450:~$ sudo ifconfig wlp2s0 channel 40
+# ^C
+# palmer@palmer-Latitude-E5450:~$ sudo iwconfig wlp2s0 channel 40
+# palmer@palmer-Latitude-E5450:~$ sudo iwconfig wlp2s0 channel 100
+# sudo /etc/init.d/network-manager  stop
+# palmer@palmer-Latitude-E5450:~$ sudo /etc/init.d/network-manager  stop
+# [ ok ] Stopping network-manager (via systemctl): network-manager.service.
+# palmer@palmer-Latitude-E5450:~$
+# palmer@palmer-Latitude-E5450:~$ sudo iwconfig wlp2s0 mode managed
+# Error for wireless request "Set Mode" (8B06) :
+#     SET failed on device wlp2s0 ; Device or resource busy.
+# palmer@palmer-Latitude-E5450:~$ sudo ifconfig  wlan down
+# wlan: ERROR while getting interface flags: No such device
+# palmer@palmer-Latitude-E5450:~$ sudo iwconfig  wlan down
+# iwconfig: unknown command "down"
+# palmer@palmer-Latitude-E5450:~$ sudo ifconfig  wlp2s0 down
+# palmer@palmer-Latitude-E5450:~$ sudo iwconfig wlp2s0 mode managed
+# palmer@palmer-Latitude-E5450:~$ sudo ifconfig  wlp2s0 up
+# palmer@palmer-Latitude-E5450:~$ sudo iwconfig  wlan up
+# iwconfig: unknown command "up"
+# palmer@palmer-Latitude-E5450:~$ sudo ifconfig  wlan up
+# wlan: ERROR while getting interface flags: No such device
+# palmer@palmer-Latitude-E5450:~$ sudo iwconfig  wlan up
+# iwconfig: unknown command "up"
+# palmer@palmer-Latitude-E5450:~$ sudo iwconfig  wlp2s0  up
+# iwconfig: unknown command "up"
+# palmer@palmer-Latitude-E5450:~$ sudo ifconfig  wlp2s0  up
+# palmer@palmer-Latitude-E5450:~$ sudo /etc/init.d/network-manager  start
+# [ ok ] Starting network-manager (via systemctl): network-manager.service.
+# palmer@palmer-Latitude-E5450:~$
