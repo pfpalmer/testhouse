@@ -10,6 +10,8 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support.ui import Select
+
 
 import urllib.request
 
@@ -377,6 +379,10 @@ class Nvg599Class(GatewayClass):
         # restore_factory_defaults = airties_session.find_element_by_xpath
         # ('//*[@id="__ML_restore_factory_defaults"]')       # pfp1
 
+        # should we close the seesion?--------------------------------
+        airties_session.close()
+
+
     def install_airties_firmware(self, airties_ip, update_bin_file, rf, rfa):
         # print('setting 4920 with ip:' + ip_of_airties + ' to factory default' )
         print('setting 4920 with ip:' + airties_ip + ' upgrading firmware:' + update_bin_file)
@@ -624,8 +630,71 @@ class Nvg599Class(GatewayClass):
     #                       'ip': '192.168.1.67',
     #                       'device_test_name': 'fixed_s9', 'name': 'palmer_Latitude-E5450',
     #                       'location': 'tbd'},
+    def adv_configure_guest_network(self, rf, rfa, enable_disable_param, guest_ssid_param = "dog", guest_ssid_password_param = "guest_dog"):
+        print('in adv_configure_guest_network')
+        print('enable_disable_param:' + enable_disable_param + '\n')
 
-    def enable_guest_network_and_set_password_ssid(self, rf, rfa):
+        # dianostics_link = browser.find_element_by_link_text("Diagnostics")
+        home_network_link = self.session.find_element_by_link_text("Home Network")
+        home_network_link.click()
+        sleep(2)
+
+        wi_fi_link = self.session.find_element_by_link_text("Wi-Fi")
+        wi_fi_link.click()
+        sleep(2)
+        self.check_if_dac_required()
+        sleep(5)
+
+        advanced_options_link = self.session.find_element_by_link_text("Advanced Options")
+        advanced_options_link.click()
+        sleep(2)
+
+        guest_ssid_enable = Select(self.session.find_element_by_id("ogssidenable"))
+        current_guest_enable_state = guest_ssid_enable.first_selected_option.text
+        print('selected option.text:' + str(current_guest_enable_state) + '\n')
+        # selected_option = guest_ssid_enable.first_selected_option.value
+        print('selected option.value:' + str(current_guest_enable_state) + '\n')
+        # current_selected_option = str(current_guest_enable_state)
+        if current_guest_enable_state == "off" and enable_disable_param == "off":
+            # I think we are always done in this state
+            print('we are done')
+        else:
+            # simplifies logic if is on then we just set everything again
+            if enable_disable_param == 'on':
+                guest_ssid_enable = Select(self.session.find_element_by_id("ogssidenable"))
+                guest_ssid_enable.select_by_value('on')
+                # if user enable_disable is on and the current state is on we still have to check for any password changed
+                print('enable disable is on:'+ enable_disable_param)
+                sleep(2)
+                # set the guest ssid
+                # resets_link = browser.find_element_by_link_text("Resets")
+                guest_ssid = self.session.find_element_by_id("ossidname2")
+                guest_ssid.clear()
+                guest_ssid.send_keys(guest_ssid_param)
+
+                guest_ssid_password = self.session.find_element_by_id("okey2")
+                guest_ssid_password.clear()
+                guest_ssid_password.send_keys(guest_ssid_password_param)
+
+                submit = self.session.find_element_by_name("Save")
+                submit.click()
+                self.check_for_wifi_warning()
+            else:
+                guest_ssid_enable = Select(self.session.find_element_by_id("ogssidenable"))
+                guest_ssid_enable.select_by_value('off')
+                # lets clear the guest id password when we disable the guest_ssid
+                # maybe not , it gets set when we enable the guest_ssid
+                # guest_ssid_password = self.session.find_element_by_id("okey2")
+                # guest_ssid_password.clear()
+                submit = self.session.find_element_by_name("Save")
+                submit.click()
+                self.check_for_wifi_warning()
+
+            exit()
+
+    # adv_disable_guest_network
+
+    def enable_guest_network_and_set_passwords(self, rf, rfa, ssid_password, guest_ssid_password):
         print('in enable_guest_network_and_set_password_ssid')
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
         home_network_link = self.session.find_element_by_link_text("Home Network")
@@ -636,13 +705,30 @@ class Nvg599Class(GatewayClass):
         wi_fi_link.click()
         sleep(2)
         self.check_if_dac_required()
+
+        id_password = self.session.find_element_by_id("password")
+        self.session.find_element_by_id("password").clear()
+        # id_password.send_keys("1111111111")
+        id_password.send_keys(ssid_password)
+        rf.write('     Setting SSID password to:' + ssid_password + '\n')
+
+        guest_id_password = self.session.find_element_by_id("checkpassword")
+        self.session.find_element_by_id("checkpassword").clear()
+        guest_id_password.send_keys("1111111111")
+
         guest_id_enable = self.session.find_element_by_name("gssidenable")
         guest_id_enable.click()
-
+        # this is an on - off drop down
         for option in guest_id_enable.find_elements_by_tag_name('option'):
             if option.text == "On":
                 option.click()
+
         guest_id_password = self.session.find_element_by_id("gssidpassword")
+        self.session.find_element_by_id("gssidpassword").clear()
+        guest_id_password.send_keys("2222222222")
+
+        guest_id_password = self.session.find_element_by_id("checkguestpassword")
+        self.session.find_element_by_id("checkguestpassword").clear()
         guest_id_password.send_keys("2222222222")
 
         submit = self.session.find_element_by_name("Save")
@@ -1540,8 +1626,8 @@ class Nvg599Class(GatewayClass):
         rg_url = 'http://192.168.1.254/'
         self.session = webdriver.Chrome()
         self.session.get(rg_url)
-        self.enable_guest_network_and_set_password_ssid(rf, rfa)
-        self.session.close()
+        # self.enable_guest_network_and_set_password_ssid(rf, rfa)
+        # .session.close()
 
     @staticmethod
     def factory_test():
@@ -1661,7 +1747,7 @@ class Nvg599Class(GatewayClass):
         rg_url = 'http://192.168.1.254/'
         self.session = webdriver.Chrome()
         self.session.get(rg_url)
-        self.enable_guest_network_and_set_password_ssid(rf, rfa)
+        # self.enable_guest_network_and_set_passwords(rf, rfa)
         sleep(60)
         return duration
 
@@ -1837,6 +1923,89 @@ class Nvg599Class(GatewayClass):
     # palmer@palmer-Latitude-E5450:~$ nmcli dev wifi | grep AirTies
     # I think I have to diable the wired connection on the RG. Then
 
+# super dog
+    def get_nmcli_networks(self):
+        print('in wps_pair_default_airties')
+        # nmcli connection down id "Wired connection 1
+        #  nmcli connection show --active
+        nmcli_wifi_dict = {}
+        cmd = "nmcli dev wifi rescan"
+        try:
+            output = subprocess.check_output(cmd, shell=True)
+        except subprocess.CalledProcessError as e:
+            print(e.output)
+        else:
+            print('rescan')
+            sleep(3)
+        cmd = "nmcli dev wifi"
+        try:
+            output = subprocess.check_output(cmd, shell=True)
+        except subprocess.CalledProcessError as e:
+            print(e.output)
+        else:
+            line_list = output.decode('utf-8').splitlines()
+            # line_list = output.splitlines()
+            for line in line_list:
+                line = line.split()
+                print('line:'  + str(line))
+                if line[0] == 'IN-USE':
+                    continue
+
+                if line[0] == '*':
+                    active_ssid = nmcli_ssid = line[0]
+                    print('active ssid' + str(active_ssid))
+                    nmcli_ssid = line[1]
+                    print('ssid' + str(nmcli_ssid) + '\n')
+                    nmcli_mode = line[2]
+                    # print("connectedDeviceStatus", ip_lan_output_split[3])
+                    nmcli_chan = line[3]
+                    # nmcli_ssid("connectedDeviceDHCP", ip_lan_output_split[4])
+                    nmcli_rate = line[4]
+                    print('rate' + str(nmcli_rate) + '\n')
+
+                    # print("connectedDeviceSSIDNumber", ip_lan_output_split[5])
+                    nmcli_rate_units = line[5]
+                    nmcli_signal = line[6]
+                    nmcli_security = line[8]
+                    nmcli_wifi_dict[nmcli_ssid] = {}
+                    # do I need the above?
+                    nmcli_wifi_dict[nmcli_ssid]['MODE'] = nmcli_mode
+                    nmcli_wifi_dict[nmcli_ssid]["CHAN"] = nmcli_chan
+                    nmcli_wifi_dict[nmcli_ssid]["RATE"] = nmcli_rate
+                    nmcli_wifi_dict[nmcli_ssid]["rate_units"] = nmcli_rate_units
+                    nmcli_wifi_dict[nmcli_ssid]["SIGNAL"] = nmcli_signal
+                    nmcli_wifi_dict[nmcli_ssid]["SECURITY"] = nmcli_security
+                    continue
+                    #    print("this is an airties device!")
+                    # print("connectedDeviceIP", line[1])
+                nmcli_ssid = line[0]
+                print('ssid' + str(nmcli_ssid) + '\n')
+                nmcli_mode = line[1]
+                # print("connectedDeviceStatus", ip_lan_output_split[3])
+                nmcli_chan = line[2]
+                # nmcli_ssid("connectedDeviceDHCP", ip_lan_output_split[4])
+                nmcli_rate = line[3]
+                print('rate' + str(nmcli_rate) + '\n')
+
+                # print("connectedDeviceSSIDNumber", ip_lan_output_split[5])
+                nmcli_rate_units = line[4]
+                nmcli_signal = line[5]
+                nmcli_security = line[7]
+
+                nmcli_wifi_dict[nmcli_ssid] = {}
+                # do I need the above?
+                nmcli_wifi_dict[nmcli_ssid]['MODE'] = nmcli_mode
+                nmcli_wifi_dict[nmcli_ssid]["CHAN"] = nmcli_chan
+                nmcli_wifi_dict[nmcli_ssid]["RATE"] = nmcli_rate
+                nmcli_wifi_dict[nmcli_ssid]["rate_units"] = nmcli_rate_units
+                nmcli_wifi_dict[nmcli_ssid]["SIGNAL"] = nmcli_signal
+                nmcli_wifi_dict[nmcli_ssid]["SECURITY"] = nmcli_security
+
+            return nmcli_wifi_dict
+            # exit()
+            #print('these are the networks' + str(output))
+
+
     def wps_pair_default_airties(self, airties_network):
         print('in wps_pair_default_airties')
         # nmcli connection down id "Wired connection 1
@@ -1848,7 +2017,6 @@ class Nvg599Class(GatewayClass):
             print(e.output)
         else:
             print(output)
-
         cmd = "nmcli dev wifi"
         try:
             output = subprocess.check_output(cmd, shell=True)
@@ -1856,24 +2024,7 @@ class Nvg599Class(GatewayClass):
             print(e.output)
         else:
             print('these are the networks' + output)
-        # exit()
 
-        # why do I want o close
-        # self.session.close()
-        #  self.default_rg_ssid
-        # cmd = "nmcli con down ATTqbrAnYs"
-        cmd = "nmcli con down " + self.default_rg_ssid
-        print('the default rg ssid is:' + str(cmd))
-
-        try:
-            output = subprocess.check_output(cmd, shell=True)
-        except subprocess.CalledProcessError as e:
-            print(e.output)
-        else:
-            print(output)
-        # output = subprocess.check_output(cmd, shell=True)
-
-        # airties_4920_defaults = {
         #     '88:41:FC:86:64:D6': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '2',
         #                           'state': 'None', 'default_ssid': 'AirTies_SmartMesh_4PNF',
         #                           'default_pw': 'kykfmk8997',
@@ -2430,7 +2581,7 @@ class Nvg599Class(GatewayClass):
         except pxssh.ExceptionPxssh as e:
             print('pxssh failed to login')
             ssh_client.close()
-            rf.write('    Failed to log in to ' + speed_test_ip + "Aborting test")
+            rf.write('    Failed to log in to ' + speed_test_ip + "Aborting test \n\n")
             rf.write('    Error:' + str(e))
             print(str(e))
             return "Fail"
