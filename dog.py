@@ -1502,8 +1502,17 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     # def adv_configure_guest_network(self, rf, rfa, enable_disable_param, guest_ssid_param = "dog", guest_ssid_password_param = "guest_dog"):
 
     # nvg_599_dut.adv_configure_guest_network(rf, rfa, "on", "super_dog_ssid", "the_doggiest_password")
+    # def adv_conf_band2_radio_ui(self, band2_enable_disable, mode, bandwidth, channel, power_level):
+    nvg_599_dut.adv_conf_band2_radio_ui(rf, rfa, "on", "b-only", "40", "7", "92")
 
-    nvg_599_dut.adv_configure_guest_network(rf, rfa, "on", "say_what_ssid", "no_way_password")
+
+    #def adv_conf_band2_home(self, rf, rfa, band2_home_ssid_enable_disable_parm, ssid_name, hide_ssid_name, security, wpa_version, password, wpa_setup_on_off, max_clients):
+    # nvg_599_dut.adv_conf_band2_home(rf, rfa, "on", "ssid_dog, "off", security,
+    #                            wpa_version, password, wpa_setup_on_off, max_clients):
+
+
+    # nvg_599_dut.adv_configure_guest_network(rf, rfa, "on", "say_what_ssid", "no_way_password")
+
 
     exit()
 

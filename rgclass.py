@@ -12,7 +12,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support.ui import Select
 
-
 import urllib.request
 
 from xml.etree.ElementTree import fromstring, ElementTree
@@ -55,10 +54,10 @@ nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53
                                 'ssid': 'ATTqbrAnYs', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
                                 'ssid_4': 'ATTPOC', 'ssid_2_pw': 'Ba1tshop'},
 
-            "35448081188192":   {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
-                                 'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'ssid_pw': 'eeh4jxmh7q26',
-                                 'ssid': 'ATT4ujR48s', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
-                                 'ssid_4': 'ATTPOC', 'ssid_4_pw': 'Ba1tshop'}}
+            "35448081188192": {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
+                               'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'ssid_pw': 'eeh4jxmh7q26',
+                               'ssid': 'ATT4ujR48s', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
+                               'ssid_4': 'ATTPOC', 'ssid_4_pw': 'Ba1tshop'}}
 # *7<#56*2<2
 # outside of func['88:41:fc:86:64:d7', '88:41:fc:c3:56:c3']
 airties_4920_defaults = {
@@ -67,19 +66,18 @@ airties_4920_defaults = {
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'airties_1_2g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
     '88:41:FC:86:64:D4': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '5',
-                          'state': 'None',  'default_ssid': 'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
-                          'address_type': 'None', 'port': 'None', 'ssid': 'None',  'rssi': 'None', 'ip': 'None',
+                          'state': 'None', 'default_ssid': 'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
+                          'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'airties_1_5g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
     '88:41:FC:C3:56:C2': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '2',
                           'state': 'None', 'default_ssid': 'AirTies_Air4920_33N3', 'default_pw': 'wthchc7344',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', ' ip': 'None',
                           'device_test_name': 'airties_2_2g', 'name': 'ATT_4920_C356C0', 'location': 'master_bedroom'},
-    '88:41:FC:C3:56:C0': {'device_type': 'airties_4920', 'oper_sys': 'tbd',  'radio': 'abg', 'band': '5',
+    '88:41:FC:C3:56:C0': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '5',
                           'state': 'None', 'default_ssid': 'AirTies_Air4920_33N3', 'default_pw': 'wthchc7344',
                           'address_type': 'None', 'port ': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'airties_2_5g', 'name': 'ATT_4920_C356C0',
                           'location': 'master_bedroom'}, }
-
 
 test_house_devices_static_info = {
     '88:41:FC:86:64:D6': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '2',
@@ -88,13 +86,13 @@ test_house_devices_static_info = {
                           'device_test_name': 'airties_1_2g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
     '88:41:FC:86:64:D4': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '5',
                           'state': 'None',
-                          'address_type': 'None', 'port': 'None', 'ssid': 'None',  'rssi': 'None', 'ip': 'None',
+                          'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'airties_1_5g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
     '8:41:fc:c3:56:c2': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '2',
-                          'state': 'None',
-                          'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', ' ip': 'None',
-                          'device_test_name': 'airties_2_2g', 'name': 'ATT_4920_C356C0', 'location': 'master_bedroom'},
-    '88:41:fc:c3:56:c0': {'device_type': 'airties_4920', 'oper_sys': 'tbd',  'radio': 'abg', 'band': '5',
+                         'state': 'None',
+                         'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', ' ip': 'None',
+                         'device_test_name': 'airties_2_2g', 'name': 'ATT_4920_C356C0', 'location': 'master_bedroom'},
+    '88:41:fc:c3:56:c0': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '5',
                           'state': 'None',
                           'address_type': 'None', 'port ': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'airties_2_5g', 'name': 'ATT_4920_C356C0', 'location': 'master_bedroom'},
@@ -106,7 +104,7 @@ test_house_devices_static_info = {
                           'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'mac_book_1', 'name': 'macbook-mbr', 'location': 'master_bedroom'},
-    '34:e6:d7:2b:cd:7c': {'device_type': 'ubuntu_laptop', 'oper_sys': '18.04',  'radio': 'abg', 'band': '5',
+    '34:e6:d7:2b:cd:7c': {'device_type': 'ubuntu_laptop', 'oper_sys': '18.04', 'radio': 'abg', 'band': '5',
                           'state': 'None',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'mac_book_1', 'name': 'palmer_Latitude-E5450',
@@ -320,10 +318,9 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect(">")
         return self.telnet_cli_session
+
     # @staticmethod
     # def set_all_4920s_to_factory_default(self):
-
-
 
     # @staticmethod
     # def set_all_4920s_to_factory_default(self):
@@ -382,7 +379,6 @@ class Nvg599Class(GatewayClass):
         # should we close the seesion?--------------------------------
         airties_session.close()
 
-
     def install_airties_firmware(self, airties_ip, update_bin_file, rf, rfa):
         # print('setting 4920 with ip:' + ip_of_airties + ' to factory default' )
         print('setting 4920 with ip:' + airties_ip + ' upgrading firmware:' + update_bin_file)
@@ -425,7 +421,8 @@ class Nvg599Class(GatewayClass):
         # airties_session.refresh()
         # firmware update link // *[ @ id = "mainlevel"] / li[3] / ul / li[2] / ul / li / a
         # window_before = airties_session.window_handles[0]
-        firmware_update_link = airties_session.find_element_by_xpath('// *[ @ id = "mainlevel"] / li[3] / ul / li[2] / ul / li / a')
+        firmware_update_link = airties_session.find_element_by_xpath(
+            '// *[ @ id = "mainlevel"] / li[3] / ul / li[2] / ul / li / a')
         firmware_update_link.click()
         print('click on firmware update \n\n ')
         # airties_session.refresh()
@@ -622,19 +619,19 @@ class Nvg599Class(GatewayClass):
                             test_house_ip = test_house_devices_static_info[wifi_ui_mac_present]['ip']
                             print('th', test_house_ip)
                     break
-                i = i+1
+                i = i + 1
             print('----------------------------------------')
+
     # '8C:45:00:9F:82:9D': {'device_type': ' Galaxy-S9', 'oper_sys': 'Android 9', 'radio': 'abg', 'band': '5',
     #                       'state': 'None',
     #                       'address_type': 'fixed', 'port': 'None', 'ssid': 'None', 'rssi': 'None',
     #                       'ip': '192.168.1.67',
     #                       'device_test_name': 'fixed_s9', 'name': 'palmer_Latitude-E5450',
     #                       'location': 'tbd'},
-    def adv_configure_guest_network(self, rf, rfa, enable_disable_param, guest_ssid_param = "dog", guest_ssid_password_param = "guest_dog"):
+    def adv_configure_guest_network(self, rf, rfa, enable_disable_param, guest_ssid_param="dog",
+                                    guest_ssid_password_param="guest_dog"):
         print('in adv_configure_guest_network')
         print('enable_disable_param:' + enable_disable_param + '\n')
-
-        # dianostics_link = browser.find_element_by_link_text("Diagnostics")
         home_network_link = self.session.find_element_by_link_text("Home Network")
         home_network_link.click()
         sleep(2)
@@ -664,10 +661,9 @@ class Nvg599Class(GatewayClass):
                 guest_ssid_enable = Select(self.session.find_element_by_id("ogssidenable"))
                 guest_ssid_enable.select_by_value('on')
                 # if user enable_disable is on and the current state is on we still have to check for any password changed
-                print('enable disable is on:'+ enable_disable_param)
+                print('enable disable is on:' + enable_disable_param)
                 sleep(2)
                 # set the guest ssid
-                # resets_link = browser.find_element_by_link_text("Resets")
                 guest_ssid = self.session.find_element_by_id("ossidname2")
                 guest_ssid.clear()
                 guest_ssid.send_keys(guest_ssid_param)
@@ -689,10 +685,6 @@ class Nvg599Class(GatewayClass):
                 submit = self.session.find_element_by_name("Save")
                 submit.click()
                 self.check_for_wifi_warning()
-
-            exit()
-
-    # adv_disable_guest_network
 
     def enable_guest_network_and_set_passwords(self, rf, rfa, ssid_password, guest_ssid_password):
         print('in enable_guest_network_and_set_password_ssid')
@@ -737,6 +729,7 @@ class Nvg599Class(GatewayClass):
 
     """ I should use this function to get the information for a specific band /guest SSID
     This would make the test case logic  easier to follow"""
+
     def get_ui_ssid_info(self):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
         home_network_link = self.session.find_element_by_link_text("Home Network")
@@ -866,6 +859,227 @@ class Nvg599Class(GatewayClass):
         self.check_for_wifi_warning()
 
     # we want to use the same session but the dict of connected devices is a temporary value subject to change
+    # super dog band2 method
+    def adv_conf_band2_radio_ui(self, rf, rfa, band2_enable_disable_parm, mode, bandwidth, channel, power):
+        mode_values = {"n-only", "b-only", "bg", "bgn", "gn"}
+        bandwidth_values = {"20", "40"}
+        channel_values = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"}
+        power_level_int = int(power)
+        power_level_range = range(0, 100)
+
+        if mode not in mode_values:
+            print('invalid mode parameter:' + mode + " cannot continue")
+            return "Fail"
+        if bandwidth not in bandwidth_values:
+            print('invalid bandwidth parameter:' + mode + " cannot continue")
+            return "Fail"
+        if channel not in channel_values:
+            print('invalid channel parameter:' + mode + " cannot continue")
+            return "Fail"
+        if power_level_int not in power_level_range:
+            print('invalid power level parameter:' + mode + " cannot continue")
+            return "Fail"
+        # dianostics_link = browser.find_element_by_link_text("Diagnostics")
+        home_network_link = self.session.find_element_by_link_text("Home Network")
+        home_network_link.click()
+        sleep(2)
+        # resets_link = browser.find_element_by_link_text("Resets")
+        wi_fi_link = self.session.find_element_by_link_text("Wi-Fi")
+        wi_fi_link.click()
+        sleep(2)
+        print("dog0 \n")
+        self.check_if_dac_required()
+        print("dog1 \n")
+        advanced_options_link = self.session.find_element_by_link_text("Advanced Options")
+        advanced_options_link.click()
+        sleep(2)
+        print("dog2 \n")
+
+        band2_enable_disable = Select(self.session.find_element_by_id("owl80211on"))
+        band2_enable_disable_state = band2_enable_disable.first_selected_option.text
+        print('selected option.text:' + str(band2_enable_disable_state) + '\n')
+        # selected_option = guest_ssid_enable.first_selected_option.value
+        # print('selected option.value:' + str(current_guest_enable_state) + '\n')
+        # current_selected_option = str(current_guest_enable_state)
+
+        print('band2_enable_disable_state:' + str(band2_enable_disable_state) + ' band2_enable_disable_parm:' + str(
+            band2_enable_disable_parm) + '\n')
+
+        if band2_enable_disable_state == "off" and band2_enable_disable_parm == "off":
+            # I think we are always done in this state
+            print('off and off')
+            return "Pass"
+        else:
+            # simplifies logic if it is on then we just set everything again
+            if band2_enable_disable_parm == 'on':
+                band2_enable_disable_selection = Select(self.session.find_element_by_id("owl80211on"))
+                band2_enable_disable_selection.select_by_value('on')
+                # if user enable_disable is on and the current state is on we still have to check for any password changed
+                print('enable disable is on:' + str(band2_enable_disable_state))
+                sleep(2)
+
+                mode_selection = Select(self.session.find_element_by_id("ostandard"))
+                # ostandard values n-only, b-only, bg, bgn, gn
+                mode_selection.select_by_value(mode)
+                # if user enable_disable is on and the current state is on we still have to check for any password changed
+                print('mode is :' + str(mode))
+                sleep(2)
+
+                bandwidth_selection = Select(self.session.find_element_by_id("obandwidth"))
+                # ostandard values n-only, b-only, bg, bgn, gn
+                bandwidth_selection.select_by_value(bandwidth)
+                # if user enable_disable is on and the current state is on we still have to check for other changes
+                print('mode is :' + str(bandwidth))
+                sleep(2)
+
+                channel_selection = Select(self.session.find_element_by_id("ochannelplusauto"))
+                # ostandard values n-only, b-only, bg, bgn, gn
+                channel_selection.select_by_value(channel)
+                # if user enable_disable is on and the current state is on we still have to check for other changes
+                print('channel is :' + str(channel))
+                sleep(2)
+
+                power_level = self.session.find_element_by_id("opower")
+                power_level.clear()
+                power_level.send_keys(power)
+
+                submit = self.session.find_element_by_name("Save")
+                submit.click()
+                sleep(2)
+                self.check_for_wifi_warning()
+
+            else:
+                # to get here  the current state is on but the user has selected off
+                # so we turn off and return pass
+                band2_enable_disable_selection = Select(self.session.find_element_by_id("owl80211on"))
+                band2_enable_disable_selection.select_by_value('off')
+                # if user enable_disable is on and the current state is on we still have to check for any password changed
+
+                submit = self.session.find_element_by_name("Save")
+                submit.click()
+                sleep(2)
+                self.check_for_wifi_warning()
+
+            return "Pass"
+
+        # adv_conf band2 home
+
+        # we want to use the same session but the dict of connected devices is a temporary value subject to change
+        # super dog band2 method
+    def adv_conf_band2_home(self, rf, rfa, band2_home_ssid_enable_disable_parm, ssid_name, hide_ssid_name, security, wpa_version, password, wpa_setup_on_off, max_clients):
+        security_values = {"none", "wpa", "defwpa"}
+        wpa_version_values = {"2", "both"}
+
+        if security not in security_values:
+            print('invalid security_values parameter:' + str(security) + " cannot continue")
+            return "Fail"
+        if wpa_version not in wpa_version_values:
+            print('invalid security parameter:' + str(wpa_version) + " cannot continue")
+            return "Fail"
+
+        # dianostics_link = browser.find_element_by_link_text("Diagnostics")
+        home_network_link = self.session.find_element_by_link_text("Home Network")
+        home_network_link.click()
+        sleep(2)
+        # resets_link = browser.find_element_by_link_text("Resets")
+        wi_fi_link = self.session.find_element_by_link_text("Wi-Fi")
+        wi_fi_link.click()
+        sleep(2)
+        print("dog0 \n")
+        self.check_if_dac_required()
+        print("dog1 \n")
+        advanced_options_link = self.session.find_element_by_link_text("Advanced Options")
+        advanced_options_link.click()
+        sleep(2)
+        print("dog2 \n")
+
+        band2_home_ssid_enable_disable = Select(self.session.find_element_by_id("oussidenable"))
+        band2_home_ssid_enable_disable_state = band2_home_ssid_enable_disable.first_selected_option.text
+        print('selected option.text:' + str(band2_home_ssid_enable_disable_state) + '\n')
+        # selected_option = guest_ssid_enable.first_selected_option.value
+        # print('selected option.value:' + str(current_guest_enable_state) + '\n')
+        # current_selected_option = str(current_guest_enable_state)
+
+        print('band2_enable_disable_state:' + str(band2_home_ssid_enable_disable_state) + ' band2_enable_disable_parm:' + str(band2_home_ssid_enable_disable_parm) + '\n')
+
+        if band2_home_ssid_enable_disable_state == "off" and band2_home_ssid_enable_disable_parm == "off":
+            # I think we are always done in this state
+            print('off and off')
+            return "Pass"
+        else:
+            # simplifies logic if it is on then we just set everything again
+            if band2_home_ssid_enable_disable_parm == 'on':
+                band2_home_ssid_enable_disable_selection = Select(self.session.find_element_by_id("oussidenable"))
+                band2_home_ssid_enable_disable_selection.select_by_value('on')
+                # if user enable_disable is on and the current state is on we still have to check for any password changed
+                print('home ssid enable=disable is on:' + str(band2_home_ssid_enable_disable_state))
+                sleep(2)
+
+                # ssid
+                ssid_name_entry = self.session.find_element_by_id("ossidname")
+                ssid_name_entry.clear()
+                ssid_name_entry.send_keys(ssid_name)
+
+                band2_home_hide_ssid_selection = Select(self.session.find_element_by_id("ohide"))
+                band2_home_hide_ssid_selection.select_by_value(hide_ssid_name)
+                # if user enable_disable is on and the current state is on we still have to check for any password changed
+                print('hide home ssid:' + str(hide_ssid_name))
+
+                security_selection = Select(self.session.find_element_by_id("osecurity"))
+                security_selection.select_by_value(security)
+                # if user enable_disable is on and the current state is on we still have to check for any password changed
+                print('security selection:' + str(hide_ssid_name))
+
+                wpa_version_selection = Select(self.session.find_element_by_id("owpaversion"))
+                # ostandard values n-only, b-only, bg, bgn, gn
+                wpa_version_selection.select_by_value(wpa_version)
+                # if user enable_disable is on and the current state is on we still have to check for any password changed
+                print('wpa version  is :' + str(wpa_version))
+                sleep(2)
+
+                # if the securiy is set to WPA Default password then we cannot change the password
+                if security != 'defwpa':
+                    password_entry = self.session.find_element_by_id("okey1")
+                    password_entry.clear()
+                    password_entry.send_keys(password)
+
+                wpa_setup_on_off_selection = Select(self.session.find_element_by_id("owps"))
+                # ostandard values n-only, b-only, bg, bgn, gn
+                wpa_setup_on_off_selection.select_by_value(wpa_setup_on_off)
+                # if user enable_disable is on and the current state is on we still have to check for any password changed
+                print('wpa_setup_on_off:' + str(wpa_setup_on_off))
+                sleep(2)
+# wpa_setup_on_off, max_clients):
+                # ssid
+                max_clients_entry = self.session.find_element_by_id("omaxclients")
+                max_clients_entry.clear()
+                max_clients_entry.send_keys(max_clients)
+
+
+                submit = self.session.find_element_by_name("Save")
+                submit.click()
+                sleep(2)
+                self.check_for_wifi_warning()
+
+            else:
+                # to get here  the current state is on but the user has selected off
+                # so we turn off and return pass
+                band2_home_network_enable_disable_selection = Select(self.session.find_element_by_id("oussidenable"))
+                band2_home_network_enable_disable_selection.select_by_value(band2_home_ssid_enable_disable_parm)
+                # if user enable_disable is on and the current state is on we still have to check for any password changed
+                print('band2_home_ssid_enable_disable_selection:' + str(band2_home_ssid_enable_disable_parm))
+
+                submit = self.session.find_element_by_name("Save")
+                submit.click()
+                sleep(2)
+                self.check_for_wifi_warning()
+
+            return "Pass"
+
+    # config adv band2 home
+
+    # we want to use the same session but the dict of connected devices is a temporary value subject to change
+
     def ui_get_device_list(self):
         global nvg_info
         global test_house_devices_static_info
@@ -965,7 +1179,8 @@ class Nvg599Class(GatewayClass):
 
         return ui_rg_connected_clients_dict
 
-    def check_for_wifi_security_and_regular_warning(self):
+    # def check_for_wifi_security_and_regular_warning(self):
+    def check_for_wifi_warning(self):
         print('in check_for_wifi_warning ')
         # warning = self.session.find_element_by_name("ReturnWarned")
         # we get this warning every time so we don't have to check for no such exception
@@ -978,24 +1193,35 @@ class Nvg599Class(GatewayClass):
         if wi_fi_warning:
             print("Wi-Fi Warning displayed ")
             # submit = self.session.find_element_by_name("ReturnWarned")
-            displayed_text = self.session.page_source
-            sleep(5)
-            if "Wi-Fi security that is not recommended." in displayed_text:
-                submit = self.session.find_element_by_name("ReturnWarned")
-                submit.click()
-                return_string = "wi-fi security change... Continue"
-                print("wi-fi security change... Continue")
-                return return_string
+            # displayed_text = self.session.page_source
+            # sleep(5)
 
-            if "You have made a change to your Wi-Fi configuration" in displayed_text:
-                submit = self.session.find_element_by_name("Continue")
-                submit.click()
-                return_string = "wi-fi regular warning change... Continue"
-                print("wi-fi regular warning change... Continue")
-                return return_string
+            # submit = self.session.find_element_by_name("ReturnWarned")
+            submit = self.session.find_element_by_name("Continue")
 
-# I think this is only be used for the password testcases
-    def check_for_wifi_warning(self):
+            submit.click()
+            return_string = "wi-fi security change... Continue"
+            print("wi-fi security change... Continue")
+
+            # not sure if we need this
+            # just click if we get a warning
+
+            # if "Wi-Fi security that is not recommended." in displayed_text:
+            #     submit = self.session.find_element_by_name("ReturnWarned")
+            #     submit.click()
+            #     return_string = "wi-fi security change... Continue"
+            #     print("wi-fi security change... Continue")
+            #     return return_string
+
+            # if "You have made a change to your Wi-Fi configuration" in displayed_text:
+            #     submit = self.session.find_element_by_name("Continue")
+            #     submit.click()
+            #     return_string = "wi-fi regular warning change... Continue"
+            #     print("wi-fi regular warning change... Continue")
+            #     return return_string
+
+    # I think this is only be used for the password testcases
+    def xcheck_for_wifi_warning(self):
         print('in check_for_wifi_warning ')
         # warning = self.session.find_element_by_name("ReturnWarned")
         # we get this warning every time so we don't have to check for no such exception
@@ -1092,18 +1318,19 @@ class Nvg599Class(GatewayClass):
 
         for device_mac in ip_lan_info_dict:
             if tftp_server_name == ip_lan_info_dict[device_mac]['Name']:
-                print('inputname:' + tftp_server_name + '  name_from_dict:' + ip_lan_info_dict[device_mac]['Name'] + '\n')
+                print(
+                    'inputname:' + tftp_server_name + '  name_from_dict:' + ip_lan_info_dict[device_mac]['Name'] + '\n')
                 server_ip = ip_lan_info_dict[device_mac]['IP']
 
         if server_ip != "0.0.0.0":
-                # note_8_ip = ip_lan_info_dict['b8:d7:af:aa:27:c3']['IP']
-                # device_ip = ip_lan_info_dict[device_mac]['IP']
-                rf.write('    TFTP server IP  present in cli command sh ip lan: ' + server_ip)
-                print('tftp server is present :' + str(server_ip))
+            # note_8_ip = ip_lan_info_dict['b8:d7:af:aa:27:c3']['IP']
+            # device_ip = ip_lan_info_dict[device_mac]['IP']
+            rf.write('    TFTP server IP  present in cli command sh ip lan: ' + server_ip)
+            print('tftp server is present :' + str(server_ip))
         else:
             rf.write('    TFTP server IP not present in cli command sh ip lan, Aborting test')
             print('TFTP  server IP not present in cli command sh ip lan')
-            test_status =  "Fail"
+            test_status = "Fail"
             return test_status
 
         telnet_cli_session.sendline("install " + server_ip + " " + install_bin_file)
@@ -1182,6 +1409,7 @@ class Nvg599Class(GatewayClass):
             sleep(4)
         except NoSuchElementException:
             print('DAC challenge not displayed- Continuing')
+
     #        # browser.find_element_by_xpath("//*[@id='main-content']/div[2]/div[2]/div/h1.text")
 
     def check_if_wifi_warning_displayed(self):
@@ -1202,198 +1430,199 @@ class Nvg599Class(GatewayClass):
             print('Changes Saved')
         except NoSuchElementException:
             print('No save confirmation')
-#         print("in cli_sh_wi_clients")
-#         self.telnet_cli_session = self.login_nvg_599_cli()
-#         self.telnet_cli_session.sendline("show wi clients")
-#         self.telnet_cli_session.expect('OCKED>')
-#         show_wi_client_str = self.telnet_cli_session.before
-#         self.telnet_cli_session.close()
-#         print('------------------------------------------------------\n')
-#         # dividing on macs
-#         wi_reg_ex = re.compile(r'(?:[0-9a-fA-F]:?){12}.*?\n.*\n.*\n.*\n')
-#         client_string_list = re.findall(wi_reg_ex, show_wi_client_str)
-#
-#         number_of_entries = len(client_string_list)
-#         print("The list has :", number_of_entries)
-#
-#         client_entries = range(0, number_of_entries)
-#
-#         for client_list_entry in client_entries:
-#             print("entry:", client_string_list[client_list_entry])
-#             print("-------------------------")
-#
-#             client_string_list_split = client_string_list[client_list_entry].split()
-#
-#             mac = client_string_list_split[0]
-#             mac = mac.upper()
-#             mac = mac[:-1]
-#             print('modified 2g mac', mac)
-#             cli_rg_connected_clients_dict = {}
-#             if mac in test_house_devices_static_info:
-#                 # self.cli_rg_connected_clients_dict[mac] = {}
-#                 cli_rg_connected_clients_dict[mac] = {}
-#
-#                 print('mac found in lab dict', mac)
-#
-#                 # self.cli_rg_connected_clients_dict[mac]['band'] = test_house_devices_static_info[mac]['band']
-#                 # print('setting band to:',  self.cli_rg_connected_clients_dict[mac]['band'])
-#
-#                 cli_rg_connected_clients_dict[mac]['band'] = test_house_devices_static_info[mac]['band']
-#                 print('setting band to:', cli_rg_connected_clients_dict[mac]['band'])
-#
-#
-#                 if re.search(r'.*State=(\w+),', client_string_list[client_list_entry]) is not None:
-#                     wi_state_search = re.search(r'.*State=(\w+)', client_string_list[client_list_entry])
-#                     # self.cli_rg_connected_clients_dict[mac]['wi_state'] = wi_state_search.group(1)
-#                     cli_rg_connected_clients_dict[mac]['wi_state'] = wi_state_search.group(1)
-#                     print('Seting wi_state to ', wi_state_search.group(1))
-#                 else:
-#                     # self.cli_rg_connected_clients_dict[mac]['wi_state'] = "Not found or State value missing"
-#                     cli_rg_connected_clients_dict[mac]['wi_state'] = "Not found or State value missing"
-#                     print('Seting wi_state to Not Found or value missing ')
-#
-#                 if re.search(r'.*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})',
-#                     client_string_list[client_list_entry]) is not None:
-#                     wi_state_search = re.search(r'.*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})',
-#                     client_string_list[client_list_entry])
-#                     # self.cli_rg_connected_clients_dict[mac]['ip'] = wi_state_search.group(1)
-#                     cli_rg_connected_clients_dict[mac]['ip'] = wi_state_search.group(1)
-#                     print('Seting ip to ', wi_state_search.group(1))
-#                 else:
-#                     #self.cli_rg_connected_clients_dict[mac]['ip'] = "Not found or State value missing"
-#                     cli_rg_connected_clients_dict[mac]['ip'] = "Not found or State value missing"
-#                     print('Seting ip to Not Found or value missing ')
-#
-#                 if re.search(r'.*SSID=(\w+)', client_string_list[client_list_entry]) is not None:
-#                     wi_state_search = re.search(r'.*SSID=(\w+)', client_string_list[client_list_entry])
-#                     #self.cli_rg_connected_clients_dict[mac]['ip'] = wi_state_search.group(1)
-#                     cli_rg_connected_clients_dict[mac]['ip'] = wi_state_search.group(1)
-#                     print('Seting SSID to ', wi_state_search.group(1))
-#                 else:
-#                     # self.cli_rg_connected_clients_dict[mac]['ssid'] = "Not found or State value missing"
-#                     cli_rg_connected_clients_dict[mac]['ssid'] = "Not found or State value missing"
-#                     print('Seting ssid to Not Found or value missing ')
-#
-#                 if re.search(r'.*PSMod=(\w+)', client_string_list[client_list_entry]) is not None:
-#                     wi_state_search = re.search(r'.*PSMod=(\w+)', client_string_list[client_list_entry])
-#                     # self.cli_rg_connected_clients_dict[mac]['psmod'] = wi_state_search.group(1)
-#                     cli_rg_connected_clients_dict[mac]['psmod'] = wi_state_search.group(1)
-#                     print('Seting psmod to ', wi_state_search.group(1))
-#                 else:
-#                     # self.cli_rg_connected_clients_dict[mac]['psmod'] = "Not found or value missing"
-#                     cli_rg_connected_clients_dict[mac]['psmod'] = "Not found or value missing"
-#                     print('Seting psmod to Not Found or value missing ')
-#
-#                 if re.search(r'.*NMod=(\w+)', client_string_list[client_list_entry]) is not None:
-#                     wi_state_search = re.search(r'.*NMod=(\w+)', client_string_list[client_list_entry])
-#                     # self.cli_rg_connected_clients_dict[mac]['nmod'] = wi_state_search.group(1)
-#                     cli_rg_connected_clients_dict[mac]['nmod'] = wi_state_search.group(1)
-#                     print('Seting psmod to ', wi_state_search.group(1))
-#                 else:
-#                     # self.cli_rg_connected_clients_dict[mac]['nmod'] = "Not found or value missing"
-#                     cli_rg_connected_clients_dict[mac]['nmod'] = "Not found or value missing"
-#                     print('Seting nmmod to Not Found or value missing ')
-#
-#                 if re.search(r'.*WMMEn=(\w+)', client_string_list[client_list_entry]) is not None:
-#                     wi_state_search = re.search(r'.*WMMEn=(\w+)', client_string_list[client_list_entry])
-#                     # self.cli_rg_connected_clients_dict[mac]['wmmen'] = wi_state_search.group(1)
-#                     self.cli_rg_connected_clients_dict[mac]['wmmen'] = wi_state_search.group(1)
-#                     print('Seting psmod to ', wi_state_search.group(1))
-#                 else:
-#                     # self.cli_rg_connected_clients_dict[mac]['wmmen'] = "Not found or value missing"
-#                     cli_rg_connected_clients_dict[mac]['wmmen'] = "Not found or value missing"
-#                     print('Seting wmmen to Not Found or value missing ')
-#
-#                 if re.search(r'.*Rate=(\w+\s\w+)', client_string_list[client_list_entry]) is not None:
-#                     wi_state_search = re.search(r'.*Rate=(\w+\s\w+)', client_string_list[client_list_entry])
-#                     # self.cli_rg_connected_clients_dict[mac]['wmmen'] = wi_state_search.group(1)
-#                     cli_rg_connected_clients_dict[mac]['wmmen'] = wi_state_search.group(1)
-#                     print('Seting rate to ', wi_state_search.group(1))
-#                 else:
-#                     # self.cli_rg_connected_clients_dict[mac]['rate'] = "Not found or value missing"
-#                     self.cli_rg_connected_clients_dict[mac]['rate'] = "Not found or value missing"
-#                     print('Seting rate to Not Found or value missing ')
-#
-#                 if re.search(r'.*ON\sfor\s(\w+\s\w+)', client_string_list[client_list_entry]) is not None:
-#                     wi_state_search = re.search(r'.*ON\sfor\s(\w+\s\w+)', client_string_list[client_list_entry])
-#                     # self.cli_rg_connected_clients_dict[mac]['ontime'] = wi_state_search.group(1)
-#                     cli_rg_connected_clients_dict[mac]['ontime'] = wi_state_search.group(1)
-#                     print('Seting ontime to ', wi_state_search.group(1))
-#                 else:
-#                     # self.cli_rg_connected_clients_dict[mac]['ontime'] = "Not found or value missing"
-#                     cli_rg_connected_clients_dict[mac]['ontime'] = "Not found or value missing"
-#
-#                     print('Seting On Time to Not Found or value missing ')
-#
-#                 if re.search(r'.*TxPkt=(\w+)', client_string_list[client_list_entry]) is not None:
-#                     wi_state_search = re.search(r'.*TxPkt=(\w+)', client_string_list[client_list_entry])
-#                     # self.cli_rg_connected_clients_dict[mac]['txpkt'] = wi_state_search.group(1)
-#                     cli_rg_connected_clients_dict[mac]['txpkt'] = wi_state_search.group(1)
-#                     print('Seting txpkt to ', wi_state_search.group(1))
-#                 else:
-#                     # self.cli_rg_connected_clients_dict[mac]['txpkt'] = "Not found or value missing"
-#                     cli_rg_connected_clients_dict[mac]['txpkt'] = "Not found or value missing"
-#                     print('Seting txpkt to Not Found or value missing ')
-#
-#                 if re.search(r'.*TxErr=(\w+)', client_string_list[client_list_entry]) is not None:
-#                     wi_state_search = re.search(r'.*TxErr=(\w+)', client_string_list[client_list_entry])
-#                     # self.cli_rg_connected_clients_dict[mac]['txerr'] = wi_state_search.group(1)
-#                     cli_rg_connected_clients_dict[mac]['txerr'] = wi_state_search.group(1)
-#                     print('Seting txerr to ', wi_state_search.group(1))
-#                 else:
-#                     # self.cli_rg_connected_clients_dict[mac]['txerr'] = "Not found or value missing"
-#                     cli_rg_connected_clients_dict[mac]['txerr'] = "Not found or value missing"
-#                     print('Seting txerr to Not Found or value missing ')
-#
-#                 if re.search(r'.*RxUni=(\w+)', client_string_list[client_list_entry]) is not None:
-#                     wi_state_search = re.search(r'.*RxUni=(\w+)', client_string_list[client_list_entry])
-#                     # self.cli_rg_connected_clients_dict[mac]['rxuni'] = wi_state_search.group(1)
-#                     cli_rg_connected_clients_dict[mac]['rxuni'] = wi_state_search.group(1)
-#                     print('Seting rxuni to ', wi_state_search.group(1))
-#                 else:
-#                     # self.cli_rg_connected_clients_dict[mac]['rxuni'] = "Not found or value missing"
-#                     cli_rg_connected_clients_dict[mac]['rxuni'] = "Not found or value missing"
-#                     print('Seting rxuni to Not Found or value missing ')
-#
-#                 if re.search(r'.*RxMul=(\w+)', client_string_list[client_list_entry]) is not None:
-#                     wi_state_search = re.search(r'.*RxMul=(\w+)', client_string_list[client_list_entry])
-#                     # self.cli_rg_connected_clients_dict[mac]['rxmul'] = wi_state_search.group(1)
-#                     cli_rg_connected_clients_dict[mac]['rxmul'] = wi_state_search.group(1)
-#                     print('Seting rxmul to ', wi_state_search.group(1))
-#                 else:
-#                     # self.cli_rg_connected_clients_dict[mac]['rxuni'] = "Not found or value missing"
-#                     cli_rg_connected_clients_dict[mac]['rxuni'] = "Not found or value missing"
-#                     print('Seting rxmul to Not Found or value missing ')
-#
-#                 if re.search(r'.*RxErr=(\w+)', client_string_list[client_list_entry]) is not None:
-#                     wi_state_search = re.search(r'.*RxErr=(\w+)', client_string_list[client_list_entry])
-#                     # self.cli_rg_connected_clients_dict[mac]['rxerr'] = wi_state_search.group(1)
-#                     cli_rg_connected_clients_dict[mac]['rxerr'] = wi_state_search.group(1)
-#                     print('Seting rxerr to ', wi_state_search.group(1))
-#                 else:
-#                     # self.cli_rg_connected_clients_dict[mac]['rxerr'] = "Not found or value missing"
-#                     cli_rg_connected_clients_dict[mac]['rxerr'] = "Not found or value missing"
-#                     print('Seting rxerr to Not Found or value missing ')
-#
-#                 if re.search(r'.*RSSI=-(\w+)', client_string_list[client_list_entry]) is not None:
-#                     wi_state_search = re.search(r'.*RSSI=-(\w+)', client_string_list[client_list_entry])
-#                     # self.cli_rg_connected_clients_dict[mac]['rxerr'] = wi_state_search.group(1)
-#                     cli_rg_connected_clients_dict[mac]['rxerr'] = wi_state_search.group(1)
-#                     print('Seting rssi to ', wi_state_search.group(1))
-#                 else:
-#                     # self.cli_rg_connected_clients_dict[mac]['rssi'] = "Not found or value missing"
-#                     cli_rg_connected_clients_dict[mac]['rssi'] = "Not found or value missing"
-#                     print('Seting rssi to Not Found or value missing ')
-#
-#         return cli_rg_connected_clients_dict
-#
-#         # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).
+
+    #         print("in cli_sh_wi_clients")
+    #         self.telnet_cli_session = self.login_nvg_599_cli()
+    #         self.telnet_cli_session.sendline("show wi clients")
+    #         self.telnet_cli_session.expect('OCKED>')
+    #         show_wi_client_str = self.telnet_cli_session.before
+    #         self.telnet_cli_session.close()
+    #         print('------------------------------------------------------\n')
+    #         # dividing on macs
+    #         wi_reg_ex = re.compile(r'(?:[0-9a-fA-F]:?){12}.*?\n.*\n.*\n.*\n')
+    #         client_string_list = re.findall(wi_reg_ex, show_wi_client_str)
+    #
+    #         number_of_entries = len(client_string_list)
+    #         print("The list has :", number_of_entries)
+    #
+    #         client_entries = range(0, number_of_entries)
+    #
+    #         for client_list_entry in client_entries:
+    #             print("entry:", client_string_list[client_list_entry])
+    #             print("-------------------------")
+    #
+    #             client_string_list_split = client_string_list[client_list_entry].split()
+    #
+    #             mac = client_string_list_split[0]
+    #             mac = mac.upper()
+    #             mac = mac[:-1]
+    #             print('modified 2g mac', mac)
+    #             cli_rg_connected_clients_dict = {}
+    #             if mac in test_house_devices_static_info:
+    #                 # self.cli_rg_connected_clients_dict[mac] = {}
+    #                 cli_rg_connected_clients_dict[mac] = {}
+    #
+    #                 print('mac found in lab dict', mac)
+    #
+    #                 # self.cli_rg_connected_clients_dict[mac]['band'] = test_house_devices_static_info[mac]['band']
+    #                 # print('setting band to:',  self.cli_rg_connected_clients_dict[mac]['band'])
+    #
+    #                 cli_rg_connected_clients_dict[mac]['band'] = test_house_devices_static_info[mac]['band']
+    #                 print('setting band to:', cli_rg_connected_clients_dict[mac]['band'])
+    #
+    #
+    #                 if re.search(r'.*State=(\w+),', client_string_list[client_list_entry]) is not None:
+    #                     wi_state_search = re.search(r'.*State=(\w+)', client_string_list[client_list_entry])
+    #                     # self.cli_rg_connected_clients_dict[mac]['wi_state'] = wi_state_search.group(1)
+    #                     cli_rg_connected_clients_dict[mac]['wi_state'] = wi_state_search.group(1)
+    #                     print('Seting wi_state to ', wi_state_search.group(1))
+    #                 else:
+    #                     # self.cli_rg_connected_clients_dict[mac]['wi_state'] = "Not found or State value missing"
+    #                     cli_rg_connected_clients_dict[mac]['wi_state'] = "Not found or State value missing"
+    #                     print('Seting wi_state to Not Found or value missing ')
+    #
+    #                 if re.search(r'.*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})',
+    #                     client_string_list[client_list_entry]) is not None:
+    #                     wi_state_search = re.search(r'.*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})',
+    #                     client_string_list[client_list_entry])
+    #                     # self.cli_rg_connected_clients_dict[mac]['ip'] = wi_state_search.group(1)
+    #                     cli_rg_connected_clients_dict[mac]['ip'] = wi_state_search.group(1)
+    #                     print('Seting ip to ', wi_state_search.group(1))
+    #                 else:
+    #                     #self.cli_rg_connected_clients_dict[mac]['ip'] = "Not found or State value missing"
+    #                     cli_rg_connected_clients_dict[mac]['ip'] = "Not found or State value missing"
+    #                     print('Seting ip to Not Found or value missing ')
+    #
+    #                 if re.search(r'.*SSID=(\w+)', client_string_list[client_list_entry]) is not None:
+    #                     wi_state_search = re.search(r'.*SSID=(\w+)', client_string_list[client_list_entry])
+    #                     #self.cli_rg_connected_clients_dict[mac]['ip'] = wi_state_search.group(1)
+    #                     cli_rg_connected_clients_dict[mac]['ip'] = wi_state_search.group(1)
+    #                     print('Seting SSID to ', wi_state_search.group(1))
+    #                 else:
+    #                     # self.cli_rg_connected_clients_dict[mac]['ssid'] = "Not found or State value missing"
+    #                     cli_rg_connected_clients_dict[mac]['ssid'] = "Not found or State value missing"
+    #                     print('Seting ssid to Not Found or value missing ')
+    #
+    #                 if re.search(r'.*PSMod=(\w+)', client_string_list[client_list_entry]) is not None:
+    #                     wi_state_search = re.search(r'.*PSMod=(\w+)', client_string_list[client_list_entry])
+    #                     # self.cli_rg_connected_clients_dict[mac]['psmod'] = wi_state_search.group(1)
+    #                     cli_rg_connected_clients_dict[mac]['psmod'] = wi_state_search.group(1)
+    #                     print('Seting psmod to ', wi_state_search.group(1))
+    #                 else:
+    #                     # self.cli_rg_connected_clients_dict[mac]['psmod'] = "Not found or value missing"
+    #                     cli_rg_connected_clients_dict[mac]['psmod'] = "Not found or value missing"
+    #                     print('Seting psmod to Not Found or value missing ')
+    #
+    #                 if re.search(r'.*NMod=(\w+)', client_string_list[client_list_entry]) is not None:
+    #                     wi_state_search = re.search(r'.*NMod=(\w+)', client_string_list[client_list_entry])
+    #                     # self.cli_rg_connected_clients_dict[mac]['nmod'] = wi_state_search.group(1)
+    #                     cli_rg_connected_clients_dict[mac]['nmod'] = wi_state_search.group(1)
+    #                     print('Seting psmod to ', wi_state_search.group(1))
+    #                 else:
+    #                     # self.cli_rg_connected_clients_dict[mac]['nmod'] = "Not found or value missing"
+    #                     cli_rg_connected_clients_dict[mac]['nmod'] = "Not found or value missing"
+    #                     print('Seting nmmod to Not Found or value missing ')
+    #
+    #                 if re.search(r'.*WMMEn=(\w+)', client_string_list[client_list_entry]) is not None:
+    #                     wi_state_search = re.search(r'.*WMMEn=(\w+)', client_string_list[client_list_entry])
+    #                     # self.cli_rg_connected_clients_dict[mac]['wmmen'] = wi_state_search.group(1)
+    #                     self.cli_rg_connected_clients_dict[mac]['wmmen'] = wi_state_search.group(1)
+    #                     print('Seting psmod to ', wi_state_search.group(1))
+    #                 else:
+    #                     # self.cli_rg_connected_clients_dict[mac]['wmmen'] = "Not found or value missing"
+    #                     cli_rg_connected_clients_dict[mac]['wmmen'] = "Not found or value missing"
+    #                     print('Seting wmmen to Not Found or value missing ')
+    #
+    #                 if re.search(r'.*Rate=(\w+\s\w+)', client_string_list[client_list_entry]) is not None:
+    #                     wi_state_search = re.search(r'.*Rate=(\w+\s\w+)', client_string_list[client_list_entry])
+    #                     # self.cli_rg_connected_clients_dict[mac]['wmmen'] = wi_state_search.group(1)
+    #                     cli_rg_connected_clients_dict[mac]['wmmen'] = wi_state_search.group(1)
+    #                     print('Seting rate to ', wi_state_search.group(1))
+    #                 else:
+    #                     # self.cli_rg_connected_clients_dict[mac]['rate'] = "Not found or value missing"
+    #                     self.cli_rg_connected_clients_dict[mac]['rate'] = "Not found or value missing"
+    #                     print('Seting rate to Not Found or value missing ')
+    #
+    #                 if re.search(r'.*ON\sfor\s(\w+\s\w+)', client_string_list[client_list_entry]) is not None:
+    #                     wi_state_search = re.search(r'.*ON\sfor\s(\w+\s\w+)', client_string_list[client_list_entry])
+    #                     # self.cli_rg_connected_clients_dict[mac]['ontime'] = wi_state_search.group(1)
+    #                     cli_rg_connected_clients_dict[mac]['ontime'] = wi_state_search.group(1)
+    #                     print('Seting ontime to ', wi_state_search.group(1))
+    #                 else:
+    #                     # self.cli_rg_connected_clients_dict[mac]['ontime'] = "Not found or value missing"
+    #                     cli_rg_connected_clients_dict[mac]['ontime'] = "Not found or value missing"
+    #
+    #                     print('Seting On Time to Not Found or value missing ')
+    #
+    #                 if re.search(r'.*TxPkt=(\w+)', client_string_list[client_list_entry]) is not None:
+    #                     wi_state_search = re.search(r'.*TxPkt=(\w+)', client_string_list[client_list_entry])
+    #                     # self.cli_rg_connected_clients_dict[mac]['txpkt'] = wi_state_search.group(1)
+    #                     cli_rg_connected_clients_dict[mac]['txpkt'] = wi_state_search.group(1)
+    #                     print('Seting txpkt to ', wi_state_search.group(1))
+    #                 else:
+    #                     # self.cli_rg_connected_clients_dict[mac]['txpkt'] = "Not found or value missing"
+    #                     cli_rg_connected_clients_dict[mac]['txpkt'] = "Not found or value missing"
+    #                     print('Seting txpkt to Not Found or value missing ')
+    #
+    #                 if re.search(r'.*TxErr=(\w+)', client_string_list[client_list_entry]) is not None:
+    #                     wi_state_search = re.search(r'.*TxErr=(\w+)', client_string_list[client_list_entry])
+    #                     # self.cli_rg_connected_clients_dict[mac]['txerr'] = wi_state_search.group(1)
+    #                     cli_rg_connected_clients_dict[mac]['txerr'] = wi_state_search.group(1)
+    #                     print('Seting txerr to ', wi_state_search.group(1))
+    #                 else:
+    #                     # self.cli_rg_connected_clients_dict[mac]['txerr'] = "Not found or value missing"
+    #                     cli_rg_connected_clients_dict[mac]['txerr'] = "Not found or value missing"
+    #                     print('Seting txerr to Not Found or value missing ')
+    #
+    #                 if re.search(r'.*RxUni=(\w+)', client_string_list[client_list_entry]) is not None:
+    #                     wi_state_search = re.search(r'.*RxUni=(\w+)', client_string_list[client_list_entry])
+    #                     # self.cli_rg_connected_clients_dict[mac]['rxuni'] = wi_state_search.group(1)
+    #                     cli_rg_connected_clients_dict[mac]['rxuni'] = wi_state_search.group(1)
+    #                     print('Seting rxuni to ', wi_state_search.group(1))
+    #                 else:
+    #                     # self.cli_rg_connected_clients_dict[mac]['rxuni'] = "Not found or value missing"
+    #                     cli_rg_connected_clients_dict[mac]['rxuni'] = "Not found or value missing"
+    #                     print('Seting rxuni to Not Found or value missing ')
+    #
+    #                 if re.search(r'.*RxMul=(\w+)', client_string_list[client_list_entry]) is not None:
+    #                     wi_state_search = re.search(r'.*RxMul=(\w+)', client_string_list[client_list_entry])
+    #                     # self.cli_rg_connected_clients_dict[mac]['rxmul'] = wi_state_search.group(1)
+    #                     cli_rg_connected_clients_dict[mac]['rxmul'] = wi_state_search.group(1)
+    #                     print('Seting rxmul to ', wi_state_search.group(1))
+    #                 else:
+    #                     # self.cli_rg_connected_clients_dict[mac]['rxuni'] = "Not found or value missing"
+    #                     cli_rg_connected_clients_dict[mac]['rxuni'] = "Not found or value missing"
+    #                     print('Seting rxmul to Not Found or value missing ')
+    #
+    #                 if re.search(r'.*RxErr=(\w+)', client_string_list[client_list_entry]) is not None:
+    #                     wi_state_search = re.search(r'.*RxErr=(\w+)', client_string_list[client_list_entry])
+    #                     # self.cli_rg_connected_clients_dict[mac]['rxerr'] = wi_state_search.group(1)
+    #                     cli_rg_connected_clients_dict[mac]['rxerr'] = wi_state_search.group(1)
+    #                     print('Seting rxerr to ', wi_state_search.group(1))
+    #                 else:
+    #                     # self.cli_rg_connected_clients_dict[mac]['rxerr'] = "Not found or value missing"
+    #                     cli_rg_connected_clients_dict[mac]['rxerr'] = "Not found or value missing"
+    #                     print('Seting rxerr to Not Found or value missing ')
+    #
+    #                 if re.search(r'.*RSSI=-(\w+)', client_string_list[client_list_entry]) is not None:
+    #                     wi_state_search = re.search(r'.*RSSI=-(\w+)', client_string_list[client_list_entry])
+    #                     # self.cli_rg_connected_clients_dict[mac]['rxerr'] = wi_state_search.group(1)
+    #                     cli_rg_connected_clients_dict[mac]['rxerr'] = wi_state_search.group(1)
+    #                     print('Seting rssi to ', wi_state_search.group(1))
+    #                 else:
+    #                     # self.cli_rg_connected_clients_dict[mac]['rssi'] = "Not found or value missing"
+    #                     cli_rg_connected_clients_dict[mac]['rssi'] = "Not found or value missing"
+    #                     print('Seting rssi to Not Found or value missing ')
+    #
+    #         return cli_rg_connected_clients_dict
+    #
+    #         # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).
     #         *SSID=(\w+).*PSMod=(\w+)?,.*NMode=(\w+)?,.*WMMEn=(\w+)?,.*Rate=(\w+\s\w+).*ON\sfor\s(\w+\s\w+)?.
     #         *TxPkt=(\w+).*TxErr=(\w+).*RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)?', re.DOTALL)
-#         # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:(\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\w+).
+    #         # show_wi_clients_reg_ex = re.compile(r'.*State=(\w+).*IP:(\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\w+).
     #         *RxUni=(\w+).*RxMul=(\w+).*RxErr=(\w+).*RSSI=-(\w+)', re.DOTALL)
-#         # not sure if I need to return this if the dictionary is alread bound to the instance
-#         return cli_rg_connected_clients_dict
+    #         # not sure if I need to return this if the dictionary is alread bound to the instance
+    #         return cli_rg_connected_clients_dict
 
     # @staticmethod  not static because we use the UI
     def get_airties_ip(self, airties_test_name):
@@ -1425,11 +1654,11 @@ class Nvg599Class(GatewayClass):
 
                     # for key, value in current_ui_rg_connected_clients_dict.items():
             # else:
-                # print('not this one: ' + test_house_devices_static_info[key]['device_test_name'])
+            # print('not this one: ' + test_house_devices_static_info[key]['device_test_name'])
             #    airties_ip = None
 
             # or key, value in current_ui_rg_connected_clients_dict.items():
-                # print('key:' + str(key) + ' the value:' + str(value))
+            # print('key:' + str(key) + ' the value:' + str(value))
             #    print('test name:' + current_ui_rg_connected_clients_dict[key]['test_name'])
         print('Name not present in test house device dictionary')
         return airties_ip
@@ -1660,6 +1889,7 @@ class Nvg599Class(GatewayClass):
                 print('time' + str(time.time()))
                 continue
         print('done')
+
     # @staticmethod
     # def factory_reset_rg(self, rg_url="http://192.168.1.254/cgi-bin/home.ha"):
     # we have to assume that the default RG IP is 192.168.1.254
@@ -1776,7 +2006,7 @@ class Nvg599Class(GatewayClass):
         # sleep(2)
         soup = BeautifulSoup(self.session.page_source, 'html.parser')
         tables = soup.findChildren('table')
-# five tables on this page
+        # five tables on this page
         table = tables[4]
         # table = soup.find("table100", {"class": "table100"})
         # print ("table is",table)
@@ -1816,36 +2046,36 @@ class Nvg599Class(GatewayClass):
                     return ui_channel_2g
 
                 print("5G -dbg channel:", row[2])
-#                # ui_channel_5g = row[2]
+                #                # ui_channel_5g = row[2]
                 if value_requested == 'ui_channel_5g':
                     print("5G Channel:", row[2])
                     ui_channel_5g = row[2]
                     return ui_channel_5g
 
-#        sleep(2)
-#       session.quit()
-#        homeNetworkLink = browser.find_element_by_link_text("Home Network")
-#        homeNetworkLink.click()
-#        sleep(2)
-#        homeNetworkLink = browser.find_element_by_link_text("Wi-Fi")
-#        homeNetworkLink.click()
-#        sleep(2)
-        # exit()
-        # soup = BeautifulSoup(browser.page_source, 'html.parser')
-        # print(" ------------access code ----------------")
-        # print(soup.find(id="password"))
-        # print(" ------------access code ----------------")
-#        device_access_code = browser.find_element_by_id("password")
-#       device_access_code.send_keys(self.device_access_code)
-#        submit = browser.find_element_by_name("Continue")
-#        submit.click()
-#        advancedOptionsLink = browser.find_element_by_link_text("Advanced Options")
-#        sleep(2)
-#       advancedOptionsLink.click()
-#       sleep(20)
-#       browser.quit()
-#        we need the band (2g or 5g) because both bands could be automatic which would be ambiguous
-#        nvg_599_dut.ui_set_bw_channel('g2', 40, 2)
+    #        sleep(2)
+    #       session.quit()
+    #        homeNetworkLink = browser.find_element_by_link_text("Home Network")
+    #        homeNetworkLink.click()
+    #        sleep(2)
+    #        homeNetworkLink = browser.find_element_by_link_text("Wi-Fi")
+    #        homeNetworkLink.click()
+    #        sleep(2)
+    # exit()
+    # soup = BeautifulSoup(browser.page_source, 'html.parser')
+    # print(" ------------access code ----------------")
+    # print(soup.find(id="password"))
+    # print(" ------------access code ----------------")
+    #        device_access_code = browser.find_element_by_id("password")
+    #       device_access_code.send_keys(self.device_access_code)
+    #        submit = browser.find_element_by_name("Continue")
+    #        submit.click()
+    #        advancedOptionsLink = browser.find_element_by_link_text("Advanced Options")
+    #        sleep(2)
+    #       advancedOptionsLink.click()
+    #       sleep(20)
+    #       browser.quit()
+    #        we need the band (2g or 5g) because both bands could be automatic which would be ambiguous
+    #        nvg_599_dut.ui_set_bw_channel('g2', 40, 2)
 
     def ui_set_band_bandwith_channel(self, band, bandwidth, channel):
         global nvg_info
@@ -1871,8 +2101,8 @@ class Nvg599Class(GatewayClass):
         advanced_options_link = self.session.find_element_by_link_text("Advanced Options")
         advanced_options_link.click()
         sleep(2)
-# nvg_599_dut.ui_set_bw_channel('g2', 40, 2)
-#        if band_selected == '2g' :
+        # nvg_599_dut.ui_set_bw_channel('g2', 40, 2)
+        #        if band_selected == '2g' :
         if band == '2g':
             bandwidth_select = self.session.find_element_by_id("obandwidth")
             print('found obandwidth')
@@ -1923,7 +2153,7 @@ class Nvg599Class(GatewayClass):
     # palmer@palmer-Latitude-E5450:~$ nmcli dev wifi | grep AirTies
     # I think I have to diable the wired connection on the RG. Then
 
-# super dog
+    # super dog
     def get_nmcli_networks(self):
         print('in wps_pair_default_airties')
         # nmcli connection down id "Wired connection 1
@@ -1947,7 +2177,7 @@ class Nvg599Class(GatewayClass):
             # line_list = output.splitlines()
             for line in line_list:
                 line = line.split()
-                print('line:'  + str(line))
+                print('line:' + str(line))
                 if line[0] == 'IN-USE':
                     continue
 
@@ -2003,8 +2233,7 @@ class Nvg599Class(GatewayClass):
 
             return nmcli_wifi_dict
             # exit()
-            #print('these are the networks' + str(output))
-
+            # print('these are the networks' + str(output))
 
     def wps_pair_default_airties(self, airties_network):
         print('in wps_pair_default_airties')
@@ -2034,7 +2263,7 @@ class Nvg599Class(GatewayClass):
         for key in airties_4920_defaults:
             if airties_4920_defaults[key]['default_ssid'] == airties_network:
                 print(airties_4920_defaults[key]['default_pw'])
-                cmd = "nmcli device wifi connect " + airties_network + " " + "password " +\
+                cmd = "nmcli device wifi connect " + airties_network + " " + "password " + \
                       airties_4920_defaults[key]['default_pw']
                 # may not need the password
                 # cmd = "nmcli device wifi connect " + airties_network
@@ -2430,15 +2659,15 @@ class Nvg599Class(GatewayClass):
 
         sleep(2)
 
-# 2.4 bw possibilities 20,40
-# 5 bw possibilities 20,40,80
-# InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.BSSID fc:51:a4:2f:25:94
-# InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.AutoChannelEnable 0
-# InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_BandLock X_0000   C5_5.0GHz
-# tr69 GetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth
-# tr69 SetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth=X_0000C5_80MHz
-# tr69 SetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth=X_0000C5_40MHz
-# InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth X_0000C5_80MH
+    # 2.4 bw possibilities 20,40
+    # 5 bw possibilities 20,40,80
+    # InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.BSSID fc:51:a4:2f:25:94
+    # InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.AutoChannelEnable 0
+    # InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_BandLock X_0000   C5_5.0GHz
+    # tr69 GetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth
+    # tr69 SetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth=X_0000C5_80MHz
+    # tr69 SetParameterValues  InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth=X_0000C5_40MHz
+    # InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.X_0000C5_Bandwidth X_0000C5_80MH
     @staticmethod
     def wait_for_ssh_to_be_ready(host, port, timeout_parm, retry_interval):
         print('in wait_for_ssh_to_be_read')
@@ -2574,7 +2803,7 @@ class Nvg599Class(GatewayClass):
         # ssh_client.login(hostname, username=None, port=8022)
         try:
             # ssh_client.PROMPT='$'
-            ssh_client.login(hostname, username=None, auto_prompt_reset=True,  quiet=False, sync_multiplier=5, port=8022)
+            ssh_client.login(hostname, username=None, auto_prompt_reset=True, quiet=False, sync_multiplier=5, port=8022)
             rf.write('    Logged in to ' + speed_test_ip + '\n')
             print("logged in to note8 \n")
 
@@ -2641,7 +2870,6 @@ class Nvg599Class(GatewayClass):
             if tmp_list[0] == 'NAME':
                 continue
 
-
     @staticmethod
     def nmcli_get_connections():
         # command = 'nmcli c'
@@ -2694,15 +2922,14 @@ class Nvg599Class(GatewayClass):
 
         # out = check_output(["ls -la"].decode("utf-8").shell=True)
         try:
-            #out = subprocess.check_output("ping -c" + str(number_of_pings) + " " +
+            # out = subprocess.check_output("ping -c" + str(number_of_pings) + " " +
             #                             remote_ip, shell=True).decode("utf-8")
             output = subprocess.check_output(cmd, shell=True)
 
         except subprocess.CalledProcessError as e:
             print('ping error', e)
-            output= "ping fail"
-            return(output)
-
+            output = "ping fail"
+            return (output)
 
         # output = subprocess.check_output(cmd, shell=True)
         for line in output.splitlines():
@@ -2821,13 +3048,14 @@ class Nvg599Class(GatewayClass):
             # e.returncode = 0
             ping_fail_str = str(e.output)
             ping_fail_return = "Ping_failed  ping fail str:" + ping_fail_str
-            print('ping failed:'+ ping_fail_str)
+            print('ping failed:' + ping_fail_str)
 
             return "Fail"
 
     def tftp_list_test(self, *file_list):
         for x in file_list:
             print(x)
+
     # we want to pass in a remote file source  in case we are getting  files from somewhere else-- do I need a put?
     # def tftp_get_file_cli(self, remote_file_source, *source_device_list):
 
@@ -2839,7 +3067,8 @@ class Nvg599Class(GatewayClass):
         # show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(self)
         source_device_ip = 0
         for ip_lan_entry in show_ip_lan_dict:
-            print('remote_source: ' + str(tftp_server_name) + 'Name:'  + str(show_ip_lan_dict[ip_lan_entry]["Name"]) + '\n\n')
+            print('remote_source: ' + str(tftp_server_name) + 'Name:' + str(
+                show_ip_lan_dict[ip_lan_entry]["Name"]) + '\n\n')
 
             if tftp_server_name == show_ip_lan_dict[ip_lan_entry]["Name"]:
                 # print(ip_lan_entry)
@@ -2900,7 +3129,7 @@ class Nvg599Class(GatewayClass):
         #     print('remote 3:' + str(tftp_session.before) + '\n')
         # tftp_session.close()
 
-# pfp ******  moved to parent class forget it for now
+    # pfp ******  moved to parent class forget it for now
     def xxlogin_nvg_599_cli(self):
         print('In login_nvg_5g_cli')
         self.telnet_cli_session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
@@ -2917,7 +3146,6 @@ class Nvg599Class(GatewayClass):
 
         return self.telnet_cli_session
 
-# super dog
     def tftp_rg_firmware_from_cli(self):
         print('In login_nvg_5g_cli')
         self.telnet_cli_session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
@@ -2931,7 +3159,6 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.expect(">")
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect(">")
-
 
     def login_nvg_599_band5_cli(self):
         print('In login_nvg_5g_cli')
@@ -3099,20 +3326,20 @@ class Nvg599Class(GatewayClass):
         print('tr69 enbled for ECO')
         self.session.close()
 
-#     @staticmethod
-#     def get_tr69_ssid_status_cli(ssid):
-#         telnet_cli_session = login_nvg_599_cli()
-#         telnet_cli_session.sendline('magic')
-#         telnet_cli_session.expect("UNLOCKED>")
-#         telnet_cli_session.sendline('tr69 tr69 GetParameterValues InternetGatewayDevice.
+    #     @staticmethod
+    #     def get_tr69_ssid_status_cli(ssid):
+    #         telnet_cli_session = login_nvg_599_cli()
+    #         telnet_cli_session.sendline('magic')
+    #         telnet_cli_session.expect("UNLOCKED>")
+    #         telnet_cli_session.sendline('tr69 tr69 GetParameterValues InternetGatewayDevice.
     #         LANDevice.1.WLANConfiguration.' + ssid + '.Enable')
-#         telnet_cli_session.expect(".*UNLOCKED>")
-#         status_output = telnet_cli_session.before
-#         status_info_reg_ex = re.compile(r'Enable\s(\d)')
-#         status = status_info_reg_ex.search(status_output)
-#         print('returning SSID:' + ssid + ' Status:' + status )
-#         telnet_cli_session.close()
-#
+    #         telnet_cli_session.expect(".*UNLOCKED>")
+    #         status_output = telnet_cli_session.before
+    #         status_info_reg_ex = re.compile(r'Enable\s(\d)')
+    #         status = status_info_reg_ex.search(status_output)
+    #         print('returning SSID:' + ssid + ' Status:' + status )
+    #         telnet_cli_session.close()
+    #
 
     def get_tr69_auto_setup_ssid_status_cli(self, ssid):
         self.telnet_cli_session = self.login_nvg_599_cli()
@@ -3263,7 +3490,7 @@ class Nvg599Class(GatewayClass):
                 print('time' + str(time.time()))
                 continue
 
-# incomplete there are profiles to add
+    # incomplete there are profiles to add
     def enable_parental_control(self, rf, rfa):
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
@@ -3448,7 +3675,9 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.expect('>')
         status_output = self.telnet_cli_session.before
         band2_cli_dict = {}
-        status_info_reg_ex = re.compile(r'SSID:\s"(\w+)"\s*?Mode:\s(\w+)\s*?RSSI:\s(\d+).*?noise:\s-(\d+).*?Channel:\s(\d+).*?BSSID:\s(\w+:\w+:\w+:\w+:\w+:\w+)', re.DOTALL)
+        status_info_reg_ex = re.compile(
+            r'SSID:\s"(\w+)"\s*?Mode:\s(\w+)\s*?RSSI:\s(\d+).*?noise:\s-(\d+).*?Channel:\s(\d+).*?BSSID:\s(\w+:\w+:\w+:\w+:\w+:\w+)',
+            re.DOTALL)
         print('status_output' + str(status_output) + '\n')
         mo1 = status_info_reg_ex.search(status_output)
         # print('ssid:' + str(mo1.group(1)) + '\n')
@@ -3476,7 +3705,9 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.sendline('wl status')
         self.telnet_cli_session.expect('#')
         status_output = self.telnet_cli_session.before
-        status_info_reg_ex = re.compile(r'SSID:\s"(\w+)"\s*?Mode:\s(\w+)\s*?RSSI:\s(\d+).*?noise:\s-(\d+).*?Channel:\s(\d+)/(\d+).*?BSSID:\s(\w+:\w+:\w+:\w+:\w+:\w+)',re.DOTALL)
+        status_info_reg_ex = re.compile(
+            r'SSID:\s"(\w+)"\s*?Mode:\s(\w+)\s*?RSSI:\s(\d+).*?noise:\s-(\d+).*?Channel:\s(\d+)/(\d+).*?BSSID:\s(\w+:\w+:\w+:\w+:\w+:\w+)',
+            re.DOTALL)
         print('status_output' + str(status_output) + '\n')
         mo1 = status_info_reg_ex.search(status_output)
         band5_cli_dict['ssid'] = str(mo1.group(1))
@@ -3492,7 +3723,7 @@ class Nvg599Class(GatewayClass):
     def urllib_get_rg_file(self, rg_url_to_return, rf, rfa):
         print('in url get')
         # with urllib.request.urlopen('http://192.168.1.254/ATT/topology') as response:
-        with urllib.request.urlopen(rg_url_to_return, data = None, timeout = 3) as response:
+        with urllib.request.urlopen(rg_url_to_return, data=None, timeout=3) as response:
             html_response = response.read()
             encoding = response.headers.get_content_charset('utf-8')
             decoded_html = html_response.decode(encoding)
@@ -3523,7 +3754,7 @@ class Nvg599Class(GatewayClass):
         telnet_cli_session = Nvg599Class.login_nvg_599_cli(self)
 
         # self.telnet_cli_session. sendline("show ip lan")
-        telnet_cli_session. sendline("show ip lan")
+        telnet_cli_session.sendline("show ip lan")
         # self.telnet_cli_session.expect('>')
         telnet_cli_session.expect('>')
         # ip_lan_output = self.telnet_cli_session.before
@@ -3571,7 +3802,8 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect("UNLOCKED>")
-        self.telnet_cli_session.sendline('tr69 GetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.' + ssid + '.')
+        self.telnet_cli_session.sendline(
+            'tr69 GetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.' + ssid + '.')
         self.telnet_cli_session.expect("UNLOCKED>")
         tr69_auto_ssid_default = self.telnet_cli_session.before
         return tr69_auto_ssid_default
@@ -3616,15 +3848,13 @@ class Nvg599Class(GatewayClass):
         # urllib.request.urlretrieve(rg_url, filename=url_temp_file)
         # urllib.request.urlretrieve(rg_url)
 
-
-
     def session_cleanup(self):
         pass
-# class Nvg_5268_Class(GatewayClass):
-#     def __init__(self):
-#         self.name = "Nvg_5268"
-#      # rg5268 = pexpect.spawn("telnet 192.168.1.254")
 
+    # class Nvg_5268_Class(GatewayClass):
+    #     def __init__(self):
+    #         self.name = "Nvg_5268"
+    #      # rg5268 = pexpect.spawn("telnet 192.168.1.254")
 
     from subprocess import Popen, PIPE
 
@@ -3636,7 +3866,6 @@ class Nvg599Class(GatewayClass):
         proc.communicate(password.encode())
         stdout = proc.communicate()[0]
         print('stdout' + stdout)
-
 
 #        cmd = "sudo /etc/init.d/network-manager  stop"
 #         try:
