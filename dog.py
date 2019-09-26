@@ -4,10 +4,11 @@ from __future__ import unicode_literals
 from   rgclass import test_house_devices_static_info
 # import itertools
 import pprint
+import subprocess
 import wget
 from datetime import datetime
 # from selenium.webdriver.support.ui import WebDriverWait
-
+import traceback
 import pickle
 # import global.py
 # import time
@@ -46,23 +47,18 @@ ALL_BAND5_CHANNELS = {36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112,
 #     test_status = "Pass"
 #     rf.write('Test ' + test_name + '\n')
 #     print('Test:' + test_name + '\n')
-def test_dfs(nvg_599_dut,rf, rfa, test_name ):
+def trigger_dfs_channel_change(nvg_599_dut,rf, rfa, test_name, airties_name = "None" ):
     global NON_DFS_CHANNELS
     global DFS_CHANNELS
     test_status = "Pass"
-    rf.write('Test ' + test_name + '\n')
+    rf.write('Test ' + test_name + ' Airties device:' + airties_name + '\n')
     print('Test:' + test_name + '\n')
-    # now = datetime.today().isoformat()
-    now = datetime.today().strftime("%B %d, %Y,%H:%M")
-    # dfs_results_file = open('dfs_file.txt', 'a')
-    # dfs_results_file.write("Test Title:tst_dfs Execution time:")
-    # dfs_results_file.write(now)
-    # dfs_results_file.write("\n")
-
     session = nvg_599_dut.session
     home_link = session.find_element_by_link_text("Device")
     home_link.click()
+
     current_5g_channel = nvg_599_dut.get_ui_home_network_status_value("ui_channel_5g")
+    print('current_5g_channel{' + current_5g_channel + '\n')
     if current_5g_channel in DFS_CHANNELS:
         result = "Current 5G:" + current_5g_channel + " is a DFS channel\n"
         result_str = str(result)
@@ -71,41 +67,76 @@ def test_dfs(nvg_599_dut,rf, rfa, test_name ):
     else:
         print('this is a non DFS Changing to DFS channel 100')
         # def ui_set_bw_channel(self, band, bandwidth, channel):
-        result = "Current 5G:" + current_5g_channel + " is not a DFS channel\n"
-        # result_str = str(result)
         # dfs_results_file.write("Changing to DFS channel 100, bandwidth 80\n")
         rf.write('    ' + 'Changing to DFS channel 100, bandwidth 80\n')
-
+        print(' Airties before 5 \n')
+        # new_session = nvg_599_dut.login_4920("192.168.1.67")
+        # new_session.sendline('\n')
+        # new_session.expect('#')
+        # new_session.close()
         nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, 100)
+
         print('setting channel to DFS channel 100')
+    # this is the default, we are triggering dfs from the RG 5 g side
+#   fails here
+    # nvg_599_dut.login_4920("192.168.1.67")
 
-    nvg_599_dut.login_nvg_599_cli()
-    nvg_599_dut.telnet_cli_session.sendline()
-    nvg_599_dut.telnet_cli_session.expect(">")
-    # this is the IP used for build prior to corvus3 d13/d11
-    # nvg_599_dut.telnet_cli_session.sendline("telnet 192.168.1.1")
-    nvg_599_dut.telnet_cli_session.sendline("telnet 203.0.113.2")
-    nvg_599_dut.telnet_cli_session.expect("#")
-    nvg_599_dut.telnet_cli_session.sendline("wl -i eth1 radar 2")
-    sleep(10)
+    if airties_name == "None":
+        print(' Airties:' + airties_name + '\n')
+        print('triggering DFS from the RG \n')
 
+        nvg_599_dut.login_nvg_599_cli()
+        nvg_599_dut.telnet_cli_session.sendline()
+        nvg_599_dut.telnet_cli_session.expect(">")
+        # this is the IP used for build prior to corvus3 d13/d11
+        # nvg_599_dut.telnet_cli_session.sendline("telnet 192.168.1.1")
+        nvg_599_dut.telnet_cli_session.sendline("telnet 203.0.113.2")
+        nvg_599_dut.telnet_cli_session.expect("#")
+        nvg_599_dut.telnet_cli_session.sendline("wl -i eth1 radar 2")
+        sleep(10)
+    # elif airties_name == "Any":
+    #     pass
+    else:
+        print(' Airties: ' + airties_name + '\n')
+        # nvg_599_dut.login_nvg_599_cli()
+        ip_lan_info_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
+        # first translate the device name to a mac using the
+        for x, y in ip_lan_info_dict.items():
+            print(x, y)
+        airties_ip = "0.0.0.0"
+
+        for device_mac in ip_lan_info_dict:
+            if airties_name == ip_lan_info_dict[device_mac]['Name']:
+                airties_ip = ip_lan_info_dict[device_mac]['IP']
+                print(' Airties ip:  ' + airties_ip + '\n')
+
+        if airties_ip == "0.0.0.0":
+            rf.write('    ' + 'Airties device not found in sh IP lan: Aborting \n')
+            print('   Airties device not found in sh IP lan: Aborting \n')
+            return "Fail"
+
+        print(' Airties ip: ' +  airties_ip + '\n')
+        print(' This is a biggy \n')
+
+        # this doesn't work afer the commit button is pressed for some reason
+        # airties_cli_session =  nvg_599_dut.login_4920(airties_ip)
+        # print(' This is a biggy session:' + str(airties_cli_session) +  '\n')
+        # airties_cli_session.sendline("\n")
+        # airties_cli_session.expect("#")
+        # airties_cli_session.sendline("wl -i wl1 radar 2")
+        # airties_cli_session.expect("#")
+        # sleep(5)
+        # airties_cli_session.close()
     current_5g_channel = nvg_599_dut.get_ui_home_network_status_value("ui_channel_5g")
     current_5g_channel = int(current_5g_channel)
 
-    print('current_5g_channel', current_5g_channel)
-    # after the test we expect the channel to have been changed to a non DFS channel
-
+    # after the simulating radar detection we expect the channel to change to a non DFS channel
+    print('current_5g_channel after trigger', current_5g_channel)
     if current_5g_channel in NON_DFS_CHANNELS:
-        #rf.write('    ' + "5G channel changed to non DFS channel: " + '\n')
-        # test_status = "Fail"
         rf.write("    5G channel changed to non DFS channel:" + str(current_5g_channel) + " Pass \n" )
-        #dfs_results_file.write(str(current_5g_channel))
-        #dfs_results_file.write("\n")
-
         print("Channel change to non DFS  Passed\n")
         print("Setting back to DFS\n")
         rf.write("    Changing back to DFS channel: 100 \n" )
-
         nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, 100)
 
         current_5g_channel = nvg_599_dut.get_ui_home_network_status_value("ui_channel_5g")
@@ -127,57 +158,62 @@ def test_dfs(nvg_599_dut,rf, rfa, test_name ):
 
 
 def tst_speed_test(nvg_599_dut, results_file, test_ip):
-    print('in tst_speed_test')
-    now = datetime.today().isoformat()
-    results_file.write("Test Title:tst_speed_tst Execution time:")
-    results_file.write(now)
-    results_file.write("\n")
-    down_load_speed, up_load_speed = nvg_599_dut.speed_test_cli(test_ip)
-    print('Download speed:', down_load_speed, 'Upload speed:', up_load_speed)
-    speed = 'Download speed:' + down_load_speed + ' Upload speed:' + up_load_speed
-    results_file.write(speed)
-    results_file.write("\n")
+    try:
+        print('in tst_speed_test')
+        now = datetime.today().isoformat()
+        results_file.write("Test Title:tst_speed_tst Execution time:")
+        results_file.write(now)
+        results_file.write("\n")
+        down_load_speed, up_load_speed = nvg_599_dut.speed_test_cli(test_ip)
+        print('Download speed:', down_load_speed, 'Upload speed:', up_load_speed)
+        speed = 'Download speed:' + down_load_speed + ' Upload speed:' + up_load_speed
+        results_file.write(speed)
+        results_file.write("\n")
+        gw_serial_number = nvg_599_dut.serial_number
+        gw_info = 'NVG 599 serial number:' + gw_serial_number
+        results_file.write(gw_info)
+        results_file.write("\n")
+        software_version = 'Software Version:' + nvg_599_dut.software_version
+        results_file.write(software_version)
+        results_file.write("\n\n\n")
+    except Exception as e:
+        print("type error: " + str(e))
+        print(traceback.format_exc())
 
-    gw_serial_number = nvg_599_dut.serial_number
-    gw_info = 'NVG 599 serial number:' + gw_serial_number
-    results_file.write(gw_info)
-    results_file.write("\n")
-    software_version = 'Software Version:' + nvg_599_dut.software_version
-    results_file.write(software_version)
-    results_file.write("\n")
-    results_file.write("\n")
-    results_file.write("\n")
-
+# deprecated
 def tst_ping_ip(nvg_599_dut, ping_history_file, remote_ip):
-    print('in tst_ping')
-    # ping_history_file  = open('ping_history_file.txt', 'a+')
-    ping_history_file = open(ping_history_file, 'a+')
-    now = datetime.today().isoformat()
-    ping_history_file.write("Test Title:tst_ping Execution time:")
-    ping_history_file.write(now)
-    ping_history_file.write("\n")
-    min_ping,avg_ping,max_ping,mdev_ping = nvg_599_dut.ping_from_local_host(remote_ip)
-    min_str = 'Min time: ' + min
-    ping_history_file.write(min_str)
+    try:
+        print('in tst_ping')
+        ping_history_file = open(ping_history_file, 'a+')
+        now = datetime.today().isoformat()
+        ping_history_file.write("Test Title:tst_ping Execution time:")
+        ping_history_file.write(now)
+        ping_history_file.write("\n")
+        min_ping,avg_ping,max_ping,mdev_ping = nvg_599_dut.ping_from_local_host(remote_ip)
+        min_str = 'Min time: ' + min
+        ping_history_file.write(min_str)
 
-    ping_history_file.write("\n")
-    avg_str = 'Avg time: ' + avg_ping
-    ping_history_file.write(avg_str)
+        ping_history_file.write("\n")
+        avg_str = 'Avg time: ' + avg_ping
+        ping_history_file.write(avg_str)
 
-    ping_history_file.write("\n")
-    max_str = 'Max time:' + max_ping
-    ping_history_file.write(max_str)
+        ping_history_file.write("\n")
+        max_str = 'Max time:' + max_ping
+        ping_history_file.write(max_str)
 
-    ping_history_file.write("\n")
-    mdev_str = 'mdev time:' + mdev_ping
-    ping_history_file.write(mdev_str)
+        ping_history_file.write("\n")
+        mdev_str = 'mdev time:' + mdev_ping
+        ping_history_file.write(mdev_str)
 
-    ping_history_file.write("\n")
-    print('min: ', min_ping)
-    print('avg: ', avg_ping)
-    print('max: ', max_ping)
-    print('mdev:', mdev_ping)
-    return "Pass"
+        ping_history_file.write("\n")
+        print('min: ', min_ping)
+        print('avg: ', avg_ping)
+        print('max: ', max_ping)
+        print('mdev:', mdev_ping)
+        return "Pass"
+    except Exception as e:
+        print("type error: " + str(e))
+        print(traceback.format_exc())
 
 def test_ping_device_name(nvg_599_dut, device_name_to_ping):
     sh_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(nvg_599_dut)
@@ -499,22 +535,18 @@ def tst_ping_rg_power_level(nvg_599_dut, remote_ip, number_of_pings):
     ping_file.writelines('tst_ping_rg_power_level' + '\n')
     now = datetime.today().strftime("%B %d, %Y,%H:%M")
     ping_file.writelines('Date:' + now + '  599 FW Ver:' + nvg_599_dut.software_version + '  Ser. No:' + nvg_599_dut.serial_number + '\n\n')
-
     nvg_599_dut.disable_enable_wifi_2_4g('On')
     sleep(60)
     nvg_599_dut.disable_enable_wifi_5g('On')
     sleep(60)
     nvg_599_dut.set_wifi_power_level('band2', '100')
     nvg_599_dut.set_wifi_power_level('band5', '100')
-
     nvg_599_dut.disable_enable_wifi_5g('Off')
     sleep(120)
     min_ping, avg_ping, max_ping, mdev_ping, sent, received, loss = nvg_599_dut.ping_from_local_host(remote_ip,number_of_pings)
     print('min:' + min_ping + ' max:' + max_ping)
-
     ping_file.writelines('Band:' + 'band2' + '  Ping: ' + remote_ip + '  RG Pwr: 100%' +
                      '  Sent:' + sent + '  Received:' + received + '  Percent loss:' + loss + '%\n')
-
     ping_file.writelines('Minimum:' + min_ping + '  Average::' + avg_ping + '  Maximum:' + max_ping + ' Max dev:' + mdev_ping + '\n')
     ping_file.writelines('\n')
     print('xx2')
@@ -525,7 +557,6 @@ def tst_ping_rg_power_level(nvg_599_dut, remote_ip, number_of_pings):
     ping_file.writelines('Band:' + 'band2' + '  Ping: ' + remote_ip + '  RG Pwr: 50%' +
                       '  Sent:' + sent + '  Received:' + received + '  Percent loss:' + loss + '%\n')
     ping_file.writelines('Minimum:' + min_ping + '  Average::' + avg_ping + '  Maximum:' + max_ping + ' Max dev:' + mdev_ping + '\n')
-
     print('xx2')
     # restore  band2
     ping_file.writelines('\n')
@@ -784,8 +815,7 @@ def test_speedtest_from_android(nvg_599_dut, device_name, test_house_devices_sta
     if device_ip != "0.0.0.0" :
         # note_8_ip = ip_lan_info_dict['b8:d7:af:aa:27:c3']['IP']
         # device_ip = ip_lan_info_dict[device_mac]['IP']
-        rf.write('    Android device IP  present in cli command sh ip lan: ' + device_ip )
-
+        rf.write('    Android device IP  present in cli command sh ip lan: ' + device_ip + '\n' )
         print('device is present :' + str(device_ip))
     else:
         rf.write('    Android device IP not present in cli command sh ip lan, Aborting test \n\n')
@@ -944,7 +974,9 @@ def ping_gw_from_4920(nvg_599_dut,rf,rfa, test_name, airties_ip = 'Default'):
     else:
         ip_4920 = airties_ip
 
-    airties_session = nvg_599_dut.static_login_4920(ip_4920)
+    # airties_session = nvg_599_dut.static_login_4920(ip_4920)
+    airties_session = nvg_599_dut.login_4920(ip_4920)
+
     airties_session.sendline('ping -c 4 192.168.1.254')
     airties_session.expect('#')
     ping_output = airties_session.before
@@ -1060,7 +1092,7 @@ def verify_airties_hello_packet_count_increasing(nvg_599_dut,rf, rfa, test_name,
              return "Fail"
     else:
         ip_4920 = airties_ip
-    airties_session = nvg_599_dut.static_login_4920(ip_4920)
+    airties_session = nvg_599_dut.login_4920(ip_4920)
     airties_session.sendline('cat /proc/mesh-ng-topology | grep hello')
     airties_session.expect('#')
     hello_output = airties_session.before
@@ -1183,17 +1215,23 @@ def url_att_friendly_info_smoke(nvg_599_dut, url_to_return, rf, rfa, test_name):
     friendly_regex = re.compile(r'ownaddr=(\w+:\w+:\w+:\w+:\w+:\w+).*?(friendlyname=\w+)')
     friendly_text = friendly_regex.search(decoded_html)
 
-    print('rg_mac:' + friendly_text.group(1))
+    # this is wrong, calling this could cause an invalid operator execption
+    # print('rg_mac:' + friendly_text.group(1))
+    # rg_mac = friendly_text.group(1)
+    # print('ip:' + friendly_text.group(2))
+    # friendlyname = friendly_text.group(2)
 
-    rg_mac = friendly_text.group(1)
-    print('ip:' + friendly_text.group(2))
-    friendlyname = friendly_text.group(2)
+
     if friendly_text == None:
         print('friendly-info file fails test')
-        rf.write('     friendly-info file strings:ownaddr=' + rg_mac + 'and friendly name::' + friendlyname + 'not found:Fail\n\n')
+        rf.write('     friendly-info file strings:ownaddr=' + nvg_5g_mac +  'not found:Fail\n\n')
         test_status = "Fail"
     else:
         print(friendly_text)
+        print('rg_mac:' + friendly_text.group(1))
+        rg_mac = friendly_text.group(1)
+        print('ip:' + friendly_text.group(2))
+        friendlyname = friendly_text.group(2)
         rf.write('     friendly-info file strings:ownaddr=' + rg_mac + 'and friendly name:' + friendlyname + ' found :Pass\n\n')
     return test_status
 
@@ -1401,7 +1439,7 @@ def install_airties_firmware(nvg_599_dut, rf, rfa, test_name, airties_firmware, 
     # remote device name is any then get the first available airties
     # else use the one provided, if not on the loal lan then error.
     # get the ip of the device from the name
-    print('execute_speedtest_from_android_termux')
+    print('install_airties_firmware')
     test_status = "Passed"
     return test_status
 
@@ -1426,7 +1464,7 @@ def guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, test_name):
             default_wifi_active = connection
             print('active_ssid:' + default_wifi_active + '\n')
         else:
-            print('wired_ssid:' + default_wifi_active + '\n')
+            print('wired_ssid:' + connection + '\n')
 
         nvg_599_dut.nmcli_set_connection(connection, 'down')
 
@@ -1474,8 +1512,7 @@ def guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, test_name):
     return test_status
 
 
-def enable_guest_network_and_set_passwords(self, rf, rfa, test_name,
-                                           ssid_password = '1111111111', guest_ssid_password = '2222222222'):
+def enable_guest_network_and_set_passwords(self, rf, rfa, test_name, ssid_password = '1111111111', guest_ssid_password = '2222222222'):
 # def config_enable_guest_network_and_set_passwords(nvg_599_dut, rf, rfa, test_name):
     print('in config_enable_guest_network_and_set_passwords \n')
 
@@ -1483,12 +1520,85 @@ def enable_guest_network_and_set_passwords(self, rf, rfa, test_name,
     pass
 
 
+
+
+def verify_ssid_change_propagated_to_airties(self, rf, rfa, test_name , ssid, password = "default" ):
+# def config_enable_guest_network_and_set_passwords(nvg_599_dut, rf, rfa, test_name):
+    print('in config_enable_guest_network_and_set_passwords \n')
+    self.conf_home_network_ssid_and_password(rf, rfa, ssid, password)
+    test_status = rf.write('Test ' + str(test_name) + '\n')
+
+
+
+
+# patches
 with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     open('resultsa_file.txt', mode='w', encoding='utf-8') as rfa :
     now = datetime.today().strftime("%B %d, %Y,%H:%M")
 
     send_email = 1
     nvg_599_dut = Nvg599Class()
+    #     def conf_guest_network_ssid_and_password(self, rf, rfa, enable_disable, guest_ssid = "default", guest_password = "2222222222"):
+    # nvg_599_dut.rg_setup_without_factory_reset(rf, rfa)
+    # nvg_599_dut.conf_home_network_ssid_and_password(self, rf, rfa, home_ssid = "default", home_password = "default"):
+    nvg_599_dut.get_4920_ssid("192.168.1.67")
+    #nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default_baloney", "default")
+
+    # nvg_599_dut.conf_guest_network_ssid_and_password(rf, rfa, "off",  "patches_is_a_pretty_dog", "woofcarlysdogwoof")
+    exit()
+    # local_to_remote_ping(nvg_599_dut,rf, rfa,  '192.168.1.69',  "local_to_remote_ping")
+    # exit()
+    #------------------------------------------------------------------------------
+    # # started nmcli dev wifi rescansudo systemctl start wpa_supplicant.service
+    # ssid_pw_dict = nvg_599_dut.get_ui_ssid_and_password_values()
+    # guest_ssid_to_remove = ssid_pw_dict['band2']['ssid']
+    # global nvg_info
+    # print('band2 to remove:' + str(guest_ssid_to_remove))
+    #
+    # nmcli_connections = nvg_599_dut.nmcli_get_connections_test()
+    # # here we are just looking at deleting existing nmcli connections. Not sure if I have to do this.
+    # for line in nmcli_connections.splitlines():
+    #     if "ATT4ujR48s_Guest" in str(line, 'utf-8'):
+    #         line_list = line.split()
+    #         uuid = line_list[-3]
+    #         print('deleting uuid:' + str(uuid,'utf-8')  + '\n')
+    #         cmd = "nmcli connection  delete " + str(uuid,'utf-8')
+    #         try:
+    #             output = subprocess.check_output(cmd, shell=True)
+    #         except subprocess.CalledProcessError as e:
+    #             print(e.output)
+    #         else:
+    #             print(output)
+    #     # nmcli device wifi connect ATT4ujR48s_Guest password 2222222222
+    # cmd = "nmcli device wifi connect " + ssid_pw_dict['guest']['ssid'] +  " password " + ssid_pw_dict['guest']['password']
+    # try:
+    #     output = subprocess.check_output(cmd, shell=True)
+    # except subprocess.CalledProcessError as e:
+    #      print(e.output)
+    # else:
+    #     print(output)
+    # sleep(5)
+    # cmd = "nmcli device wifi connect " + ssid_pw_dict['band5']['ssid'] + " password " + ssid_pw_dict['band5']['password']
+    # try:
+    #     output = subprocess.check_output(cmd, shell=True)
+    # except subprocess.CalledProcessError as e:
+    #     print(e.output)
+    # else:
+    # print(str(ssid_pw_dict))
+    # exit()
+    # #------------------------------------------------------------------------------
+    #
+    #
+
+
+
+
+    # guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, "def guest_client_cannot_ping_rg")
+
+    # nvg_599_dut.nmcli_get_active_connections()
+    #nvg_599_dut.ping_check("192.168.1.254")
+
+    # exit()
     # nmcli_dict = nvg_599_dut.get_nmcli_networks()
     # for x in  nmcli_dict:
     #     print('ssid:'  + x + '\n\n\n')
@@ -1503,33 +1613,37 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
 
     # nvg_599_dut.adv_configure_guest_network(rf, rfa, "on", "super_dog_ssid", "the_doggiest_password")
     # def adv_conf_band2_radio_ui(self, band2_enable_disable, mode, bandwidth, channel, power_level):
-    nvg_599_dut.adv_conf_band2_radio_ui(rf, rfa, "on", "b-only", "40", "7", "92")
+    #nvg_599_dut.adv_conf_band2_radio_ui(rf, rfa, "on", "b-only", "40", "7", "92")
 
 
     #def adv_conf_band2_home(self, rf, rfa, band2_home_ssid_enable_disable_parm, ssid_name, hide_ssid_name, security, wpa_version, password, wpa_setup_on_off, max_clients):
     # nvg_599_dut.adv_conf_band2_home(rf, rfa, "on", "ssid_dog, "off", security,
     #                            wpa_version, password, wpa_setup_on_off, max_clients):
-
-
     # nvg_599_dut.adv_configure_guest_network(rf, rfa, "on", "say_what_ssid", "no_way_password")
 
-
-    exit()
 
     # now that we have the dict we can look for the default  4921
     # nvg_599_dut.enable_monitor_mode()
     # test_speedtest_from_android(nvg_599_dut, 'Galaxy-Note8', test_house_devices_static_info, 'test_speedtest_from_android ', rf, rfa)
     # def execute_speedtest_from_android_termux(speed_test_ip, rf, rfa):
     # nvg_599_dut.execute_speedtest_from_android_termux("192.168.1.77",rf, rfa)
-    rf.write('RG Test run Firmware:' +  nvg_599_dut.software_version + '  Date:' + now + ' ' '\n\n')
+    # rf.write('RG Test run Firmware:' +  nvg_599_dut.software_version + '  Date:' + now + ' ' '\n\n')
+    rf.write('RG Test run Firmware: nvg599-11.5.0h0d18_1.1.bin  Date:' + now +  '\n\n')
+
     rfa.write(now + '\n')
     sleep(2)
-    #nvg_599_dut.rg_setup_without_factory_reset(rf, rfa)
-    # exit()
-    # tftp_rg_firmware_and_install(nvg_599_dut, "LP-PPALMER", "nvg599-11.5.0h0d11_1.1.bin", rf, rfa, "tftp_rg_firmware_and_install")
+    # this test needs some investigation
+    # test_speedtest_from_android(nvg_599_dut, 'Galaxy-Note8', test_house_devices_static_info, 'test_speedtest_from_android ', rf, rfa)
 
+    # trigger_dfs_channel_change(nvg_599_dut, rf, rfa, 'trigger_dfs_channel_change', "ATT_4920_8664D4")
+    # trigger_dfs_channel_change(nvg_599_dut, rf, rfa, 'trigger_dfs_channel_change', "None")
+
+    # nvg_599_dut.rg_setup_without_factory_reset(rf, rfa)
+    #tftp_rg_firmware_and_install(nvg_599_dut, "LP-PPALMER", "nvg599-9.2.2h13d26_1.1.bin", rf, rfa,"tftp_rg_firmware_and_install")
+
+   #  exit()
+    #nvg_599_dut.rg_setup_without_factory_reset(rf, rfa)
     #nvg_599_dut.nmcli_set_connection(nmcli_connection_name, command):
-    # tftp_rg_firmware_and_install(nvg_599_dut, "LP-PPALMER", "nvg599-11.5.0h0d8_1.1.bin", rf, rfa, "tftp_rg_firmware_and_install")
 
     # this  works
     # guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, 'guest_client_cannot_ping_rg')
@@ -1541,8 +1655,6 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     # this takes the prior active connection down and connects to the new one, which is easier, and then triger
     # on the rg ui from the the wps button
     #
-    # exit()
-
     # def static_reset_4920(ip_4920):
     #     print('In static_reset_4920')
     #     cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
@@ -1560,9 +1672,9 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     # end this works----------------------------------------------------------------------------
 
 
-    # tftp_rg_firmware_and_install(nvg_599_dut, "LP-PPALMER", "nvg599-11.5.0h0d14_1.1.bin", rf, rfa,"tftp_rg_firmware_and_install")
+    # tftp_rg_firmware_and_install(nvg_599_dut, "LP-PPALMER", "nvg599-11.5.0h0d18_1.1.bin", rf, rfa,"tftp_rg_firmware_and_install")
     # sleep(300)
-    # url_att_friendly_info_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/friendly-info', rf, rfa, 'url_att_friendly_info_smoke')
+    url_att_friendly_info_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/friendly-info', rf, rfa, 'url_att_friendly_info_smoke')
     ping_gw_from_4920(nvg_599_dut, rf, rfa, "ping_gw_from_4920")
     ping_airties_from_rg(nvg_599_dut, rf, rfa, "ping_airties_from_RG")
     verify_airties_hello_packet_count_increasing(nvg_599_dut, rf, rfa, "verify_airties_hello_packet_count_increasing")
@@ -1570,13 +1682,10 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     url_att_topology_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/topology', rf, rfa, 'url_att_topology_smoke')
     url_att_route_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/route', rf, rfa, 'url_att_route_smoke')
     # url_att_friendly_info_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/friendly-info', rf, rfa,
-    # 'url_att_friendly_info_smoke')
     # band5_peers_set_after_airties_association(nvg_599_dut, rf, rfa, "band5_peers_set_after_airties_associationn")
     # nvg_599_dut.tftp_get_file_cli(source_device_name, "nvg599-9.2.2h13d24_1.1.bin","nvg599-9.2.2h13d22_1.1.bin","nvg599-9.2.2h13d20_1.1.bin","nvg599-9.2.2h13d18_1.1.bin","nvg599-9.2.2h13d16_1.1.bin","nvg599-9.2.2h13d14_1.1.bin","nvg599-9.2.2h13d12_1.1.bin","nvg599-9.2.2h13d10_1.1.bin")
     url_att_steer_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/steer', rf, rfa, 'url_att_steer_smoke')
     test_speedtest_from_android(nvg_599_dut, 'Galaxy-Note8', test_house_devices_static_info, 'test_speedtest_from_android ', rf, rfa)
-    # tftp_rg_firmware_and_install(nvg_599_dut, "LP-PPALMER", "nvg599-11.5.0h0d4_1.1.bin", rf, rfa,
-    #                            "tftp_rg_firmware_and_install")
     verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '3', 'ZipKey-PSK', 'Cirrent1',  rf, rfa, "verify_auto_ssid_defaults_via_tr69" )
     verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '4', 'ATTPOC', 'Ba1tshop', rf, rfa, "verify_auto_ssid_defaults_via_tr69" )
     verify_auto_info_not_present_in_ui(nvg_599_dut, rf, rfa, "verify_auto_info_not_present_in_ui" )
@@ -1584,7 +1693,6 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     url_att_topology_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/topology', rf, rfa, 'url_att_topology_smoke')
     url_att_route_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/route', rf, rfa, 'url_att_route_smoke')
     local_to_remote_ping(nvg_599_dut,rf, rfa,  '192.168.1.69',  "local_to_remote_ping")
-    test_dfs(nvg_599_dut, rf, rfa, "test_dfs")
 
     # before factory reset the order would be
     # reset any airties device to factory defaults and then after reset access the airties default netowrk using
@@ -1742,7 +1850,7 @@ nvg_599_dut = Nvg599Class()
 
 # peers_xml = band5_att_peers_smoke(nvg_599_dut,'present', run_file, run_file_db, 'band5_att_peers_smoke')
 
-print('outside of func' + str(peers_xml))
+# print('outside of func' + str(peers_xml))
 exit()
 
 # tree = ElementTree(fromstring(peers_xml))
@@ -2156,38 +2264,13 @@ password_too_long_71 = "00000000001111111111222222222233333333334444444444555555
 # exit()
 
 # min chars is 8
-
-# max chars is 63
-#password_just_right ="000000000011111111112222222222333333333344444444445555555555666"
-update_rg ='/home/palmer/Downloads/nvg599-9.2.2h13d10_1.1.bin'
-nvg_599_dut.update_rg(update_rg)
-exit()
-
-set_wifi_return_code = nvg_599_dut.ui_set_wifi_password(custom_security, password_too_long_64)
-print('******** set_wifi_return_code: ' + set_wifi_return_code)
-print('############################################')
-set_wifi_return_code = nvg_599_dut.ui_set_wifi_password(custom_security, password_too_short_7)
-print('******** set_wifi_return_code: ' + str(set_wifi_return_code))
-print('############################################')
-set_wifi_return_code = nvg_599_dut.ui_set_wifi_password(custom_security, password_max_63)
-print('******** set_wifi_return_code: ' + str(set_wifi_return_code))
-print('############################################')
-
-dfs_file = open('dfs_file.txt','a')
-test_dfs(nvg_599_dut,dfs_file)
-
-exit()
-
-
-# test_channel_channelband_combinations(band5_channel_list, band5_bandwidth_list,ip_to_ping, result_file_name)
-xALL_BAND5_CHANNELS = [52, 56]
-xALL_BAND5_BANDWIDTHS= [20, 40]
-
-ip_to_ping = '192.168.1.80'
-
-test_channel_channelband_combinations(xALL_BAND5_CHANNELS, xALL_BAND5_BANDWIDTHS, ip_to_ping, 'tc_chan_tm.txt')
-
-exit()
+#
+# # max chars is 63
+# #password_just_right ="000000000011111111112222222222333333333344444444445555555555666"
+# update_rg ='/home/palmer/Downloads/nvg599-9.2.2h13d10_1.1.bin'
+# nvg_599_dut.update_rg(update_rg)
+# exit()
+#
 
 ALL_BAND5_CHANNELS = [104, 108, 112, 116, 132, 136, 140, 144, 149, 153, 157, 161, 165]
 #ALL_BAND5_CHANNELS = [36, 40, 44, 48,52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144, 149, 153, 157, 161, 165]

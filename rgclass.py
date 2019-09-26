@@ -43,20 +43,21 @@ from datetime import datetime
 
 #  Apple path for wifi info
 # /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I
+# dictionary with the serial number as the key
 
 nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
-                                'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4', 'ssid_pw': 'c2cmybt25dey',
-                                'ssid': 'xxxxxx', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
+                                'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4', 'ssid_def_pw': 'c2cmybt25dey',
+                                'ssid_def': 'xxxxxx', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
                                 'ssid_4': 'ATTPOC', 'ssid_4_pw': 'Ba1tshop'},
 
             "277427577103760": {'model': 'nvg599', 'device_access_code': '<<01%//4&/', 'magic': 'ggtxstgwipcg',
-                                'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'ssid_pw': 'nsrmpr59rxwv',
-                                'ssid': 'ATTqbrAnYs', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
+                                'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'ssid_def_pw': 'nsrmpr59rxwv',
+                                'ssid_def': 'ATTqbrAnYs', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
                                 'ssid_4': 'ATTPOC', 'ssid_2_pw': 'Ba1tshop'},
 
             "35448081188192": {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
-                               'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'ssid_pw': 'eeh4jxmh7q26',
-                               'ssid': 'ATT4ujR48s', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
+                               'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'ssid_def_pw': 'eeh4jxmh7q26',
+                               'ssid_def': 'ATT4ujR48s', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
                                'ssid_4': 'ATTPOC', 'ssid_4_pw': 'Ba1tshop'}}
 # *7<#56*2<2
 # outside of func['88:41:fc:86:64:d7', '88:41:fc:c3:56:c3']
@@ -223,18 +224,11 @@ class Nvg599Class(GatewayClass):
         self.hardware_version = None
         self.serial_number = None
         self.factory_reset = None
-        # # self.cli_rg_connected_clients_dict = {}
-        # # self.ui_rg_connected_clients_dict = {}
-        # self.ip_lan_connections_dict_cli = {}
-        # self.get_ui_system_information()
-
-        # print("in Nvg599Class__init")
-        # self.init_info = True
-        # self.mesh_connected_clents = {}
         self.rg_url = 'http://192.168.1.254/'
         self.get_ui_system_information()
         self.device_access_code = nvg_info[self.serial_number]['device_access_code']
-        self.default_rg_ssid = nvg_info[self.serial_number]['ssid']
+        self.default_rg_ssid = nvg_info[self.serial_number]['ssid_def']
+        print('dog \n')
 
     def remote_webserver(self):
         pass
@@ -262,10 +256,6 @@ class Nvg599Class(GatewayClass):
             if th.text == "Serial Number":
                 self.serial_number = th.next_sibling.next_sibling.text
                 print("serial Number is:", self.serial_number)
-                # print ("nvg serial number dict",nvg_info[self.serial_number])
-                # print("nvg access code", nvg_info[self.serial_number]['device_access_code'])
-                # tmp_dac = nvg_info[self.serial_number]['device_access_code']
-                # self.device_access_code = tmp_dac
                 self.device_access_code = nvg_info[self.serial_number]['device_access_code']
                 print("dac is:", self.device_access_code)
             if th.text == "Software Version":
@@ -284,11 +274,8 @@ class Nvg599Class(GatewayClass):
                 print(th.next_sibling.next_sibling.text)
                 self.hardware_version = th.next_sibling.next_sibling.text
 
-        sleep(2)
-
     def check_for_system_info_page(self):
         print('in check_for_system_info_page)')
-        # global nvg_info
         return_string = "Pass"
         rg_url = 'http://192.168.1.254/'
         self.session = webdriver.Chrome()
@@ -319,12 +306,8 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.expect(">")
         return self.telnet_cli_session
 
-    # @staticmethod
-    # def set_all_4920s_to_factory_default(self):
 
-    # @staticmethod
-    # def set_all_4920s_to_factory_default(self):
-
+    # Should combine these two methods
     def set_all_4920s_to_factory_default(self):
         # show_ip_lan_dict = self.get_rg_sh_ip_lan_info_cli()
         show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(self)
@@ -620,16 +603,9 @@ class Nvg599Class(GatewayClass):
                             print('th', test_house_ip)
                     break
                 i = i + 1
-            print('----------------------------------------')
 
-    # '8C:45:00:9F:82:9D': {'device_type': ' Galaxy-S9', 'oper_sys': 'Android 9', 'radio': 'abg', 'band': '5',
-    #                       'state': 'None',
-    #                       'address_type': 'fixed', 'port': 'None', 'ssid': 'None', 'rssi': 'None',
-    #                       'ip': '192.168.1.67',
-    #                       'device_test_name': 'fixed_s9', 'name': 'palmer_Latitude-E5450',
-    #                       'location': 'tbd'},
-    def adv_configure_guest_network(self, rf, rfa, enable_disable_param, guest_ssid_param="dog",
-                                    guest_ssid_password_param="guest_dog"):
+    def adv_configure_guest_network(self, rf, rfa, enable_disable_param, guest_ssid_param = "default_guest",
+                                    guest_ssid_password_param = "disabled"):
         print('in adv_configure_guest_network')
         print('enable_disable_param:' + enable_disable_param + '\n')
         home_network_link = self.session.find_element_by_link_text("Home Network")
@@ -686,7 +662,98 @@ class Nvg599Class(GatewayClass):
                 submit.click()
                 self.check_for_wifi_warning()
 
-    def enable_guest_network_and_set_passwords(self, rf, rfa, ssid_password, guest_ssid_password):
+    #def conf_quest_network_ssid_and_password(self, rf, rfa, enable_disable_ssid_password, guest_ssid_password):
+    def org_conf_quest_network_ssid_and_password(self, rf, rfa, enable_disable, guest_ssid, guest_password):
+        # print('in enable_guest_network_and_set_password_ssid')
+        # # dianostics_link = browser.find_element_by_link_text("Diagnostics")
+        # home_network_link = self.session.find_element_by_link_text("Home Network")
+        # home_network_link.click()
+        # sleep(10)
+        # # resets_link = browser.find_element_by_link_text("Resets")
+        # wi_fi_link = self.session.find_element_by_link_text("Wi-Fi")
+        # wi_fi_link.click()
+        # sleep(2)
+        # self.check_if_dac_required()
+        #
+        # id_password = self.session.find_element_by_id("password")
+        # self.session.find_element_by_id("password").clear()
+        # id_password.send_keys(ssid_password)
+        # rf.write('     Setting SSID password to:' + ssid_password + '\n')
+        #
+        # check_password = self.session.find_element_by_id("checkpassword")
+        # self.session.find_element_by_id("checkpassword").clear()
+        # check_password.send_keys(ssid_password)
+        #
+        # guest_id_enable = self.session.find_element_by_name("gssidenable")
+        # guest_id_enable.click()
+        # # this is an on - off drop down
+        # for option in guest_id_enable.find_elements_by_tag_name('option'):
+        #     if option.text == "On":
+        #         option.click()
+        #
+        # guest_id_password = self.session.find_element_by_id("gssidpassword")
+        # self.session.find_element_by_id("gssidpassword").clear()
+        # guest_id_password.send_keys(guest_ssid_password)
+        #
+        # guest_id_password = self.session.find_element_by_id("checkguestpassword")
+        # self.session.find_element_by_id("checkguestpassword").clear()
+        # guest_id_password.send_keys(guest_ssid_password)
+
+        submit = self.session.find_element_by_name("Save")
+        submit.click()
+        self.check_for_wifi_warning()
+
+    # The logic here is that is the home_password is "default" then the Security is set to "Default Password"
+    def conf_home_network_ssid_and_password(self, rf, rfa, home_ssid = "default", home_password = "default"):
+        global nvg_info
+        print('in conf_home_network_ssid_and_password')
+        # dianostics_link = browser.find_element_by_link_text("Diagnostics")
+        home_network_link = self.session.find_element_by_link_text("Home Network")
+        home_network_link.click()
+        sleep(10)
+        # resets_link = browser.find_element_by_link_text("Resets")
+        wi_fi_link = self.session.find_element_by_link_text("Wi-Fi")
+        wi_fi_link.click()
+        sleep(2)
+        self.check_if_dac_required()
+        # the option to enable disable is greyed out
+        # if enable_disable == "off":
+        #     guest_id_enable_select = Select(self.session.find_element_by_name("gssidenable"))
+        #     guest_id_enable_select.select_by_value('off')
+        #     submit = self.session.find_element_by_name("Save")
+        ssid_text_box = self.session.find_element_by_id("ssid")
+        ssid_text_box.clear()
+
+        if home_ssid == "default":
+            print('home ssid:' + str(nvg_info[self.serial_number]['ssid_def']) + '\n')
+            ssid_text_box.send_keys(nvg_info[self.serial_number]['ssid_def'])
+        else:
+        # if not the default then the user has entered a new ssid
+            ssid_text_box.send_keys(home_ssid)
+            print("setting guest ssid to" + str(home_ssid) + '\n')
+
+        security_selection = Select(self.session.find_element_by_id("ussidsecurity"))
+        if home_password ==  "default":
+            security_selection.select_by_value('defwpa')
+            sleep(3)
+            #security_state = security_selection.first_selected_option.text
+        else:
+            security_selection.select_by_value('wpa')
+            sleep(3)
+            password_link = self.session.find_element_by_id("password")
+            password_link.clear()
+            password_link.send_keys(home_password)
+
+            #self.session.find_element_by_id("password").clear()
+
+        submit = self.session.find_element_by_name("Save")
+        submit.click()
+        self.check_for_wifi_warning()
+# ##
+
+
+    def conf_guest_network_ssid_and_password(self, rf, rfa, enable_disable, guest_ssid = "default", guest_password = "2222222222"):
+        global nvg_info
         print('in enable_guest_network_and_set_password_ssid')
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
         home_network_link = self.session.find_element_by_link_text("Home Network")
@@ -697,40 +764,47 @@ class Nvg599Class(GatewayClass):
         wi_fi_link.click()
         sleep(2)
         self.check_if_dac_required()
+        if enable_disable == "off":
+            guest_id_enable_select = Select(self.session.find_element_by_name("gssidenable"))
+            guest_id_enable_select.select_by_value('off')
+            submit = self.session.find_element_by_name("Save")
+            submit.click()
+            self.check_for_wifi_warning()
+            print("disabling guest ssid \n")
+            # Nothing left to do if we are turning off the guest newtwork
+            return
+        # we are turning it on or it is already on
+        print("guest ssid enabled.. contuing  \n")
+        guest_id_enable_select  = Select(self.session.find_element_by_name("gssidenable"))
+        guest_id_enable_select.select_by_value('on')
+        guest_ssid_link = self.session.find_element_by_id("gssid")
+        self.session.find_element_by_id("gssid").clear()
 
-        id_password = self.session.find_element_by_id("password")
-        self.session.find_element_by_id("password").clear()
-        # id_password.send_keys("1111111111")
-        id_password.send_keys(ssid_password)
-        rf.write('     Setting SSID password to:' + ssid_password + '\n')
-
-        guest_id_password = self.session.find_element_by_id("checkpassword")
-        self.session.find_element_by_id("checkpassword").clear()
-        guest_id_password.send_keys("1111111111")
-
-        guest_id_enable = self.session.find_element_by_name("gssidenable")
-        guest_id_enable.click()
-        # this is an on - off drop down
-        for option in guest_id_enable.find_elements_by_tag_name('option'):
-            if option.text == "On":
-                option.click()
-
-        guest_id_password = self.session.find_element_by_id("gssidpassword")
+        if guest_ssid == "default":
+            print('dac:' + str(self.device_access_code))
+            tmp_string = self.device_access_code + "_Guest"
+            print('dac:' + str(tmp_string))
+            guest_ssid_link.send_keys(tmp_string)
+            #guest_ssid.send_keys(self.device_access_code +  '_Guest')
+        else:
+            # if not the default then the user has entered a new ssid
+            guest_ssid_link.send_keys(guest_ssid)
+            print("setting guest ssid to" + str(guest_ssid) + '\n')
+        # if we get here we know that he guest network is enabled  so a password is needed.
+        guest_id_password_link = self.session.find_element_by_id("gssidpassword")
         self.session.find_element_by_id("gssidpassword").clear()
-        guest_id_password.send_keys("2222222222")
-
-        guest_id_password = self.session.find_element_by_id("checkguestpassword")
-        self.session.find_element_by_id("checkguestpassword").clear()
-        guest_id_password.send_keys("2222222222")
+        guest_id_password_link.send_keys(guest_password)
 
         submit = self.session.find_element_by_name("Save")
         submit.click()
         self.check_for_wifi_warning()
 
+
     """ I should use this function to get the information for a specific band /guest SSID
     This would make the test case logic  easier to follow"""
 
-    def get_ui_ssid_info(self):
+    def get_ui_ssid_and_password_values(self):
+        global nvg_info
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
         home_network_link = self.session.find_element_by_link_text("Home Network")
         home_network_link.click()
@@ -749,7 +823,7 @@ class Nvg599Class(GatewayClass):
         band5_password_entry = self.session.find_element_by_name("tkey1")
         band5_password = band5_password_entry.get_attribute('value')
 
-        guest_ssid_entry = self.session.find_element_by_name("gssidname2")
+        guest_ssid_entry = self.session.find_element_by_name("ossidname2")
         guest_ssid = guest_ssid_entry.get_attribute('value')
         guest_password_entry = self.session.find_element_by_name("okey2")
         guest_password = guest_password_entry.get_attribute('value')
@@ -758,7 +832,23 @@ class Nvg599Class(GatewayClass):
         band2_ssid = band2_ssid_entry.get_attribute('value')
         band2_password_entry = self.session.find_element_by_name("okey1")
         band2_password = band2_password_entry.get_attribute('value')
-        return band2_ssid, guest_ssid, band5_ssid, band2_password, guest_password, band5_password
+
+        ssid_pw_dict = {}
+        ssid_pw_dict['band2'] = {}
+        ssid_pw_dict['band2']['ssid'] = band2_ssid
+        ssid_pw_dict['band2']['password'] = band2_password
+
+        ssid_pw_dict['band5'] = {}
+        ssid_pw_dict['band5']['ssid'] = band5_ssid
+        ssid_pw_dict['band5']['password'] = band5_password
+
+        ssid_pw_dict['guest'] = {}
+        ssid_pw_dict['guest']['ssid'] = guest_ssid
+        ssid_pw_dict['guest']['password'] = guest_password
+
+        # return band2_ssid, guest_ssid, band5_ssid, band2_password, guest_password, band5_password
+        return ssid_pw_dict
+
 
     def get_home_network_ip_allocation_page_source(self):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
@@ -811,7 +901,7 @@ class Nvg599Class(GatewayClass):
         sleep(30)
         return self.session.page_source
 
-    def set_ui_ssid(self, ssid_band5, ssid_guest, ssid_band2):
+    def set_ui_ssid(self, ssid_band5, ssid_band2, ssid_guest):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
         home_network_link = self.session.find_element_by_link_text("Home Network")
         home_network_link.click()
@@ -1179,7 +1269,7 @@ class Nvg599Class(GatewayClass):
 
         return ui_rg_connected_clients_dict
 
-    # def check_for_wifi_security_and_regular_warning(self):
+    # was called  check_for_wifi_security_and_regular_warning(self):
     def check_for_wifi_warning(self):
         print('in check_for_wifi_warning ')
         # warning = self.session.find_element_by_name("ReturnWarned")
@@ -1187,7 +1277,7 @@ class Nvg599Class(GatewayClass):
         try:
             wi_fi_warning = self.session.find_element_by_class_name("warning")
         except NoSuchElementException:
-            return_string = "Wi-Fi Warning not detcted."
+            return_string = "Wi-Fi Warning not detected."
             return return_string
 
         if wi_fi_warning:
@@ -1414,34 +1504,72 @@ class Nvg599Class(GatewayClass):
 
     def check_if_wifi_warning_displayed(self):
         print('in check_if_wifi_warning_displayed')
+
+        # self.login_4920('192.168.1.67')
+
         try:
             sleep(4)
             self.session.find_element_by_xpath('//*[@id="content-sub"]/div[1]/h1')
+            print('session in check:' + str(self.session))
             print('WiFi warning displayed')
             print('Clicking on Continue')
             submit = self.session.find_element_by_name("Continue")
+
+            # print('--in check_if_wifi  before click login')
+            # airties_cli_session = self.login_4920('192.168.1.67')
+            # print('session before:' + str(airties_cli_session) + '\n\n\n')
+            #
+            # print('basic session before session:' + str(self.session) + '\n\n\n')
+            # print('basic session after:' + str(self.session) + '\n\n\n')
+            # print('in ifconfig before click  click----------------------\n ')
+            # sleep(5)
+            # cmd = "route"
+            # # cmd = "ping -c5 " + "192.168.1.67"
+            # try:
+            #     output = subprocess.check_output(cmd, shell=True)
+            # except subprocess.CalledProcessError as e:
+            #     print('errror ' + e.output)
+            # else:
+            #     print('these are the interface outputs' + str(output))
+            #     print('just a test' + str(output) + '\n')
+            # # cmd = "nmcli dev wifi"
+
             submit.click()
-            sleep(10)
+
+            # this is where it fails for some reason that I have not figured out
+
+            # print('basic session after:' + str(self.session) + '\n\n\n')
+            # print('in ifconfig after click \n')
+            # print('---------------------------\n')
+            # sleep(5)
+            # cmd = "route"
+            # # cmd = "ping -c5 " + "192.168.1.67"
+            # try:
+            #     output = subprocess.check_output(cmd, shell=True)
+            # except subprocess.CalledProcessError as e:
+            #     print('errror ' + e.output)
+            # else:
+            #     print('these are the interface outputs' + str(output))
+            #     print('just a test' + str(output) + '\n')
+            # # cmd = "nmcli dev wifi"
+            # try:
+            #     output = subprocess.check_output(cmd, shell=True)
+            # except subprocess.CalledProcessError as e:
+            #     print(e.output)
+            # else:
+            #     print('these are the xnetworks' + str(output))
+            #     print('just a test' + str(output) + '\n')
         except NoSuchElementException:
             print('Wi-Fi warning not displayed - Continuing')
         try:
-            sleep(4)
+            sleep(2)
             self.session.find_element_by_xpath('//*[@id="error-message-text"]')
-            print('Changes Saved')
+            print('in check_if_wifi  after changes saved')
         except NoSuchElementException:
             print('No save confirmation')
 
-    #         print("in cli_sh_wi_clients")
-    #         self.telnet_cli_session = self.login_nvg_599_cli()
-    #         self.telnet_cli_session.sendline("show wi clients")
-    #         self.telnet_cli_session.expect('OCKED>')
-    #         show_wi_client_str = self.telnet_cli_session.before
-    #         self.telnet_cli_session.close()
-    #         print('------------------------------------------------------\n')
-    #         # dividing on macs
-    #         wi_reg_ex = re.compile(r'(?:[0-9a-fA-F]:?){12}.*?\n.*\n.*\n.*\n')
-    #         client_string_list = re.findall(wi_reg_ex, show_wi_client_str)
-    #
+        # print('basic session after returning from try:' + str(self.session) + '\n\n\n')
+
     #         number_of_entries = len(client_string_list)
     #         print("The list has :", number_of_entries)
     #
@@ -2092,15 +2220,20 @@ class Nvg599Class(GatewayClass):
         sleep(2)
         wifi_link = self.session.find_element_by_link_text("Wi-Fi")
         wifi_link.click()
-
+        print(' Airties5a \n')
         # handle being asked for password
         # self.session = self.check_if_dac_required()
         self.check_if_dac_required()
+
+        #print('in the change channel')
+        #self.login_4920('192.168.1.67')
 
         sleep(5)
         advanced_options_link = self.session.find_element_by_link_text("Advanced Options")
         advanced_options_link.click()
         sleep(2)
+        # print('after advanced options')
+        # self.login_4920('192.168.1.67')
         # nvg_599_dut.ui_set_bw_channel('g2', 40, 2)
         #        if band_selected == '2g' :
         if band == '2g':
@@ -2121,6 +2254,8 @@ class Nvg599Class(GatewayClass):
                     option.click()
 
         if band == '5g':
+            print('in 5g')
+            # self.login_4920('192.168.1.67')
             bandwidth_select = self.session.find_element_by_id("tbandwidth")
             print('found obandwidth')
             print('bandwidth', bandwidth)
@@ -2145,8 +2280,12 @@ class Nvg599Class(GatewayClass):
                     pass
                     # print('did not find channel')
             sleep(2)
+            print('in 6g')
+            #self.login_4920('192.168.1.67')
             submit = self.session.find_element_by_name("Save")
             submit.click()
+            # print('in 7g')
+            # self.login_4920('192.168.1.67')
             self.check_if_wifi_warning_displayed()
             return self.session
 
@@ -2252,7 +2391,7 @@ class Nvg599Class(GatewayClass):
         except subprocess.CalledProcessError as e:
             print(e.output)
         else:
-            print('these are the networks' + output)
+            print('these are the xnetworks' + str(output))
 
         #     '88:41:FC:86:64:D6': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '2',
         #                           'state': 'None', 'default_ssid': 'AirTies_SmartMesh_4PNF',
@@ -2367,7 +2506,7 @@ class Nvg599Class(GatewayClass):
         # submit = self.session.find_element_by_name("Save")
         # sleep(2)
         # submit.click()
-        self.check_for_wifi_security_and_regular_warning()
+        self.check_for_wifi_warning()
         # self.check_for_wifi_warning()
 
     # This needs an enable disable ar
@@ -2399,7 +2538,7 @@ class Nvg599Class(GatewayClass):
         submit = self.session.find_element_by_name("Save")
         sleep(10)
         submit.click()
-        self.check_for_wifi_security_and_regular_warning()
+        self.check_for_wifi_warning()
         # self.session.implicitly_wait(5)
         # wi_fi_2_4 = self.session.find_element_by_name("owl80211on")
         # wi_fi_2_4.click()
@@ -2419,7 +2558,7 @@ class Nvg599Class(GatewayClass):
         # submit = self.session.find_element_by_name("Save")
         # sleep(10)
         # submit.click()
-        # self.check_for_wifi_security_and_regular_warning()
+        # self.check_for_wifi_warning()
         # # self.check_for_wifi_warning()
 
     # parm must be Off or On with capitalized first letter
@@ -2480,8 +2619,7 @@ class Nvg599Class(GatewayClass):
         # submit = self.session.find_element_by_name("Save")
         # sleep(10)
         # submit.click()
-        self.check_for_wifi_security_and_regular_warning()
-        # self.check_for_wifi_warning()
+        self.check_for_wifi_warning()
         ################################################
 
     def ui_disable_enable_wifi_2_4_and_5g_wifi(self):
@@ -2519,7 +2657,7 @@ class Nvg599Class(GatewayClass):
         sleep(10)
         submit.click()
 
-        self.check_for_wifi_security_and_regular_warning()
+        self.check_for_wifi_warning()
         self.session.implicitly_wait(5)
         wi_fi_2_4 = self.session.find_element_by_name("owl80211on")
         wi_fi_2_4.click()
@@ -2539,7 +2677,7 @@ class Nvg599Class(GatewayClass):
         submit = self.session.find_element_by_name("Save")
         sleep(10)
         submit.click()
-        self.check_for_wifi_security_and_regular_warning()
+        self.check_for_wifi_warning()
         # self.check_for_wifi_warning()
 
     def ui_get_wifi_password(self):
@@ -2810,12 +2948,12 @@ class Nvg599Class(GatewayClass):
         except pxssh.ExceptionPxssh as e:
             print('pxssh failed to login')
             ssh_client.close()
-            rf.write('    Failed to log in to ' + speed_test_ip + "Aborting test \n\n")
-            rf.write('    Error:' + str(e))
+            rf.write('    Failed to log in to: ' + speed_test_ip + '  Aborting test \n')
+            rf.write('    Error:' + str(e) + '\n')
             print(str(e))
             return "Fail"
         print('2')
-        print()
+        print('2.5')
         ssh_client.prompt()
         print('3')
         ssh_client.sendline('speedtest  --server 5024')
@@ -2853,39 +2991,50 @@ class Nvg599Class(GatewayClass):
     #  nmcli connection show --active
     # nmcli con down "Wired connection 1"
 
+    # @staticmethod
+    # def nmcli_get_active_connections():
+    #     # command = 'nmcli c'
+    #     # cmd = "nmcli r all"
+    #     cmd = "nmcli connection show --active "
+    #     # output = subprocess.check_output(['nmcli', 'r'],shell=True)
+    #     output = subprocess.check_output(cmd, shell=True)
+    #     connection_list = []
+    #     active_connection_list = []
+    #     # output = output.decode('utf-8')
+    #     # tmp_list = []
+    #     for line in output.splitlines():
+    #         line = line.decode('utf-8')
+    #         tmp_list = line.split()
+    #         if tmp_list[0] == 'NAME':
+    #             continue
+
     @staticmethod
     def nmcli_get_active_connections():
-        # command = 'nmcli c'
-        # cmd = "nmcli r all"
-        cmd = "nmcli connection show --active "
-        # output = subprocess.check_output(['nmcli', 'r'],shell=True)
+        cmd = "nmcli connection show --active"
         output = subprocess.check_output(cmd, shell=True)
-        connection_list = []
         active_connection_list = []
-        # output = output.decode('utf-8')
-        # tmp_list = []
         for line in output.splitlines():
             line = line.decode('utf-8')
             tmp_list = line.split()
             if tmp_list[0] == 'NAME':
                 continue
+            active_connection_list.append(tmp_list[0])
+        print('active connection list', *active_connection_list)
+        return active_connection_list
+        # print(tmp_list[0])
+        # sleep(10)
+        # cmd = "nmcli con down ATTqbrAnYs"
+        # cmd = "nmcli device wifi connect AirTies_SmartMesh_4PNF kykfmk8997"
 
     @staticmethod
     def nmcli_get_connections():
-        # command = 'nmcli c'
-        # cmd = "nmcli r all"
         cmd = "nmcli connection show "
         # output = subprocess.check_output(['nmcli', 'r'],shell=True)
         output = subprocess.check_output(cmd, shell=True)
         connection_list = []
         active_connection_list = []
-        # output = output.decode('utf-8')
-        # tmp_list = []
         for line in output.splitlines():
             line = line.decode('utf-8')
-            # tmp_list = []
-            # print(line)
-            # print('-----------------------------')
             nmcli_active_dict = {}
             tmp_list = line.split()
             if tmp_list[0] == 'NAME':
@@ -2951,6 +3100,35 @@ class Nvg599Class(GatewayClass):
         # sudo nmcli device wifi connect AirTies_Air4920_33N3 wthchc7344
 
     @staticmethod
+    def nmcli_get_connections_test():
+        global nvg_info
+
+        # nmcli connection show - -active
+        # command = 'nmcli c'
+        # cmd = "nmcli r all"
+        cmd = "nmcli con show"
+        # output = subprocess.check_output(['nmcli', 'r'],shell=True)
+        output = subprocess.check_output(cmd, shell=True)
+        for line in output.splitlines():
+            print('out  dog  ===========\n', line)
+        sleep(10)
+        # cmd = "nmcli con down ATTqbrAnYs"
+        # cmd = "nmcli device wifi connect AirTies_SmartMesh_4PNF kykfmk8997"
+        # output = subprocess.check_output(['nmcli', 'r'],shell=True)
+        output = subprocess.check_output(cmd, shell=True)
+
+        return output
+        #for line in output.splitlines():
+         #    print('out  nmcli test  ===========\n', line)
+
+        # 'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
+        # this command lists all the visble APS
+        # iwlist wlp2s0 s
+        # this command turns off the current Wfi connect
+        # this command connects to the wifi , it generates an 802.1x supplicant fail message but seems to work
+        # sudo nmcli device wifi connect AirTies_Air4920_33N3 wthchc7344
+
+    @staticmethod
     def nmcli_test():
         # nmcli connection show - -active
         # command = 'nmcli c'
@@ -2976,51 +3154,40 @@ class Nvg599Class(GatewayClass):
         # sudo nmcli device wifi connect AirTies_Air4920_33N3 wthchc7344
 
     @staticmethod
-    def ping_from_local_host(remote_ip, number_of_pings=20):
+    def ping_from_local_host(remote_ip, number_of_pings=10):
         print('ping ' + remote_ip + ' from_local_host')
-        # ping_file = open('ping_file.txt', 'a')
-        # out = subprocess.Popen("ping  -c3 localhost",stdout=subprocess.PIPE,stderr=subprocess.STDOUT, shell=True)
-        # out = subprocess.Popen(["ping ", "-c3"," localhost"], stdout=subprocess.PIPE)
-        # out, err = out.communicate()
-        # out = check_output(["ping ", "-c3 ", "localhost"]).decode("utf-8")
-        # out = check_output(["ls -la"].decode("utf-8").shell=True)
         try:
             out = subprocess.check_output("ping -c" + str(number_of_pings) + " " +
                                           remote_ip, shell=True).decode("utf-8")
         except subprocess.CalledProcessError as e:
             print('ping error', e)
-
             return '0', '0', '0', '0', '0', '0', '0'
         # result = os.system(cmd)
         print('out===========\n', out)
-        print('endout1===========\n')
-        # pingInfoRegEx = re.compile(r'.*=\s(\w+)/(\w+)/(\w+)/(\w+)',re.DOTALL)
         # ping_statistics = re.compile(r'statistics ---.*(\d+)\spackets\.*(\d+)\sreceived',re.DOTALL)
+        # don't need .DOTALL because everythin is on one line
         ping_info_reg_ex = re.compile(r'rtt.*?=\s(\d+\.\d+)/(\d+\.\d+)/(\d+\.\d+)/(\d+\.\d+)')
         print('out2===========\n', out)
         print('endout2===========\n')
-
         # pingInfoRegEx = re.compile(r'.*?rtt/s+=/s+(/d+/./d+)',re.DOTALL)
         mo1 = ping_info_reg_ex.search(out)
-        # print('mo1',mo1)
-        # minimum = mo1.group(1)
-        # print('mnext--just a value', minimum)
         min_ping = mo1.group(1)
         print('min:' + min_ping + '\n')
-        # sleep(10)
         avg_ping = mo1.group(2)
         print('avg:' + avg_ping + '\n')
-        # sleep(10)
         max_ping = mo1.group(3)
         print('max:' + max_ping + '\n')
-        # sleep(10)
         mdev_ping = mo1.group(4)
         print('mdev:' + mdev_ping + '\n')
-
         ping_statistics = re.compile(r'statistics ---\s(\d+)\spackets.*\s(\d+)\sreceived,\s(\d+)%')
         stats = ping_statistics.search(out)
-        # print('sent:>' + stats.group(1))
-        print('sent:>' + stats.group(1) + ' received:' + stats.group(2) + 'loss:' + stats.group(3))
+        try:
+            print('sent:>' + stats.group(1) + ' received:' + stats.group(2) + 'loss:' + stats.group(3))
+        except AttributeError:
+            print("something wrong - aborting")
+            return 0, 0, 0, 0, 0, 0, 0
+            # return down_load_speed, up_load_speed
+        # print('sent:>' + stats.group(1) + ' received:' + stats.group(2) + 'loss:' + stats.group(3))
         sent = stats.group(1)
         print('sent:' + sent + '\n')
         # sleep(10)
@@ -3052,11 +3219,12 @@ class Nvg599Class(GatewayClass):
 
             return "Fail"
 
+    # experiemtntal
     def tftp_list_test(self, *file_list):
         for x in file_list:
             print(x)
 
-    # we want to pass in a remote file source  in case we are getting  files from somewhere else-- do I need a put?
+    # we want to pass in a remote file source in case we are getting  files from somewhere else-- do I need a put?
     # def tftp_get_file_cli(self, remote_file_source, *source_device_list):
 
     def tftp_get_file_cli(self, tftp_server_name, firmware_to_get, rf, rfa):
@@ -3095,39 +3263,7 @@ class Nvg599Class(GatewayClass):
         print('remote 3:' + str(tftp_session.before) + '\n')
         tftp_session.close()
         return result
-        # Nvg599Class.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
-        # self.telnet_cli_session = pexpect.spawn("tftp connect 192.168.1.254", encoding='utf-8')
-        # self.ip_lan_connections_dict_cli[connected_device_mac] = {}
-        # ip_lan_connections_dict_cli[connected_device_mac] = {}
-        # ip_lan_connections_dict_cli[connected_device_mac]["IP"] = connected_device_ip
-        # ip_lan_connections_dict_cli[connected_device_mac]["Name"] = connected_device_name
-        # ip_lan_connections_dict_cli[connected_device_mac]["State"] = connected_device_status
-        # ip_lan_connections_dict_cli[connected_device_mac]["DHCP"] = connected_device_dhcp
-        # ip_lan_connections_dict_cli[connected_device_mac]["Port"] = connected_device_port
-        #
-        # print('source device name :' + source_device_name + '\n')
-        #
-        # sh_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
-        # for mac in sh_ip_lan_dict:
-        #     print('mac:' + mac +  '\n')
-        #     print('name:' + sh_ip_lan_dict[mac]['Name'] +  '\n')
-        #
-        #     if source_device_name == sh_ip_lan_dict[mac]['Name']:
-        #         print('found name' + sh_ip_lan_dict[mac]['Name'] + ' ip:' +sh_ip_lan_dict[mac]['IP'])
-        # exit()
-        #
-        # for remote_file in source_device_list:
-        #     # source_ip = "192.168.1.65"
-        #     # remote_file_source
-        #     # tftp_session = pexpect.spawn("tftp 192.168.1.65", encoding="utf-8", cwd="/home/palmer/Downloads")
-        #     tftp_session = pexpect.spawn("tftp " + remote_file_source, encoding="utf-8", cwd="/home/palmer/Downloads")
-        #
-        #     tftp_session.expect("tftp>")
-        #     tftp_session.sendline("get " + remote_file)
-        #     tftp_session.expect("tftp>")
-        #     sleep(4)
-        #     print('remote 3:' + str(tftp_session.before) + '\n')
-        # tftp_session.close()
+
 
     # pfp ******  moved to parent class forget it for now
     def xxlogin_nvg_599_cli(self):
@@ -3197,7 +3333,6 @@ class Nvg599Class(GatewayClass):
 
     # def login_nvg_cli_ssh(self):
     def xlogin_nvg_599_cli(self):
-
         print('In login_nvg_cli, enabling airties lib')
         ssh_cli_session = pexpect.spawn("ssh remotessh@192.168.1.254", encoding='utf-8')
         ssh_cli_session.expect("ord:")
@@ -3222,13 +3357,27 @@ class Nvg599Class(GatewayClass):
         return telnet_cli_session
 
     @staticmethod
-    def static_login_4920(ip_4920):
+    def login_4920(ip_4920):
         print('In login_4920')
-        cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
-        cli_session.expect("ogin:")
-        cli_session.sendline('admin')
-        cli_session.expect("#")
-        return cli_session
+        # air_cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
+        air_cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
+        air_cli_session.sendline('\n')
+
+        sleep(1)
+        print('1')
+
+        air_cli_session.expect("ogin:")
+        print('2')
+
+        air_cli_session.sendline('root')
+        print('3')
+
+        air_cli_session.expect("#")
+        print('4')
+
+        status_output = air_cli_session.before
+        print(status_output)
+        return air_cli_session
 
     @staticmethod
     def static_reset_4920(ip_4920):
@@ -3243,6 +3392,9 @@ class Nvg599Class(GatewayClass):
         cli_session.close()
 
     @staticmethod
+
+    #derp
+
     def get_4920_ssid(ip_4920):
         print('In get_4920_ssid')
         cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
@@ -3253,11 +3405,34 @@ class Nvg599Class(GatewayClass):
         cli_session.expect("#")
         status_output = cli_session.before
         print(status_output)
-        status_info_reg_ex = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',
-                                        re.DOTALL)
+
+        #status_info_reg_ex = re.compile(r'SSID:\s+\"(\w+)Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
+        status_info_reg_ex = re.compile(r'SSID:\s+\"(\w+)',re.DOTALL)
+           r'SSID:\s"(\w+)"\s*?Mode:\s(\w+)\s*?RSSI:\s(\d+).*?noise:\s-(\d+).*?Channel:\s(\d+).*?BSSID:\s(\w+:\w+:\w+:\w+:\w+:\w+)',
+            re.DOTALL)
+        print('status_output' + str(status_output) + '\n')
+        mo1 = status_info_reg_ex.search(status_output)
+        # print('ssid:' + str(mo1.group(1)) + '\n')
+        # print('Mode:' + str(mo1.group(2)) + '\n')
+        # print('RSSI:' + str(mo1.group(3)) + '\n')
+        # print('noise:' + str(mo1.group(4)) + '\n')
+        # print('channel:' + str(mo1.group(5)) + '\n')
+        # print('BSSID:' + (str(mo1.group(6)).lower()) + '\n')
+        # sleep(5)
+        # exit()
+        mo1 = status_info_reg_ex.search(status_output)
+        band2_cli_dict['ssid'] = str(mo1.group(1))
+        band2_cli_dict['mode'] = str(mo1.group(2))
+        band2_cli_dict['rssi'] = str(mo1.group(3))
+        band2_cli_dict['noise'] = str(mo1.group(4))
+        band2_cli_dict['channel'] = str(mo1.group(5))
+        band2_cli_dict['bssid'] = str(mo1.group(6)).lower()
+        self.telnet_cli_session.close()
+        return band2_cli_dict
         # statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
         # status InfoRegEx = re.compile(r'Model\s(\w+)')
         mo1 = status_info_reg_ex.search(status_output)
+        print('ssid:' + str(mo1.group(1)) + '\n')
         return mo1
 
     def cli_rg_status(self, ip):
@@ -3850,13 +4025,6 @@ class Nvg599Class(GatewayClass):
 
     def session_cleanup(self):
         pass
-
-    # class Nvg_5268_Class(GatewayClass):
-    #     def __init__(self):
-    #         self.name = "Nvg_5268"
-    #      # rg5268 = pexpect.spawn("telnet 192.168.1.254")
-
-    from subprocess import Popen, PIPE
 
     def enable_monitor_mode(self):
         print('in enable monitor mode')
