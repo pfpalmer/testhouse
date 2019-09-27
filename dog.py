@@ -1446,76 +1446,120 @@ def install_airties_firmware(nvg_599_dut, rf, rfa, test_name, airties_firmware, 
 def guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, test_name, guest_ssid, guest_password):
     print('in guest_client_cannot_ping_rg \n')
     rf.write('Test ' + str(test_name) + '\n')
-    test_status = nvg_599_dut.ping_check('192.168.1.254')
+    test_status = "Pass"
+    global nvg_info
+    # "35448081188192": {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
+    #                    'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'ssid_def_pw': 'eeh4jxmh7q26',
+    #                    'ssid_def': 'ATT4ujR48s', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
+    #                    'ssid_4': 'ATTPOC', 'ssid_4_pw': 'Ba1tshop'}}
+    #ssid_default = nvg_info[nvg_599_dut.serial_number]['ssid_def']
+    #ssid_default_password = nvg_info[nvg_599_dut.serial_number]['ssid_def_pw']
+    # nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default","default")
+
+    # start off with a known ssid and password
+    ssid_default, ssid_default_password = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default", "default")
+    try:
+        cmd = 'nmcli device wifi connect ' + ssid_default  + ' password ' + ssid_default_password
+        print('nmcli device wifi connect')
+        nvg_599_dut.nmcli_set_connection(cmd)
+    except subprocess.CalledProcessError as e:
+        print('errror ' + e.output)
+        print('failed to connect to  default SSID')
+        rf.write('     Failed to connect to  default ssid.    :Fail\n')
+        # try:
+        #     cmd = 'nmcli c up Wired'
+        #     print('nmcli wired connection up')
+        #     nvg_599_dut.nmcli_set_connection(cmd)
+        # except subprocess.CalledProcessError as e:
+        #     print('errror ' + e.output)
+        #     print('failed to restore Wired connection')
+        #     rf.write('     Failed to restore Wired connection.    :Fail\n')
+        return "Fail"
+    # we need to set the ssid and password in the UI to the defaults before connecting or disconnecting
+    ping_status = nvg_599_dut.ping_check('google.com')
     # Make sure we can ping the ssid
-    if test_status == "Fail":
-        rf.write('     Local to RG ping failed. Cannot continue)     :Fail\n')
+    if ping_status == "Fail":
+        rf.write('     Local to google.com  ping failed. Cannot continue     :Fail\n')
+        try:
+            cmd = 'nmcli c up Wired'
+            print('nmcli wired connection up')
+            nvg_599_dut.nmcli_set_connection(cmd)
+        except subprocess.CalledProcessError as e:
+            print('errror ' + e.output)
+            print('failed to restore Wired connection')
+            rf.write('     Failed to restore Wired connection.    :Fail\n')
+            test_status = "Fail"
         return test_status
     else:
         rf.write('     Local to RG ping Pass.)     :OK\n')
-
     # get the connection lists from nmcli
-    connection_list, active_connection_list  = nvg_599_dut.nmcli_get_connections()
 
-    # get the non wired connection and turn off all the connections
-    rf.write('     Turn off all active connections     :OK\n')
-    for  connection in active_connection_list:
-        if connection != 'Wired':
-            default_wifi_active = connection
-            print('active_ssid:' + default_wifi_active + '\n')
-        else:
-            print('wired_ssid:' + connection + '\n')
-
-        nmcli_cmd = "nmcli con down " + connection
+    # turn on guest network  and set the ssid and password guest_password
+   #  nvg_599_dut.conf_guest_network_ssid_and_password(rf, rfa, "on", guest_ssid , guest_password = "2222222222")
+    nvg_599_dut.conf_guest_network_ssid_and_password(rf, rfa, "on", guest_ssid , guest_password)
+    print('change guest password and connect to it:' + guest_ssid + ':password:' + guest_password + '\n')
+    sleep(20)
+    cmd = 'nmcli dev wifi rescan'
+    nvg_599_dut.nmcli_set_connection(cmd)
+    sleep(20)
+    try:
+        cmd ='nmcli device wifi connect ' + guest_ssid + ' password ' + guest_password
+        print('nmcli device wifi connect:' + str(guest_ssid) + ' password: ' + str(guest_password))
+        nvg_599_dut.nmcli_set_connection(cmd)
+    except subprocess.CalledProcessError as e:
+        print('errror ' + e.output)
+        print('failed to connect to guest SSID')
+        print('failed nmcli device wifi connect:' + str(guest_ssid) + ' password: ' + str(guest_password))
+        rf.write('     Failed to connect to guest ssid.    :Fail\n')
+        test_status = "Fail"
+        # always want to restore the Wired connection
+        nmcli_cmd = "nmcli con up Wired "
         nvg_599_dut.nmcli_set_connection(nmcli_cmd)
-
-        # nvg_599_dut.nmcli_set_connection(connection, 'down')
-
-    print('turn up  the wifi ATT4ujR48s_Guest \n')
-    # may I should get the default from the fixed dict or from the UI
-    # we should not assume the active directory is the default
-    # just connect to the guest ssid using the default guest ssid name
-
-    #default_ssid = nvg_599_dut.default_rg_ssid
-
-    # here we have to make sure the guest network is up and the password is set to something
-    nvg_599_dut.conf_guest_network_ssid_and_password(rf, rfa, "on", guest_ssid , guest_password = "2222222222")
-
-
-    # guest_ssid = default_wifi_active + '_Guest'
-    # guest_ssid = nvg_599_dut.default_rg_ssid + '_Guest'
-
-    print('guest_ssid:' + guest_ssid + '\n')
-    # --------------------------------------  what are we expecting here
-    nvg_599_dut.nmcli_set_connection(guest_ssid, guest_password, 'connect')
-
-    test_status = nvg_599_dut.ping_check('google.com')
-    # Make sure we can ping the ssid
-    if test_status == "Fail":
-        rf.write('     Guest SSID to google.com failed.    :Fail\n')
         return test_status
-    else:
-        rf.write('     Guest SSID to google.com      :OK\n')
-        print('Guest SSID to google.com      :OK\n')
 
-    # print('ping expected to fail should not be able to ping RG from guest network' + '\n')
-    test_status = nvg_599_dut.ping_check('192.168.1.254')
+    rf.write('     Turn off the wired connections     :OK\n')
+    print('turning down wired_ssid:\n')
+    nmcli_cmd = "nmcli con down Wired "
+    nvg_599_dut.nmcli_set_connection(nmcli_cmd)
+    sleep(10)
+    ping_status = nvg_599_dut.ping_check('192.168.1.254')
     # Make sure we can ping the ssid
-    if test_status == "Fail":
-        rf.write('     Guest SSID to RG disallowed.    :Pass\n')
+    if ping_status == "Fail":
+        rf.write('     Guest SSID to 192.168.1.254  failed.    :Pass\n')
+        print(' Ping from Guest SSID to RG 192.168.1.254   failed as expected    :Pass\n')
     else:
-        rf.write('     Guest SSID to should not be able to ping RG      :Fail\n')
-        return test_status
-    # turn everything back on
-    nvg_599_dut.nmcli_set_connection(guest_ssid, 'down')
-    sleep(2)
+        rf.write('     Ping guest SSID to RG IP passed     :Fail\n')
+        print('GPing guest SSID to RG IP passed     :Fail\n')
 
-    nvg_599_dut.nmcli_set_connection(guest_ssid, 'up')
-    # may need to do this
-    # nmcli device wifi connect ATT4ujR48s password eeh4jxmh7q26
-    for  connection in active_connection_list:
-        nvg_599_dut.nmcli_set_connection(connection, 'up')
+    try:
+        cmd = 'nmcli c up Wired'
+        print('nmcli wired connection up')
+        nvg_599_dut.nmcli_set_connection(cmd)
+    except subprocess.CalledProcessError as e:
+        print('errror ' + e.output)
+        print('failed to restore Wired connection')
+        rf.write('     Failed to restore Wired connection.    :Fail\n')
+        test_status = "Fail"
+
+    #ssid_default, ssid_default_password = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default", "default")
+
+    try:
+        cmd = 'nmcli device wifi connect ' + ssid_default + ' password ' + ssid_default_password
+        print('nmcli device wifi connect back to default  ssid:' + ssid_default + ' password:' + ssid_default_password )
+        nvg_599_dut.nmcli_set_connection(cmd)
+    except subprocess.CalledProcessError as e:
+        print('errror ' + e.output)
+        print('failed to connect back to  SSID')
+        rf.write('     Failed to connect back to default ssid.    :Fail\n')
+        return "Fail"
+
+    # for  connection in active_connection_list:
+    #     nvg_599_dut.nmcli_set_connection(connection, 'up')
     rf.write('     guest_client_cannot_ping_rg_airties_firmware     :Pass\n')
+
+    # restoring connection to default SSID
+    # ssid_default, ssid_default_password = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default", "default")
+
 
     return test_status
 
@@ -1574,7 +1618,7 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
 
     send_email = 1
     nvg_599_dut = Nvg599Class()
-    guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, "def guest_client_cannot_ping_rg", "dog_ssid", "dog_password123")
+    guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, "guest_client_cannot_ping_rg", "dog_ssid_patches", "dog_password123")
     # nvg_599_dut.rg_setup_without_factory_reset(rf, rfa)
 
     exit()

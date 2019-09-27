@@ -228,7 +228,6 @@ class Nvg599Class(GatewayClass):
         self.get_ui_system_information()
         self.device_access_code = nvg_info[self.serial_number]['device_access_code']
         self.default_rg_ssid = nvg_info[self.serial_number]['ssid_def']
-        print('dog \n')
 
     def remote_webserver(self):
         pass
@@ -738,32 +737,59 @@ class Nvg599Class(GatewayClass):
         #     submit = self.session.find_element_by_name("Save")
         ssid_text_box = self.session.find_element_by_id("ssid")
         ssid_text_box.clear()
+        #
+        # "35448081188192": {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
+        #                    'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'ssid_def_pw': 'eeh4jxmh7q26',
+        #                    'ssid_def': 'ATT4ujR48s', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
+        #                    'ssid_4': 'ATTPOC', 'ssid_4_pw': 'Ba1tshop'}}
 
         if home_ssid == "default":
-            print('home ssid:' + str(nvg_info[self.serial_number]['ssid_def']) + '\n')
+            home_ssid_ui = nvg_info[self.serial_number]['ssid_def']
+            print('home ssid:' + str(nvg_info[self.serial_number]['ssid_def'] + ':') + '\n')
             ssid_text_box.send_keys(nvg_info[self.serial_number]['ssid_def'])
         else:
         # if not the default then the user has entered a new ssid
             ssid_text_box.send_keys(home_ssid)
-            print("setting home ssid to: " + str(home_ssid) + '\n')
+            print("setting home ssid to: " + str(home_ssid) + ':\n')
 
-        security_selection = Select(self.session.find_element_by_id("ussidsecurity"))
+        if home_password == "default":
+            # here we are setting the default security and  the password
+            security_selection = Select(self.session.find_element_by_id("ussidsecurity"))
+            #home_password = nvg_info[self.serial_number]['ssid_def_pw']
+            security_selection.select_by_value('wpa')
+            submit = self.session.find_element_by_name("Save")
+            submit.click()
+            self.check_for_wifi_warning()
+            print('setting security setting to:' + str(security_selection) + '\n')
+
+        #security_selection = Select(self.session.find_element_by_id("ussidsecurity"))
+        password_link = self.session.find_element_by_id("password")
         if home_password ==  "default":
-            security_selection.select_by_value('defwpa')
+            # here we are setting the default security and  the password
+            home_password_ui = nvg_info[self.serial_number]['ssid_def_pw']
+            # i don't have to do anything
+            #security_selection.select_by_value('defwpa')
+            # password_link = self.session.find_element_by_id("password")
+            # password_link.clear()
+            # print("setting home password to: " + str(home_password) + ':\n')
+            # password_link.send_keys(home_password)
             sleep(3)
             #security_state = security_selection.first_selected_option.text
         else:
-            security_selection.select_by_value('wpa')
-            sleep(3)
-            password_link = self.session.find_element_by_id("password")
+            home_password_ui = home_password
             password_link.clear()
-            password_link.send_keys(home_password)
-            #self.session.find_element_by_id("password").clear()
+            password_link.send_keys(home_password_ui)
+            #security_selection.select_by_value('wpa')
+            # sleep(3)
+
+        print("setting home password to: " + str(home_password_ui) + ':\n')
+
+
+
         submit = self.session.find_element_by_name("Save")
         submit.click()
         self.check_for_wifi_warning()
-
-
+        return home_ssid, home_password_ui
 
     def conf_guest_network_ssid_and_password(self, rf, rfa, enable_disable, guest_ssid, guest_password = "2222222222"):
         global nvg_info
@@ -794,15 +820,31 @@ class Nvg599Class(GatewayClass):
         self.session.find_element_by_id("gssid").clear()
 
         if guest_ssid == "default":
+
+            # "35448081188192": {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
+            #                    'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'ssid_def_pw': 'eeh4jxmh7q26',
+            #                    'ssid_def': 'ATT4ujR48s', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
+            #                    'ssid_4': 'ATTPOC', 'ssid_4_pw': 'Ba1tshop'}}
+
+            # if home_ssid == "default":
+            #     home_ssid = nvg_info[self.serial_number]['ssid_def']
+            #     print('home ssid:' + str(nvg_info[self.serial_number]['ssid_def'] + ':') + '\n')
+            #     ssid_text_box.send_keys(nvg_info[self.serial_number]['ssid_def'])
+            #
+            # this is wrong
             print('dac:' + str(self.device_access_code))
             tmp_string = self.device_access_code + "_Guest"
             print('dac:' + str(tmp_string))
-            guest_ssid_link.send_keys(tmp_string)
+            home_ssid = nvg_info[self.serial_number]['ssid_def']
+            def_quest_ssid = home_ssid + '_Guest'
+            #guest_ssid_link.send_keys(tmp_string)
+            guest_ssid_link.send_keys(def_quest_ssid)
+
             #guest_ssid.send_keys(self.device_access_code +  '_Guest')
         else:
             # if not the default then the user has entered a new ssid
             guest_ssid_link.send_keys(guest_ssid)
-            print("setting guest ssid to" + str(guest_ssid) + '\n')
+            print("setting guest ssid to:" + str(guest_ssid) + '\n')
         # if we get here we know that he guest network is enabled  so a password is needed.
         guest_id_password_link = self.session.find_element_by_id("gssidpassword")
         self.session.find_element_by_id("gssidpassword").clear()
@@ -3088,9 +3130,11 @@ class Nvg599Class(GatewayClass):
             #                             remote_ip, shell=True).decode("utf-8")
             output = subprocess.check_output(cmd, shell=True)
         except subprocess.CalledProcessError as e:
-            print('ping error', e)
+            print('nmcli command error:' + str(cmd), e)
             output = "ping fail"
             return (output)
+
+        print('nmcli command pass:' + str(cmd))
 
         # output = subprocess.check_output(cmd, shell=True)
         for line in output.splitlines():
