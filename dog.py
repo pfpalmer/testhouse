@@ -1443,7 +1443,7 @@ def install_airties_firmware(nvg_599_dut, rf, rfa, test_name, airties_firmware, 
     test_status = "Passed"
     return test_status
 
-def guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, test_name):
+def guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, test_name, guest_ssid, guest_password):
     print('in guest_client_cannot_ping_rg \n')
     rf.write('Test ' + str(test_name) + '\n')
     test_status = nvg_599_dut.ping_check('192.168.1.254')
@@ -1466,20 +1466,28 @@ def guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, test_name):
         else:
             print('wired_ssid:' + connection + '\n')
 
-        nvg_599_dut.nmcli_set_connection(connection, 'down')
+        nmcli_cmd = "nmcli con down " + connection
+        nvg_599_dut.nmcli_set_connection(nmcli_cmd)
+
+        # nvg_599_dut.nmcli_set_connection(connection, 'down')
 
     print('turn up  the wifi ATT4ujR48s_Guest \n')
     # may I should get the default from the fixed dict or from the UI
     # we should not assume the active directory is the default
     # just connect to the guest ssid using the default guest ssid name
 
-    default_ssid = nvg_599_dut.default_rg_ssid
+    #default_ssid = nvg_599_dut.default_rg_ssid
+
+    # here we have to make sure the guest network is up and the password is set to something
+    nvg_599_dut.conf_guest_network_ssid_and_password(rf, rfa, "on", guest_ssid , guest_password = "2222222222")
+
+
     # guest_ssid = default_wifi_active + '_Guest'
-    guest_ssid = nvg_599_dut.default_rg_ssid + '_Guest'
+    # guest_ssid = nvg_599_dut.default_rg_ssid + '_Guest'
 
     print('guest_ssid:' + guest_ssid + '\n')
     # --------------------------------------  what are we expecting here
-    nvg_599_dut.nmcli_set_connection(guest_ssid, 'up')
+    nvg_599_dut.nmcli_set_connection(guest_ssid, guest_password, 'connect')
 
     test_status = nvg_599_dut.ping_check('google.com')
     # Make sure we can ping the ssid
@@ -1502,7 +1510,7 @@ def guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, test_name):
     nvg_599_dut.nmcli_set_connection(guest_ssid, 'down')
     sleep(2)
 
-    nvg_599_dut.nmcli_set_connection(default_ssid, 'up')
+    nvg_599_dut.nmcli_set_connection(guest_ssid, 'up')
     # may need to do this
     # nmcli device wifi connect ATT4ujR48s password eeh4jxmh7q26
     for  connection in active_connection_list:
@@ -1524,12 +1532,40 @@ def enable_guest_network_and_set_passwords(self, rf, rfa, test_name, ssid_passwo
 
 def verify_ssid_change_propagated_to_airties(self, rf, rfa, test_name , ssid, password = "default" ):
 # def config_enable_guest_network_and_set_passwords(nvg_599_dut, rf, rfa, test_name):
-    print('in config_enable_guest_network_and_set_passwords \n')
+    print('in verify_ssid_change_propagated_to_airties \n')
     self.conf_home_network_ssid_and_password(rf, rfa, ssid, password)
+    rf.write('     Setting ssid to:' + ssid + 'setting password to:' + password + '\n')
     test_status = rf.write('Test ' + str(test_name) + '\n')
+    sleep(10)
+    ip_list_4920 = nvg_599_dut.get_ip_list_of_4920s()
+    if len(ip_list_4920) == 0:
+        print('no 4920 ip available, abort   \n')
+        rf.write('     No airties present in lan, aborting test.    :Fail\n')
 
+        return
+    print('ip:' + str(ip_list_4920[0]) + '\n')
+    ip_4920 = ip_list_4920[0]
+    wl_4920_dict = nvg_599_dut.get_4920_ssid(ip_4920)
+    rf.write('     Logging in to airtis with IP' + ip_4920 + '\n')
+    # # mo1 = status_info_reg_ex.search(status_output)
+    # airties_wl_dict['ssid'] = str(mo1.group(1))
+    # airties_wl_dict['mode'] = str(mo1.group(2))
+    # airties_wl_dict['rssi'] = str(mo1.group(3))
+    # airties_wl_dict['noise'] = str(mo1.group(4))
+    # airties_wl_dict['channel'] = str(mo1.group(5))
+    # airties_wl_dict['bssid'] = str(mo1.group(6)).lower()
+    # cli_session.close()
 
+    print('ssid = ' + str(wl_4920_dict['ssid']) + '\n')
+    airties_ssid = wl_4920_dict['ssid']
+    if wl_4920_dict['ssid'] == ssid :
+        rf.write('     RG ssid:' + ssid + ' =  airties ssid:' +  airties_ssid + ' :Pass \n')
+        print('tada : \n')
+    else:
+        rf.write('     RG ssid:' + ssid + ' does not equal  airties ssid:' + airties_ssid + ' : Fail\n')
 
+# nvg_599_dut.get_4920_ssid("192.168.1.67")
+    return "Fail"
 
 # patches
 with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
@@ -1538,11 +1574,22 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
 
     send_email = 1
     nvg_599_dut = Nvg599Class()
+    guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, "def guest_client_cannot_ping_rg", "dog_ssid", "dog_password123")
+    # nvg_599_dut.rg_setup_without_factory_reset(rf, rfa)
+
+    exit()
+    #wl_4920_dict = nvg_599_dut.get_4920_ssid("192.168.1.67")
+    # print(str(wl_4920_dict))
+    # exit()
     #     def conf_guest_network_ssid_and_password(self, rf, rfa, enable_disable, guest_ssid = "default", guest_password = "2222222222"):
     # nvg_599_dut.rg_setup_without_factory_reset(rf, rfa)
     # nvg_599_dut.conf_home_network_ssid_and_password(self, rf, rfa, home_ssid = "default", home_password = "default"):
-    nvg_599_dut.get_4920_ssid("192.168.1.67")
-    #nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default_baloney", "default")
+    # nvg_599_dut.get_4920_ssid("192.168.1.67")
+    #def verify_ssid_change_propagated_to_airties(self, rf, rfa, test_name, ssid, password="default"):
+    verify_ssid_change_propagated_to_airties(nvg_599_dut,rf, rfa, "verify_ssid_change_propagated_to_airties", "default","default")
+
+
+    # nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default_baloney", "default")
 
     # nvg_599_dut.conf_guest_network_ssid_and_password(rf, rfa, "off",  "patches_is_a_pretty_dog", "woofcarlysdogwoof")
     exit()
@@ -1593,7 +1640,7 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
 
 
 
-    # guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, "def guest_client_cannot_ping_rg")
+    guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, "def guest_client_cannot_ping_rg")
 
     # nvg_599_dut.nmcli_get_active_connections()
     #nvg_599_dut.ping_check("192.168.1.254")

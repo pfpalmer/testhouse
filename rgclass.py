@@ -292,7 +292,7 @@ class Nvg599Class(GatewayClass):
         return return_string
 
     def login_nvg_cli(self):
-        print('In login_nvg_cli, enabling airties lib')
+        print('In login_nvg_cli')
         self.telnet_cli_session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
         self.telnet_cli_session.expect("ogin:")
         self.telnet_cli_session.sendline('admin')
@@ -436,7 +436,6 @@ class Nvg599Class(GatewayClass):
         # exit()
         # window_after = airties_session.window_handles[1]
         # airties_session.switch_to_window(window_after)
-
         # airties_session.refresh()
         # start = time.time()
         # # print("starting 4920 upgrade  timer:" + str(start))
@@ -453,24 +452,40 @@ class Nvg599Class(GatewayClass):
         #         sleep(30)
         #         print('sleeping30 secs')
         #         continue
-        #
-        # airties_session.switch_to.default_content()
-        #
-        # sleep(200)
-        # return "Pass"
+        airties_session.switch_to.default_content()
 
+
+    def set_4920_ip_list_to_factory_default(self):
+        # air_ties_ip_list = []
+        #show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(self)
+        show_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
+
+        # airties_4920_ip_list = []
+        for ip_lan_entry in show_ip_lan_dict:
+            if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
+            # print(ip_lan_entry)
+                #add this to a list which airties_4920
+                print('in for loop' + show_ip_lan_dict[ip_lan_entry]["IP"])
+                # airties_4920_ip_list.append(show_ip_lan_dict[ip_lan_entry]["IP"])
+                self.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
+                # Nvg599Class.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
+
+# patches1
     def get_ip_list_of_4920s(self):
         # air_ties_ip_list = []
-        show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(self)
-        # airties_4920_ip_list = []
+        # show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(self)
+        show_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
+
+        airties_4920_ip_list = []
         for ip_lan_entry in show_ip_lan_dict:
             if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
                 # print(ip_lan_entry)
                 # add this to a list which airties_4920
                 print('in for loop' + show_ip_lan_dict[ip_lan_entry]["IP"])
-                # airties_4920_ip_list.append(show_ip_lan_dict[ip_lan_entry]["IP"])
-                self.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
+                airties_4920_ip_list.append(show_ip_lan_dict[ip_lan_entry]["IP"])
+                #self.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
                 # Nvg599Class.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
+        return airties_4920_ip_list
 
     # review this incomplete method
     def set_fixed_ip_allocation(self):
@@ -730,7 +745,7 @@ class Nvg599Class(GatewayClass):
         else:
         # if not the default then the user has entered a new ssid
             ssid_text_box.send_keys(home_ssid)
-            print("setting guest ssid to" + str(home_ssid) + '\n')
+            print("setting home ssid to: " + str(home_ssid) + '\n')
 
         security_selection = Select(self.session.find_element_by_id("ussidsecurity"))
         if home_password ==  "default":
@@ -743,16 +758,14 @@ class Nvg599Class(GatewayClass):
             password_link = self.session.find_element_by_id("password")
             password_link.clear()
             password_link.send_keys(home_password)
-
             #self.session.find_element_by_id("password").clear()
-
         submit = self.session.find_element_by_name("Save")
         submit.click()
         self.check_for_wifi_warning()
-# ##
 
 
-    def conf_guest_network_ssid_and_password(self, rf, rfa, enable_disable, guest_ssid = "default", guest_password = "2222222222"):
+
+    def conf_guest_network_ssid_and_password(self, rf, rfa, enable_disable, guest_ssid, guest_password = "2222222222"):
         global nvg_info
         print('in enable_guest_network_and_set_password_ssid')
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
@@ -3063,18 +3076,17 @@ class Nvg599Class(GatewayClass):
         # cmd = "nmcli device wifi connect AirTies_SmartMesh_4PNF kykfmk8997"
 
     @staticmethod
-    def nmcli_set_connection(nmcli_connection_name, command):
+    def nmcli_set_connection(cmd):
         # command = 'nmcli c'
         # cmd = "nmcli r all"
-        cmd = "nmcli con " + command + " " + nmcli_connection_name
+        # cmd = "nmcli con " + command + " " + nmcli_connection_name +  " password " + password
+        # cmd = "nmcli device wifi  " + command + " " + nmcli_ssid +  " password " + nmcli_password
         # output = subprocess.check_output(['nmcli', 'r'],shell=True)
-
         # out = check_output(["ls -la"].decode("utf-8").shell=True)
         try:
             # out = subprocess.check_output("ping -c" + str(number_of_pings) + " " +
             #                             remote_ip, shell=True).decode("utf-8")
             output = subprocess.check_output(cmd, shell=True)
-
         except subprocess.CalledProcessError as e:
             print('ping error', e)
             output = "ping fail"
@@ -3333,7 +3345,7 @@ class Nvg599Class(GatewayClass):
 
     # def login_nvg_cli_ssh(self):
     def xlogin_nvg_599_cli(self):
-        print('In login_nvg_cli, enabling airties lib')
+        print('In xlogin_nvg_cli, enabling airties lib')
         ssh_cli_session = pexpect.spawn("ssh remotessh@192.168.1.254", encoding='utf-8')
         ssh_cli_session.expect("ord:")
         ssh_cli_session.sendline('alcatel')
@@ -3344,7 +3356,7 @@ class Nvg599Class(GatewayClass):
 
     @staticmethod
     def static_login_nvg_599_cli():
-        print('In login_nvg_cli')
+        print('In static_login_nvg_cli')
         telnet_cli_session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
         telnet_cli_session.expect("ogin:")
         telnet_cli_session.sendline('admin')
@@ -3404,36 +3416,29 @@ class Nvg599Class(GatewayClass):
         cli_session.sendline('wl -i wl1 status')
         cli_session.expect("#")
         status_output = cli_session.before
-        print(status_output)
-
-        #status_info_reg_ex = re.compile(r'SSID:\s+\"(\w+)Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
-        status_info_reg_ex = re.compile(r'SSID:\s+\"(\w+)',re.DOTALL)
-           r'SSID:\s"(\w+)"\s*?Mode:\s(\w+)\s*?RSSI:\s(\d+).*?noise:\s-(\d+).*?Channel:\s(\d+).*?BSSID:\s(\w+:\w+:\w+:\w+:\w+:\w+)',
-            re.DOTALL)
-        print('status_output' + str(status_output) + '\n')
-        mo1 = status_info_reg_ex.search(status_output)
-        # print('ssid:' + str(mo1.group(1)) + '\n')
-        # print('Mode:' + str(mo1.group(2)) + '\n')
-        # print('RSSI:' + str(mo1.group(3)) + '\n')
-        # print('noise:' + str(mo1.group(4)) + '\n')
-        # print('channel:' + str(mo1.group(5)) + '\n')
-        # print('BSSID:' + (str(mo1.group(6)).lower()) + '\n')
-        # sleep(5)
-        # exit()
-        mo1 = status_info_reg_ex.search(status_output)
-        band2_cli_dict['ssid'] = str(mo1.group(1))
-        band2_cli_dict['mode'] = str(mo1.group(2))
-        band2_cli_dict['rssi'] = str(mo1.group(3))
-        band2_cli_dict['noise'] = str(mo1.group(4))
-        band2_cli_dict['channel'] = str(mo1.group(5))
-        band2_cli_dict['bssid'] = str(mo1.group(6)).lower()
-        self.telnet_cli_session.close()
-        return band2_cli_dict
-        # statusInfoRegEx = re.compile(r'Model\s(\w+).*Serial Number\s+(\d+)',re.DOTALL)
-        # status InfoRegEx = re.compile(r'Model\s(\w+)')
+        # print(status_output)
+        airties_wl_dict = {}
+        # #status_info_reg_ex = re.compile(r'SSID:\s+\"(\w+)Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
+        # status_info_reg_ex = re.compile(r'SSID:\s+\"(\w+)',re.DOTALL)
+        status_info_reg_ex = re.compile(r'SSID:\s"(\w+)"\s*?Mode:\s(\w+)\s*?RSSI:\s(\d+).*?noise:\s-(\d+).*?Channel:\s(\d+).*?BSSID:\s(\w+:\w+:\w+:\w+:\w+:\w+)',re.DOTALL)
+        # print('status_output' + str(status_output) + '\n')
         mo1 = status_info_reg_ex.search(status_output)
         print('ssid:' + str(mo1.group(1)) + '\n')
-        return mo1
+        print('Mode:' + str(mo1.group(2)) + '\n')
+        print('RSSI:' + str(mo1.group(3)) + '\n')
+        print('noise:' + str(mo1.group(4)) + '\n')
+        print('channel:' + str(mo1.group(5)) + '\n')
+        print('BSSID:' + (str(mo1.group(6)).lower()) + '\n')
+        sleep(5)
+        # mo1 = status_info_reg_ex.search(status_output)
+        airties_wl_dict['ssid'] = str(mo1.group(1))
+        airties_wl_dict['mode'] = str(mo1.group(2))
+        airties_wl_dict['rssi'] = str(mo1.group(3))
+        airties_wl_dict['noise'] = str(mo1.group(4))
+        airties_wl_dict['channel'] = str(mo1.group(5))
+        airties_wl_dict['bssid'] = str(mo1.group(6)).lower()
+        cli_session.close()
+        return airties_wl_dict
 
     def cli_rg_status(self, ip):
         self.ip = ip
@@ -3924,9 +3929,9 @@ class Nvg599Class(GatewayClass):
         return mo1.group(2)
 
     def cli_sh_rg_ip_lan_info(self):
-        # telnet_cli_session =self.login_nvg_599_cli()
+        telnet_cli_session =self.login_nvg_599_cli()
         # telnet_cli_session = Nvg599Class.static_login_nvg_599_cli()
-        telnet_cli_session = Nvg599Class.login_nvg_599_cli(self)
+        #  = Nvg599Class.login_nvg_599_cli(self)
 
         # self.telnet_cli_session. sendline("show ip lan")
         telnet_cli_session.sendline("show ip lan")
