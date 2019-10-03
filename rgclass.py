@@ -56,7 +56,7 @@ nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53
                                 'ssid_4': 'ATTPOC', 'ssid_2_pw': 'Ba1tshop'},
 
             "35448081188192": {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
-                               'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'ssid_def_pw': 'eeh4jxmh7q26',
+                               'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'ssid_def_pw': '',
                                'ssid_def': 'ATT4ujR48s', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
                                'ssid_4': 'ATTPOC', 'ssid_4_pw': 'Ba1tshop'}}
 # *7<#56*2<2
@@ -472,14 +472,9 @@ class Nvg599Class(GatewayClass):
 
 # patches1
     def get_ip_list_of_4920s(self):
-        # air_ties_ip_list = []
-        # show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(self)
         show_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
-
         airties_4920_ip_list = []
         for ip_lan_entry in show_ip_lan_dict:
-
-
             if ("ATT_49" in show_ip_lan_dict[ip_lan_entry]['Name']) and (show_ip_lan_dict[ip_lan_entry]['State'] == "on"):
 
             #if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
@@ -1145,7 +1140,8 @@ class Nvg599Class(GatewayClass):
             if band2_home_ssid_enable_disable_parm == 'on':
                 band2_home_ssid_enable_disable_selection = Select(self.session.find_element_by_id("oussidenable"))
                 band2_home_ssid_enable_disable_selection.select_by_value('on')
-                # if user enable_disable is on and the current state is on we still have to check for any password changed
+                # if user enable_disable is on and the current state is
+                # on we still have to check for any password changed
                 print('home ssid enable=disable is on:' + str(band2_home_ssid_enable_disable_state))
                 sleep(2)
 
@@ -1200,7 +1196,8 @@ class Nvg599Class(GatewayClass):
                 # so we turn off and return pass
                 band2_home_network_enable_disable_selection = Select(self.session.find_element_by_id("oussidenable"))
                 band2_home_network_enable_disable_selection.select_by_value(band2_home_ssid_enable_disable_parm)
-                # if user enable_disable is on and the current state is on we still have to check for any password changed
+                # if user enable_disable is on and the current state is
+                # on we still have to check for any password changed
                 print('band2_home_ssid_enable_disable_selection:' + str(band2_home_ssid_enable_disable_parm))
 
                 submit = self.session.find_element_by_name("Save")
@@ -1443,7 +1440,8 @@ class Nvg599Class(GatewayClass):
             #      print('No Input errors displayed- Continuing')
 
     def install_rg_cli(self, tftp_server_name, install_bin_file, rf, rfa):
-        print('in install_rg_cli: installing' + str(install_bin_file) )
+        future = rfa
+        print('in install_rg_cli: installing' + str(install_bin_file))
         test_status = 'Pass'
         telnet_cli_session = self.login_nvg_599_cli()
         # nvg_599_dut.login_nvg_599_cli()
@@ -1459,9 +1457,12 @@ class Nvg599Class(GatewayClass):
         # self.telnet_cli_session.close()
 
         for device_mac in ip_lan_info_dict:
-            #if tftp_server_name == ip_lan_info_dict[device_mac]['Name'] && ip_lan_info_dict[device_mac]["State"] == "on":
-            if (ip_lan_info_dict[device_mac]["State"] == "on") and  (ip_lan_info_dict[device_mac]['Name']== tftp_server_name):
-                print('inputname:' + tftp_server_name + '  name_from_dict:' + ip_lan_info_dict[device_mac]['Name'] + '\n')
+            # if tftp_server_name ==
+            # ip_lan_info_dict[device_mac]['Name'] && ip_lan_info_dict[device_mac]["State"]=="on":
+            if (ip_lan_info_dict[device_mac]["State"] == "on") \
+                    and (ip_lan_info_dict[device_mac]['Name'] == tftp_server_name):
+                print('inputname:' + tftp_server_name + '  name_from_dict:' +
+                      ip_lan_info_dict[device_mac]['Name'] + '\n')
                 server_ip = ip_lan_info_dict[device_mac]['IP']
 
         if server_ip != "0.0.0.0":
@@ -2333,7 +2334,6 @@ class Nvg599Class(GatewayClass):
                     # print('did not find channel')
             sleep(2)
             print('in 6g')
-            #self.login_4920('192.168.1.67')
             submit = self.session.find_element_by_name("Save")
             submit.click()
             # print('in 7g')
@@ -3129,7 +3129,7 @@ class Nvg599Class(GatewayClass):
         except subprocess.CalledProcessError as e:
             print('nmcli command error:' + str(cmd), e)
             output = "ping fail"
-            return (output)
+            return output
 
         print('nmcli command pass:' + str(cmd))
 
@@ -3421,7 +3421,7 @@ class Nvg599Class(GatewayClass):
         # print(status_output)
         return self.telnet_cli_session
         # exit()
-        airties_wl_dict = {}
+        # airties_wl_dict = {}
 
 
         # air_cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
@@ -3460,11 +3460,7 @@ class Nvg599Class(GatewayClass):
         sleep(20)
         cli_session.close()
 
-    @staticmethod
-
-    #derp
-
-    def get_4920_ssid(ip_4920):
+    def get_4920_ssid(self, ip_4920):
         print('In get_4920_ssid')
         cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
         cli_session.expect("ogin:")
