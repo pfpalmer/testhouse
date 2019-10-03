@@ -215,6 +215,7 @@ class Nvg599Class(GatewayClass):
         self.init_info = False
         self.telnet_cli_session = None
         self.airties_ap_cli_session = None
+        self.air_cli_session = None
         global nvg_info
         # # The DAC must be read from the actual device., so it is stored in a dictionary of all the test house nvg599s
         self.software_version = None
@@ -477,7 +478,11 @@ class Nvg599Class(GatewayClass):
 
         airties_4920_ip_list = []
         for ip_lan_entry in show_ip_lan_dict:
-            if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
+
+
+            if ("ATT_49" in show_ip_lan_dict[ip_lan_entry]['Name']) and (show_ip_lan_dict[ip_lan_entry]['State'] == "on"):
+
+            #if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
                 # print(ip_lan_entry)
                 # add this to a list which airties_4920
                 print('in for loop' + show_ip_lan_dict[ip_lan_entry]["IP"])
@@ -748,6 +753,7 @@ class Nvg599Class(GatewayClass):
             print('home ssid:' + str(nvg_info[self.serial_number]['ssid_def'] + ':') + '\n')
             ssid_text_box.send_keys(nvg_info[self.serial_number]['ssid_def'])
         else:
+            home_ssid_ui = home_ssid
         # if not the default then the user has entered a new ssid
             ssid_text_box.send_keys(home_ssid)
             print("setting home ssid to: " + str(home_ssid) + ':\n')
@@ -784,20 +790,18 @@ class Nvg599Class(GatewayClass):
 
         print("setting home password to: " + str(home_password_ui) + ':\n')
 
-
-
         submit = self.session.find_element_by_name("Save")
         submit.click()
         self.check_for_wifi_warning()
-        return home_ssid, home_password_ui
+        return home_ssid_ui, home_password_ui
 
-    def conf_guest_network_ssid_and_password(self, rf, rfa, enable_disable, guest_ssid, guest_password = "2222222222"):
+    def conf_guest_network_ssid_and_password(self, rf, rfa, enable_disable, guest_ssid_parm, guest_password_parm):
         global nvg_info
         print('in enable_guest_network_and_set_password_ssid')
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
         home_network_link = self.session.find_element_by_link_text("Home Network")
         home_network_link.click()
-        sleep(10)
+        sleep(15)
         # resets_link = browser.find_element_by_link_text("Resets")
         wi_fi_link = self.session.find_element_by_link_text("Wi-Fi")
         wi_fi_link.click()
@@ -819,41 +823,26 @@ class Nvg599Class(GatewayClass):
         guest_ssid_link = self.session.find_element_by_id("gssid")
         self.session.find_element_by_id("gssid").clear()
 
-        if guest_ssid == "default":
-
-            # "35448081188192": {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
-            #                    'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'ssid_def_pw': 'eeh4jxmh7q26',
-            #                    'ssid_def': 'ATT4ujR48s', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
-            #                    'ssid_4': 'ATTPOC', 'ssid_4_pw': 'Ba1tshop'}}
-
-            # if home_ssid == "default":
-            #     home_ssid = nvg_info[self.serial_number]['ssid_def']
-            #     print('home ssid:' + str(nvg_info[self.serial_number]['ssid_def'] + ':') + '\n')
-            #     ssid_text_box.send_keys(nvg_info[self.serial_number]['ssid_def'])
-            #
-            # this is wrong
-            print('dac:' + str(self.device_access_code))
-            tmp_string = self.device_access_code + "_Guest"
-            print('dac:' + str(tmp_string))
-            home_ssid = nvg_info[self.serial_number]['ssid_def']
-            def_quest_ssid = home_ssid + '_Guest'
+        if guest_ssid_parm == "default":
+            def_ssid = nvg_info[self.serial_number]['ssid_def']
+            guest_ssid_parm = def_ssid + '_Guest'
             #guest_ssid_link.send_keys(tmp_string)
-            guest_ssid_link.send_keys(def_quest_ssid)
-
-            #guest_ssid.send_keys(self.device_access_code +  '_Guest')
+            guest_ssid_link.send_keys(guest_ssid_parm)
+            print('setting ssid to default ssid:' + str(guest_ssid_parm))
         else:
             # if not the default then the user has entered a new ssid
-            guest_ssid_link.send_keys(guest_ssid)
-            print("setting guest ssid to:" + str(guest_ssid) + '\n')
+            guest_ssid_link.send_keys(guest_ssid_parm)
+            print("setting guest ssid to:" + str(guest_ssid_parm) + '\n')
         # if we get here we know that he guest network is enabled  so a password is needed.
         guest_id_password_link = self.session.find_element_by_id("gssidpassword")
         self.session.find_element_by_id("gssidpassword").clear()
-        guest_id_password_link.send_keys(guest_password)
-
+        guest_id_password_link.send_keys(guest_password_parm)
+        print('guest password>>>>>>>>>>>>>>' + str(guest_password_parm))
         submit = self.session.find_element_by_name("Save")
         submit.click()
         self.check_for_wifi_warning()
 
+        return guest_ssid_parm, guest_password_parm
 
     """ I should use this function to get the information for a specific band /guest SSID
     This would make the test case logic  easier to follow"""
@@ -1454,17 +1443,25 @@ class Nvg599Class(GatewayClass):
             #      print('No Input errors displayed- Continuing')
 
     def install_rg_cli(self, tftp_server_name, install_bin_file, rf, rfa):
-        print('in install_rg_cli')
+        print('in install_rg_cli: installing' + str(install_bin_file) )
         test_status = 'Pass'
         telnet_cli_session = self.login_nvg_599_cli()
         # nvg_599_dut.login_nvg_599_cli()
         ip_lan_info_dict = self.cli_sh_rg_ip_lan_info()
         server_ip = "0.0.0.0"
 
+        # ip_lan_connections_dict_cli[connected_device_mac] = {}
+        # ip_lan_connections_dict_cli[connected_device_mac]["IP"] = connected_device_ip
+        # ip_lan_connections_dict_cli[connected_device_mac]["Name"] = connected_device_name
+        # ip_lan_connections_dict_cli[connected_device_mac]["State"] = connected_device_status
+        # ip_lan_connections_dict_cli[connected_device_mac]["DHCP"] = connected_device_dhcp
+        # ip_lan_connections_dict_cli[connected_device_mac]["Port"] = connected_device_port
+        # self.telnet_cli_session.close()
+
         for device_mac in ip_lan_info_dict:
-            if tftp_server_name == ip_lan_info_dict[device_mac]['Name']:
-                print(
-                    'inputname:' + tftp_server_name + '  name_from_dict:' + ip_lan_info_dict[device_mac]['Name'] + '\n')
+            #if tftp_server_name == ip_lan_info_dict[device_mac]['Name'] && ip_lan_info_dict[device_mac]["State"] == "on":
+            if (ip_lan_info_dict[device_mac]["State"] == "on") and  (ip_lan_info_dict[device_mac]['Name']== tftp_server_name):
+                print('inputname:' + tftp_server_name + '  name_from_dict:' + ip_lan_info_dict[device_mac]['Name'] + '\n')
                 server_ip = ip_lan_info_dict[device_mac]['IP']
 
         if server_ip != "0.0.0.0":
@@ -3412,28 +3409,44 @@ class Nvg599Class(GatewayClass):
         sleep(120)
         return telnet_cli_session
 
-    @staticmethod
-    def login_4920(ip_4920):
-        print('In login_4920')
-        # air_cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
-        air_cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
-        air_cli_session.sendline('\n')
+    def login_4920(self, ip_4920):
+        print('In login_4920' + '\n')
+        self.telnet_cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
+        self.telnet_cli_session.expect("ogin:")
+        self.telnet_cli_session.sendline('root')
+        self.telnet_cli_session.expect("#")
+        #self.telnet_cli_session.sendline('wl -i wl1 status')
+        #self.telnet_cli_session.expect("#")
+        #status_output = self.telnet_cli_session.before
+        # print(status_output)
+        return self.telnet_cli_session
+        # exit()
+        airties_wl_dict = {}
 
+
+        # air_cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
+
+
+        #self.telnet_cli_session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
+
+        print("===============  this is the command telnet " + str(ip_4920) + '\n')
+
+
+        #session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
+
+        self.air_cli_session = pexpect.spawn("telnet " + ip_4920, encoding = 'utf-8')
+        # self.air_cli_session.sendline('\n')
         sleep(1)
         print('1')
-
-        air_cli_session.expect("ogin:")
+        self.air_cli_session.expect("ogin:")
         print('2')
-
-        air_cli_session.sendline('root')
+        self.air_cli_session.sendline('root')
         print('3')
-
-        air_cli_session.expect("#")
+        self.air_cli_session.expect("#")
         print('4')
-
-        status_output = air_cli_session.before
+        status_output = self.air_cli_session.before
         print(status_output)
-        return air_cli_session
+        return self.air_cli_session
 
     @staticmethod
     def static_reset_4920(ip_4920):
@@ -3455,7 +3468,7 @@ class Nvg599Class(GatewayClass):
         print('In get_4920_ssid')
         cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
         cli_session.expect("ogin:")
-        cli_session.sendline('admin')
+        cli_session.sendline('root')
         cli_session.expect("#")
         cli_session.sendline('wl -i wl1 status')
         cli_session.expect("#")

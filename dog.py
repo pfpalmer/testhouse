@@ -31,8 +31,8 @@ from rgclass import Nvg599Class
 # from rgclass import DFS_CHANNELS
 # from rgclass import  test_house_devices_static_info
 
-NON_DFS_CHANNELS = {36, 40, 44, 48, 149, 153, 157, 161, 165}
-DFS_CHANNELS     = {52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144}
+NON_DFS_CHANNELS = {"36", "40", "44", "48", "149", "153", "157", "161", "165"}
+DFS_CHANNELS     = {"52", "56", "60", "64", "100", "104", "108", "112", "116", "132", "136", "140", "144"}
 ALL_BAND5_CHANNELS = {36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112,
                       116, 132, 136, 140, 144, 149, 153, 157, 161, 165}
 
@@ -50,6 +50,10 @@ ALL_BAND5_CHANNELS = {36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112,
 def trigger_dfs_channel_change(nvg_599_dut,rf, rfa, test_name, airties_name = "None" ):
     global NON_DFS_CHANNELS
     global DFS_CHANNELS
+    # nvg_599_dut.login_4920("192.168.1.72")
+    # sleep(10)
+    # exit()
+
     test_status = "Pass"
     rf.write('Test ' + test_name + ' Airties device:' + airties_name + '\n')
     print('Test:' + test_name + '\n')
@@ -58,7 +62,10 @@ def trigger_dfs_channel_change(nvg_599_dut,rf, rfa, test_name, airties_name = "N
     home_link.click()
 
     current_5g_channel = nvg_599_dut.get_ui_home_network_status_value("ui_channel_5g")
-    print('current_5g_channel{' + current_5g_channel + '\n')
+    var_type = type(current_5g_channel)
+    print('type is:' + str(var_type))
+
+    print('current_5g_channel' + current_5g_channel + '\n')
     if current_5g_channel in DFS_CHANNELS:
         result = "Current 5G:" + current_5g_channel + " is a DFS channel\n"
         result_str = str(result)
@@ -78,13 +85,20 @@ def trigger_dfs_channel_change(nvg_599_dut,rf, rfa, test_name, airties_name = "N
 
         print('setting channel to DFS channel 100')
     # this is the default, we are triggering dfs from the RG 5 g side
-#   fails here
     # nvg_599_dut.login_4920("192.168.1.67")
+
+    # nvg_599_dut.login_4920("192.168.1.72")
+    # sleep(10)
+    # exit()
+    sleep(220)
+    # nvg_599_dut.login_4920("192.168.1.72")
+    #
+    # exit()
+
 
     if airties_name == "None":
         print(' Airties:' + airties_name + '\n')
         print('triggering DFS from the RG \n')
-
         nvg_599_dut.login_nvg_599_cli()
         nvg_599_dut.telnet_cli_session.sendline()
         nvg_599_dut.telnet_cli_session.expect(">")
@@ -116,19 +130,19 @@ def trigger_dfs_channel_change(nvg_599_dut,rf, rfa, test_name, airties_name = "N
             return "Fail"
 
         print(' Airties ip: ' +  airties_ip + '\n')
-        print(' This is a biggy \n')
+        print(' This is before biggy \n')
 
         # this doesn't work afer the commit button is pressed for some reason
-        # airties_cli_session =  nvg_599_dut.login_4920(airties_ip)
-        # print(' This is a biggy session:' + str(airties_cli_session) +  '\n')
-        # airties_cli_session.sendline("\n")
-        # airties_cli_session.expect("#")
-        # airties_cli_session.sendline("wl -i wl1 radar 2")
-        # airties_cli_session.expect("#")
-        # sleep(5)
-        # airties_cli_session.close()
-    current_5g_channel = nvg_599_dut.get_ui_home_network_status_value("ui_channel_5g")
-    current_5g_channel = int(current_5g_channel)
+        airties_cli_session =  nvg_599_dut.login_4920(airties_ip)
+        print(' This is a biggy session:' + str(airties_cli_session) +  '\n')
+        #airties_cli_session.sendline("\n")
+        #airties_cli_session.expect("#")
+        airties_cli_session.sendline("wl -i wl1 radar 2")
+        airties_cli_session.expect("#")
+        sleep(5)
+        airties_cli_session.close()
+    current_5g_channel = str(nvg_599_dut.get_ui_home_network_status_value("ui_channel_5g"))
+    # current_5g_channel = current_5g_channel
 
     # after the simulating radar detection we expect the channel to change to a non DFS channel
     print('current_5g_channel after trigger', current_5g_channel)
@@ -1347,8 +1361,10 @@ def airties_wps_connection_after_airties_factory_reset(nvg_599_dut, airties_ssid
 
 # rg_firmware nvg599-11.5.0h0d1_1.1.bin"
 def tftp_rg_firmware_and_install(nvg_599_dut, tftp_server_name, rg_firmware, rf, rfa, test_name):
+    print('Test:' + test_name + '\n')
     test_status = "Pass"
     rf.write('Test ' + test_name + '\n')
+    nvg_599_dut.software_version = rg_firmware
     # If we cant get the file there is no point in continuing
     test_status = nvg_599_dut.install_rg_cli(tftp_server_name, rg_firmware, rf, rfa)
     if test_status == "Pass":
@@ -1443,41 +1459,70 @@ def install_airties_firmware(nvg_599_dut, rf, rfa, test_name, airties_firmware, 
     test_status = "Passed"
     return test_status
 
-def guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, test_name, guest_ssid, guest_password):
+def guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, test_name, guest_ssid, guest_password = "default_guest_password"):
     print('in guest_client_cannot_ping_rg \n')
     rf.write('Test ' + str(test_name) + '\n')
     test_status = "Pass"
     global nvg_info
-    # "35448081188192": {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
-    #                    'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'ssid_def_pw': 'eeh4jxmh7q26',
-    #                    'ssid_def': 'ATT4ujR48s', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
-    #                    'ssid_4': 'ATTPOC', 'ssid_4_pw': 'Ba1tshop'}}
-    #ssid_default = nvg_info[nvg_599_dut.serial_number]['ssid_def']
-    #ssid_default_password = nvg_info[nvg_599_dut.serial_number]['ssid_def_pw']
-    # nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default","default")
+    #
+    # Set home ssid and password to defaults so we know what they are
+    # Connect to guest network
+    # Turn off wired connection
+    # verify we can ping google
+    # verify that we cannot ping the RG
+    # turn on wired
+    # connect back to main ssid
 
-    # start off with a known ssid and password
-    ssid_default, ssid_default_password = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default", "default")
+    # The logic here is that is the home_password is "default" then the Security is set to "Default Password"
+    home_ssid_conf, home_password_conf = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, home_ssid="default", home_password="default")
+    print('**************ssid default  from conf call:' + home_ssid_conf  + '  ssid default:' + home_password_conf + '\n\n')
+
+    sleep(20)
+    cmd = 'nmcli dev wifi rescan'
+    nvg_599_dut.nmcli_set_connection(cmd)
+    sleep(20)
+
     try:
-        cmd = 'nmcli device wifi connect ' + ssid_default  + ' password ' + ssid_default_password
-        print('nmcli device wifi connect')
+        cmd = 'nmcli device wifi connect ' + home_ssid_conf + ' password ' + home_password_conf
+        print('nmcli device wifi connect to default  ssid:' + str(home_ssid_conf) + ' password:' + str(home_password_conf))
+        nvg_599_dut.nmcli_set_connection(cmd)
+    except subprocess.CalledProcessError as e:
+        print('errror ' + e.output)
+        print('failed to connect back to  SSID')
+        rf.write('     Failed to connect  to default home ssid.    :Fail\n')
+        return "Fail"
+
+    # eeh4jxmh7q26
+
+    rf.write('     Turn off the wired connections     :OK\n')
+    print('Turning down wired_ssid:\n')
+    nmcli_cmd = "nmcli con down Wired "
+    nvg_599_dut.nmcli_set_connection(nmcli_cmd)
+    sleep(10)
+    ping_status = nvg_599_dut.ping_check('192.168.1.254')
+    # Make sure we can ping the ssid
+    if ping_status == "Pass":
+        rf.write('      STA SSID to 192.168.1.254(RG(  passed.    :Pass\n')
+        print(' Ping from STA Home SSID to RG 192.168.1.254 passed:Pass\n')
+    else:
+        rf.write('     Ping  from STA SSID to RG IP failed     :Fail\n')
+        print('Ping  from STA SSID to RG IP failed      :Fail\n')
+
+
+    # now we connect to the guest network and verify that we can ping google,com on the wan
+    guest_ssid_conf, guest_password_conf = nvg_599_dut.conf_guest_network_ssid_and_password(rf, rfa, "enable", guest_ssid, guest_password)
+    print('**************guest ssid defaults back from conf call:' + guest_ssid_conf  + '  ssid default:' + guest_password_conf + '\n\n')
+    try:
+        cmd = 'nmcli device wifi connect ' + guest_ssid_conf  + ' password ' + guest_password_conf
+        print('nmcli device wifi connect' +  str(guest_ssid_conf)  + ' password ' + str(guest_password_conf))
         nvg_599_dut.nmcli_set_connection(cmd)
     except subprocess.CalledProcessError as e:
         print('errror ' + e.output)
         print('failed to connect to  default SSID')
         rf.write('     Failed to connect to  default ssid.    :Fail\n')
-        # try:
-        #     cmd = 'nmcli c up Wired'
-        #     print('nmcli wired connection up')
-        #     nvg_599_dut.nmcli_set_connection(cmd)
-        # except subprocess.CalledProcessError as e:
-        #     print('errror ' + e.output)
-        #     print('failed to restore Wired connection')
-        #     rf.write('     Failed to restore Wired connection.    :Fail\n')
         return "Fail"
-    # we need to set the ssid and password in the UI to the defaults before connecting or disconnecting
+    # Make sure we can ping the a wan website
     ping_status = nvg_599_dut.ping_check('google.com')
-    # Make sure we can ping the ssid
     if ping_status == "Fail":
         rf.write('     Local to google.com  ping failed. Cannot continue     :Fail\n')
         try:
@@ -1492,76 +1537,148 @@ def guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, test_name, guest_ssid, gue
         return test_status
     else:
         rf.write('     Local to RG ping Pass.)     :OK\n')
-    # get the connection lists from nmcli
 
-    # turn on guest network  and set the ssid and password guest_password
-   #  nvg_599_dut.conf_guest_network_ssid_and_password(rf, rfa, "on", guest_ssid , guest_password = "2222222222")
-    nvg_599_dut.conf_guest_network_ssid_and_password(rf, rfa, "on", guest_ssid , guest_password)
-    print('change guest password and connect to it:' + guest_ssid + ':password:' + guest_password + '\n')
-    sleep(20)
-    cmd = 'nmcli dev wifi rescan'
-    nvg_599_dut.nmcli_set_connection(cmd)
-    sleep(20)
-    try:
-        cmd ='nmcli device wifi connect ' + guest_ssid + ' password ' + guest_password
-        print('nmcli device wifi connect:' + str(guest_ssid) + ' password: ' + str(guest_password))
-        nvg_599_dut.nmcli_set_connection(cmd)
-    except subprocess.CalledProcessError as e:
-        print('errror ' + e.output)
-        print('failed to connect to guest SSID')
-        print('failed nmcli device wifi connect:' + str(guest_ssid) + ' password: ' + str(guest_password))
-        rf.write('     Failed to connect to guest ssid.    :Fail\n')
-        test_status = "Fail"
-        # always want to restore the Wired connection
-        nmcli_cmd = "nmcli con up Wired "
-        nvg_599_dut.nmcli_set_connection(nmcli_cmd)
-        return test_status
-
-    rf.write('     Turn off the wired connections     :OK\n')
-    print('turning down wired_ssid:\n')
-    nmcli_cmd = "nmcli con down Wired "
-    nvg_599_dut.nmcli_set_connection(nmcli_cmd)
-    sleep(10)
+    # the last step is to ping the RG from the guest network and this should fail
     ping_status = nvg_599_dut.ping_check('192.168.1.254')
     # Make sure we can ping the ssid
     if ping_status == "Fail":
-        rf.write('     Guest SSID to 192.168.1.254  failed.    :Pass\n')
-        print(' Ping from Guest SSID to RG 192.168.1.254   failed as expected    :Pass\n')
+        rf.write('      STA connected to Guest SSID  ping to 192.168.1.254(RG) Failed as expected.    :Pass\n')
+        print(' Ping from STA Home SSID to RG 192.168.1.254 Failed Pass\n')
     else:
-        rf.write('     Ping guest SSID to RG IP passed     :Fail\n')
-        print('GPing guest SSID to RG IP passed     :Fail\n')
-
-    try:
-        cmd = 'nmcli c up Wired'
-        print('nmcli wired connection up')
-        nvg_599_dut.nmcli_set_connection(cmd)
-    except subprocess.CalledProcessError as e:
-        print('errror ' + e.output)
-        print('failed to restore Wired connection')
-        rf.write('     Failed to restore Wired connection.    :Fail\n')
+        rf.write('     Ping from STA SSID to RG IP passed but should fail     :Fail\n')
+        print('Ping  from STA SSID to RG IP       :Fail\n')
         test_status = "Fail"
 
-    #ssid_default, ssid_default_password = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default", "default")
+    rf.write('     Turn on the wired connections     :OK\n')
+    print('Turning back on wired_ssid:\n')
+    nmcli_cmd = "nmcli con up Wired "
+    nvg_599_dut.nmcli_set_connection(nmcli_cmd)
+    sleep(10)
 
     try:
-        cmd = 'nmcli device wifi connect ' + ssid_default + ' password ' + ssid_default_password
-        print('nmcli device wifi connect back to default  ssid:' + ssid_default + ' password:' + ssid_default_password )
+        cmd = 'nmcli device wifi connect ' + home_ssid_conf + ' password ' + home_password_conf
+        print('nmcli device wifi connect to default  ssid:' + str(home_ssid_conf) + ' password:' + str(home_password_conf))
         nvg_599_dut.nmcli_set_connection(cmd)
     except subprocess.CalledProcessError as e:
         print('errror ' + e.output)
         print('failed to connect back to  SSID')
-        rf.write('     Failed to connect back to default ssid.    :Fail\n')
+        rf.write('     Failed to connect  to default home ssid.    :Fail\n')
         return "Fail"
-
-    # for  connection in active_connection_list:
-    #     nvg_599_dut.nmcli_set_connection(connection, 'up')
-    rf.write('     guest_client_cannot_ping_rg_airties_firmware     :Pass\n')
-
-    # restoring connection to default SSID
-    # ssid_default, ssid_default_password = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default", "default")
 
 
     return test_status
+    # exit()
+
+
+
+
+
+    # # Now wconnect to the
+    # guest_ssid_conf, guest_password_conf = nvg_599_dut.conf_guest_network_ssid_and_password(rf, rfa, "enable", guest_ssid, guest_password)
+    # print('**************guest ssid defaults back from conf call:' + guest_ssid_conf  + '  ssid default:' + guest_password_conf + '\n\n')
+    # try:
+    #     cmd = 'nmcli device wifi connect ' + guest_ssid_conf  + ' password ' + guest_password_conf
+    #     print('nmcli device wifi connect' +  str(guest_ssid_conf)  + ' password ' + str(guest_password_conf))
+    #     nvg_599_dut.nmcli_set_connection(cmd)
+    # except subprocess.CalledProcessError as e:
+    #     print('errror ' + e.output)
+    #     print('failed to connect to  default SSID')
+    #     rf.write('     Failed to connect to  default ssid.    :Fail\n')
+    #     return "Fail"
+    # # Make sure we can ping the a wan website
+    # ping_status = nvg_599_dut.ping_check('google.com')
+    # if ping_status == "Fail":
+    #     rf.write('     Local to google.com  ping failed. Cannot continue     :Fail\n')
+    #     try:
+    #         cmd = 'nmcli c up Wired'
+    #         print('nmcli wired connection up')
+    #         nvg_599_dut.nmcli_set_connection(cmd)
+    #     except subprocess.CalledProcessError as e:
+    #         print('errror ' + e.output)
+    #         print('failed to restore Wired connection')
+    #         rf.write('     Failed to restore Wired connection.    :Fail\n')
+    #         test_status = "Fail"
+    #     return test_status
+    # else:
+    #     rf.write('     Local to RG ping Pass.)     :OK\n')
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    # exit()
+
+
+    # get the connection lists from nmcli
+    # turn on guest network  and set the ssid and password guest_password
+   # #  nvg_599_dut.conf_guest_network_ssid_and_password(rf, rfa, "on", guest_ssid , guest_password = "2222222222")
+   #  nvg_599_dut.conf_guest_network_ssid_and_password(rf, rfa, "on", guest_ssid , guest_password)
+   #  print('change guest password and connect to it:' + guest_ssid + ':password:' + guest_password + '\n')
+   #  sleep(20)
+   #  cmd = 'nmcli dev wifi rescan'
+   #  nvg_599_dut.nmcli_set_connection(cmd)
+   #  sleep(20)
+   #  try:
+   #      cmd ='nmcli device wifi connect ' + guest_ssid + ' password ' + guest_password
+   #      print('nmcli device wifi connect:' + str(guest_ssid) + ' password: ' + str(guest_password))
+   #      nvg_599_dut.nmcli_set_connection(cmd)
+   #  except subprocess.CalledProcessError as e:
+   #      print('errror ' + e.output)
+   #      print('failed to connect to guest SSID')
+   #      print('failed nmcli device wifi connect:' + str(guest_ssid) + ' password: ' + str(guest_password))
+   #      rf.write('     Failed to connect to guest ssid.    :Fail\n')
+   #      test_status = "Fail"
+   #      # always want to restore the Wired connection
+   #      nmcli_cmd = "nmcli con up Wired "
+   #      nvg_599_dut.nmcli_set_connection(nmcli_cmd)
+   #      return test_status
+   #
+   #  rf.write('     Turn off the wired connections     :OK\n')
+   #  print('turning down wired_ssid:\n')
+   #  nmcli_cmd = "nmcli con down Wired "
+   #  nvg_599_dut.nmcli_set_connection(nmcli_cmd)
+   #  sleep(10)
+   #  ping_status = nvg_599_dut.ping_check('192.168.1.254')
+   #  # Make sure we can ping the ssid
+   #  if ping_status == "Fail":
+   #      rf.write('     Guest SSID to 192.168.1.254  failed.    :Pass\n')
+   #      print(' Ping from Guest SSID to RG 192.168.1.254   failed as expected    :Pass\n')
+   #  else:
+   #      rf.write('     Ping guest SSID to RG IP passed     :Fail\n')
+   #      print('GPing guest SSID to RG IP passed     :Fail\n')
+   #
+   #  try:
+   #      cmd = 'nmcli c up Wired'
+   #      print('nmcli wired connection up')
+   #      nvg_599_dut.nmcli_set_connection(cmd)
+   #  except subprocess.CalledProcessError as e:
+   #      print('errror ' + e.output)
+   #      print('failed to restore Wired connection')
+   #      rf.write('     Failed to restore Wired connection.    :Fail\n')
+   #      test_status = "Fail"
+   #
+   #  #ssid_default, ssid_default_password = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default", "default")
+   #
+   #  try:
+   #      cmd = 'nmcli device wifi connect ' + ssid_default + ' password ' + ssid_default_password
+   #      print('nmcli device wifi connect back to default  ssid:' + ssid_default + ' password:' + ssid_default_password )
+   #      nvg_599_dut.nmcli_set_connection(cmd)
+   #  except subprocess.CalledProcessError as e:
+   #      print('errror ' + e.output)
+   #      print('failed to connect back to  SSID')
+   #      rf.write('     Failed to connect back to default ssid.    :Fail\n')
+   #      return "Fail"
+   #
+   #  # for  connection in active_connection_list:
+   #  #     nvg_599_dut.nmcli_set_connection(connection, 'up')
+   #  rf.write('     guest_client_cannot_ping_rg_airties_firmware     :Pass\n')
+   #
+   #  # restoring connection to default SSID
+   #  # ssid_default, ssid_default_password = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default", "default"
+   #
+   #  return test_status
 
 
 def enable_guest_network_and_set_passwords(self, rf, rfa, test_name, ssid_password = '1111111111', guest_ssid_password = '2222222222'):
@@ -1572,20 +1689,68 @@ def enable_guest_network_and_set_passwords(self, rf, rfa, test_name, ssid_passwo
     pass
 
 
+def test_4920_login(self, rf, rfa):
+    print('in test_4920_login \n')
+    nvg_599_dut.air_cli_session = pexpect.spawn("telnet  192.168.1.72", encoding='utf-8')
+    nvg_599_dut.air_cli_session.sendline('\n')
+    print('1')
+    nvg_599_dut.air_cli_session.expect("ogin:")
+    print('2')
+    nvg_599_dut.air_cli_session.sendline('root')
+    print('3')
+    nvg_599_dut.air_cli_session.expect("#")
+    print('4')
+    status_output = nvg_599_dut.air_cli_session.before
+    print(status_output)
 
-
-def verify_ssid_change_propagated_to_airties(self, rf, rfa, test_name , ssid, password = "default" ):
-# def config_enable_guest_network_and_set_passwords(nvg_599_dut, rf, rfa, test_name):
-    print('in verify_ssid_change_propagated_to_airties \n')
-    self.conf_home_network_ssid_and_password(rf, rfa, ssid, password)
-    rf.write('     Setting ssid to:' + ssid + 'setting password to:' + password + '\n')
-    test_status = rf.write('Test ' + str(test_name) + '\n')
-    sleep(10)
+def load_4920_firmware(nvg_599_dut, rf, rfa, test_name, name_of_4920_or_any, firmware_to_load):
+    print('in load_4920_firmware \n')
+    rf.write('Test ' + str(test_name) + '\n')
+    test_status = "Pass"
     ip_list_4920 = nvg_599_dut.get_ip_list_of_4920s()
     if len(ip_list_4920) == 0:
         print('no 4920 ip available, abort   \n')
         rf.write('     No airties present in lan, aborting test.    :Fail\n')
+        return
+    print('ip:' + str(ip_list_4920[0]) + '\n')
 
+    if name_of_4920_or_any == "any":
+        airties_ip = ip_list_4920[0]
+        nvg_599_dut.install_airties_firmware(airties_ip, firmware_to_load)
+
+
+# nvg_599_dut.install_airties_firmware('192.168.1.68', '/home/palmer/Downloads/AirTies_7381.bin', rf, rfa)
+
+
+
+def verify_ssid_change_propagated_to_airties(nvg_599_dut, rf, rfa, test_name , ssid_parm, password_parm = "default123", ):
+# def config_enable_guest_network_and_set_passwords(nvg_599_dut, rf, rfa, test_name):
+    print('in verify_ssid_change_propagated_to_airties \n')
+    home_ssid_conf, home_password_conf =  nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, ssid_parm, password_parm)
+    rf.write('     Setting ssid to:' + ssid_parm + 'setting password to:' + password_parm + '\n')
+    test_status = rf.write('Test ' + str(test_name) + '\n')
+    # After we configure the ssid we have to connect to it in order to login to the Airties device
+    sleep(20)
+    cmd = 'nmcli dev wifi rescan'
+    nvg_599_dut.nmcli_set_connection(cmd)
+    sleep(20)
+
+    try:
+        cmd = 'nmcli device wifi connect ' + home_ssid_conf + ' password ' + home_password_conf
+        print('nmcli device wifi connect to default  ssid:' + str(home_ssid_conf) + ' password:' + str(home_password_conf))
+        nvg_599_dut.nmcli_set_connection(cmd)
+    except subprocess.CalledProcessError as e:
+        print('errror ' + e.output)
+        print('failed to connect back to  SSID')
+        rf.write('     Failed to connect  to default home ssid.    :Fail\n')
+        return "Fail"
+
+
+
+    ip_list_4920 = nvg_599_dut.get_ip_list_of_4920s()
+    if len(ip_list_4920) == 0:
+        print('no 4920 ip available, abort   \n')
+        rf.write('     No airties present in lan, aborting test.    :Fail\n')
         return
     print('ip:' + str(ip_list_4920[0]) + '\n')
     ip_4920 = ip_list_4920[0]
@@ -1600,141 +1765,42 @@ def verify_ssid_change_propagated_to_airties(self, rf, rfa, test_name , ssid, pa
     # airties_wl_dict['bssid'] = str(mo1.group(6)).lower()
     # cli_session.close()
 
-    print('ssid = ' + str(wl_4920_dict['ssid']) + '\n')
+    print('airties ssid = ' + str(wl_4920_dict['ssid']) + '\n')
     airties_ssid = wl_4920_dict['ssid']
     if wl_4920_dict['ssid'] == ssid :
         rf.write('     RG ssid:' + ssid + ' =  airties ssid:' +  airties_ssid + ' :Pass \n')
         print('tada : \n')
     else:
         rf.write('     RG ssid:' + ssid + ' does not equal  airties ssid:' + airties_ssid + ' : Fail\n')
+        test_status = "Fail"
+
+    nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default", "default")
 
 # nvg_599_dut.get_4920_ssid("192.168.1.67")
-    return "Fail"
+
+    return test_status
 
 # patches
 with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     open('resultsa_file.txt', mode='w', encoding='utf-8') as rfa :
     now = datetime.today().strftime("%B %d, %Y,%H:%M")
-
     send_email = 1
+
     nvg_599_dut = Nvg599Class()
-    guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, "guest_client_cannot_ping_rg", "dog_ssid_patches", "dog_password123")
-    # nvg_599_dut.rg_setup_without_factory_reset(rf, rfa)
+
+
+    # load_4920_firmware(nvg_599_dut, rf, rfa, 'load_4920_firmware', 'any', '/home/palmer/Downloads/AirTies_7381.bin')
+
+    #verify_ssid_change_propagated_to_airties(nvg_599_dut,rf, rfa, "verify_ssid_change_propagated_to_airties", "ATT4ujR48sdog","default")
+
 
     exit()
-    #wl_4920_dict = nvg_599_dut.get_4920_ssid("192.168.1.67")
-    # print(str(wl_4920_dict))
-    # exit()
-    #     def conf_guest_network_ssid_and_password(self, rf, rfa, enable_disable, guest_ssid = "default", guest_password = "2222222222"):
-    # nvg_599_dut.rg_setup_without_factory_reset(rf, rfa)
-    # nvg_599_dut.conf_home_network_ssid_and_password(self, rf, rfa, home_ssid = "default", home_password = "default"):
-    # nvg_599_dut.get_4920_ssid("192.168.1.67")
-    #def verify_ssid_change_propagated_to_airties(self, rf, rfa, test_name, ssid, password="default"):
-    verify_ssid_change_propagated_to_airties(nvg_599_dut,rf, rfa, "verify_ssid_change_propagated_to_airties", "default","default")
-
-
-    # nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default_baloney", "default")
-
-    # nvg_599_dut.conf_guest_network_ssid_and_password(rf, rfa, "off",  "patches_is_a_pretty_dog", "woofcarlysdogwoof")
-    exit()
-    # local_to_remote_ping(nvg_599_dut,rf, rfa,  '192.168.1.69',  "local_to_remote_ping")
-    # exit()
-    #------------------------------------------------------------------------------
-    # # started nmcli dev wifi rescansudo systemctl start wpa_supplicant.service
-    # ssid_pw_dict = nvg_599_dut.get_ui_ssid_and_password_values()
-    # guest_ssid_to_remove = ssid_pw_dict['band2']['ssid']
-    # global nvg_info
-    # print('band2 to remove:' + str(guest_ssid_to_remove))
-    #
-    # nmcli_connections = nvg_599_dut.nmcli_get_connections_test()
-    # # here we are just looking at deleting existing nmcli connections. Not sure if I have to do this.
-    # for line in nmcli_connections.splitlines():
-    #     if "ATT4ujR48s_Guest" in str(line, 'utf-8'):
-    #         line_list = line.split()
-    #         uuid = line_list[-3]
-    #         print('deleting uuid:' + str(uuid,'utf-8')  + '\n')
-    #         cmd = "nmcli connection  delete " + str(uuid,'utf-8')
-    #         try:
-    #             output = subprocess.check_output(cmd, shell=True)
-    #         except subprocess.CalledProcessError as e:
-    #             print(e.output)
-    #         else:
-    #             print(output)
-    #     # nmcli device wifi connect ATT4ujR48s_Guest password 2222222222
-    # cmd = "nmcli device wifi connect " + ssid_pw_dict['guest']['ssid'] +  " password " + ssid_pw_dict['guest']['password']
-    # try:
-    #     output = subprocess.check_output(cmd, shell=True)
-    # except subprocess.CalledProcessError as e:
-    #      print(e.output)
-    # else:
-    #     print(output)
-    # sleep(5)
-    # cmd = "nmcli device wifi connect " + ssid_pw_dict['band5']['ssid'] + " password " + ssid_pw_dict['band5']['password']
-    # try:
-    #     output = subprocess.check_output(cmd, shell=True)
-    # except subprocess.CalledProcessError as e:
-    #     print(e.output)
-    # else:
-    # print(str(ssid_pw_dict))
-    # exit()
-    # #------------------------------------------------------------------------------
-    #
-    #
-
-
-
-
-    guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, "def guest_client_cannot_ping_rg")
-
-    # nvg_599_dut.nmcli_get_active_connections()
-    #nvg_599_dut.ping_check("192.168.1.254")
-
-    # exit()
-    # nmcli_dict = nvg_599_dut.get_nmcli_networks()
-    # for x in  nmcli_dict:
-    #     print('ssid:'  + x + '\n\n\n')
-    #     for y in nmcli_dict[x]:
-    #         print('ssid:'+ x + ' y:' + y + ':' + nmcli_dict[x][y] + '\n')
-    # connection_list, active_connection_list = nvg_599_dut.nmcli_get_connections()
-    # print('connect:' + str(connection_list) + '\n')
-    # print('active:' + str(active_connection_list) + '\n')
-
-    #def adv_configure_guest_network(self, rf, rfa, enable_disable, guest_ssid, guest_ssid_password):
-    # def adv_configure_guest_network(self, rf, rfa, enable_disable_param, guest_ssid_param = "dog", guest_ssid_password_param = "guest_dog"):
-
-    # nvg_599_dut.adv_configure_guest_network(rf, rfa, "on", "super_dog_ssid", "the_doggiest_password")
-    # def adv_conf_band2_radio_ui(self, band2_enable_disable, mode, bandwidth, channel, power_level):
-    #nvg_599_dut.adv_conf_band2_radio_ui(rf, rfa, "on", "b-only", "40", "7", "92")
-
-
-    #def adv_conf_band2_home(self, rf, rfa, band2_home_ssid_enable_disable_parm, ssid_name, hide_ssid_name, security, wpa_version, password, wpa_setup_on_off, max_clients):
-    # nvg_599_dut.adv_conf_band2_home(rf, rfa, "on", "ssid_dog, "off", security,
-    #                            wpa_version, password, wpa_setup_on_off, max_clients):
-    # nvg_599_dut.adv_configure_guest_network(rf, rfa, "on", "say_what_ssid", "no_way_password")
-
-
-    # now that we have the dict we can look for the default  4921
-    # nvg_599_dut.enable_monitor_mode()
-    # test_speedtest_from_android(nvg_599_dut, 'Galaxy-Note8', test_house_devices_static_info, 'test_speedtest_from_android ', rf, rfa)
-    # def execute_speedtest_from_android_termux(speed_test_ip, rf, rfa):
-    # nvg_599_dut.execute_speedtest_from_android_termux("192.168.1.77",rf, rfa)
-    # rf.write('RG Test run Firmware:' +  nvg_599_dut.software_version + '  Date:' + now + ' ' '\n\n')
-    rf.write('RG Test run Firmware: nvg599-11.5.0h0d18_1.1.bin  Date:' + now +  '\n\n')
-
+    rf.write('RG Test run Firmware: nvg599-11.5.0h0d26_1.1.bin  Date:' + now +  '\n\n')
     rfa.write(now + '\n')
     sleep(2)
-    # this test needs some investigation
-    # test_speedtest_from_android(nvg_599_dut, 'Galaxy-Note8', test_house_devices_static_info, 'test_speedtest_from_android ', rf, rfa)
 
-    # trigger_dfs_channel_change(nvg_599_dut, rf, rfa, 'trigger_dfs_channel_change', "ATT_4920_8664D4")
-    # trigger_dfs_channel_change(nvg_599_dut, rf, rfa, 'trigger_dfs_channel_change', "None")
-
-    # nvg_599_dut.rg_setup_without_factory_reset(rf, rfa)
-    #tftp_rg_firmware_and_install(nvg_599_dut, "LP-PPALMER", "nvg599-9.2.2h13d26_1.1.bin", rf, rfa,"tftp_rg_firmware_and_install")
-
-   #  exit()
-    #nvg_599_dut.rg_setup_without_factory_reset(rf, rfa)
-    #nvg_599_dut.nmcli_set_connection(nmcli_connection_name, command):
+    verify_ssid_change_propagated_to_airties(nvg_599_dut,rf, rfa, "verify_ssid_change_propagated_to_airties", "ATT4ujR48sdog","default")
+    load_4920_firmware(nvg_599_dut, rf, rfa, 'load_4920_firmware', 'any', '/home/palmer/Downloads/AirTies_7381.bin')
 
     # this  works
     # guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, 'guest_client_cannot_ping_rg')
@@ -1763,17 +1829,19 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     # end this works----------------------------------------------------------------------------
 
 
-    # tftp_rg_firmware_and_install(nvg_599_dut, "LP-PPALMER", "nvg599-11.5.0h0d18_1.1.bin", rf, rfa,"tftp_rg_firmware_and_install")
-    # sleep(300)
+    tftp_rg_firmware_and_install(nvg_599_dut, "LP-PPALMER", "nvg599-11.5.0h0d26_1.1.bin", rf, rfa,"tftp_rg_firmware_and_install")
+
+    guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, "guest_client_cannot_ping_rg", "default", "default123")
     url_att_friendly_info_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/friendly-info', rf, rfa, 'url_att_friendly_info_smoke')
+    trigger_dfs_channel_change(nvg_599_dut, rf, rfa, 'trigger_dfs_channel_change', "None")
+    test_speedtest_from_android(nvg_599_dut, 'Galaxy-Note8', test_house_devices_static_info, 'test_speedtest_from_android ', rf, rfa)
     ping_gw_from_4920(nvg_599_dut, rf, rfa, "ping_gw_from_4920")
     ping_airties_from_rg(nvg_599_dut, rf, rfa, "ping_airties_from_RG")
     verify_airties_hello_packet_count_increasing(nvg_599_dut, rf, rfa, "verify_airties_hello_packet_count_increasing")
     verify_airties_build_versions(nvg_599_dut, rf, rfa, 'verify_airties_build_versions')
     url_att_topology_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/topology', rf, rfa, 'url_att_topology_smoke')
     url_att_route_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/route', rf, rfa, 'url_att_route_smoke')
-    # url_att_friendly_info_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/friendly-info', rf, rfa,
-    # band5_peers_set_after_airties_association(nvg_599_dut, rf, rfa, "band5_peers_set_after_airties_associationn")
+    band5_peers_set_after_airties_association(nvg_599_dut, rf, rfa, "band5_peers_set_after_airties_associationn")
     # nvg_599_dut.tftp_get_file_cli(source_device_name, "nvg599-9.2.2h13d24_1.1.bin","nvg599-9.2.2h13d22_1.1.bin","nvg599-9.2.2h13d20_1.1.bin","nvg599-9.2.2h13d18_1.1.bin","nvg599-9.2.2h13d16_1.1.bin","nvg599-9.2.2h13d14_1.1.bin","nvg599-9.2.2h13d12_1.1.bin","nvg599-9.2.2h13d10_1.1.bin")
     url_att_steer_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/steer', rf, rfa, 'url_att_steer_smoke')
     test_speedtest_from_android(nvg_599_dut, 'Galaxy-Note8', test_house_devices_static_info, 'test_speedtest_from_android ', rf, rfa)
@@ -1781,14 +1849,14 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '4', 'ATTPOC', 'Ba1tshop', rf, rfa, "verify_auto_ssid_defaults_via_tr69" )
     verify_auto_info_not_present_in_ui(nvg_599_dut, rf, rfa, "verify_auto_info_not_present_in_ui" )
     verify_google_ping_from_rg_5g(nvg_599_dut, rf, rfa, "verify_google_ping_from_rg_5g")
-    url_att_topology_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/topology', rf, rfa, 'url_att_topology_smoke')
+    # url_att_topology_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/topology', rf, rfa, 'url_att_topology_smoke')
     url_att_route_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/route', rf, rfa, 'url_att_route_smoke')
     local_to_remote_ping(nvg_599_dut,rf, rfa,  '192.168.1.69',  "local_to_remote_ping")
+    verify_ssid_change_propagated_to_airties(nvg_599_dut,rf, rfa, "verify_ssid_change_propagated_to_airties", "ATT4ujR48s","default")
 
     # before factory reset the order would be
     # reset any airties device to factory defaults and then after reset access the airties default netowrk using
     # the nmcli routines.
-
     # execute_factory_reset(nvg_599_dut, rf, rfa, "execute_factory_reset")
     # nvg_599_dut.enable_guest_network_and_set_passwords(rf, rfa)
     # guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, "def guest_client_cannot_ping_rg(nvg_599_dut")
@@ -1796,7 +1864,6 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
 
 if send_email == 1:
     nvg_599_dut.email_test_results(rf, nvg_599_dut.software_version)
-
     # we want to get the SSID becaause we have to reconnect to it
     # wl_status_info_dict = nvg_599_dut.get_rg_band2_status_cli()
     # rg_ssid = wl_status_info_dict['ssid']
@@ -2434,7 +2501,7 @@ exit()
 
 #url_to_check = "http://192.168.1.254/cgi-bin/home.ha"
 
-nvg_599_dut.factory_reset_rg()
+nvg_599_dut.factory_reset_rg(rf, rfa)
 # These are now part of standard factory reset.
 # nvg_599_dut.enable_sshd_ssh_cli()
 # nvg_599_dut.conf_tr69_eco_url()
