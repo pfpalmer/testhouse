@@ -1646,6 +1646,29 @@ def enable_guest_network_and_set_passwords(self, rf, rfa, test_name, ssid_passwo
     rf.write('Test ' + str(test_name) + '\n')
     pass
 
+#def load_airties_firmware(nvg_599_dut, rf, rfa, test_name, name_of_4920_or_any, firmware_to_load):
+#def set_4920_to_factory_default(self, ip_of_4920):
+# #names are:  ATT_4920_C356C0  or ATT_4920_8664D4
+#     def get_ip_connected_airties_by_name(self,airties_name):
+# patches1
+def set_airties_to_factory_default(nvg_599_dut, rf, rfa, test_name, name_of_4920_or_any):
+    # def get_ip_connected_airties_by_name(self,airties_name):
+
+    # names are:  ATT_4920_C356C0  or ATT_4920_8664D4
+
+    nvg_599_dut.get_connected_airties_ip_from_name(name_of_4920_or_any)
+
+    ip_list_4920 = nvg_599_dut.get_ip_list_of_4920s()
+    if len(ip_list_4920) == 0:
+        print('no 4920 ip available, abort   \n')
+        rf.write('     No airties present in lan, aborting test.    :Fail\n')
+        rf.write('     Failed to connect  to changed home ssid.    :Fail\n')
+        rf.write('     No airties devices detected' + '\n')
+    #  ip_4920 = ip_list_4920[0]
+    #wl_4920_dict = nvg_599_dut.get_4920_ssid(ip_4920)
+    # rf.write('     Logging in to airtis with IP' + ip_4920 + '\n')
+
+    pass
 
 def test_4920_login(self, rf, rfa):
     print('in test_4920_login \n')
@@ -1661,7 +1684,8 @@ def test_4920_login(self, rf, rfa):
     status_output = nvg_599_dut.air_cli_session.before
     print(status_output)
 
-def load_4920_firmware(nvg_599_dut, rf, rfa, test_name, name_of_4920_or_any, firmware_to_load):
+# nvg_599_dut.install_airties_firmware('192.168.1.68', '/home/palmer/Downloads/AirTies_7381.bin', rf, rfa)
+def load_airties_firmware(nvg_599_dut, rf, rfa, test_name, name_of_4920_or_any, firmware_to_load):
     print('in load_4920_firmware \n')
     rf.write('Test ' + str(test_name) + '\n')
     test_status = "Pass"
@@ -1674,8 +1698,38 @@ def load_4920_firmware(nvg_599_dut, rf, rfa, test_name, name_of_4920_or_any, fir
 
     if name_of_4920_or_any == "any":
         airties_ip = ip_list_4920[0]
-        nvg_599_dut.install_airties_firmware(airties_ip, firmware_to_load)
-# nvg_599_dut.install_airties_firmware('192.168.1.68', '/home/palmer/Downloads/AirTies_7381.bin', rf, rfa)
+        uptime_before_reload = nvg_599_dut.get_4920_uptime(airties_ip)
+        print('     uptime_before_reload_reload:' + str(uptime_before_reload) + '\n')
+        rf.write('     uptime_before_reload_reload:' + uptime_before_reload + '\n')
+
+        nvg_599_dut.install_airties_firmware(airties_ip, firmware_to_load, rf, rfa)
+        rf.write('     Installed firmware:' + firmware_to_load + '\n')
+        print('     Installed firmware:' +  str(firmware_to_load) + '\n')
+        nvg_599_dut.install_airties_firmware(airties_ip, "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_2.33.1.2.2112_telnet_enabled_preinstall.bin", rf, rfa)
+        rf.write('     Installed telnet enable  patch \n')
+        print('     Installed telnet enable  patch \n')
+        uptime_after_reload_reload = nvg_599_dut.get_4920_uptime(airties_ip)
+        print('     uptime_before_reload_reload:' + str(uptime_before_reload) + '\n')
+        rf.write('     uptime_before_reload_reload:' + uptime_before_reload + '\n')
+        print('     uptime_after_reload_reload:' + str(uptime_after_reload_reload) + '\n')
+        rf.write('     uptime_after_reload_reload:' + uptime_after_reload_reload + '\n')
+
+# nvg_599_dut.install_airties_firmware('192.168.1.68', '/home/palmer/Downloads/AirTies_Air4920US-AL_FW_2.49.2.20.7381.bin', rf, rfa)
+
+
+    # nvg_599_dut.install_airties_firmware('192.168.1.68', '/home/palmer/Downloads/AirTies_Air4920US-AL_FW_2.49.2.18.7197_FullImage.bin', rf, rfa)
+# def install_airties_firmware(nvg_599_dut, rf, rfa, test_name , airties_name_or_any, firmware_to_install):
+#     ip_list_4920 = nvg_599_dut.get_ip_list_of_4920s()
+#     if len(ip_list_4920) == 0:
+#         print('no 4920 ip available, abort   \n')
+#         rf.write('     No airties present in lan, aborting test.    :Fail\n')
+#     airties_ip = ip_list_4920[0]
+#     # wl_4920_dict = nvg_599_dut.get_4920_ssid(airties_ip)
+#     rf.write('     Logging in to airtis with IP' + airties_ip + '\n')
+#     # def install_airties_firmware(self, airties_ip, update_bin_file, rf, rfa):
+#     nvg_599_dut.install_airties_firmware(airties_ip, firmware_to_install, rf, rfa )
+
+
 
 def verify_ssid_change_propagated_to_airties(nvg_599_dut, rf, rfa, test_name , ssid_parm, password_parm = "default123"):
     print('in verify_ssid_change_propagated_to_airties \n')
@@ -1695,9 +1749,9 @@ def verify_ssid_change_propagated_to_airties(nvg_599_dut, rf, rfa, test_name , s
     test_status = rf.write('Test ' + str(test_name) + '\n')
     # After we configure the ssid we have to connect to it in order to login to the Airties device
     cmd = 'nmcli dev wifi rescan'
-    sleep(20)
+    sleep(10)
     nvg_599_dut.nmcli_set_connection(cmd)
-    sleep(20)
+    sleep(30)
 
     try:
         cmd = 'nmcli device wifi connect ' + home_ssid_conf + ' password ' + home_password_conf
@@ -1705,19 +1759,24 @@ def verify_ssid_change_propagated_to_airties(nvg_599_dut, rf, rfa, test_name , s
         nvg_599_dut.nmcli_set_connection(cmd)
     except subprocess.CalledProcessError as e:
         print('errror ' + e.output)
-        print('failed to connect back to  SSID')
-        rf.write('     Failed to connect  to default home ssid.    :Fail\n')
+        print('failed to connect to changed SSID')
+        rf.write('     Failed to connect  to changed home ssid.    :Fail\n')
+        home_ssid_conf, home_password_conf = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default","default")
+        rf.write('     Setting ssid  back to defaults:' + home_ssid_conf + 'setting password to:' + home_password_conf + '\n')
         return "Fail"
 
-    sleep(20)
+    sleep(120)
 
     ip_list_4920 = nvg_599_dut.get_ip_list_of_4920s()
 
     if len(ip_list_4920) == 0:
         print('no 4920 ip available, abort   \n')
         rf.write('     No airties present in lan, aborting test.    :Fail\n')
-        return
-    print('ip:' + str(ip_list_4920[0]) + '\n')
+        rf.write('     Failed to connect  to changed home ssid.    :Fail\n')
+        home_ssid_conf,  = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default","default")
+        rf.write('     No airties devices detected' + '\n')
+        rf.write('     Setting ssid  back to defaults:' + home_ssid_conf + 'setting password to:' + home_password_conf + '\n')
+
     ip_4920 = ip_list_4920[0]
     wl_4920_dict = nvg_599_dut.get_4920_ssid(ip_4920)
     rf.write('     Logging in to airtis with IP' + ip_4920 + '\n')
@@ -1753,14 +1812,14 @@ def verify_ssid_change_propagated_to_airties(nvg_599_dut, rf, rfa, test_name , s
         rf.write('     Failed to restore Wired connection.    :Fail\n')
         test_status = "Fail"
 
-
+    sleep(120)
     home_ssid_def, home_password_def = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default", "default")
     rf.write('     RG ssid set back to default:\n')
     # After we configure the ssid we have to connect to it in order to login to the Airties device
     cmd = 'nmcli dev wifi rescan'
-    sleep(20)
+    sleep(120)
     nvg_599_dut.nmcli_set_connection(cmd)
-    sleep(20)
+    sleep(60)
 
     try:
         cmd = 'nmcli device wifi connect ' + home_ssid_def + ' password ' + home_password_def
@@ -1788,10 +1847,12 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
 
     nvg_599_dut = Nvg599Class()
 
-
     # load_4920_firmware(nvg_599_dut, rf, rfa, 'load_4920_firmware', 'any', '/home/palmer/Downloads/AirTies_7381.bin')
+    load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_2.49.2.20.7381.bin")
+    # load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "AirTies_Air4920US-AL_FW_2.33.1.2.2112_telnet_enabled_preinstall.bin")
 
-    verify_ssid_change_propagated_to_airties(nvg_599_dut,rf, rfa, "verify_ssid_change_propagated_to_airties", "ATT4ujR48sdog","default")
+
+    # verify_ssid_change_propagated_to_airties(nvg_599_dut,rf, rfa, "verify_ssid_change_propagated_to_airties", "ATT4ujR48sdog","default")
 
 
     exit()

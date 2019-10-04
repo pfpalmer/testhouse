@@ -56,7 +56,7 @@ nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53
                                 'ssid_4': 'ATTPOC', 'ssid_2_pw': 'Ba1tshop'},
 
             "35448081188192": {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
-                               'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'ssid_def_pw': '',
+                               'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'ssid_def_pw': 'eeh4jxmh7q26',
                                'ssid_def': 'ATT4ujR48s', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
                                'ssid_4': 'ATTPOC', 'ssid_4_pw': 'Ba1tshop'}}
 # *7<#56*2<2
@@ -323,6 +323,7 @@ class Nvg599Class(GatewayClass):
                 # Nvg599Class.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
                 Nvg599Class.set_4920_to_factory_default(self, airties_ip)
 
+    # patches1
     def set_4920_to_factory_default(self, ip_of_4920):
         # print('setting 4920 with ip:' + ip_of_4920 + ' to factory default' )
         print('setting 4920 with ip:' + ip_of_4920 + ' to factory default')
@@ -353,7 +354,9 @@ class Nvg599Class(GatewayClass):
         airties_session.switch_to.frame(airties_session.find_element_by_css_selector("frame[name=mainFrame"))
         # airties_session.refresh()
         wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__ML_restore_factory_defaults"]'))).click()
-        alert = airties_session.switch_to_alert()
+        #alert = airties_session.switch_to_alert()
+        alert = airties_session.switch_to.alert()
+
         alert.accept()
         sleep(200)
         # restore_factory_defaults = airties_session.find_element_by_xpath
@@ -470,7 +473,44 @@ class Nvg599Class(GatewayClass):
                 self.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
                 # Nvg599Class.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
 
+        #     # self.ip_lan_connections_dict_cli[connected_device_mac] = {}
+        #     ip_lan_connections_dict_cli[connected_device_mac] = {}
+        #     ip_lan_connections_dict_cli[connected_device_mac]["IP"] = connected_device_ip
+        #     ip_lan_connections_dict_cli[connected_device_mac]["Name"] = connected_device_name
+        #     ip_lan_connections_dict_cli[connected_device_mac]["State"] = connected_device_status
+        #     ip_lan_connections_dict_cli[connected_device_mac]["DHCP"] = connected_device_dhcp
+        #     ip_lan_connections_dict_cli[connected_device_mac]["Port"] = connected_device_port
+        #     # self.telnet_cli_session.close()
+        # telnet_cli_session.close()
+        # return ip_lan_connections_dict_cli
+
+        # '88:41:FC:86:64:D4': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '5',
+        #                       'state': 'None', 'default_ssid': 'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
+        #                       'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
+        #                       'device_test_name': 'airties_1_5g', 'name': 'ATT_4920_8664D4',
+        #                       'location': 'master_bedroom'},
+        # '88:41:FC:C3:56:C2': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '2',
+        #                       'state': 'None', 'default_ssid': 'AirTies_Air4920_33N3', 'default_pw': 'wthchc7344',
+        #                       'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', ' ip': 'None',
+        #                       'device_test_name': 'airties_2_2g', 'name': 'ATT_4920_C356C0',
+        #                       'location': 'master_bedroom'},
+
+#names are:  ATT_4920_C356C0  or ATT_4920_8664D4
 # patches1
+    def get_connected_airties_ip_from_name(self,airties_name):
+        show_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
+        airties_4920_ip_list = []
+        for ip_lan_entry in show_ip_lan_dict:
+            # names are:  ATT_4920_C356C0  or ATT_4920_8664D4
+            if (airties_name  ==  show_ip_lan_dict[ip_lan_entry][airties_name]) and (show_ip_lan_dict[ip_lan_entry]['State'] == "on"):
+                airties_ip = show_ip_lan_dict[ip_lan_entry]["IP"]
+                return airties_ip
+            # this is the one we want
+            else:
+                print('named airties device:' + str(airties_name) + 'not assciated to RG \n')
+                return "0.0.0.0"
+
+
     def get_ip_list_of_4920s(self):
         show_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
         airties_4920_ip_list = []
@@ -3459,6 +3499,20 @@ class Nvg599Class(GatewayClass):
         cli_session.expect("Responses")
         sleep(20)
         cli_session.close()
+
+
+    def get_4920_uptime(self, ip_4920):
+        print('In get_4920_ssid')
+        cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
+        cli_session.expect("ogin:")
+        cli_session.sendline('root')
+        cli_session.expect("#")
+        cli_session.sendline('uptime')
+        cli_session.expect("#")
+        status_output = cli_session.before
+        print(str(status_output))
+        return status_output
+
 
     def get_4920_ssid(self, ip_4920):
         print('In get_4920_ssid')
