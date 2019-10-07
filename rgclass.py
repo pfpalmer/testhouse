@@ -3501,9 +3501,11 @@ class Nvg599Class(GatewayClass):
         cli_session.close()
 
 
-    def get_4920_uptime(self, ip_4920):
-        print('In get_4920_ssid')
-        cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
+    def get_4920_uptime(self, ip_airties):
+        print('In get_4920_uptime')
+        print('ip is:' + str(ip_airties))
+
+        cli_session = pexpect.spawn("telnet " + ip_airties, encoding='utf-8')
         cli_session.expect("ogin:")
         cli_session.sendline('root')
         cli_session.expect("#")

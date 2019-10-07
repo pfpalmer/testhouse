@@ -1165,6 +1165,89 @@ def verify_google_ping_from_rg_5g(nvg_599_dut,rf,rfa, test_name):
 
 from rgclass import nvg_info
 
+
+def login_nvg_599_band5_cli(self):
+    print('In login_nvg_5g_cli')
+    self.telnet_cli_session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
+    self.telnet_cli_session.expect("ogin:")
+    self.telnet_cli_session.sendline('admin')
+    self.telnet_cli_session.expect("ord:")
+    nvg_dac = self.device_access_code
+    self.telnet_cli_session.sendline(nvg_dac)
+    self.telnet_cli_session.expect(">")
+    self.telnet_cli_session.sendline('magic')
+    self.telnet_cli_session.expect(">")
+    self.telnet_cli_session.sendline('telnet 203.0.113.2')
+    self.telnet_cli_session.expect('#')
+    self.telnet_cli_session.sendline('export LD_LIBRARY_PATH=/lib:/airties/lib')
+    self.telnet_cli_session.expect("#")
+    self.telnet_cli_session.sendline('export PATH=$PATH:/airties/usr/sbin')
+    self.telnet_cli_session.expect("#")
+    return self.telnet_cli_session
+
+
+
+#patches
+
+def steering_radio_names_integration_test(nvg_599_dut, rf, rfa, test_name):
+    test_status = "Pass"
+    rf.write('Test ' + test_name + '\n')
+    print('Test:' + test_name + '\n')
+    nvg_5g_session = nvg_599_dut.login_nvg_599_band5_cli()
+    nvg_5g_session.sendline('steer-client --command dump | grep name')
+    nvg_5g_session.expect('#')
+    steer_client_output = nvg_5g_session.before
+
+    print('steer client output' + str(steer_client_output))
+    steer_client_output_lines = steer_client_output.splitlines()
+
+    # I think the length minus 1 is what we want // need to check this
+    # This must be outside the for loop
+    # ip_lan_connections_dict_cli = {}
+
+    # speed_test_regex = re.compile(r'(Download:\s+\w+\.\w+\s+\w+).*(Upload:\s+\w+\.\w+\s+\w+)', re.DOTALL)
+    # speed_test_groups = speed_test_regex.search(speed_test_ouput)
+    # print(speed_test_groups.group(1))
+    # print(speed_test_groups.group(2))
+
+    for line in steer_client_output_lines:
+        print('line is:' + str(line))
+        steer_client_regex = re.compile(r'radio_name: (wl0), radio_mac (\w+:\w+:\w+:\w+:\w+:\w+), ssid: (\w+),')
+        steer_client_groups = steer_client_regex.search(line)
+        print('first group:' + steer_client_groups.group(1))
+
+    # ip_lan_output = telnet_cli_session.before
+    # ip_lan_output = ip_lan_output.split('\n\r')
+    # status_info_reg_ex = re.compile(r'Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',
+    #                                 re.DOTALL)
+    #
+    # decoded_html = nvg_599_dut.urllib_get_rg_file(url_to_return, rf, rfa)
+    # rg_serial_number = nvg_599_dut.serial_number
+    # nvg_5g_mac = nvg_info[rg_serial_number]['mac5g']
+    # print ('nvg_mac_5g: ' + str(nvg_5g_mac) + '\n')
+    # print ('decoded: ' + str(decoded_html) +  '>end_decoded \n')
+    # ip_5g_side = "203.0.113.2"
+    # #topology_regex = re.compile(r'(ownaddr=.*?ipaddr={})'.format(ip_5g_side))
+    # topology_regex = re.compile(r'ownaddr=(\w+:\w+:\w+:\w+:\w+:\w+).*?(ipaddr={})'.format(ip_5g_side))
+    # topology_text =   topology_regex.search(decoded_html)
+    # print('rg_mac:' + topology_text.group(1))
+    # rg_mac = topology_text.group(1)
+    # print('ip:' + topology_text.group(2))
+    # ip_5g = topology_text.group(2)
+    # if topology_text == None:
+    #      print('topology file fails test')
+    #      rf.write('     topology file strings:ownaddr=' + rg_mac + 'and 5g side IP:' + ip_5g + 'not found:Fail\n\n')
+    #      test_status = "Fail"
+    # else:
+    #     print(topology_text)
+    #     rf.write('     topology file strings:ownaddr=' + rg_mac + 'and 5g side IP:' + ip_5g + ' found :Pass\n\n')
+    # return test_status
+
+
+
+
+
+
 def url_att_topology_smoke(nvg_599_dut, url_to_return, rf, rfa, test_name):
     test_status = "Pass"
     rf.write('Test ' + test_name + '\n')
@@ -1685,7 +1768,7 @@ def test_4920_login(self, rf, rfa):
     print(status_output)
 
 # nvg_599_dut.install_airties_firmware('192.168.1.68', '/home/palmer/Downloads/AirTies_7381.bin', rf, rfa)
-def load_airties_firmware(nvg_599_dut, rf, rfa, test_name, name_of_4920_or_any, firmware_to_load):
+def load_airties_firmware(nvg_599_dut, rf, rfa, test_name, name_of_airties_or_any, firmware_to_load):
     print('in load_4920_firmware \n')
     rf.write('Test ' + str(test_name) + '\n')
     test_status = "Pass"
@@ -1696,12 +1779,12 @@ def load_airties_firmware(nvg_599_dut, rf, rfa, test_name, name_of_4920_or_any, 
         return
     print('ip:' + str(ip_list_4920[0]) + '\n')
 
-    if name_of_4920_or_any == "any":
+    if name_of_airties_or_any == "any":
         airties_ip = ip_list_4920[0]
+        nvg_599_dut.install_airties_firmware(airties_ip, "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_2.33.1.2.2112_telnet_enabled_preinstall.bin", rf, rfa)
         uptime_before_reload = nvg_599_dut.get_4920_uptime(airties_ip)
-        print('     uptime_before_reload_reload:' + str(uptime_before_reload) + '\n')
-        rf.write('     uptime_before_reload_reload:' + uptime_before_reload + '\n')
-
+        #print('     uptime_before_reload_reload:' + str(uptime_before_reload) + '\n')
+        #rf.write('     uptime_before_reload_reload:' + uptime_before_reload + '\n')
         nvg_599_dut.install_airties_firmware(airties_ip, firmware_to_load, rf, rfa)
         rf.write('     Installed firmware:' + firmware_to_load + '\n')
         print('     Installed firmware:' +  str(firmware_to_load) + '\n')
@@ -1847,8 +1930,12 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
 
     nvg_599_dut = Nvg599Class()
 
+    #nvg_599_dut.tftp_get_file_cli("LP-PPALMER" , "AirTies_Air4920US-AL_FW_2.49.2.21.7431.bin", rf, rfa)
+    steering_radio_names_integration_test(nvg_599_dut, rf, rfa, 'steering_radio_names_integration_test')
+    exit()
+
     # load_4920_firmware(nvg_599_dut, rf, rfa, 'load_4920_firmware', 'any', '/home/palmer/Downloads/AirTies_7381.bin')
-    load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_2.49.2.20.7381.bin")
+    #load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_2.49.2.21.7431.bin")
     # load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "AirTies_Air4920US-AL_FW_2.33.1.2.2112_telnet_enabled_preinstall.bin")
 
 
@@ -1861,7 +1948,6 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     sleep(2)
 
     verify_ssid_change_propagated_to_airties(nvg_599_dut,rf, rfa, "verify_ssid_change_propagated_to_airties", "ATT4ujR48sdog","default")
-    load_4920_firmware(nvg_599_dut, rf, rfa, 'load_4920_firmware', 'any', '/home/palmer/Downloads/AirTies_7381.bin')
 
     # this  works
     # guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, 'guest_client_cannot_ping_rg')
