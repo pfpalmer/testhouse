@@ -6,7 +6,14 @@ from pexpect import pxssh
 from socket import timeout
 # from subprocess import check_output
 from selenium.webdriver.common.by import By
+from selenium.webdriver import DesiredCapabilities
+
+
+from selenium import webdriver
+
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -324,6 +331,30 @@ class Nvg599Class(GatewayClass):
                 Nvg599Class.set_4920_to_factory_default(self, airties_ip)
 
     # patches1
+
+    def login_eco(self):
+        # print('setting 4920 with ip:' + ip_of_4920 + ' to factory default' )
+        print('url is http://arris1.arriseco.com/manage/login')
+        #global nvg_info
+        # capabilities = DesiredCapabilities.CHROME.copy()
+        #capabilities = DesiredCapabilities.CHROME.copy()
+        desired_capabilities = DesiredCapabilities.FIREFOX.copy()
+        desired_capabilities['acceptInsecureCerts'] = True
+        eco_url = 'https://arris1.arriseco.com/manage/login/'
+        print('eco session' + str(eco_url))
+        #options = webdriver.ChromeOptions()
+        # options.add_argument("--disable-web-security")
+        #options.add_argument("--ignore-certificate-errors")
+        #options.add_argument("--allow-running-insecure-content")
+        #capabilities = options.to_capabilities()
+        # eco_session = webdriver.Firefox(capabilities=desired_capabilities)
+        eco_session = webdriver.Firefox()
+
+        # eco_session = webdriver.Chrome(eco_url, capabilities)
+        eco_session.get(eco_url)
+        sleep(320)
+
+
     def set_4920_to_factory_default(self, ip_of_4920):
         # print('setting 4920 with ip:' + ip_of_4920 + ' to factory default' )
         print('setting 4920 with ip:' + ip_of_4920 + ' to factory default')
@@ -483,7 +514,6 @@ class Nvg599Class(GatewayClass):
         #     # self.telnet_cli_session.close()
         # telnet_cli_session.close()
         # return ip_lan_connections_dict_cli
-
         # '88:41:FC:86:64:D4': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '5',
         #                       'state': 'None', 'default_ssid': 'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
         #                       'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
@@ -495,7 +525,7 @@ class Nvg599Class(GatewayClass):
         #                       'device_test_name': 'airties_2_2g', 'name': 'ATT_4920_C356C0',
         #                       'location': 'master_bedroom'},
 
-#names are:  ATT_4920_C356C0  or ATT_4920_8664D4
+# the only names are:  ATT_4920_C356C0  or ATT_4920_8664D4
 # patches1
     def get_connected_airties_ip_from_name(self,airties_name):
         show_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
@@ -510,13 +540,11 @@ class Nvg599Class(GatewayClass):
                 print('named airties device:' + str(airties_name) + 'not assciated to RG \n')
                 return "0.0.0.0"
 
-
     def get_ip_list_of_4920s(self):
         show_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
         airties_4920_ip_list = []
         for ip_lan_entry in show_ip_lan_dict:
             if ("ATT_49" in show_ip_lan_dict[ip_lan_entry]['Name']) and (show_ip_lan_dict[ip_lan_entry]['State'] == "on"):
-
             #if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
                 # print(ip_lan_entry)
                 # add this to a list which airties_4920
@@ -541,7 +569,6 @@ class Nvg599Class(GatewayClass):
         # allocate_link = self.session.find_element_by_xpath("//td[text()='Allocate_7c:64:56:b8:2f:30']")
         # allocate_link = self.session.find_element_by_xpath("//table[@class='grid table100']//tr[contains(td[2],
         # 'Allocate_7c:64:56:b8:2f:30')]")
-
         # allocate_link = self.session.find_element_by_xpath("//table[@class='grid table100']//td")
         table_rows = self.session.find_elements_by_xpath("//table[@class='grid table100']/tbody//tr")
         # table_rows = self.session.find_element_by_xpath("//table//r[@class='a']")
@@ -615,7 +642,6 @@ class Nvg599Class(GatewayClass):
             print('tr:', tr)
             cells = tr.find_all("td")
             exit()
-
             cells = tr.find_all("td")
             # print('cells:',cells)
             # print('cell1:',cells[1].text())
@@ -658,24 +684,20 @@ class Nvg599Class(GatewayClass):
                     break
                 i = i + 1
 
-    def adv_configure_guest_network(self, rf, rfa, enable_disable_param, guest_ssid_param = "default_guest",
-                                    guest_ssid_password_param = "disabled"):
+    def adv_configure_guest_network(self, rf, rfa, enable_disable_param, guest_ssid_param = "default_guest", guest_ssid_password_param = "disabled"):
         print('in adv_configure_guest_network')
         print('enable_disable_param:' + enable_disable_param + '\n')
         home_network_link = self.session.find_element_by_link_text("Home Network")
         home_network_link.click()
         sleep(2)
-
         wi_fi_link = self.session.find_element_by_link_text("Wi-Fi")
         wi_fi_link.click()
         sleep(2)
         self.check_if_dac_required()
         sleep(5)
-
         advanced_options_link = self.session.find_element_by_link_text("Advanced Options")
         advanced_options_link.click()
         sleep(2)
-
         guest_ssid_enable = Select(self.session.find_element_by_id("ogssidenable"))
         current_guest_enable_state = guest_ssid_enable.first_selected_option.text
         print('selected option.text:' + str(current_guest_enable_state) + '\n')
@@ -690,7 +712,7 @@ class Nvg599Class(GatewayClass):
             if enable_disable_param == 'on':
                 guest_ssid_enable = Select(self.session.find_element_by_id("ogssidenable"))
                 guest_ssid_enable.select_by_value('on')
-                # if user enable_disable is on and the current state is on we still have to check for any password changed
+                # if user enable_disable is on and the current state is on we still have to check for  password changes
                 print('enable disable is on:' + enable_disable_param)
                 sleep(2)
                 # set the guest ssid
@@ -789,41 +811,43 @@ class Nvg599Class(GatewayClass):
             ssid_text_box.send_keys(nvg_info[self.serial_number]['ssid_def'])
         else:
             home_ssid_ui = home_ssid
-        # if not the default then the user has entered a new ssid
+            # if not the default then the user has entered a new ssid
             ssid_text_box.send_keys(home_ssid)
             print("setting home ssid to: " + str(home_ssid) + ':\n')
 
         if home_password == "default":
             # here we are setting the default security and  the password
             security_selection = Select(self.session.find_element_by_id("ussidsecurity"))
-            #home_password = nvg_info[self.serial_number]['ssid_def_pw']
-            security_selection.select_by_value('wpa')
+            # home_password = nvg_info[self.serial_number]['ssid_def_pw']
+            security_selection.select_by_value('defwpa')
             submit = self.session.find_element_by_name("Save")
             submit.click()
             self.check_for_wifi_warning()
             print('setting security setting to:' + str(security_selection) + '\n')
+            # security_selection = Select(self.session.find_element_by_id("ussidsecurity"))
+            # exit()
 
-        #security_selection = Select(self.session.find_element_by_id("ussidsecurity"))
         password_link = self.session.find_element_by_id("password")
         if home_password ==  "default":
+            # pass
+            # we don't need any of this
             # here we are setting the default security and  the password
             home_password_ui = nvg_info[self.serial_number]['ssid_def_pw']
-            # i don't have to do anything
-            #security_selection.select_by_value('defwpa')
+            # don't have to do anything
+            # security_selection.select_by_value('defwpa')
             # password_link = self.session.find_element_by_id("password")
             # password_link.clear()
-            # print("setting home password to: " + str(home_password) + ':\n')
-            # password_link.send_keys(home_password)
-            sleep(3)
-            #security_state = security_selection.first_selected_option.text
+            print("setting home password to default : " + str(home_password_ui) + ':\n')
+            # password_link.send_keys(home_password_def)
+            # sleep(3)
+            # security_state = security_selection.first_selected_option.text
         else:
             home_password_ui = home_password
             password_link.clear()
             password_link.send_keys(home_password_ui)
-            #security_selection.select_by_value('wpa')
+            # security_selection.select_by_value('wpa')
             # sleep(3)
-
-        print("setting home password to: " + str(home_password_ui) + ':\n')
+            print("setting home password to: " + str(home_password_ui) + ':\n')
 
         submit = self.session.find_element_by_name("Save")
         submit.click()
@@ -853,7 +877,7 @@ class Nvg599Class(GatewayClass):
             return
         # we are turning it on or it is already on
         print("guest ssid enabled.. contuing  \n")
-        guest_id_enable_select  = Select(self.session.find_element_by_name("gssidenable"))
+        guest_id_enable_select = Select(self.session.find_element_by_name("gssidenable"))
         guest_id_enable_select.select_by_value('on')
         guest_ssid_link = self.session.find_element_by_id("gssid")
         self.session.find_element_by_id("gssid").clear()
@@ -861,7 +885,7 @@ class Nvg599Class(GatewayClass):
         if guest_ssid_parm == "default":
             def_ssid = nvg_info[self.serial_number]['ssid_def']
             guest_ssid_parm = def_ssid + '_Guest'
-            #guest_ssid_link.send_keys(tmp_string)
+            # uest_ssid_link.send_keys(tmp_string)
             guest_ssid_link.send_keys(guest_ssid_parm)
             print('setting ssid to default ssid:' + str(guest_ssid_parm))
         else:
@@ -927,7 +951,6 @@ class Nvg599Class(GatewayClass):
 
         # return band2_ssid, guest_ssid, band5_ssid, band2_password, guest_password, band5_password
         return ssid_pw_dict
-
 
     def get_home_network_ip_allocation_page_source(self):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
@@ -1083,14 +1106,14 @@ class Nvg599Class(GatewayClass):
             if band2_enable_disable_parm == 'on':
                 band2_enable_disable_selection = Select(self.session.find_element_by_id("owl80211on"))
                 band2_enable_disable_selection.select_by_value('on')
-                # if user enable_disable is on and the current state is on we still have to check for any password changed
+                # if user enable_disable is on and the current state is on we still have to check for  password changes
                 print('enable disable is on:' + str(band2_enable_disable_state))
                 sleep(2)
 
                 mode_selection = Select(self.session.find_element_by_id("ostandard"))
                 # ostandard values n-only, b-only, bg, bgn, gn
                 mode_selection.select_by_value(mode)
-                # if user enable_disable is on and the current state is on we still have to check for any password changed
+                # if user enable_disable is on and the current state is on we still have to check for  password changes
                 print('mode is :' + str(mode))
                 sleep(2)
 
@@ -1122,7 +1145,7 @@ class Nvg599Class(GatewayClass):
                 # so we turn off and return pass
                 band2_enable_disable_selection = Select(self.session.find_element_by_id("owl80211on"))
                 band2_enable_disable_selection.select_by_value('off')
-                # if user enable_disable is on and the current state is on we still have to check for any password changed
+                # if user enable_disable is on and  current state is on we still have to check for any password changed
 
                 submit = self.session.find_element_by_name("Save")
                 submit.click()
@@ -1192,18 +1215,18 @@ class Nvg599Class(GatewayClass):
 
                 band2_home_hide_ssid_selection = Select(self.session.find_element_by_id("ohide"))
                 band2_home_hide_ssid_selection.select_by_value(hide_ssid_name)
-                # if user enable_disable is on and the current state is on we still have to check for any password changed
+                # if user enable_disable is on and the current state is on we still have to check for  password changes
                 print('hide home ssid:' + str(hide_ssid_name))
 
                 security_selection = Select(self.session.find_element_by_id("osecurity"))
                 security_selection.select_by_value(security)
-                # if user enable_disable is on and the current state is on we still have to check for any password changed
+                # if user enable_disable is on and the current state is on we still have to check for  password changes
                 print('security selection:' + str(hide_ssid_name))
 
                 wpa_version_selection = Select(self.session.find_element_by_id("owpaversion"))
                 # ostandard values n-only, b-only, bg, bgn, gn
                 wpa_version_selection.select_by_value(wpa_version)
-                # if user enable_disable is on and the current state is on we still have to check for any password changed
+                # if user enable_disable is on and the current state is on we still have to check for  password changes
                 print('wpa version  is :' + str(wpa_version))
                 sleep(2)
 
@@ -1216,7 +1239,7 @@ class Nvg599Class(GatewayClass):
                 wpa_setup_on_off_selection = Select(self.session.find_element_by_id("owps"))
                 # ostandard values n-only, b-only, bg, bgn, gn
                 wpa_setup_on_off_selection.select_by_value(wpa_setup_on_off)
-                # if user enable_disable is on and the current state is on we still have to check for any password changed
+                # if user enable_disable is on and the current state is on we still have to check for  password changes
                 print('wpa_setup_on_off:' + str(wpa_setup_on_off))
                 sleep(2)
 # wpa_setup_on_off, max_clients):
@@ -1371,7 +1394,7 @@ class Nvg599Class(GatewayClass):
             submit = self.session.find_element_by_name("Continue")
 
             submit.click()
-            return_string = "wi-fi security change... Continue"
+            # return_string = "wi-fi security change... Continue"
             print("wi-fi security change... Continue")
 
             # not sure if we need this
@@ -2317,10 +2340,6 @@ class Nvg599Class(GatewayClass):
         # handle being asked for password
         # self.session = self.check_if_dac_required()
         self.check_if_dac_required()
-
-        #print('in the change channel')
-        #self.login_4920('192.168.1.67')
-
         sleep(5)
         advanced_options_link = self.session.find_element_by_link_text("Advanced Options")
         advanced_options_link.click()
@@ -2390,7 +2409,7 @@ class Nvg599Class(GatewayClass):
         # nmcli connection down id "Wired connection 1
         #  nmcli connection show --active
         nmcli_wifi_dict = {}
-        cmd = "nmcli dev wifi rescan"
+        cmd = ""
         try:
             output = subprocess.check_output(cmd, shell=True)
         except subprocess.CalledProcessError as e:
@@ -3211,9 +3230,7 @@ class Nvg599Class(GatewayClass):
         output = subprocess.check_output(cmd, shell=True)
 
         return output
-        #for line in output.splitlines():
-         #    print('out  nmcli test  ===========\n', line)
-
+        # for line in output.splitlines():
         # 'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
         # this command lists all the visble APS
         # iwlist wlp2s0 s
@@ -3462,18 +3479,10 @@ class Nvg599Class(GatewayClass):
         return self.telnet_cli_session
         # exit()
         # airties_wl_dict = {}
-
-
         # air_cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
-
-
         #self.telnet_cli_session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
-
         print("===============  this is the command telnet " + str(ip_4920) + '\n')
-
-
-        #session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
-
+        # session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
         self.air_cli_session = pexpect.spawn("telnet " + ip_4920, encoding = 'utf-8')
         # self.air_cli_session.sendline('\n')
         sleep(1)
@@ -3500,7 +3509,6 @@ class Nvg599Class(GatewayClass):
         sleep(20)
         cli_session.close()
 
-
     def get_4920_uptime(self, ip_airties):
         print('In get_4920_uptime')
         print('ip is:' + str(ip_airties))
@@ -3515,7 +3523,6 @@ class Nvg599Class(GatewayClass):
         print(str(status_output))
         return status_output
 
-
     def get_4920_ssid(self, ip_4920):
         print('In get_4920_ssid')
         cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
@@ -3527,7 +3534,8 @@ class Nvg599Class(GatewayClass):
         status_output = cli_session.before
         # print(status_output)
         airties_wl_dict = {}
-        # #status_info_reg_ex = re.compile(r'SSID:\s+\"(\w+)Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).*Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
+        # #status_info_reg_ex = re.compile(r'SSID:\s+\"(\w+)Model\s(\w+)\s+\w+/\w+.*number\s+(\w+).
+        # *Uptime\s+(\d\d:\d\d:\d\d:\d\d)',re.DOTALL)
         # status_info_reg_ex = re.compile(r'SSID:\s+\"(\w+)',re.DOTALL)
         status_info_reg_ex = re.compile(r'SSID:\s"(\w+)"\s*?Mode:\s(\w+)\s*?RSSI:\s(\d+).*?noise:\s-(\d+).*?Channel:\s(\d+).*?BSSID:\s(\w+:\w+:\w+:\w+:\w+:\w+)',re.DOTALL)
         # print('status_output' + str(status_output) + '\n')
@@ -3667,7 +3675,7 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.close()
         return tr69_auth_type
 
-    def get_tr69_parameters_for_ssid(self, ssid_number, rf, rfa):
+    def get_tr69_parameters_for_ssid(self, ssid_number):
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")

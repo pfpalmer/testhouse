@@ -907,7 +907,7 @@ def verify_auto_info_not_present_in_ui(nvg_599_dut, rf, rfa, test_name):
     return "Fail"
 
 def verify_auto_ssid_defaults_via_tr69(nvg_599_dut, auto_ssid_number, default_ssid, default_pass_phrase,  rf, rfa, test_name):
-    tr69_output = nvg_599_dut.get_tr69_parameters_for_ssid(auto_ssid_number, rf, rfa)
+    tr69_output = nvg_599_dut.get_tr69_parameters_for_ssid(auto_ssid_number)
     auto_ssid_defaults_status = "Pass"
     rf.write('Test ' + test_name + " " + "SSID:" + auto_ssid_number + '\n')
     print('Test:' + test_name + " " + auto_ssid_number + '\n')
@@ -1206,15 +1206,22 @@ def steering_radio_names_integration_test(nvg_599_dut, rf, rfa, test_name):
     # ip_lan_connections_dict_cli = {}
 
     # speed_test_regex = re.compile(r'(Download:\s+\w+\.\w+\s+\w+).*(Upload:\s+\w+\.\w+\s+\w+)', re.DOTALL)
-    # speed_test_groups = speed_test_regex.search(speed_test_ouput)
+    # sp
+    # eed_test_groups = speed_test_regex.search(speed_test_ouput)
     # print(speed_test_groups.group(1))
     # print(speed_test_groups.group(2))
 
     for line in steer_client_output_lines:
         print('line is:' + str(line))
-        steer_client_regex = re.compile(r'radio_name: (wl0), radio_mac (\w+:\w+:\w+:\w+:\w+:\w+), ssid: (\w+),')
+        steer_client_regex = re.compile(r'radio_name:\s+(wl0),\s+ radio_mac\s+(\w+:\w+:\w+:\w+:\w+:\w+),\s+ssid: (\w+),')
         steer_client_groups = steer_client_regex.search(line)
-        print('first group:' + steer_client_groups.group(1))
+        # steer_test = steer_client_groups.group(1)
+        if steer_client_groups == None:
+            # print('first group:' + steer_client_groups.group(1))
+            print('we didnt find it \n')
+        else:
+            print('we foud something find it \n')
+
 
     # ip_lan_output = telnet_cli_session.before
     # ip_lan_output = ip_lan_output.split('\n\r')
@@ -1594,11 +1601,18 @@ def guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, test_name, guest_ssid, gue
 
     # now we connect to the guest network and verify that we can ping google,com on the wan
     guest_ssid_conf, guest_password_conf = nvg_599_dut.conf_guest_network_ssid_and_password(rf, rfa, "enable", guest_ssid, guest_password)
-    print('**************guest ssid defaults back from conf call:' + guest_ssid_conf  + '  ssid default:' + guest_password_conf + '\n\n')
+    print('**************guest ssid defaults after  conf call:' + guest_ssid_conf  + '  ssid default:' + guest_password_conf + '\n\n')
+
+    sleep(60)
+    cmd = 'nmcli dev wifi rescan'
+    nvg_599_dut.nmcli_set_connection(cmd)
+    sleep(60)
+
     try:
         cmd = 'nmcli device wifi connect ' + guest_ssid_conf  + ' password ' + guest_password_conf
-        print('nmcli device wifi connect' +  str(guest_ssid_conf)  + ' password ' + str(guest_password_conf))
+        print('nmcli device wifi connect to guest ssid ' +  str(guest_ssid_conf)  + ' password ' + str(guest_password_conf))
         nvg_599_dut.nmcli_set_connection(cmd)
+        sleep(60)
     except subprocess.CalledProcessError as e:
         print('errror ' + e.output)
         print('failed to connect to  default SSID')
@@ -1636,7 +1650,10 @@ def guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, test_name, guest_ssid, gue
     print('Turning back on wired_ssid:\n')
     nmcli_cmd = "nmcli con up Wired "
     nvg_599_dut.nmcli_set_connection(nmcli_cmd)
-    sleep(10)
+    sleep(60)
+    cmd = 'nmcli dev wifi rescan'
+    nvg_599_dut.nmcli_set_connection(cmd)
+    sleep(60)
 
     try:
         cmd = 'nmcli device wifi connect ' + home_ssid_conf + ' password ' + home_password_conf
@@ -1736,7 +1753,6 @@ def enable_guest_network_and_set_passwords(self, rf, rfa, test_name, ssid_passwo
 # patches1
 def set_airties_to_factory_default(nvg_599_dut, rf, rfa, test_name, name_of_4920_or_any):
     # def get_ip_connected_airties_by_name(self,airties_name):
-
     # names are:  ATT_4920_C356C0  or ATT_4920_8664D4
 
     nvg_599_dut.get_connected_airties_ip_from_name(name_of_4920_or_any)
@@ -1847,11 +1863,9 @@ def verify_ssid_change_propagated_to_airties(nvg_599_dut, rf, rfa, test_name , s
         home_ssid_conf, home_password_conf = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default","default")
         rf.write('     Setting ssid  back to defaults:' + home_ssid_conf + 'setting password to:' + home_password_conf + '\n')
         return "Fail"
-
     sleep(120)
 
     ip_list_4920 = nvg_599_dut.get_ip_list_of_4920s()
-
     if len(ip_list_4920) == 0:
         print('no 4920 ip available, abort   \n')
         rf.write('     No airties present in lan, aborting test.    :Fail\n')
@@ -1883,7 +1897,7 @@ def verify_ssid_change_propagated_to_airties(nvg_599_dut, rf, rfa, test_name , s
         test_status = "Fail"
         print('Fail home ssid:' + str(home_ssid_conf) +  'does not match airties:' + str(wl_4920_dict['ssid']) + '\n')
 
-    print('     RG ssid set back to default:\n')
+    print('     Turning up wired connection:\n')
 
     try:
         cmd = 'nmcli c up Wired'
@@ -1897,8 +1911,10 @@ def verify_ssid_change_propagated_to_airties(nvg_599_dut, rf, rfa, test_name , s
 
     sleep(120)
     home_ssid_def, home_password_def = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default", "default")
-    rf.write('     RG ssid set back to default:\n')
+    rf.write('     Setting RG ssid back to default:\n')
     # After we configure the ssid we have to connect to it in order to login to the Airties device
+    print('     setting RG ssid back to default:\n')
+
     cmd = 'nmcli dev wifi rescan'
     sleep(120)
     nvg_599_dut.nmcli_set_connection(cmd)
@@ -1929,25 +1945,39 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     send_email = 1
 
     nvg_599_dut = Nvg599Class()
-
+    # nvg_599_dut.login_eco()
+    # exit()
     #nvg_599_dut.tftp_get_file_cli("LP-PPALMER" , "AirTies_Air4920US-AL_FW_2.49.2.21.7431.bin", rf, rfa)
-    steering_radio_names_integration_test(nvg_599_dut, rf, rfa, 'steering_radio_names_integration_test')
+    rf.write('RG Test run Firmware: nvg599-11.5.0h0d30_1.1.bin  Date:' + now +  '\n\n')
+    rfa.write(now + '\n')
+    sleep(2)
+    execute_factory_reset(nvg_599_dut, rf, rfa, 'execute_factory_reset')
+
+    # tftp_rg_firmware_and_install(nvg_599_dut, "LP-PPALMER", "nvg599-11.5.0h0d30_1.1.bin", rf, rfa,"tftp_rg_firmware_and_install")
+
+    # steering_radio_names_integration_test(nvg_599_dut, rf, rfa, 'steering_radio_names_integration_test')
+    # check this
+
     exit()
 
     # load_4920_firmware(nvg_599_dut, rf, rfa, 'load_4920_firmware', 'any', '/home/palmer/Downloads/AirTies_7381.bin')
+
+
+
     #load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_2.49.2.21.7431.bin")
     # load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "AirTies_Air4920US-AL_FW_2.33.1.2.2112_telnet_enabled_preinstall.bin")
 
 
     # verify_ssid_change_propagated_to_airties(nvg_599_dut,rf, rfa, "verify_ssid_change_propagated_to_airties", "ATT4ujR48sdog","default")
+    #(nvg_599_dut, rf, rfa, "guest_client_cannot_ping_rg", "default", "default123")
+
+    # verify_ssid_change_propagated_to_airties(nvg_599_dut,rf, rfa, "verify_ssid_change_propagated_to_airties", "ATT4ujR48sdog","default")
+    #exit()
+
+    # exit()
 
 
-    exit()
-    rf.write('RG Test run Firmware: nvg599-11.5.0h0d26_1.1.bin  Date:' + now +  '\n\n')
-    rfa.write(now + '\n')
-    sleep(2)
-
-    verify_ssid_change_propagated_to_airties(nvg_599_dut,rf, rfa, "verify_ssid_change_propagated_to_airties", "ATT4ujR48sdog","default")
+    # verify_ssid_change_propagated_to_airties(nvg_599_dut,rf, rfa, "verify_ssid_change_propagated_to_airties", "ATT4ujR48sdog","default")
 
     # this  works
     # guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, 'guest_client_cannot_ping_rg')
@@ -1976,13 +2006,13 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     # end this works----------------------------------------------------------------------------
 
 
-    tftp_rg_firmware_and_install(nvg_599_dut, "LP-PPALMER", "nvg599-11.5.0h0d26_1.1.bin", rf, rfa,"tftp_rg_firmware_and_install")
 
     guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, "guest_client_cannot_ping_rg", "default", "default123")
+    # exit()
     url_att_friendly_info_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/friendly-info', rf, rfa, 'url_att_friendly_info_smoke')
     trigger_dfs_channel_change(nvg_599_dut, rf, rfa, 'trigger_dfs_channel_change', "None")
-    test_speedtest_from_android(nvg_599_dut, 'Galaxy-Note8', test_house_devices_static_info, 'test_speedtest_from_android ', rf, rfa)
-    ping_gw_from_4920(nvg_599_dut, rf, rfa, "ping_gw_from_4920")
+    # test_speedtest_from_android(nvg_599_dut, 'Galaxy-Note8', test_house_devices_static_info, 'test_speedtest_from_android ', rf, rfa)
+    #ping_gw_from_4920(nvg_599_dut, rf, rfa, "ping_gw_from_4920")
     ping_airties_from_rg(nvg_599_dut, rf, rfa, "ping_airties_from_RG")
     verify_airties_hello_packet_count_increasing(nvg_599_dut, rf, rfa, "verify_airties_hello_packet_count_increasing")
     verify_airties_build_versions(nvg_599_dut, rf, rfa, 'verify_airties_build_versions')
@@ -1999,6 +2029,7 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     # url_att_topology_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/topology', rf, rfa, 'url_att_topology_smoke')
     url_att_route_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/route', rf, rfa, 'url_att_route_smoke')
     local_to_remote_ping(nvg_599_dut,rf, rfa,  '192.168.1.69',  "local_to_remote_ping")
+
     verify_ssid_change_propagated_to_airties(nvg_599_dut,rf, rfa, "verify_ssid_change_propagated_to_airties", "ATT4ujR48s","default")
 
     # before factory reset the order would be
