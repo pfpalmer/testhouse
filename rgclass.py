@@ -54,18 +54,18 @@ from datetime import datetime
 
 nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53#1/2", 'magic': 'kjundhkdxlxr',
                                 'mac2g': 'd0:39:b3:60:56:f1', 'mac5g': 'd0:39:b3:60:56:f4', 'ssid_def_pw': 'c2cmybt25dey',
-                                'ssid_def': 'xxxxxx', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
-                                'ssid_4': 'ATTPOC', 'ssid_4_pw': 'Ba1tshop'},
+                                'ssid_def': 'ATTJJ25r3A', 'auto_ssid_3': 'ZipKey-PSK', 'auto_ssid_3_pw': 'Cirrent1',
+                                'auto_ssid_4': 'ATTPOC', 'auto_ssid_4_pw': 'Ba1tshop'},
 
             "277427577103760": {'model': 'nvg599', 'device_access_code': '<<01%//4&/', 'magic': 'ggtxstgwipcg',
                                 'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'ssid_def_pw': 'nsrmpr59rxwv',
-                                'ssid_def': 'ATTqbrAnYs', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
-                                'ssid_4': 'ATTPOC', 'ssid_2_pw': 'Ba1tshop'},
+                                'ssid_def': 'ATTqbrAnYs', 'auto_ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
+                                'auto_ssid_4': 'ATTPOC', 'ssid_2_pw': 'Ba1tshop'},
 
             "35448081188192": {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
                                'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'ssid_def_pw': 'eeh4jxmh7q26',
-                               'ssid_def': 'ATT4ujR48s', 'ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
-                               'ssid_4': 'ATTPOC', 'ssid_4_pw': 'Ba1tshop'}}
+                               'ssid_def': 'ATT4ujR48s', 'ssid_3': 'ZipKey-PSK', 'auto_ssid_3_pw': 'Cirrent1',
+                               'auto_ssid_4': 'ATTPOC', 'auto_ssid_4_pw': 'Ba1tshop'}}
 # *7<#56*2<2
 # outside of func['88:41:fc:86:64:d7', '88:41:fc:c3:56:c3']
 airties_4920_defaults = {
@@ -337,21 +337,75 @@ class Nvg599Class(GatewayClass):
         print('url is http://arris1.arriseco.com/manage/login')
         #global nvg_info
         # capabilities = DesiredCapabilities.CHROME.copy()
-        #capabilities = DesiredCapabilities.CHROME.copy()
-        desired_capabilities = DesiredCapabilities.FIREFOX.copy()
+        desired_capabilities = DesiredCapabilities.CHROME.copy()
+        # print('desired:' +  str(desired_capabilities))
+        # desired_capabilities = DesiredCapabilities.FIREFOX.copy()
         desired_capabilities['acceptInsecureCerts'] = True
         eco_url = 'https://arris1.arriseco.com/manage/login/'
-        print('eco session' + str(eco_url))
-        #options = webdriver.ChromeOptions()
-        # options.add_argument("--disable-web-security")
-        #options.add_argument("--ignore-certificate-errors")
-        #options.add_argument("--allow-running-insecure-content")
+        # print('eco session' + str(eco_url))
+
+        options = webdriver.ChromeOptions()
+        # print(str(options))
+        #exit()
+        options.add_argument("--disable-web-security")
+        options.add_argument("--ignore-certificate-errors")
+        options.add_argument("--allow-running-insecure-content")
+        # print("after some options have been assigned:", str(options))
+
         #capabilities = options.to_capabilities()
         # eco_session = webdriver.Firefox(capabilities=desired_capabilities)
-        eco_session = webdriver.Firefox()
+        # eco_session = webdriver.Firefox()
 
-        # eco_session = webdriver.Chrome(eco_url, capabilities)
+
+        eco_session = webdriver.Chrome(options = options)
         eco_session.get(eco_url)
+        sleep(10)
+
+        eco_username = eco_session.find_element_by_xpath('//*[@id="gwt-uid-5"]')
+        # band2_power.clear()
+        eco_username.send_keys("austin_cpe")
+        eco_password = eco_session.find_element_by_xpath('//*[@id="gwt-uid-7"]')
+        eco_password.send_keys("Arris2018")
+
+        eco_submit = eco_session.find_element_by_xpath('// *[ @ id = "manage-1081434779"] / div / div[2] / div / div / div / div / div[2] / div / div[3] / div / table / tbody / tr[3] / td[3] / div / span')
+        eco_submit.click()
+
+        sleep(10)
+        rg_serial_number = eco_session.find_element_by_xpath('// *[ @ id = "gwt-uid-10"]')
+        rg_serial_number.send_keys('277427577103760')
+        sleep(10)
+        rg_serial_number_submit = eco_session.find_element_by_xpath('//*[@id="manage-1081434779"]/div/div[2]/div/div[3]/div/div/div/div/div/div/div/div[2]/div/div/div/div/div/div/div[2]/div/div/div/div/div[2]/div/div/div[1]/div/div[2]/div/div/div[1]/div/div[3]/div/span/span')
+        rg_serial_number_submit.click()
+        sleep(10)
+
+        # rg_select = eco_session.find_element_by_xpath ('// *[ @ id = "gwt-uid-14"]')
+        # rg_select.click()
+        rg_select = eco_session.find_element_by_xpath ('//*[@id="manage-1081434779"]/div/div[2]/div/div[3]/div/div/div/div/div/div/div/div[2]/div/div/div/div/div/div/div[2]/div/div/div/div/div[2]/div/div/div[3]/div/div/div[2]/div/div/div[1]/div/div[2]/div[1]/table/tbody/tr')
+
+        # rg_select = eco_session.find_element_by_link_text ('NVG599')
+        rg_select.click()
+        sleep(10)
+        print('looking for diags now\n')
+        rg_diagnostics = eco_session.find_element_by_xpath('//*[@id="gwt-uid-55"]/span')
+        rg_diagnostics.click()
+        sleep(10)
+        print('looking for get parms  now\n')
+
+        rg_get_parameters = eco_session.find_element_by_xpath('//*[@id="manage-1081434779"]/div/div[2]/div/div[3]/div/div/div/div/div/div/div/div[2]/div/div/div/div/div[5]/div/div[2]/div/div/div/div/div/div[3]/div/div[2]/div/div/div/div/div/div[5]/div/div/div/div/div/div[1]/div/div/div[1]/div/div/div[3]/div/select/option[6]')
+        rg_get_parameters.click()
+
+        # 277427577103760
+        # // *[ @ id = "manage-1081434779"] / div / div[2] / div / div[3] / div / div / div / div / div / div / div / div[2] / div / div / div / div / div / div / div[2] / div / div / div / div / div[2] / div / div / div[1] / div / div[2] / div / div / div[1] / div / div[3] / div / span / span
+# //*[@id="manage-1081434779"]/div/div[2]/div/div[3]/div/div/div/div/div/div/div/div[2]/div/div/div/div/div/div/div[2]/div/div/div/div/div[2]/div/div/div[1]/div/div[2]/div/div/div[1]/div/div[3]/div/span/span
+        # eco_password = eco_session.find_element_by_id("gwt-uid-7")
+        # band2_power.clear()
+        #eco_password.send_keys("Arris2018")
+        #submit = self.session.find_element_by_name("Save")
+#//*[@id="manage-1081434779"]/div/div[2]/div/div[3]/div/div/div/div/div/div/div/div[2]/div/div/div/div/div/div/div[2]/div/div/div/div/div[2]/div/div/div[1]/div/div[2]/div/div/div[1]/div/div[3]/div/span
+
+        #submit.click()
+        sleep(6200)
+        exit()
         sleep(320)
 
 
@@ -896,7 +950,7 @@ class Nvg599Class(GatewayClass):
         guest_id_password_link = self.session.find_element_by_id("gssidpassword")
         self.session.find_element_by_id("gssidpassword").clear()
         guest_id_password_link.send_keys(guest_password_parm)
-        print('guest password>>>>>>>>>>>>>>' + str(guest_password_parm))
+        print('guest password:' + str(guest_password_parm) + '\n')
         submit = self.session.find_element_by_name("Save")
         submit.click()
         self.check_for_wifi_warning()
@@ -1060,15 +1114,19 @@ class Nvg599Class(GatewayClass):
         power_level_range = range(0, 100)
 
         if mode not in mode_values:
+            rf.write('    invalid mode parameter:' + mode + ' cannot continue'  + '\n')
             print('invalid mode parameter:' + mode + " cannot continue")
             return "Fail"
         if bandwidth not in bandwidth_values:
+            rf.write('    invalid bandwidth parameter:' + bandwidth + ' cannot continue'  + '\n')
             print('invalid bandwidth parameter:' + mode + " cannot continue")
             return "Fail"
         if channel not in channel_values:
+            rf.write('    invalid channel parameter:' + channel + ' cannot continue'  + '\n')
             print('invalid channel parameter:' + mode + " cannot continue")
             return "Fail"
         if power_level_int not in power_level_range:
+            rf.write('    invalid power_level_int parameter:' + power_level_int + ' cannot continue'  + '\n')
             print('invalid power level parameter:' + mode + " cannot continue")
             return "Fail"
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
@@ -3686,7 +3744,7 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.close()
         return tr69_output
 
-    def set_auto_setup_ssid_via_tr69_cli(self, ssid_number, max_clients, rf, rfa):
+    def set_auto_setup_ssid_via_tr69_cli(self, ssid_number, rf, rfa, test_name, max_clients):
         future = rfa
         print('Enabling tr69 auto_setup for ssid number:' + str(ssid_number))
         self.telnet_cli_session = self.login_nvg_599_cli()
@@ -3694,21 +3752,21 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
                                          + str(ssid_number) + '.Enable = 1')
-        rf.write('     Set Enable.' + ssid_number + '.Enable 0:OK\n')
+        rf.write('     Set Enable.' + str(ssid_number) + '.Enable 0:OK\n')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
                                          + str(ssid_number) + '.BeaconAdvertisementEnabled = 1')
-        rf.write('     Enable.' + ssid_number + 'BeaconAdvertisementEnabled:OK\n')
+        rf.write('     Enable.' + str(ssid_number) + 'BeaconAdvertisementEnabled:OK\n')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
                                          + str(ssid_number) + '.SSIDAdvertisementEnabled= 1')
-        rf.write('     Enable.' + ssid_number + 'SSIDAdvertisementEnabled:OK\n')
+        rf.write('     Enable.' + str(ssid_number) + 'SSIDAdvertisementEnabled:OK\n')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
-                                         + str(ssid_number) + '.X_0000C5_MaxClients=' + max_clients)
+                                         + str(ssid_number) + '.X_0000C5_MaxClients=' + str(max_clients))
         # InternetGatewayDevice.LANDevice.1.WLANConfiguration.4..X_0000C5_MaxClients
         # rf.write("    Enabled auto ssid " + str(ssid_number) + '\n')
-        rf.write('     Enable auto ssid' + ssid_number + ':OK\n')
+        rf.write('     Enable auto ssid' + str(ssid_number) + ':OK\n')
         self.telnet_cli_session.close()
         return "Pass"
 
