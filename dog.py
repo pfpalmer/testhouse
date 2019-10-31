@@ -5,6 +5,7 @@ from   rgclass import test_house_devices_static_info
 # import itertools
 import pprint
 import subprocess
+
 import wget
 from datetime import datetime
 # from selenium.webdriver.support.ui import WebDriverWait
@@ -32,7 +33,7 @@ from rgclass import Nvg599Class
 # from rgclass import  test_house_devices_static_info
 
 NON_DFS_CHANNELS = {"36", "40", "44", "48", "149", "153", "157", "161", "165"}
-DFS_CHANNELS     = {"52", "56", "60", "64", "100", "104", "108", "112", "116", "132", "136", "140", "144"}
+DFS_CHANNELS = {"52", "56", "60", "64", "100", "104", "108", "112", "116", "132", "136", "140", "144"}
 ALL_BAND5_CHANNELS = {36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112,
                       116, 132, 136, 140, 144, 149, 153, 157, 161, 165}
 
@@ -94,7 +95,6 @@ def trigger_dfs_channel_change(nvg_599_dut,rf, rfa, test_name, airties_name = "N
     # nvg_599_dut.login_4920("192.168.1.72")
     #
     # exit()
-
 
     if airties_name == "None":
         print(' Airties:' + airties_name + '\n')
@@ -203,7 +203,7 @@ def tst_ping_ip(nvg_599_dut, ping_history_file, remote_ip):
         ping_history_file.write("Test Title:tst_ping Execution time:")
         ping_history_file.write(now)
         ping_history_file.write("\n")
-        min_ping,avg_ping,max_ping,mdev_ping = nvg_599_dut.ping_from_local_host(remote_ip)
+        min_ping, avg_ping, max_ping ,mdev_ping = nvg_599_dut.ping_from_local_host(remote_ip)
         min_str = 'Min time: ' + min
         ping_history_file.write(min_str)
 
@@ -631,7 +631,7 @@ def tst_android_speed_test(nvg_599_dut, remote_ip):
         '  Ser. No:' + nvg_599_dut.serial_number + '\n')
     nvg_599_dut.disable_enable_wifi_5g('Off')
     sleep(120)
-    #down_load_speed, up_load_speed = Nvg599Class().execute_speed_test_from_android_termux(remote_ip)
+    # down_load_speed, up_load_speed = Nvg599Class().execute_speed_test_from_android_termux(remote_ip)
     down_load_speed, up_load_speed = nvg_599_dut.execute_speed_test_from_android_termux(remote_ip)
 
     tst_android_speed_file.writelines(
@@ -688,7 +688,6 @@ def tst_android_speed_test(nvg_599_dut, remote_ip):
 #     nvg_599_dut.set_wifi_power_level(band, percentage)
 #     band = 'band2'
 #     nvg_599_dut.set_wifi_power_level(band, percentage)
-from datetime import datetime
 
 def test_auto_ssid_default_tr69_values(nvg_599_dut, ssid, rf, rfa):
     default_tr69_auto_ssid_values = nvg_599_dut.get_tr69_auto_ssid(ssid)
@@ -811,7 +810,7 @@ def test_speedtest_from_android(nvg_599_dut, device_name, test_house_devices_sta
     #         print('device mac:' + str(device_mac))
     #         break
 
-    nvg_599_dut.login_nvg_599_cli()
+    # nvg_599_dut.login_nvg_599_cli()
     ip_lan_info_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
     # first translate the device name to a mac using the
 
@@ -1106,7 +1105,15 @@ def verify_airties_hello_packet_count_increasing(nvg_599_dut,rf, rfa, test_name,
              return "Fail"
     else:
         ip_4920 = airties_ip
-    airties_session = nvg_599_dut.login_4920(ip_4920)
+    # woof
+    try:
+        airties_session = nvg_599_dut.login_4920(ip_4920)
+    except Exception as e:
+        print(str(e))
+        test_status = "Fail"
+        rf.write('    unexpected exception:' + str(e) + 'Fail\n\n')
+        return
+
     airties_session.sendline('cat /proc/mesh-ng-topology | grep hello')
     airties_session.expect('#')
     hello_output = airties_session.before
@@ -1492,9 +1499,9 @@ def tftp_rg_firmware_and_install(nvg_599_dut, tftp_server_name, rg_firmware, rf,
 
 # Patches2
 
-def conf_auto_setup_ssid_via_tr69_cli(nvg_599_dut, ssid_number, max_clients, rf, rfa, test_name):
-    rf.write('Test ' + test_name + '\n')
-    test_status = nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(ssid_number, max_clients, rf, rfa)
+def enable_auto_setup_ssid_via_tr69_cli(nvg_599_dut, ssid_number, max_clients, rf, rfa, test_name):
+    rf.write('Test ' + str(test_name) + '\n')
+    test_status = nvg_599_dut.enable_auto_setup_ssid_via_tr69_cli(ssid_number, max_clients, rf, rfa)
     if test_status == "Pass":
         rf.write('     Auto SSID:'  + str(ssid_number) + 'Successfully configured :Pass\n\n')
     else:
@@ -1564,7 +1571,7 @@ def install_airties_firmware(nvg_599_dut, rf, rfa, test_name, airties_firmware, 
     print('install_airties_firmware')
     test_status = "Passed"
     return test_status
-
+# patches222
 def guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, test_name, guest_ssid, guest_password = "default_guest_password"):
     print('in guest_client_cannot_ping_rg \n')
     rf.write('Test ' + str(test_name) + '\n')
@@ -1658,18 +1665,20 @@ def guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, test_name, guest_ssid, gue
         print('Ping  from STA SSID to RG IP       :Fail\n')
         test_status = "Fail"
 
-    rf.write('     Turn on the wired connections     :OK\n\n')
-    print('Turning back on wired_ssid:\n')
+    rf.write('     Turn on the wired connections     :OK\n')
+    print('Turning on wired_ssid:\n')
     nmcli_cmd = "nmcli con up Wired "
     nvg_599_dut.nmcli_set_connection(nmcli_cmd)
-    sleep(60)
+    sleep(120)
     cmd = 'nmcli dev wifi rescan'
     nvg_599_dut.nmcli_set_connection(cmd)
-    sleep(60)
+    sleep(120)
+    home_ssid_conf, home_password_conf = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, home_ssid="default", home_password="default")
+    rf.write('     \n')
 
     try:
         cmd = 'nmcli device wifi connect ' + home_ssid_conf + ' password ' + home_password_conf
-        print('nmcli device wifi connect to default  ssid:' + str(home_ssid_conf) + ' password:' + str(home_password_conf))
+        print('nmcli device wifi connect to default  ssid:' + str(home_ssid_conf) + ' password:' + str(home_password_conf) + '\n\n')
         nvg_599_dut.nmcli_set_connection(cmd)
     except subprocess.CalledProcessError as e:
         print('errror ' + e.output)
@@ -1677,7 +1686,7 @@ def guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, test_name, guest_ssid, gue
         rf.write('     Failed to connect  to default home ssid.    :Fail\n')
         return "Fail"
 
-
+    sleep(300)
     return test_status
     # exit()
 
@@ -1843,6 +1852,7 @@ def load_airties_firmware(nvg_599_dut, rf, rfa, test_name, name_of_airties_or_an
 
 
 def verify_ssid_change_propagated_to_airties(nvg_599_dut, rf, rfa, test_name , ssid_parm, password_parm = "default123"):
+    rf.write('Test ' + str(test_name) + '\n')
     print('in verify_ssid_change_propagated_to_airties \n')
     test_status = "Pass"
     try:
@@ -1856,8 +1866,8 @@ def verify_ssid_change_propagated_to_airties(nvg_599_dut, rf, rfa, test_name , s
         test_status = "Fail"
 
     home_ssid_conf, home_password_conf =  nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, ssid_parm, password_parm)
-    rf.write('     Setting ssid to:' + ssid_parm + 'setting password to:' + password_parm + '\n')
-    test_status = rf.write('Test ' + str(test_name) + '\n')
+    rf.write('     Setting ssid to:' + ssid_parm + ' setting password to:' + password_parm + '\n')
+    #test_status = rf.write('Test ' + str(test_name) + '\n')
     # After we configure the ssid we have to connect to it in order to login to the Airties device
     cmd = 'nmcli dev wifi rescan'
     sleep(10)
@@ -1882,7 +1892,7 @@ def verify_ssid_change_propagated_to_airties(nvg_599_dut, rf, rfa, test_name , s
         print('no 4920 ip available, abort   \n')
         rf.write('     No airties present in lan, aborting test.    :Fail\n')
         rf.write('     Failed to connect  to changed home ssid.    :Fail\n')
-        home_ssid_conf,  = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default","default")
+        home_ssid_conf, home_password_conf  = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default","default")
         rf.write('     No airties devices detected' + '\n')
         rf.write('     Setting ssid  back to defaults:' + home_ssid_conf + 'setting password to:' + home_password_conf + '\n')
         return "Fail"
@@ -1923,9 +1933,9 @@ def verify_ssid_change_propagated_to_airties(nvg_599_dut, rf, rfa, test_name , s
 
     sleep(120)
     home_ssid_def, home_password_def = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, "default", "default")
-    rf.write('     Setting RG ssid back to default:\n')
+    rf.write('     Setting RG ssid back to default: ssid:' + home_ssid_def + 'password:' + home_password_def + '\n')
     # After we configure the ssid we have to connect to it in order to login to the Airties device
-    print('     setting RG ssid back to default:\n')
+    print('     setting RG ssid back to default: ssid:' + str(home_ssid_def) + 'password:' + str(home_password_def) + '\n')
 
     cmd = 'nmcli dev wifi rescan'
     sleep(120)
@@ -1970,14 +1980,14 @@ def pyfunc(r):
 # ssid_number, max_clients, rf, rfa, test_name
 #     def set_auto_setup_ssid_via_tr69_cli(self, ssid_number, max_clients, rf, rfa, test_name):
 
-def conf_auto_setup_ssid_via_tr69_cli(nvg_599_dut, auto_ssid_num, rf, rfa, test_name, max_clients = 2):
-    print('in conf_auto_setup_ssid_via_tr69_cli \n')
-    rf.write('Test ' + str(test_name) + '\n')
-    test_status = "Pass"
-    nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(auto_ssid_num, rf, rfa, test_name, max_clients)
-    pass
+# def conf_auto_setup_ssid_via_tr69_cli(nvg_599_dut, auto_ssid_num, rf, rfa, test_name, max_clients = 2):
+#     print('in conf_auto_setup_ssid_via_tr69_cli \n')
+#     rf.write('Test ' + str(test_name) + '\n')
+#     test_status = "Pass"
+#     nvg_599_dut.enable_auto_setup_ssid_via_tr69_cli(auto_ssid_num, rf, rfa, test_name, max_clients)
+#     pass
 
-#patches2
+# patches22
 def connect_to_auto_setup_ssid(nvg_599_dut, auto_ssid_num, rf, rfa, test_name, max_clients = 2):
     global nvg_info
     # ssid_nums are ssid_3 ssid_4
@@ -1985,7 +1995,7 @@ def connect_to_auto_setup_ssid(nvg_599_dut, auto_ssid_num, rf, rfa, test_name, m
     rf.write('Test ' + str(test_name) + '\n')
     test_status = "Pass"
     # configure the auto ssid parms via tr69
-    nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(auto_ssid_num, rf, rfa, test_name, max_clients)
+    nvg_599_dut.enable_auto_setup_ssid_via_tr69_cli(auto_ssid_num, rf, rfa, test_name, max_clients)
     # verify we are connected to the default ssid
     home_ssid_conf, home_password_conf = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, home_ssid="default", home_password="default")
     print('**************ssid default  from conf call:' + home_ssid_conf  + '  ssid default:' + home_password_conf + '\n\n')
@@ -2004,33 +2014,31 @@ def connect_to_auto_setup_ssid(nvg_599_dut, auto_ssid_num, rf, rfa, test_name, m
     if auto_ssid_num == "3":
         auto_ssid = nvg_info[rg_serial_number]['auto_ssid_3']
         auto_password = nvg_info[rg_serial_number]['auto_ssid_3_pw']
+    elif auto_ssid_num == "4":
+        auto_ssid = nvg_info[rg_serial_number]['auto_ssid_4']
+        auto_password = nvg_info[rg_serial_number]['auto_ssid_4_pw']
+    else:
+        print('Invalid auto ssid number:' + auto_ssid_num + 'aborting test')
+        test_status = "Pass"
+        return
 
-
-        pass
-
-
-
-    exit()
 
     try:
-        cmd = 'nmcli device wifi connect ' + home_ssid_conf + ' password ' + home_password_conf
-        print('nmcli device wifi connect to default  ssid:' + str(home_ssid_conf) + ' password:' + str(home_password_conf))
+        cmd = 'nmcli device wifi connect ' + auto_ssid + ' password ' + auto_password
+        print('nmcli device wifi connect to auto  ssid:' + str(auto_ssid) + ' password:' + str(auto_password))
         nvg_599_dut.nmcli_set_connection(cmd)
     except subprocess.CalledProcessError as e:
         print('errror ' + e.output)
-        print('failed to connect back to  SSID')
-        rf.write('     Failed to connect  to default home ssid.    :Fail\n')
+        print('failed to connect back to  auto SSID')
+        rf.write('     Failed to connect  to auto home ssid.    :Fail\n')
         return "Fail"
 
     # eeh4jxmh7q26
-
     rf.write('     Turn off the wired connections     :OK\n')
     print('Turning down wired_ssid:\n')
     nmcli_cmd = "nmcli con down Wired "
     nvg_599_dut.nmcli_set_connection(nmcli_cmd)
     sleep(10)
-
-
 
     ping_status = nvg_599_dut.ping_check('192.168.1.254')
     # Make sure we can ping the ssid
@@ -2043,8 +2051,123 @@ def connect_to_auto_setup_ssid(nvg_599_dut, auto_ssid_num, rf, rfa, test_name, m
 
     exit()
 
+#deprecated because I am going to use the dictionary approach to first get the values and then check them
+    #
+    # # useful utility function
+    # auto_ssid_dict = nvg_599_dut.get_tr69_auto_ssid_dict("3")
+    # print("------enable------>" + str(auto_ssid_dict["enable"]))
+    # print("--------channel---->" + str(auto_ssid_dict["channel"]))
+    # print("--------ssid---->" + str(auto_ssid_dict["ssid"]))
+    # print("--------default ssid---->" + str(auto_ssid_dict["default_ssid"]))
+    # print("--------password---->" + str(auto_ssid_dict["password"]))
+    # print("--------default_allowed_destinations---->" + str(auto_ssid_dict["default_allowed_destinations"]))
+    # print("--------default_allowed_ports---->" + str(auto_ssid_dict["default_allowed_ports"]))
+
+
+# def check_auto_defaults_via_tr69_cli(nvg_599_dut, auto_ssid_num, rf, rfa, test_name):
+#     print('in check_auto_defaults_via_tr69_cli \n')
+#     rf.write('Test ' + str(test_name) + '\n')
+#     test_status = "Pass"
+#     string_to_check  = nvg_599_dut.get_auto_setup_ssid_via_tr69_cli(auto_ssid_num)
+#     print('test:' + str(string_to_check))
+#     # patterns = ['dog, 'cat']
+#     patterns = ['dog', 'rat']
+#     string_to_check = "zzzzzzzzzzzzzzz"
+#     for pattern in patterns:
+#         if re.search(pattern, string_to_check) != None:
+#             print('found it')
+#         else:
+#             print('did not find it')
+#     exit()
+#     if re.search(r'.*zzz', string_to_check):
+#     # if re.search(r'.*34\.214\.197\.127,34\.210\.237\.47', string_to_check) is not None:
+#         print('---------------default whitelist ips present: Pass\n')
+#     else:
+#         print('default whitelist ips present: Pass\n')
+#         test_status = "Fail"
+
+
+
+a = [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+def printeven(mylist):
+    newlist = [x for x in a if x % 2 ==0]
+    print(newlist)
+
+def reverse_list(list):
+    reverse_list = list[:: -1]
+    if reverse_list == list:
+        print("this is a palindrome")
+        print(reverse_list)
+    else:
+        print('this is not a palindrome')
+        print(reverse_list)
+
+def print_pattern(num):
+    times_to_print = 1
+    number_to_print = 1
+    for num in range(num):
+        print(str(number_to_print ) * times_to_print)
+        times_to_print += 1
+        number_to_print += 1
+
+def twolists(list_odd, list_even):
+    new_list_odd = [x + 2 for x in list_odd if x % 2 == 1]
+    print('odd:' + str(new_list_odd))
+    new_list_even = [x + 2 for x in list_even if x % 2 == 0]
+    new_list_odd.extend(new_list_even)
+    print('even:' + str(new_list_even))
+    print('odd:' + str(new_list_odd))
+    print('final:' + str(new_list_odd))
+
+def add_one_to_list(num):
+    new_list = [x +1 for x in range(num) if x > 2]
+    print(str(new_list))
+
+def list_overlap(list1, list2):
+    new_list = []
+    for i in list1:
+        if i in list2:
+            new_list.append(i)
+    print(str(new_list))
+
+def stopif237(numlist):
+    newlist = [x for x in numlist if x != 237]
+
+numbers = [
+    386, 462, 47, 418, 907, 344, 236, 375, 823, 566, 597, 978, 328, 615, 953, 345,
+    399, 162, 758, 219, 918, 237, 412, 566, 826, 248, 866, 950, 626, 949, 687, 217,
+    815, 67, 104, 58, 512, 24, 892, 894, 767, 553, 81, 379, 843, 831, 445, 742, 717,
+    958,743, 527
+    ]
+
+list1 = [1,8,3,4,5,6]
+list2 = [6,7,8,9]
+
+set1 = {0, 2, 4, 6, 8}
+set2 = {1, 2, 3, 4, 5}
+
+def python_set(set1, set2):
+    print("Union", set1 | set2)
+    print("intersection", set1 & set2)
+    print("difference", set1 - set2)
+
+def myfib(num):
+    previous = 0
+    if num == 1:
+        print(0)
+        return
+    if num == 2:
+        print(0,1)
+        return
+
+# printeven(a)
+# exit()
+# python_set(set1, set2)
+#  exit()
 
 # patches
+from datetime import datetime
+
 with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     open('resultsa_file.txt', mode='w', encoding='utf-8') as rfa :
     now = datetime.today().strftime("%B %d, %Y,%H:%M")
@@ -2052,49 +2175,56 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
 
     nvg_599_dut = Nvg599Class()
 
-
+    # check_auto_defaults_via_tr69_cli(nvg_599_dut, '3', rf, rfa,  'check_auto_defaults_via_tr69_cli')
+    # nvg_599_dut.get_auto_setup_ssid_via_tr69_cli('3')
+    # nvg_599_dut.rg_setup_without_factory_reset(rf, rfa)
+    # home_ssid_conf, home_password_conf = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, home_ssid="default", home_password="default")
     # def conf_auto_setup_ssid_via_tr69_cli(nvg_599_dut, auto_ssid_num, rf, rfa, test_name, max_clients=2):
 
-    connect_to_auto_setup_ssid(nvg_599_dut, 3, rf, rfa,"connect_to_auto_setup_ssid")
-    exit()
-    conf_auto_setup_ssid_via_tr69_cli(nvg_599_dut, '3', rf, rfa, 'set_auto_setup_ssid_via_tr69_cli')
-    conf_auto_setup_ssid_via_tr69_cli(nvg_599_dut, "4", rf, rfa, 'set_auto_setup_ssid_via_tr69_cli')
+    ################  connect_to_auto_setup_ssid(nvg_599_dut, 3, rf, rfa,"connect_to_auto_setup_ssid")
+    ## exit()
+    # (nvg_599_dut, '3', rf, rfa, 'set_auto_setup_ssid_via_tr69_cli')
+    # (nvg_599_dut, "4", rf, rfa, 'set_auto_setup_ssid_via_tr69_cli')
 
-    exit()
     #status = nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(nvg_599_dut, "4", rf, rfa, 'nvg_599_dut.set_auto_setup_ssid_via_tr69_cli')    # nvg_599_dut.login_eco()
     # exit()
     # ping_airties_from_rg(nvg_599_dut, rf, rfa, "ping_airties_from_RG")
     # exit()
     #nvg_599_dut.rg_setup_without_factory_reset(rf, rfa)
     # exit()
-    #nvg_599_dut.tftp_get_file_cli("LP-PPALMER" , "AirTies_Air4920US-AL_FW_2.49.2.21.7431.bin", rf, rfa)
-    rf.write('RG Test run Firmware: nvg599-11.5.0h0d38_1.1.bin  Date:' + now +  '\n\n')
+    # nvg_599_dut.tftp_get_file_cli("LP-PPALMER" , "AirTies_Air4920US-AL_FW_2.49.2.21.7431.bin", rf, rfa)
+    rf.write('RG Test run Firmware: nvg599-11.5.0h0d46_1.1.bin  Date:' + now +  '\n\n')
     rfa.write(now + '\n')
     sleep(2)
     # execute_factory_reset(nvg_599_dut, rf, rfa, 'execute_factory_reset')
 
-    #tftp_rg_firmware_and_install(nvg_599_dut, "LP-PPALMER", "nvg599-11.5.0h0d38_1.1.bin", rf, rfa,"tftp_rg_firmware_and_install")
+    #tftp_rg_firmware_and_install(nvg_599_dut, "LP-PPALMER", "nvg599-11.5.0h0d46_1.1.bin", rf, rfa,"tftp_rg_firmware_and_install")
     # band5_peers_set_after_airties_association(nvg_599_dut, rf, rfa, "band5_peers_set_after_airties_associationn")
-
+    # guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, "guest_client_cannot_ping_rg", "default", "default123")
+    guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, "guest_client_cannot_ping_rg", "default", "default123")
+    verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '3', 'ZipKey-PSK', 'Cirrent1', rf, rfa, "verify_auto_ssid_defaults_via_tr69")
+    verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '4', 'ATTPOC', 'Ba1tshop', rf, rfa, "verify_auto_ssid_defaults_via_tr69")
+    # conf_auto_setup_ssid_via_tr69_cli(nvg_599_dut, '3', rf, rfa, 'conf_auto_setup_ssid_via_tr69_cli')
+    # conf_auto_setup_ssid_via_tr69_cli(nvg_599_dut, "4", rf, rfa, 'conf_auto_setup_ssid_via_tr69_cli')
     test_speedtest_from_android(nvg_599_dut, 'Galaxy-Note8', test_house_devices_static_info, 'test_speedtest_from_android ', rf, rfa)
-    steering_radio_names_integration_test(nvg_599_dut, rf, rfa, 'steering_radio_names_integration_test')
+    # steering_radio_names_integration_test(nvg_599_dut, rf, rfa, 'steering_radio_names_integration_test')
     url_att_steer_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/steer', rf, rfa, 'url_att_steer_smoke')
     url_att_friendly_info_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/friendly-info', rf, rfa, 'url_att_friendly_info_smoke')
-    guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, "guest_client_cannot_ping_rg", "default", "default123")
+    # guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, "guest_client_cannot_ping_rg", "default", "default123")
     verify_airties_hello_packet_count_increasing(nvg_599_dut, rf, rfa, "verify_airties_hello_packet_count_increasing")
     ping_gw_from_4920(nvg_599_dut, rf, rfa, "ping_gw_from_4920")
     ping_airties_from_rg(nvg_599_dut, rf, rfa, "ping_airties_from_RG")
     verify_airties_build_versions(nvg_599_dut, rf, rfa, 'verify_airties_build_versions')
     url_att_route_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/route', rf, rfa, 'url_att_route_smoke')
     url_att_topology_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/topology', rf, rfa, 'url_att_topology_smoke')
-    verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '3', 'ZipKey-PSK', 'Cirrent1',  rf, rfa, "verify_auto_ssid_defaults_via_tr69" )
-    verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '4', 'ATTPOC', 'Ba1tshop', rf, rfa, "verify_auto_ssid_defaults_via_tr69" )
-    verify_auto_info_not_present_in_ui(nvg_599_dut, rf, rfa, "verify_auto_info_not_present_in_ui" )
     verify_google_ping_from_rg_5g(nvg_599_dut, rf, rfa, "verify_google_ping_from_rg_5g")
     trigger_dfs_channel_change(nvg_599_dut, rf, rfa, 'trigger_dfs_channel_change', "None")
+    enable_auto_setup_ssid_via_tr69_cli(nvg_599_dut, '3', rf, rfa, 'conf_auto_setup_ssid_via_tr69_cli', 3)
+    enable_auto_setup_ssid_via_tr69_cli(nvg_599_dut, '4', rf, rfa, 'conf_auto_setup_ssid_via_tr69_cli', 3)
+    execute_factory_reset(nvg_599_dut, rf, rfa, "execute_factory_reset")
     # load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin")
     # load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "AirTies_Air4920US-AL_FW_2.33.1.2.2112_telnet_enabled_preinstall.bin")
-    #execute_factory_reset(nvg_599_dut, rf, rfa, "execute_factory_reset")
+
 
 if send_email == 1:
     nvg_599_dut.email_test_results(rf, nvg_599_dut.software_version)
@@ -2425,29 +2555,6 @@ verify_auto_info_not_present_in_ui(nvg_599_dut, rf, rfa, "verify_auto_info_not_p
 
 #status = nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(nvg_599_dut, "4", rf, rfa, 'nvg_599_dut.set_auto_setup_ssid_via_tr69_cli')
 
-
-
-rf.close()
-rfa.close()
-exit()
-
-# upgrade_rg_file ='/home/palmer/Downloads/nvg599-9.2.2h13d23_1.1.bin'
-# These android devices should be able to run the cli speed test
-# Galaxy-Note8,Galaxy-S9,Galaxy-Tab-A
-#test_rg_upgrade(nvg_599_dut, '/home/palmer/Downloads/nvg599-9.2.2h13d25_1.1.bin', rf, rfa)
-# test_factory_reset(nvg_599_dut, rf, rfa)
-# test_setup_auto_ssid_via_tr69(nvg_599_dut,ssid,rf,rfa)
-# nvg_599_dut.set_auto_setup_ssid_via_tr69_cli(3, rf, rfa)
-# rf.write("Test Title: Auto SSID 3 setup: Pass")
-# rfa.write("Test Title: Auto SSID 3 setup: Pass")
-#ssid = 4
-test_speedtest_from_android(nvg_599_dut, 'Galaxy-Note8', test_house_devices_static_info, rf, rfa)
-rf.close()
-rfa.close()
-if send_email == 1:
-    nvg_599_dut.email_test_results(rf)
-
-exit()
 
 
 ######################################################################################################

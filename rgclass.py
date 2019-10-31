@@ -3118,7 +3118,7 @@ class Nvg599Class(GatewayClass):
             print('pxssh failed to login')
             ssh_client.close()
             rf.write('    Failed to log in to: ' + speed_test_ip + '  Aborting test \n')
-            rf.write('    Error:' + str(e) + '\n')
+            rf.write('    Error: ' + str(e) + '\n\n')
             print(str(e))
             return "Fail"
         print('2')
@@ -3711,6 +3711,29 @@ class Nvg599Class(GatewayClass):
         print('returning SSID:' + str(ssid) + ' Status:' + str(status1))
         self.telnet_cli_session.close()
         return str(status)
+    # woof
+    def get_auto_setup_ssid_via_tr69_cli(self, ssid):
+        tr69_cli_session = self.login_nvg_599_cli()
+        tr69_cli_session.sendline('magic')
+        tr69_cli_session.expect("MAGIC/UNLOCKED>")
+        tr69_cli_session.sendline('tr69 GetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.' + ssid + '.')
+        tr69_cli_session.expect("MAGIC/UNLOCKED>")
+        # print('before', str(tr69_cli_session.before))
+        return tr69_cli_session.before
+        # exit()
+        # print('Getting ssid:' + str(ssid) + ' authentication type')
+        #
+        # status_output = self.telnet_cli_session.before
+        # status_info_reg_ex = re.compile(r'Authentication\s(\w+)', re.DOTALL)
+        # authentication_type = status_info_reg_ex.search(status_output)
+        # # print('tr69 authentication_type:' + str(authentication_type))
+        # print('expected Authentication type:' + str(expected_authentication_type))
+        # tr69_auth_type = authentication_type.group(1)
+        # print('tr69 Authentication type:' + str(tr69_auth_type))
+        # if tr69_auth_type == expected_authentication_type:
+        #     print('Pass-------------------')
+        # self.telnet_cli_session.close()
+        # return tr69_auth_type
 
     def get_auto_setup_ssid_via_tr69_cli_authentication(self, ssid, expected_authentication_type):
         self.telnet_cli_session = self.login_nvg_599_cli()
@@ -3744,29 +3767,28 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.close()
         return tr69_output
 
-    def set_auto_setup_ssid_via_tr69_cli(self, ssid_number, rf, rfa, test_name, max_clients):
+    def enable_auto_setup_ssid_via_tr69_cli(self, ssid_number, rf, rfa, test_name, max_clients=3):
         future = rfa
+        print('In enable_auto_setup_ssid_via_tr69_cli:' + str(ssid_number))
         print('Enabling tr69 auto_setup for ssid number:' + str(ssid_number))
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
                                          + str(ssid_number) + '.Enable = 1')
-        rf.write('     Set Enable.' + str(ssid_number) + '.Enable 0:OK\n')
+        rf.write('     Set Enable SSID:' + str(ssid_number) + '.Enable 0:OK\n')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
                                          + str(ssid_number) + '.BeaconAdvertisementEnabled = 1')
-        rf.write('     Enable.' + str(ssid_number) + 'BeaconAdvertisementEnabled:OK\n')
+        rf.write('     Enable SSID:' + str(ssid_number) + 'BeaconAdvertisementEnabled:OK\n')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
                                          + str(ssid_number) + '.SSIDAdvertisementEnabled= 1')
-        rf.write('     Enable.' + str(ssid_number) + 'SSIDAdvertisementEnabled:OK\n')
+        rf.write('     Enable SSID:' + str(ssid_number) + 'SSIDAdvertisementEnabled:OK\n')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
                                          + str(ssid_number) + '.X_0000C5_MaxClients=' + str(max_clients))
-        # InternetGatewayDevice.LANDevice.1.WLANConfiguration.4..X_0000C5_MaxClients
-        # rf.write("    Enabled auto ssid " + str(ssid_number) + '\n')
-        rf.write('     Enable auto ssid' + str(ssid_number) + ':OK\n')
+        rf.write('     Enable auto ssid:' + str(ssid_number) + ':OK\n\n')
         self.telnet_cli_session.close()
         return "Pass"
 
@@ -4153,6 +4175,63 @@ class Nvg599Class(GatewayClass):
         telnet_cli_session.close()
         return ip_lan_connections_dict_cli
 
+    ## patches222
+    def get_tr69_auto_ssid_dict(self, ssid):
+        tr69_auto_ssid_dict = {}
+        self.telnet_cli_session = self.login_nvg_599_cli()
+        self.telnet_cli_session.sendline('magic')
+        self.telnet_cli_session.expect("UNLOCKED>")
+        self.telnet_cli_session.sendline(
+            'tr69 GetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.' + ssid + '.')
+        self.telnet_cli_session.expect("UNLOCKED>")
+        tr69_auto_ssid_output= self.telnet_cli_session.before
+#
+        channel_reg_ex = re.compile(r'Channel\s(\d+)')
+        channel_match = channel_reg_ex.search(tr69_auto_ssid_output)
+        channel = channel_match.group(1)
+
+        ssid_reg_ex = re.compile(r'\.SSID\s+(\w+)')
+        ssid_match = ssid_reg_ex.search(tr69_auto_ssid_output)
+        ssid = ssid_match.group(1)
+
+        default_ssid_reg_ex = re.compile(r'X_0000C5_DefaultSSID\s+(\w+)')
+        default_ssid_match = default_ssid_reg_ex.search(tr69_auto_ssid_output)
+        default_ssid = default_ssid_match.group(1)
+
+       # X_0000C5_DefaultSSID
+
+        key_pass_reg_ex = re.compile(r'X_0000C5_KeyPassphrase\s+(\w+)')
+        key_pass_match = key_pass_reg_ex.search(tr69_auto_ssid_output)
+        key_pass = key_pass_match.group(1)
+
+        enable_reg_ex = re.compile(r'Enable\s(\w+)')
+        enable_match = enable_reg_ex.search(tr69_auto_ssid_output)
+        enable = enable_match.group(1)
+
+
+        default_allowed_destinations_reg_ex = re.compile(r'X_ATT_AutoSetupAllowedDestinations\s+(\S+)')
+        default_allowed_destinations_match = default_allowed_destinations_reg_ex.search(tr69_auto_ssid_output)
+        default_allowed_destinations = default_allowed_destinations_match.group(1)
+
+
+        default_allowed_ports_reg_ex = re.compile(r'X_ATT_AutoSetupAllowedPorts\s(\w+)')
+        default_allowed_ports_match = default_allowed_ports_reg_ex.search(tr69_auto_ssid_output)
+        default_allowed_ports = default_allowed_ports_match.group(1)
+
+        print('returning SSID:' + str(ssid) + ' Status:' + str(enable))
+        # exit()
+
+        tr69_auto_ssid_dict['enable'] = enable
+        tr69_auto_ssid_dict['channel'] = channel
+        tr69_auto_ssid_dict['ssid'] = ssid
+        tr69_auto_ssid_dict['default_ssid'] = default_ssid
+        tr69_auto_ssid_dict['password'] = key_pass
+        tr69_auto_ssid_dict['default_allowed_destinations'] = default_allowed_destinations
+        tr69_auto_ssid_dict['default_allowed_ports'] = default_allowed_ports
+
+        return tr69_auto_ssid_dict
+
+
     def get_tr69_auto_ssid(self, ssid):
         self.telnet_cli_session = self.login_nvg_599_cli()
         self.telnet_cli_session.sendline('magic')
@@ -4206,9 +4285,11 @@ class Nvg599Class(GatewayClass):
     def session_cleanup(self):
         pass
 
+
+    # monitor mode to capture all wif packets from my machine
+    # unfinished
     def enable_monitor_mode(self):
         print('in enable monitor mode')
-
         password = "pfpalmer"
         proc = Popen("sudo -S  /etc/init.d/network-manager  start".split(), stdin=PIPE, stdout=PIPE, stderr=PIPE)
         proc.communicate(password.encode())
