@@ -59,8 +59,8 @@ nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53
 
             "277427577103760": {'model': 'nvg599', 'device_access_code': '<<01%//4&/', 'magic': 'ggtxstgwipcg',
                                 'mac2g': 'fc:51:a4:2f:25:90', 'mac5g': 'fc:51:a4:2f:25:94', 'ssid_def_pw': 'nsrmpr59rxwv',
-                                'ssid_def': 'ATTqbrAnYs', 'auto_ssid_3': 'ZipKey-PSK', 'ssid_3_pw': 'Cirrent1',
-                                'auto_ssid_4': 'ATTPOC', 'ssid_2_pw': 'Ba1tshop'},
+                                'ssid_def': 'ATTqbrAnYs', 'auto_ssid_3': 'ZipKey-PSK', 'auto_ssid_3_pw': 'Cirrent1',
+                                'auto_ssid_4': 'ATTPOC', 'auto_ssid_4_pw': 'Ba1tshop'},
 
             "35448081188192": {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
                                'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'ssid_def_pw': 'eeh4jxmh7q26',
@@ -408,7 +408,6 @@ class Nvg599Class(GatewayClass):
         exit()
         sleep(320)
 
-
     def set_4920_to_factory_default(self, ip_of_4920):
         # print('setting 4920 with ip:' + ip_of_4920 + ' to factory default' )
         print('setting 4920 with ip:' + ip_of_4920 + ' to factory default')
@@ -439,15 +438,11 @@ class Nvg599Class(GatewayClass):
         airties_session.switch_to.frame(airties_session.find_element_by_css_selector("frame[name=mainFrame"))
         # airties_session.refresh()
         wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__ML_restore_factory_defaults"]'))).click()
-        #alert = airties_session.switch_to_alert()
         alert = airties_session.switch_to.alert()
-
         alert.accept()
         sleep(200)
         # restore_factory_defaults = airties_session.find_element_by_xpath
         # ('//*[@id="__ML_restore_factory_defaults"]')       # pfp1
-
-        # should we close the seesion?--------------------------------
         airties_session.close()
 
     def install_airties_firmware(self, airties_ip, update_bin_file, rf, rfa):
@@ -542,7 +537,6 @@ class Nvg599Class(GatewayClass):
         #         continue
         airties_session.switch_to.default_content()
 
-
     def set_4920_ip_list_to_factory_default(self):
         # air_ties_ip_list = []
         #show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(self)
@@ -551,7 +545,7 @@ class Nvg599Class(GatewayClass):
         # airties_4920_ip_list = []
         for ip_lan_entry in show_ip_lan_dict:
             if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
-            # print(ip_lan_entry)
+                # print(ip_lan_entry)
                 #add this to a list which airties_4920
                 print('in for loop' + show_ip_lan_dict[ip_lan_entry]["IP"])
                 # airties_4920_ip_list.append(show_ip_lan_dict[ip_lan_entry]["IP"])
@@ -581,12 +575,12 @@ class Nvg599Class(GatewayClass):
 
 # the only names are:  ATT_4920_C356C0  or ATT_4920_8664D4
 # patches1
-    def get_connected_airties_ip_from_name(self,airties_name):
+    def get_connected_airties_ip_from_name(self, airties_name):
         show_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
         airties_4920_ip_list = []
         for ip_lan_entry in show_ip_lan_dict:
             # names are:  ATT_4920_C356C0  or ATT_4920_8664D4
-            if (airties_name  ==  show_ip_lan_dict[ip_lan_entry][airties_name]) and (show_ip_lan_dict[ip_lan_entry]['State'] == "on"):
+            if (airties_name == show_ip_lan_dict[ip_lan_entry][airties_name]) and (show_ip_lan_dict[ip_lan_entry]['State'] == "on"):
                 airties_ip = show_ip_lan_dict[ip_lan_entry]["IP"]
                 return airties_ip
             # this is the one we want
@@ -599,12 +593,12 @@ class Nvg599Class(GatewayClass):
         airties_4920_ip_list = []
         for ip_lan_entry in show_ip_lan_dict:
             if ("ATT_49" in show_ip_lan_dict[ip_lan_entry]['Name']) and (show_ip_lan_dict[ip_lan_entry]['State'] == "on"):
-            #if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
+                # if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
                 # print(ip_lan_entry)
                 # add this to a list which airties_4920
                 print('in for loop' + show_ip_lan_dict[ip_lan_entry]["IP"])
                 airties_4920_ip_list.append(show_ip_lan_dict[ip_lan_entry]["IP"])
-                #self.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
+                # self.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
                 # Nvg599Class.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
         return airties_4920_ip_list
 
@@ -792,7 +786,7 @@ class Nvg599Class(GatewayClass):
                 submit.click()
                 self.check_for_wifi_warning()
 
-    #def conf_quest_network_ssid_and_password(self, rf, rfa, enable_disable_ssid_password, guest_ssid_password):
+    # def conf_quest_network_ssid_and_password(self, rf, rfa, enable_disable_ssid_password, guest_ssid_password):
     def org_conf_quest_network_ssid_and_password(self, rf, rfa, enable_disable, guest_ssid, guest_password):
         # print('in enable_guest_network_and_set_password_ssid')
         # # dianostics_link = browser.find_element_by_link_text("Diagnostics")
@@ -834,7 +828,7 @@ class Nvg599Class(GatewayClass):
         self.check_for_wifi_warning()
 
     # The logic here is that is the home_password is "default" then the Security is set to "Default Password"
-    def conf_home_network_ssid_and_password(self, rf, rfa, home_ssid = "default", home_password = "default"):
+    def conf_home_network_ssid_and_password(self, rf, rfa, home_ssid="default", home_password="default"):
         global nvg_info
         print('in conf_home_network_ssid_and_password')
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
@@ -882,7 +876,7 @@ class Nvg599Class(GatewayClass):
             # exit()
 
         password_link = self.session.find_element_by_id("password")
-        if home_password ==  "default":
+        if home_password == "default":
             # pass
             # we don't need any of this
             # here we are setting the default security and  the password
@@ -1114,19 +1108,19 @@ class Nvg599Class(GatewayClass):
         power_level_range = range(0, 100)
 
         if mode not in mode_values:
-            rf.write('    invalid mode parameter:' + mode + ' cannot continue'  + '\n')
+            rf.write('    invalid mode parameter:' + mode + ' cannot continue' + '\n')
             print('invalid mode parameter:' + mode + " cannot continue")
             return "Fail"
         if bandwidth not in bandwidth_values:
-            rf.write('    invalid bandwidth parameter:' + bandwidth + ' cannot continue'  + '\n')
+            rf.write('    invalid bandwidth parameter:' + bandwidth + ' cannot continue' + '\n')
             print('invalid bandwidth parameter:' + mode + " cannot continue")
             return "Fail"
         if channel not in channel_values:
-            rf.write('    invalid channel parameter:' + channel + ' cannot continue'  + '\n')
+            rf.write('    invalid channel parameter:' + channel + ' cannot continue' + '\n')
             print('invalid channel parameter:' + mode + " cannot continue")
             return "Fail"
         if power_level_int not in power_level_range:
-            rf.write('    invalid power_level_int parameter:' + power_level_int + ' cannot continue'  + '\n')
+            rf.write('    invalid power_level_int parameter:' + str(power_level_int) + ' cannot continue' + '\n')
             print('invalid power level parameter:' + mode + " cannot continue")
             return "Fail"
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
@@ -1305,13 +1299,10 @@ class Nvg599Class(GatewayClass):
                 max_clients_entry = self.session.find_element_by_id("omaxclients")
                 max_clients_entry.clear()
                 max_clients_entry.send_keys(max_clients)
-
-
                 submit = self.session.find_element_by_name("Save")
                 submit.click()
                 sleep(2)
                 self.check_for_wifi_warning()
-
             else:
                 # to get here  the current state is on but the user has selected off
                 # so we turn off and return pass
@@ -1320,16 +1311,12 @@ class Nvg599Class(GatewayClass):
                 # if user enable_disable is on and the current state is
                 # on we still have to check for any password changed
                 print('band2_home_ssid_enable_disable_selection:' + str(band2_home_ssid_enable_disable_parm))
-
                 submit = self.session.find_element_by_name("Save")
                 submit.click()
                 sleep(2)
                 self.check_for_wifi_warning()
-
             return "Pass"
-
     # config adv band2 home
-
     # we want to use the same session but the dict of connected devices is a temporary value subject to change
 
     def ui_get_device_list(self):
@@ -1561,7 +1548,7 @@ class Nvg599Class(GatewayClass):
             #      print('No Input errors displayed- Continuing')
 
     def install_rg_cli(self, tftp_server_name, install_bin_file, rf, rfa):
-        future = rfa
+        rfa.write('    For future use in a DB')
         print('in install_rg_cli: installing' + str(install_bin_file))
         test_status = 'Pass'
         telnet_cli_session = self.login_nvg_599_cli()
@@ -2458,23 +2445,88 @@ class Nvg599Class(GatewayClass):
             self.check_if_wifi_warning_displayed()
             return self.session
 
-    # palmer@palmer-Latitude-E5450:~$ nmcli dev wifi | grep AirTies
-    # I think I have to diable the wired connection on the RG. Then
 
-    # super dog
-    def get_nmcli_networks(self):
-        print('in wps_pair_default_airties')
-        # nmcli connection down id "Wired connection 1
-        #  nmcli connection show --active
-        nmcli_wifi_dict = {}
-        cmd = ""
+    def get_active_wifi_network_info(self):
+        print('in get_active_wifi_network_info')
+
+        active_wifi_dict = {}
+        cmd = "nmcli dev wifi"
         try:
             output = subprocess.check_output(cmd, shell=True)
         except subprocess.CalledProcessError as e:
             print(e.output)
         else:
-            print('rescan')
-            sleep(3)
+            line_list = output.decode('utf-8').splitlines()
+            # line_list = output.splitlines()
+            for line in line_list:
+                line = line.split()
+                # print('line:' + str(line))
+                if line[0] == 'IN-USE':
+                    continue
+
+                if line[0] == '*':
+                    active_ssid = nmcli_ssid = line[1]
+                    print('active ssid' + str(active_ssid))
+                    print('ssid' + str(nmcli_ssid) + '\n')
+                    active_mode = line[2]
+                    # print("connectedDeviceStatus", ip_lan_output_split[3])
+                    active_chan = line[3]
+                    # nmcli_ssid("connectedDeviceDHCP", ip_lan_output_split[4])
+                    active_rate = line[4]
+                    print('rate' + str(active_rate) + '\n')
+                    # print("connectedDeviceSSIDNumber", ip_lan_output_split[5])
+                    active_rate_units = line[5]
+                    active_signal = line[6]
+                    active_security = line[8]
+                    active_wifi_dict['ssid'] = active_ssid
+                    active_wifi_dict['mode'] = active_mode
+                    active_wifi_dict["chan"] = active_chan
+                    active_wifi_dict["rate"] = active_rate
+                    active_wifi_dict["rate_units"] = active_rate_units
+                    active_wifi_dict["signal"] = active_signal
+                    active_wifi_dict["security"] = active_security
+                #     #    print("this is an airties device!")
+                #     # print("connectedDeviceIP", line[1])
+                # nmcli_ssid = line[0]
+                # print('ssid' + str(nmcli_ssid) + '\n')
+                # nmcli_mode = line[1]
+                # # print("connectedDeviceStatus", ip_lan_output_split[3])
+                # nmcli_chan = line[2]
+                # # nmcli_ssid("connectedDeviceDHCP", ip_lan_output_split[4])
+                # nmcli_rate = line[3]
+                # print('rate' + str(nmcli_rate) + '\n')
+                #
+                # # print("connectedDeviceSSIDNumber", ip_lan_output_split[5])
+                # nmcli_rate_units = line[4]
+                # nmcli_signal = line[5]
+                # nmcli_security = line[7]
+                #
+                # nmcli_wifi_dict[nmcli_ssid] = {}
+                # # do I need the above?
+                # nmcli_wifi_dict[nmcli_ssid]['MODE'] = nmcli_mode
+                # nmcli_wifi_dict[nmcli_ssid]["CHAN"] = nmcli_chan
+                # nmcli_wifi_dict[nmcli_ssid]["RATE"] = nmcli_rate
+                # nmcli_wifi_dict[nmcli_ssid]["rate_units"] = nmcli_rate_units
+                # nmcli_wifi_dict[nmcli_ssid]["SIGNAL"] = nmcli_signal
+                # nmcli_wifi_dict[nmcli_ssid]["SECURITY"] = nmcli_security
+            return active_wifi_dict
+            # print('these are the networks' + str(output))
+
+
+    def get_nmcli_networks(self):
+        print('in wps_pair_default_airties')
+        # nmcli connection down id "Wired connection 1
+        # #  nmcli connection show --active
+        # cmd = ""
+        # try:
+        #     output = subprocess.check_output(cmd, shell=True)
+        # except subprocess.CalledProcessError as e:
+        #     print(e.output)
+        # else:
+        #     print('rescan')
+        #     sleep(3)
+
+        nmcli_wifi_dict = {}
         cmd = "nmcli dev wifi"
         try:
             output = subprocess.check_output(cmd, shell=True)
@@ -2538,9 +2590,7 @@ class Nvg599Class(GatewayClass):
                 nmcli_wifi_dict[nmcli_ssid]["rate_units"] = nmcli_rate_units
                 nmcli_wifi_dict[nmcli_ssid]["SIGNAL"] = nmcli_signal
                 nmcli_wifi_dict[nmcli_ssid]["SECURITY"] = nmcli_security
-
             return nmcli_wifi_dict
-            # exit()
             # print('these are the networks' + str(output))
 
     def wps_pair_default_airties(self, airties_network):
@@ -3125,12 +3175,15 @@ class Nvg599Class(GatewayClass):
         print('2.5')
         ssh_client.prompt()
         print('3')
+        rf.write('    sending speedtest command to: ' + speed_test_ip + '\n')
         ssh_client.sendline('speedtest  --server 5024')
         print('4')
         ssh_client.prompt()
         print('5')
         # speed_test_output_b = ssh_client.before
         speed_test_output = ssh_client.before
+        rf.write('    receiving speedtest command output: ' + speed_test_ip + '\n')
+
         # print(ssh_client.before)
         print('after conversion to string', speed_test_output)
         # this is waht I added
@@ -3387,7 +3440,7 @@ class Nvg599Class(GatewayClass):
 
             return "Fail"
 
-    # experiemtntal
+    # experimentatal
     def tftp_list_test(self, *file_list):
         for x in file_list:
             print(x)
@@ -3398,6 +3451,8 @@ class Nvg599Class(GatewayClass):
     def tftp_get_file_cli(self, tftp_server_name, firmware_to_get, rf, rfa):
         result = "Pass"
         print('in tftp_get_file \n\n')
+        rf.write('    getting TFTP file:' + firmware_to_get + ' from server:' +tftp_server_name )
+        rfa.write('   for future use:' )
         show_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
         print('show_ip_lan_dict:' + str(show_ip_lan_dict) + '\n\n')
         # show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(self)
@@ -3766,6 +3821,28 @@ class Nvg599Class(GatewayClass):
         tr69_output = self.telnet_cli_session.before
         self.telnet_cli_session.close()
         return tr69_output
+
+    def conf_auto_ssid_allowed_ip_and_allowed_port_via_tr69_cli(self, ssid_number, auto_allowed_ip, auto_allowed_port, rf, rfa):
+        future = rfa
+        print('In conf_auto_ssid_allowed_ip_and_allowed_port_via_tr69_cli:' + str(ssid_number))
+        print('In conf_auto_ssid_allowed_ip:' + str(auto_allowed_ip))
+        print('In conf_auto_ssid_allowed_port:' + str(auto_allowed_port))
+
+        self.telnet_cli_session = self.login_nvg_599_cli()
+        self.telnet_cli_session.sendline('magic')
+        self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
+                                         + str(ssid_number) + '.X_ATT_AutoSetupAllowedDestinations=' + auto_allowed_ip + '\'')
+        self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
+        rf.write('     Setting auto allowed IP(s) to:' + str(auto_allowed_ip) + ':OK\n')
+        self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
+                                         + str(ssid_number) + '.X_ATT_AutoSetupAllowedPorts=' + auto_allowed_port + '\'')
+        self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
+        rf.write('     Setting auto allowed Port(s) to:' + str(auto_allowed_port) + ':OK\n')
+        self.telnet_cli_session.close()
+
+        sleep(10)
+        exit()
 
     def enable_auto_setup_ssid_via_tr69_cli(self, ssid_number, rf, rfa, test_name, max_clients=3):
         future = rfa
