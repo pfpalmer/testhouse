@@ -446,7 +446,6 @@ class Nvg599Class(GatewayClass):
         airties_session.close()
 
     def install_airties_firmware(self, airties_ip, update_bin_file, rf, rfa):
-        # print('setting 4920 with ip:' + ip_of_airties + ' to factory default' )
         print('setting 4920 with ip:' + airties_ip + ' upgrading firmware:' + update_bin_file)
         global nvg_info
         airties_url = 'http://' + airties_ip + '/'
@@ -457,23 +456,20 @@ class Nvg599Class(GatewayClass):
         print(str(session_id) + '\n\n')
         airties_session.implicitly_wait(10)
         airties_session.switch_to.default_content()
-
         window_before = airties_session.window_handles[0]
         airties_session.switch_to.frame(airties_session.find_element_by_css_selector("frame[name=menuFrame"))
-
         # we need to click on this
         # //*[@id="mainlevel"]/li[3]/a this is "advanced settings"
         advanced_settings_link = airties_session.find_element_by_xpath('// *[ @ id = "mainlevel"] / li[3] / a')
         advanced_settings_link.click()
         sleep(5)
         print('click on advanced settings \n\n ')
-
         # i think this is tools  //*[@id="mainlevel"]/li[3]/ul/li[2]/ul/li/a
         # advanced_settings_link = airties_session.find_element_by_xpath('// *[ @ id = "mainlevel"] / li[3] / a')
         # advanced_settings_link.click()
 
         # this is the tools link
-        tools_link = airties_session.find_element_by_xpath('// *[ @ id = "mainlevel"] / li[3] / ul / li[2] / a')
+        tools_link = airties_session.find_element_by_xpath('// *[ @ id = "mainlevel"] / li[3] / ul / li[1] / a')
         tools_link.click()
         print('click on tools \n\n ')
 
@@ -487,10 +483,11 @@ class Nvg599Class(GatewayClass):
         # airties_session.refresh()
         # firmware update link // *[ @ id = "mainlevel"] / li[3] / ul / li[2] / ul / li / a
         # window_before = airties_session.window_handles[0]
-        firmware_update_link = airties_session.find_element_by_xpath(
-            '// *[ @ id = "mainlevel"] / li[3] / ul / li[2] / ul / li / a')
-        firmware_update_link.click()
         print('click on firmware update \n\n ')
+
+        firmware_update_link = airties_session.find_element_by_xpath('// *[ @ id = "mainlevel"] / li[3] / ul / li[1] / ul / li / a')
+        firmware_update_link.click()
+        print('click on firmware update1 \n\n ')
         # airties_session.refresh()
         sleep(5)
         # window_before = airties_session.window_handles[0]
@@ -505,6 +502,7 @@ class Nvg599Class(GatewayClass):
         sleep(5)
         airties_session.switch_to.frame(airties_session.find_element_by_css_selector("frame[name=mainFrame"))
         sleep(5)
+
         choose_file = airties_session.find_element_by_xpath('//*[@id="_UploadFWFile_"]')
         choose_file.send_keys(update_bin_file)
 
@@ -3865,7 +3863,7 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
                                          + str(ssid_number) + '.X_0000C5_MaxClients=' + str(max_clients))
-        rf.write('     Enable auto ssid:' + str(ssid_number) + ':OK\n\n')
+        rf.write('     Enable auto ssid:' + str(ssid_number) + ':OK\n')
         self.telnet_cli_session.close()
         return "Pass"
 

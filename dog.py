@@ -1667,7 +1667,7 @@ def guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, test_name, guest_ssid, gue
     ping_status = nvg_599_dut.ping_check('192.168.1.254')
     # Make sure we can ping the ssid
     if ping_status == "Fail":
-        rf.write('      STA connected to Guest SSID  ping to 192.168.1.254(RG) Failed as expected.    :Pass\n')
+        rf.write('     STA connected to Guest SSID  ping to 192.168.1.254(RG) Failed as expected.    :Pass\n')
         print('Ping from STA Home SSID to RG 192.168.1.254 Failed  as expected: Pass\n')
     else:
         rf.write('     Ping from STA SSID to RG IP passed, expected Fail: Fail\n')
@@ -1829,10 +1829,10 @@ def load_airties_firmware(nvg_599_dut, rf, rfa, test_name, name_of_airties_or_an
 
     if name_of_airties_or_any == "any":
         airties_ip = ip_list_4920[0]
-        nvg_599_dut.install_airties_firmware(airties_ip, "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_2.33.1.2.2112_telnet_enabled_preinstall.bin", rf, rfa)
         uptime_before_reload = nvg_599_dut.get_4920_uptime(airties_ip)
+        #nvg_599_dut.install_airties_firmware(airties_ip, "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin", rf, rfa)
         #print('     uptime_before_reload_reload:' + str(uptime_before_reload) + '\n')
-        #rf.write('     uptime_before_reload_reload:' + uptime_before_reload + '\n')
+        rf.write('     uptime_before_reload_reload:' + uptime_before_reload + '\n')
         nvg_599_dut.install_airties_firmware(airties_ip, firmware_to_load, rf, rfa)
         rf.write('     Installed firmware:' + firmware_to_load + '\n')
         print('     Installed firmware:' +  str(firmware_to_load) + '\n')
@@ -2058,6 +2058,7 @@ def connect_to_auto_ssid(nvg_599_dut, auto_ssid_num, rf, rfa, test_name, auto_al
     try:
         cmd = 'nmcli device wifi connect ' + auto_ssid + ' password ' + auto_password
         print('nmcli device wifi connect to auto ssid:' + str(auto_ssid) + ' password:' + str(auto_password))
+        rf.write('      STA connected to auto_ssid:' +  str(auto_ssid) +      ':Pass\n')
         nvg_599_dut.nmcli_set_connection(cmd)
     except subprocess.CalledProcessError as e:
         print('errror ' + e.output)
@@ -2090,6 +2091,8 @@ def connect_to_auto_ssid(nvg_599_dut, auto_ssid_num, rf, rfa, test_name, auto_al
     try:
         cmd = 'nmcli device wifi connect ' + default_ssid + ' password ' + default_ssid_pw
         print('nmcli device wifi connect to default ssid:' + str(default_ssid) + ' password:' + str(default_ssid_pw))
+        rf.write('      STA connected back to default ssid:' +  str(default_ssid) +      ':Pass\n')
+
         nvg_599_dut.nmcli_set_connection(cmd)
     except subprocess.CalledProcessError as e:
         print('errror ' + e.output)
@@ -2100,7 +2103,7 @@ def connect_to_auto_ssid(nvg_599_dut, auto_ssid_num, rf, rfa, test_name, auto_al
 
 
     # turn up the wired connection
-    rf.write('     Turn up the wired connections(1)     :OK\n')
+    rf.write('     Turn up the wired connections(1)     :OK\n\n')
     print('Turning up wired_ssid:\n')
     nmcli_cmd = "nmcli con up Wired "
     nvg_599_dut.nmcli_set_connection(nmcli_cmd)
@@ -2109,7 +2112,6 @@ def connect_to_auto_ssid(nvg_599_dut, auto_ssid_num, rf, rfa, test_name, auto_al
     active_wifi_dict = nvg_599_dut.get_active_wifi_network_info()
     print('---------final active wifi ssid is ' + active_wifi_dict['ssid'] + '\n\n')
     sleep(29)
-    exit()
 
 #deprecated because I am going to use the dictionary approach to first get the values and then check them
     #
@@ -2239,16 +2241,45 @@ def keys_and_values(d):
 # keys_and_values(my_dict)
 # exit()
 
-# patches
 
+def dna_complement(dna):
+    comp_dict = {
+        'A': 'T',
+        'T': 'A',
+        'C': 'G',
+        'G': 'C'
+    }
+    comp_list = []
+    for char in dna:
+        comp_list.append(comp_dict[char])
+    return comp_list
+
+
+def first_non_repeating_letter(str):
+    char_count_dict = {}
+    for char in str:
+        if char not in char_count_dict.keys():
+            char_count_dict[char] = 1
+        else:
+            # char_count_dict[char] = char_count_dict.get(key,0) + 1
+            char_count_dict[char] += 1
+
+        for char in str:
+            if char_count_dict[char] == 1:
+                return char
+# patches
 
 with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     open('resultsa_file.txt', mode='w', encoding='utf-8') as rfa :
     now = datetime.today().strftime("%B %d, %Y,%H:%M")
     send_email = 1
 
+
     nvg_599_dut = Nvg599Class()
 
+    load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin")
+    # load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "AirTies_Air4920US-AL_FW_2.33.1.2.2112_telnet_enabled_preinstall.bin")
+    exit()
     # check_auto_defaults_via_tr69_cli(nvg_599_dut, '3', rf, rfa,  'check_auto_defaults_via_tr69_cli')
     # nvg_599_dut.get_auto_setup_ssid_via_tr69_cli('3')
     # nvg_599_dut.rg_setup_without_factory_reset(rf, rfa)
@@ -2266,40 +2297,27 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     #nvg_599_dut.rg_setup_without_factory_reset(rf, rfa)
     # exit()
     # nvg_599_dut.tftp_get_file_cli("LP-PPALMER" , "AirTies_Air4920US-AL_FW_xxxxxxxxxxxx.bin", rf, rfa)
-    rf.write('RG Test run Firmware: nvg599-11.5.0h0d47_1.1.bin  Date:' + now +  '\n\n')
+    rf.write('RG Test run Firmware: nvg599-11.5.0h0d48_1.1.bin  Date:' + now +  '\n\n')
     rfa.write(now + '\n')
     sleep(2)
     # execute_factory_reset(nvg_599_dut, rf, rfa, 'execute_factory_reset')
 
-    # tftp_rg_firmware_and_install(nvg_599_dut, "LP-PPALMER", "nvg599-11.5.0h0d47_1.1.bin", rf, rfa,"tftp_rg_firmware_and_install")
+    # tftp_rg_firmware_and_install(nvg_599_dut, "LP-PPALMER", "nvg599-11.5.0h0d48_1.1.bin", rf, rfa,"tftp_rg_firmware_and_install")
     ##  band5_peers_set_after_airties_association(nvg_599_dut, rf, rfa, "band5_peers_set_after_airties_associationn")athee
-    # guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, "guest_client_cannot_ping_rg", "default", "default123")
+    guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, "guest_client_cannot_ping_rg", "default", "default123")
     # verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '3', 'ZipKey-PSK', 'Cirrent1', rf, rfa, "verify_auto_ssid_defaults_via_tr69")
     # ##############verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '4', 'ATTPOC', 'Ba1tshop', rf, rfa, "verify_auto_ssid_defaults_via_tr69")
     # #################depracated use enable conf_auto_setup_ssid_via_tr69_cli(nvg_599_dut, '3', rf, rfa, 'conf_auto_setup_ssid_via_tr69_cli')
-    # depracated conf_auto_setup_ssid_via_tr69_cli(nvg_599_dut, "4", rf, rfa, 'conf_auto_setup_ssid_via_tr69_cli')
+    # deprecated conf_auto_setup_ssid_via_tr69_cli(nvg_599_dut, "4", rf, rfa, 'conf_auto_setup_ssid_via_tr69_cli')
 
     # def conf_auto_ssid_allowed_ip_and_allowed_port_via_tr69_cli(self, ssid_number, auto_allowed_ip, auto_allowed_port, rf, rfa):
-    # def connect_to_auto_ssid(nvg_599_dut, auto_ssid_num, rf, rfa, test_name, auto_allowed_ip, auto_allowed_port,max_clients=2):
-
 
     connect_to_auto_ssid(nvg_599_dut, "3", rf, rfa, "connect_to_auto_ssid", "22.33.44.55", "77")
 
-
-    #nvg_599_dut.conf_auto_ssid_allowed_ip_and_allowed_port_via_tr69_cli("3", "1.2.3.4,5.6.7.255","25,44,99",rf, rfa)
-
-
-    # (nvg_599_dut, '3', rf, rfa, 'set_auto_setup_ssid_via_tr69_cli')
-
-
-
-    # def conf_auto_ssid_allowed_ip_and_allowed_port_via_tr69_cli(self, ssid_number, auto_allowed_ip, auto_allowed_port, rf, rfa):
-    exit()
-
-    load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin")
-    load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "AirTies_Air4920US-AL_FW_2.33.1.2.2112_telnet_enabled_preinstall.bin")
+    # load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin")
+    # load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "AirTies_Air4920US-AL_FW_2.33.1.2.2112_telnet_enabled_preinstall.bin")
     test_speedtest_from_android(nvg_599_dut, 'Galaxy-Note8', test_house_devices_static_info, 'test_speedtest_from_android ', rf, rfa)
-    exit()
+    # exit()
     # steering_radio_names_integration_test(nvg_599_dut, rf, rfa, 'steering_radio_names_integration_test')
     url_att_steer_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/steer', rf, rfa, 'url_att_steer_smoke')
     url_att_friendly_info_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/friendly-info', rf, rfa, 'url_att_friendly_info_smoke')
