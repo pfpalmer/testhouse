@@ -65,7 +65,13 @@ nvg_info = {"228946241148656": {'model': 'nvg599', 'device_access_code': "*<#/53
             "35448081188192": {'model': 'nvg599', 'device_access_code': '9==5485?6<', 'magic': 'pqomxqikedca',
                                'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'ssid_def_pw': 'eeh4jxmh7q26',
                                'ssid_def': 'ATT4ujR48s', 'ssid_3': 'ZipKey-PSK', 'auto_ssid_3_pw': 'Cirrent1',
-                               'auto_ssid_4': 'ATTPOC', 'auto_ssid_4_pw': 'Ba1tshop'}}
+                               'auto_ssid_4': 'ATTPOC', 'auto_ssid_4_pw': 'Ba1tshop'},
+
+            "233117089570624": {'model': 'nvg599', 'device_access_code': '/644<%=<18', 'magic': 'pqomxqikedca',
+                   'mac2g': '20:3d:66:49:85:61', 'mac5g': '20:3d:66:49:85:64', 'ssid_def_pw': '%hwxmtihv+ct',
+                   'ssid_def': 'ATTEMp4XPi', 'ssid_3': 'ZipKey-PSK', 'auto_ssid_3_pw': 'Cirrent1',
+                   'auto_ssid_4': 'ATTPOC', 'auto_ssid_4_pw': 'Ba1tshop'}}
+
 # *7<#56*2<2
 # outside of func['88:41:fc:86:64:d7', '88:41:fc:c3:56:c3']
 airties_4920_defaults = {
@@ -335,7 +341,7 @@ class Nvg599Class(GatewayClass):
     def login_eco(self):
         # print('setting 4920 with ip:' + ip_of_4920 + ' to factory default' )
         print('url is http://arris1.arriseco.com/manage/login')
-        #global nvg_info
+        # global nvg_info
         # capabilities = DesiredCapabilities.CHROME.copy()
         desired_capabilities = DesiredCapabilities.CHROME.copy()
         # print('desired:' +  str(desired_capabilities))
@@ -345,18 +351,9 @@ class Nvg599Class(GatewayClass):
         # print('eco session' + str(eco_url))
 
         options = webdriver.ChromeOptions()
-        # print(str(options))
-        #exit()
         options.add_argument("--disable-web-security")
         options.add_argument("--ignore-certificate-errors")
         options.add_argument("--allow-running-insecure-content")
-        # print("after some options have been assigned:", str(options))
-
-        #capabilities = options.to_capabilities()
-        # eco_session = webdriver.Firefox(capabilities=desired_capabilities)
-        # eco_session = webdriver.Firefox()
-
-
         eco_session = webdriver.Chrome(options = options)
         eco_session.get(eco_url)
         sleep(10)
@@ -372,7 +369,8 @@ class Nvg599Class(GatewayClass):
 
         sleep(10)
         rg_serial_number = eco_session.find_element_by_xpath('// *[ @ id = "gwt-uid-10"]')
-        rg_serial_number.send_keys('277427577103760')
+        # rg_serial_number.send_keys('277427577103760')
+        rg_serial_number.send_keys(self.serial_number)
         sleep(10)
         rg_serial_number_submit = eco_session.find_element_by_xpath('//*[@id="manage-1081434779"]/div/div[2]/div/div[3]/div/div/div/div/div/div/div/div[2]/div/div/div/div/div/div/div[2]/div/div/div/div/div[2]/div/div/div[1]/div/div[2]/div/div/div[1]/div/div[3]/div/span/span')
         rg_serial_number_submit.click()
@@ -399,8 +397,8 @@ class Nvg599Class(GatewayClass):
 # //*[@id="manage-1081434779"]/div/div[2]/div/div[3]/div/div/div/div/div/div/div/div[2]/div/div/div/div/div/div/div[2]/div/div/div/div/div[2]/div/div/div[1]/div/div[2]/div/div/div[1]/div/div[3]/div/span/span
         # eco_password = eco_session.find_element_by_id("gwt-uid-7")
         # band2_power.clear()
-        #eco_password.send_keys("Arris2018")
-        #submit = self.session.find_element_by_name("Save")
+        # eco_password.send_keys("Arris2018")
+        # submit = self.session.find_element_by_name("Save")
 #//*[@id="manage-1081434779"]/div/div[2]/div/div[3]/div/div/div/div/div/div/div/div[2]/div/div/div/div/div/div/div[2]/div/div/div/div/div[2]/div/div/div[1]/div/div[2]/div/div/div[1]/div/div[3]/div/span
 
         #submit.click()
@@ -534,6 +532,7 @@ class Nvg599Class(GatewayClass):
         #         print('sleeping30 secs')
         #         continue
         airties_session.switch_to.default_content()
+        airties_session.close()
 
     def set_4920_ip_list_to_factory_default(self):
         # air_ties_ip_list = []
@@ -544,7 +543,7 @@ class Nvg599Class(GatewayClass):
         for ip_lan_entry in show_ip_lan_dict:
             if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
                 # print(ip_lan_entry)
-                #add this to a list which airties_4920
+                # add this to a list which airties_4920
                 print('in for loop' + show_ip_lan_dict[ip_lan_entry]["IP"])
                 # airties_4920_ip_list.append(show_ip_lan_dict[ip_lan_entry]["IP"])
                 self.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
@@ -731,6 +730,8 @@ class Nvg599Class(GatewayClass):
                 i = i + 1
 
     def adv_configure_guest_network(self, rf, rfa, enable_disable_param, guest_ssid_param = "default_guest", guest_ssid_password_param = "disabled"):
+        del rf
+        del rfa
         print('in adv_configure_guest_network')
         print('enable_disable_param:' + enable_disable_param + '\n')
         home_network_link = self.session.find_element_by_link_text("Home Network")
@@ -827,6 +828,8 @@ class Nvg599Class(GatewayClass):
 
     # The logic here is that is the home_password is "default" then the Security is set to "Default Password"
     def conf_home_network_ssid_and_password(self, rf, rfa, home_ssid="default", home_password="default"):
+        del rf
+        del rfa
         global nvg_info
         print('in conf_home_network_ssid_and_password')
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
@@ -901,6 +904,8 @@ class Nvg599Class(GatewayClass):
         return home_ssid_ui, home_password_ui
 
     def conf_guest_network_ssid_and_password(self, rf, rfa, enable_disable, guest_ssid_parm, guest_password_parm):
+        del rf
+        del rfa
         global nvg_info
         print('in enable_guest_network_and_set_password_ssid')
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
@@ -1099,6 +1104,7 @@ class Nvg599Class(GatewayClass):
     # we want to use the same session but the dict of connected devices is a temporary value subject to change
     # super dog band2 method
     def adv_conf_band2_radio_ui(self, rf, rfa, band2_enable_disable_parm, mode, bandwidth, channel, power):
+        del rfa
         mode_values = {"n-only", "b-only", "bg", "bgn", "gn"}
         bandwidth_values = {"20", "40"}
         channel_values = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"}
@@ -2443,10 +2449,8 @@ class Nvg599Class(GatewayClass):
             self.check_if_wifi_warning_displayed()
             return self.session
 
-
     def get_active_wifi_network_info(self):
         print('in get_active_wifi_network_info')
-
         active_wifi_dict = {}
         cmd = "nmcli dev wifi"
         try:
@@ -3241,10 +3245,6 @@ class Nvg599Class(GatewayClass):
             active_connection_list.append(tmp_list[0])
         print('active connection list', *active_connection_list)
         return active_connection_list
-        # print(tmp_list[0])
-        # sleep(10)
-        # cmd = "nmcli con down ATTqbrAnYs"
-        # cmd = "nmcli device wifi connect AirTies_SmartMesh_4PNF kykfmk8997"
 
     @staticmethod
     def nmcli_get_connections():
@@ -3449,7 +3449,7 @@ class Nvg599Class(GatewayClass):
     def tftp_get_file_cli(self, tftp_server_name, firmware_to_get, rf, rfa):
         result = "Pass"
         print('in tftp_get_file \n\n')
-        rf.write('    getting TFTP file:' + firmware_to_get + ' from server:' +tftp_server_name )
+        rf.write('    getting TFTP file:' + firmware_to_get + ' from server:' + tftp_server_name )
         rfa.write('   for future use:' )
         show_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
         print('show_ip_lan_dict:' + str(show_ip_lan_dict) + '\n\n')
@@ -3485,7 +3485,6 @@ class Nvg599Class(GatewayClass):
         tftp_session.close()
         return result
 
-
     # pfp ******  moved to parent class forget it for now
     def xxlogin_nvg_599_cli(self):
         print('In login_nvg_5g_cli')
@@ -3500,7 +3499,6 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.expect(">")
         self.telnet_cli_session.sendline('magic')
         self.telnet_cli_session.expect(">")
-
         return self.telnet_cli_session
 
     def tftp_rg_firmware_from_cli(self):
@@ -3584,29 +3582,7 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.sendline('root')
         self.telnet_cli_session.expect("#")
         #self.telnet_cli_session.sendline('wl -i wl1 status')
-        #self.telnet_cli_session.expect("#")
-        #status_output = self.telnet_cli_session.before
-        # print(status_output)
         return self.telnet_cli_session
-        # exit()
-        # airties_wl_dict = {}
-        # air_cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
-        #self.telnet_cli_session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
-        print("===============  this is the command telnet " + str(ip_4920) + '\n')
-        # session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
-        self.air_cli_session = pexpect.spawn("telnet " + ip_4920, encoding = 'utf-8')
-        # self.air_cli_session.sendline('\n')
-        sleep(1)
-        print('1')
-        self.air_cli_session.expect("ogin:")
-        print('2')
-        self.air_cli_session.sendline('root')
-        print('3')
-        self.air_cli_session.expect("#")
-        print('4')
-        status_output = self.air_cli_session.before
-        print(status_output)
-        return self.air_cli_session
 
     @staticmethod
     def static_reset_4920(ip_4920):
@@ -3620,19 +3596,23 @@ class Nvg599Class(GatewayClass):
         sleep(20)
         cli_session.close()
 
+    # speed_test_regex = re.compile(r'Download:\s+(\d+\.\d+)\s+\w+.*Upload:\s+(\d+\.\d+)\s+\w+', re.DOTALL)
+    # speed_test_groups = speed_test_regex.search(speed_test_output)
     def get_4920_uptime(self, ip_airties):
         print('In get_4920_uptime')
         print('ip is:' + str(ip_airties))
-
         cli_session = pexpect.spawn("telnet " + ip_airties, encoding='utf-8')
         cli_session.expect("ogin:")
         cli_session.sendline('root')
         cli_session.expect("#")
         cli_session.sendline('uptime')
         cli_session.expect("#")
-        status_output = cli_session.before
-        print(str(status_output))
-        return status_output
+        uptime_output = cli_session.before
+        uptime_regex = re.compile(r'uptime', re.DOTALL)
+        uptime_stats = uptime_regex.search(uptime_output)
+        cli_session.close()
+        print(str(uptime_stats))
+        return uptime_stats
 
     def get_4920_ssid(self, ip_4920):
         print('In get_4920_ssid')
@@ -3700,33 +3680,33 @@ class Nvg599Class(GatewayClass):
         self.session.sendline('magic')
         self.session.expect("UNLOCKED>")
         self.session.sendline('conf')
-        self.session.expect("top)>>")
+        self.session.expect("top\)>>")
         self.session.sendline('manage cwmp')
-        self.session.expect(")>>")
+        self.session.expect("\)>>")
         self.session.sendline('set')
         self.session.expect("enable.*]:")
         self.session.sendline('on')
-        self.session.expect("):")
+        self.session.expect("\):")
         self.session.sendline('http://arris1.arriseco.com')
-        self.session.expect("acs-username.*):")
+        self.session.expect("acs-username.*\):")
         self.session.sendline()
-        self.session.expect("acs-password.*):")
+        self.session.expect("acs-password.*\):")
         self.session.sendline()
-        self.session.expect("cr-url.*):")
+        self.session.expect("cr-url.*\):")
         self.session.sendline()
         self.session.expect("cr-port.*]:")
         self.session.sendline()
         self.session.expect("cr-ip.*:")
         self.session.sendline()
-        self.session.expect("prov-code.*):")
+        self.session.expect("prov-code.*\):")
         self.session.sendline()
-        self.session.expect("qos-tos.*):")
+        self.session.expect("qos-tos.*\):")
         self.session.sendline()
-        self.session.expect("qos-p.*):")
+        self.session.expect("qos-p.*\):")
         self.session.sendline()
-        self.session.expect("qos-marker.*):")
+        self.session.expect("qos-marker.*\):")
         self.session.sendline()
-        self.session.expect("prefer.*):")
+        self.session.expect("prefer.*\):")
         self.session.sendline()
         self.session.expect("tr69.*]:")
         self.session.sendline()
@@ -3796,7 +3776,6 @@ class Nvg599Class(GatewayClass):
                                          'WLANConfiguration.3.X_0000C5_Authentication')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         print('Getting ssid:' + str(ssid) + ' authentication type')
-
         status_output = self.telnet_cli_session.before
         status_info_reg_ex = re.compile(r'Authentication\s(\w+)', re.DOTALL)
         authentication_type = status_info_reg_ex.search(status_output)
@@ -3851,19 +3830,19 @@ class Nvg599Class(GatewayClass):
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
                                          + str(ssid_number) + '.Enable = 1')
-        rf.write('     Set Enable SSID:' + str(ssid_number) + '.Enable 0:OK\n')
+        rf.write('     Set Enable auto SSID:' + str(ssid_number) + '.Enable 0:OK\n')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
                                          + str(ssid_number) + '.BeaconAdvertisementEnabled = 1')
-        rf.write('     Enable SSID:' + str(ssid_number) + 'BeaconAdvertisementEnabled:OK\n')
+        rf.write('     Enable auto SSID:' + str(ssid_number) + 'BeaconAdvertisementEnabled:OK\n')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
                                          + str(ssid_number) + '.SSIDAdvertisementEnabled= 1')
-        rf.write('     Enable SSID:' + str(ssid_number) + 'SSIDAdvertisementEnabled:OK\n')
+        rf.write('     Enable auto SSID:' + str(ssid_number) + 'SSIDAdvertisementEnabled:OK\n')
         self.telnet_cli_session.expect("MAGIC/UNLOCKED>")
         self.telnet_cli_session.sendline('tr69 SetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.'
                                          + str(ssid_number) + '.X_0000C5_MaxClients=' + str(max_clients))
-        rf.write('     Enable auto ssid:' + str(ssid_number) + ':OK\n')
+        rf.write('     Enable auto  ssid:' + str(ssid_number) + ':OK\n\n')
         self.telnet_cli_session.close()
         return "Pass"
 
@@ -4250,7 +4229,6 @@ class Nvg599Class(GatewayClass):
         telnet_cli_session.close()
         return ip_lan_connections_dict_cli
 
-    ## patches222
     def get_tr69_auto_ssid_dict(self, ssid):
         tr69_auto_ssid_dict = {}
         self.telnet_cli_session = self.login_nvg_599_cli()
@@ -4260,42 +4238,29 @@ class Nvg599Class(GatewayClass):
             'tr69 GetParameterValues InternetGatewayDevice.LANDevice.1.WLANConfiguration.' + ssid + '.')
         self.telnet_cli_session.expect("UNLOCKED>")
         tr69_auto_ssid_output= self.telnet_cli_session.before
-#
         channel_reg_ex = re.compile(r'Channel\s(\d+)')
         channel_match = channel_reg_ex.search(tr69_auto_ssid_output)
         channel = channel_match.group(1)
-
         ssid_reg_ex = re.compile(r'\.SSID\s+(\w+)')
         ssid_match = ssid_reg_ex.search(tr69_auto_ssid_output)
         ssid = ssid_match.group(1)
-
         default_ssid_reg_ex = re.compile(r'X_0000C5_DefaultSSID\s+(\w+)')
         default_ssid_match = default_ssid_reg_ex.search(tr69_auto_ssid_output)
         default_ssid = default_ssid_match.group(1)
-
        # X_0000C5_DefaultSSID
-
         key_pass_reg_ex = re.compile(r'X_0000C5_KeyPassphrase\s+(\w+)')
         key_pass_match = key_pass_reg_ex.search(tr69_auto_ssid_output)
         key_pass = key_pass_match.group(1)
-
         enable_reg_ex = re.compile(r'Enable\s(\w+)')
         enable_match = enable_reg_ex.search(tr69_auto_ssid_output)
         enable = enable_match.group(1)
-
-
         default_allowed_destinations_reg_ex = re.compile(r'X_ATT_AutoSetupAllowedDestinations\s+(\S+)')
         default_allowed_destinations_match = default_allowed_destinations_reg_ex.search(tr69_auto_ssid_output)
         default_allowed_destinations = default_allowed_destinations_match.group(1)
-
-
         default_allowed_ports_reg_ex = re.compile(r'X_ATT_AutoSetupAllowedPorts\s(\w+)')
         default_allowed_ports_match = default_allowed_ports_reg_ex.search(tr69_auto_ssid_output)
         default_allowed_ports = default_allowed_ports_match.group(1)
-
         print('returning SSID:' + str(ssid) + ' Status:' + str(enable))
-        # exit()
-
         tr69_auto_ssid_dict['enable'] = enable
         tr69_auto_ssid_dict['channel'] = channel
         tr69_auto_ssid_dict['ssid'] = ssid
@@ -4303,9 +4268,7 @@ class Nvg599Class(GatewayClass):
         tr69_auto_ssid_dict['password'] = key_pass
         tr69_auto_ssid_dict['default_allowed_destinations'] = default_allowed_destinations
         tr69_auto_ssid_dict['default_allowed_ports'] = default_allowed_ports
-
         return tr69_auto_ssid_dict
-
 
     def get_tr69_auto_ssid(self, ssid):
         self.telnet_cli_session = self.login_nvg_599_cli()
@@ -4428,4 +4391,3 @@ class Nvg599Class(GatewayClass):
 # palmer@palmer-Latitude-E5450:~$ sudo ifconfig  wlp2s0  up
 # palmer@palmer-Latitude-E5450:~$ sudo /etc/init.d/network-manager  start
 # [ ok ] Starting network-manager (via systemctl): network-manager.service.
-# palmer@palmer-Latitude-E5450:~$
