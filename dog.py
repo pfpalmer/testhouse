@@ -48,13 +48,56 @@ ALL_BAND5_CHANNELS = {36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112,
 #     test_status = "Pass"
 #     rf.write('Test ' + test_name + '\n')
 #     print('Test:' + test_name + '\n')
+
+def dfs_channel_change(nvg_599_dut,rf, rfa, test_name, start_5g_channel, end_5g_channel, airties_name = "None" ):
+    global NON_DFS_CHANNELS
+    global DFS_CHANNELS
+    test_status = "Pass"
+    rf.write('Test ' + test_name + ' Airties device:' + airties_name + '\n')
+    print('Test:' + test_name + '\n')
+    session = nvg_599_dut.session
+    home_link = session.find_element_by_link_text("Device")
+    home_link.click()
+    current_5g_channel = nvg_599_dut.get_ui_home_network_status_value("ui_channel_5g")
+    # var_type = type(current_5g_channel)
+    # print('type is:' + str(var_type))
+    if current_5g_channel != start_5g_channel:
+        nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, start_5g_channel)
+        print('setting channel to :' + start_5g_channel)
+    else:
+        print('current channel:' + current_5g_channel + ' equals start_channel: ' + start_5g_channel)
+
+    print('sleeping five minute to establish initial conditions')
+    sleep(300)
+    # we want the IP of the Airties we are going to ping
+    print('sleeping five minute to establish initial conditions')
+    print(' Airties: ' + airties_name + '\n')
+    print(' Airties:-------------------------------------------------------\n')
+
+    # nvg_599_dut.login_nvg_599_cli()
+    ip_lan_info_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
+    # first translate the device name to a mac using the
+    for x, y in ip_lan_info_dict.items():
+        print(x, y)
+    airties_ip = "0.0.0.0"
+
+    for device_mac in ip_lan_info_dict:
+        if airties_name == ip_lan_info_dict[device_mac]['Name']:
+            airties_ip = ip_lan_info_dict[device_mac]['IP']
+            print(' Airties ip:  ' + airties_ip + '\n')
+
+    if airties_ip == "0.0.0.0":
+        rf.write('    ' + 'Airties device not found in sh IP lan: Aborting \n')
+        print('   Airties device not found in sh IP lan: Aborting \n')
+        return "Fail"
+
+    print(' Airties ip: ' + airties_ip + '\n')
+    print(' This is before (1) \n')
+
+
 def trigger_dfs_channel_change(nvg_599_dut,rf, rfa, test_name, airties_name = "None" ):
     global NON_DFS_CHANNELS
     global DFS_CHANNELS
-    # nvg_599_dut.login_4920("192.168.1.72")
-    # sleep(10)
-    # exit()
-
     test_status = "Pass"
     rf.write('Test ' + test_name + ' Airties device:' + airties_name + '\n')
     print('Test:' + test_name + '\n')
@@ -73,7 +116,7 @@ def trigger_dfs_channel_change(nvg_599_dut,rf, rfa, test_name, airties_name = "N
         rf.write('    ' + result_str + '\n')
         print('this is a DFS channel:' + str(current_5g_channel))
     else:
-        print('this is a non DFS cahnnel,  Changing to DFS channel 100')
+        print('this is a non DFS channel,  Changing to DFS channel 100')
         # def ui_set_bw_channel(self, band, bandwidth, channel):
         # dfs_results_file.write("Changing to DFS channel 100, bandwidth 80\n")
         rf.write('    ' + 'Changing to DFS channel 100, bandwidth 80\n')
@@ -102,10 +145,8 @@ def trigger_dfs_channel_change(nvg_599_dut,rf, rfa, test_name, airties_name = "N
         # I think the 2 is to trgger radar on the 4920
         # nvg_599_dut.telnet_cli_session.sendline("wl -i eth1 radar 2")
         nvg_599_dut.telnet_cli_session.sendline("wl -i eth1 radar 2")
-
         sleep(10)
-    # elif airties_name == "Any":
-    #     pass
+
     else:
         print(' Airties: ' + airties_name + '\n')
         print(' Airties:-------------------------------------------------------\n')
@@ -863,8 +904,8 @@ def execute_factory_reset(nvg_599_dut,rf,rfa, test_name):
         return "Fail"
     else:
         sleep(200)
-        print('Test:' + test_name + ":" + reset_duration + '\n\n')
-        rf.write('     Test:' + test_name + ":" + reset_duration + '\n\n')
+        print('Reset duration:' + reset_duration + '\n\n')
+        rf.write('     Reset duration:' + reset_duration + '\n\n')
         return "Pass"
 
 def setup_auto_ssid_via_tr69(nvg_599_dut,ssid, max_clients,  rf, rfa, test_name):
@@ -1241,15 +1282,16 @@ def remote_manager_smoke(nvg_599_dut, rf, rfa, test_name):
     post_errs_regex = re.compile(r'n=\[(\d+)\]')
     post_errs_groups = post_errs_regex.search(post_errs_output)
     print(str(post_errs_groups.group(1)))
-    number_of_errs = post_errs_groups.group(1)
+    number_of_errs = int(post_errs_groups.group(1))
 
-    if number_of_errs != "0":
-         print('remote_manager_smoke fails test')
-         rf.write('     Found ' + number_of_errs + 'error, No errors are allowed: Fail\n\n')
-         test_status = "Fail"
+    # if number_of_errs != "0":
+    if number_of_errs > 1 :
+        print('remote_manager_smoke fails test')
+        rf.write('     Found ' + str(number_of_errs) + 'error, No errors are allowed: Fail\n\n')
+        test_status = "Fail"
     else:
         print('remote_manager_smoke passes test')
-        rf.write('     Found ' + number_of_errs + 'error, No errors are allowed: Pass\n\n')
+        rf.write('     Found ' + str(number_of_errs) + 'error, No errors are allowed: Pass\n\n')
     return test_status
 
 
@@ -1364,7 +1406,7 @@ def url_att_cca_smoke(nvg_599_dut, url_to_return, rf, rfa, test_name):
     else:
         print('cca5g text:' + cca5g_text.group(1))
         cca5g = cca5g_text.group(1)
-        print('cca file strings: "label" and "data" : found:Pass')
+        print('cca file strings: "label" and "data" : found:Pass\n')
         rf.write('     cca file strings:' + cca5g + ':found:Pass\n\n')
     return test_status
 
@@ -1801,9 +1843,10 @@ def load_airties_firmware(nvg_599_dut, rf, rfa, test_name, name_of_airties_or_an
     rf.write('Test ' + str(test_name) + '\n')
     test_status = "Pass"
     ip_list_4920 = nvg_599_dut.get_ip_list_of_4920s()
+    print(ip_list_4920)
     if len(ip_list_4920) == 0:
         print('no 4920 ip available, abort   \n')
-        rf.write('     No airties present in lan, aborting test.    :Fail\n')
+        rf.write('     No airties present in lan, aborting test.    :Not run\n\n')
         return
     print('ip:' + str(ip_list_4920[0]) + '\n')
 
@@ -1811,8 +1854,16 @@ def load_airties_firmware(nvg_599_dut, rf, rfa, test_name, name_of_airties_or_an
         airties_ip = ip_list_4920[0]
         uptime_before_reload = nvg_599_dut.get_4920_uptime(airties_ip)
         #nvg_599_dut.install_airties_firmware(airties_ip, "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin", rf, rfa)
+    else:
+        airties_ip = str(nvg_599_dut.get_4920_ip_from_named_4920(name_of_airties_or_any))
+        print('aaa_name:' + name_of_airties_or_any)
+        print('aaa_ip:' + airties_ip)
+        #airties_ip = ip_list_4920[0]
+        uptime_before_reload = nvg_599_dut.get_4920_uptime(airties_ip)
+        print('     uptime_before_reload:' + str(uptime_before_reload) + '\n')
+
         #print('     uptime_before_reload_reload:' + str(uptime_before_reload) + '\n')
-        rf.write('     uptime_before_reload:' + uptime_before_reload + '\n')
+        rf.write('     uptime_before_reload:' + str(uptime_before_reload) + '\n')
         nvg_599_dut.install_airties_firmware(airties_ip, firmware_to_load, rf, rfa)
         rf.write('     Installed firmware:' + firmware_to_load + '\n')
         print('     Installed firmware:' +  str(firmware_to_load) + '\n')
@@ -1821,26 +1872,9 @@ def load_airties_firmware(nvg_599_dut, rf, rfa, test_name, name_of_airties_or_an
         print('     Installed telnet enable  patch \n')
         uptime_after_reload_reload = nvg_599_dut.get_4920_uptime(airties_ip)
         print('     uptime_before_reload:' + str(uptime_before_reload) + '\n')
-        rf.write('     uptime_before_reload:' + uptime_before_reload + '\n')
+        rf.write('     uptime_before_reload:' + str(uptime_before_reload) + '\n')
         print('     uptime_after_reload_reload:' + str(uptime_after_reload_reload) + '\n')
-        rf.write('     uptime_after_reload:' + uptime_after_reload_reload + '\n')
-
-# nvg_599_dut.install_airties_firmware('192.168.1.68', '/home/palmer/Downloads/AirTies_Air4920US-AL_FW_2.49.2.20.7381.bin', rf, rfa)
-
-
-    # nvg_599_dut.install_airties_firmware('192.168.1.68', '/home/palmer/Downloads/AirTies_Air4920US-AL_FW_2.49.2.18.7197_FullImage.bin', rf, rfa)
-# def install_airties_firmware(nvg_599_dut, rf, rfa, test_name , airties_name_or_any, firmware_to_install):
-#     ip_list_4920 = nvg_599_dut.get_ip_list_of_4920s()
-#     if len(ip_list_4920) == 0:
-#         print('no 4920 ip available, abort   \n')
-#         rf.write('     No airties present in lan, aborting test.    :Fail\n')
-#     airties_ip = ip_list_4920[0]
-#     # wl_4920_dict = nvg_599_dut.get_4920_ssid(airties_ip)
-#     rf.write('     Logging in to airtis with IP' + airties_ip + '\n')
-#     # def install_airties_firmware(self, airties_ip, update_bin_file, rf, rfa):
-#     nvg_599_dut.install_airties_firmware(airties_ip, firmware_to_install, rf, rfa )
-
-
+        rf.write('     uptime_after_reload:' + str(uptime_after_reload_reload) + '\n')
 
 def verify_ssid_change_propagated_to_airties(nvg_599_dut, rf, rfa, test_name , ssid_parm, password_parm = "default123"):
     rf.write('Test ' + str(test_name) + '\n')
@@ -2312,7 +2346,172 @@ dogs = 'aaa bbb ccc ddd'
 # count_overlapping([[1, 5], [2, 5], [3, 6], [4, 5], [5, 6]], 2)
 # count_overlapping([[1, 5], [2, 5], [3, 6], [4, 5], [5, 6]], 1)
 import string
+def move(word):
+    #word_list = word.split()
+    word_list = list(word)
+    # print(word_list)
+    # exit()
+    # abc_list = string.ascii_lowercase
+    abc_string = 'abcdefghijklmnopqrstuvwxyz'
+    bcd_string = 'bcdefghijklmnopqrstuvwxyzA'
+    abc_list = list(abc_string)
+    bcd_list = list(bcd_string)
+    # bcd_list = abc_list.pop(0)
+    # bcd_list.append("z")
+    combined_list = zip(abc_list, bcd_list)
+    dict_list = dict(combined_list)
+    output_list = []
+    for i in word_list:
+        print(str(i))
+        output_list.append(dict_list[i])
+    print(output_list)
+    sep = ""
+    print('str:' + sep.join(output_list))
+    output_list = sep.join(output_list)
+    # exit()
+    return output_list
+
+
+def add_str_nums(num1, num2):
+    if num1.isdigit():
+        num1_int = int(num1)
+    else:
+        return -1
+
+    if num2.isdigit():
+        num2_int = int(num2)
+    else:
+        return -1
+
+    print(str(num1_int + num2_int))
+    return str(num1_int + num2_int)
+
+def compare_data(*args):
+    print(len(args))
+    if len(args) == 0 or len(args) == 1:
+        return True
+    print('1')
+
+    # exit()
+
+    # previous_arg = args[0]
+    first = True
+    previous = None
+    for i in args:
+        if first == True:
+            first = False
+            # print('22 previous:' + str(previous) + ' i:' + str(i))
+            previous = type(i)
+        else:
+            # print('33 previous:' + str(previous) + ' i:' + str(i))
+            if previous != type(i):
+                return False
+            else:
+                previous = type(i)
+    return True
+
+
+# add_str_nums('1','2')
+# move("hello")
+
+#
+# print(str(compare_data(1,[2],(3,4,4),"cat)")))
+# print(str(compare_data([2],[2])))
+#
+# a =1
+# b = 2
+# print(a == a)
+# print(a == b)
+#
+# exit()
 # patches
+def cap_to_front(s):
+    upper_list = []
+    lower_list = []
+    s_list = list(s)
+    for index, char in enumerate(s_list):
+        print(str(index)+ " --- " + str(char))
+        if char.isupper():
+            upper_list.append(char)
+        else:
+            lower_list.append(char)
+    print("  upper:" + str(upper_list))
+    print("join:" + ''.join(upper_list))
+    print("lower:" + str(lower_list))
+    print("joined:" + ''.join(upper_list) + ''.join(lower_list))
+    return ''.join(upper_list) + ''.join(lower_list)
+# print(cap_to_front("dOGo"))
+
+import subprocess
+# p = subprocess.Popen('ping 127.0.0.1')
+#p = subprocess.Popen(['ping','127.0.0.1','-c','1',"-W","2", "-D"])
+# ping_time_regex = re.compile(r'(\[(\d+.\d+\]))', re.DOTALL)
+ping_time_regex = re.compile(r'\[(\d+).+\]', re.DOTALL)
+initial_state = True
+
+if initial_state == True:
+    initial_state = False
+
+    #p = subprocess.check_output(['ping', '192.168.1.111', '-c', '1', "-D"]).decode("utf-8")
+    #ping_time = ping_time_regex.search(p)
+    #ping_time_str = ping_time.group(1)
+    ping_time_last_success_str = 0
+    while True:
+        try:
+            return_code = 0
+            # p = subprocess.check_output(['ping','128.0.0.1','-c','1',"-W","2", "-D"]).decode("utf-8")
+            # p = subprocess.check_output(['ping','192.168.1.72','-c','1',"-W","4","-D"], timeout=5).decode("utf-8")
+            p = subprocess.check_output(['ping','192.168.1.72','-c','1',"-W","4","-D"], timeout=5).decode("utf-8")
+
+            print('\n-----1\n')
+            print(p)
+            print('-----2\n')
+            ping_time = ping_time_regex.search(p)
+            # ping_last_time = ping_time
+            ping_time_last_success_str = ping_time.group(1)
+            print('ping_timestamp:' + ping_time.group(1) + 'return_code:' + str(return_code))
+            sleep(2)
+
+        except subprocess.CalledProcessError as e:
+            return_code = e.returncode
+            print('return_code:' + str(return_code))
+            print('failure:' + str(e.output))
+            p = str(e.output)
+            print('xxxxxxxxxxxxxxxxxxx', p)
+            #ping_time = ping_time_regex.search(p)
+            #ping_time_first_fail_str = ping_time.group(1)
+
+            if return_code == 0:
+                continue
+            else:
+                print('ping_last_successtime:' + str(ping_time_last_success_str))
+                # print('ping_first_fail:' + str(ping_time_first_fail_str))
+                # print('ping_time:' + str(ping_time))
+                break
+
+exit()
+
+# The -c means that the ping will stop afer 1 package is replied
+# and the -W 2 is the timelimit
+# test_string = p.wait()
+# print('----------------\n' + str(test_string))
+print('----------------\n' + str(p) + '\n\n')
+print('-------my rc---------\n' + str(my_rc) + '\n\n')
+
+
+# test_str = str(p.poll())
+#
+# print(str(p.poll()) + '\n')
+# print('---------1\n')
+# print(test_str)
+# print('---------2\n')
+
+# if p.poll():
+#     print('ping not ok')
+# else:
+#     print('ping ok')
+exit()
+
 with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     open('resultsa_file.txt', mode='w', encoding='utf-8') as rfa :
     now = datetime.today().strftime("%B %d, %Y,%H:%M")
@@ -2320,6 +2519,11 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
 
 
     nvg_599_dut = Nvg599Class()
+
+
+    dfs_channel_change(nvg_599_dut, rf, rfa, "dfs_channel_change", "100", "149","ATT_4920_8664D4")
+    exit()
+
     # nvg_599_dut.setup_tr69_url()
     # nvg_599_dut.login_eco()
     # steering_radio_names_integration_test(nvg_599_dut,rf,rfa,"steering_radio_names_integration_test")
@@ -2328,24 +2532,17 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
    #  def remote_manager_smoke(nvg_599_dut, rf, rfa, test_name):
 
 
-    remote_manager_smoke(nvg_599_dut, rf, rfa, "remote_manager_smoke")
-    result = string.ascii_lowercase
-    print(result)
-    exit()
-    url_att_cca_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/cca2G', rf, rfa, "url_att_cca5g_smoke")
-    url_att_cca_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/cca5G', rf, rfa, "url_att_cca2g_smoke")
 
-
+    # exit()
     # trigger_dfs_channel_change(nvg_599_dut, rf, rfa, 'trigger_dfs_channel_change_from_rg')
     # trigger_dfs_channel_change(nvg_599_dut, rf, rfa, 'trigger_dfs_channel_change_from_airties', "ATT_4920_8664D4")
 
 
-    exit()
-
-    # exit()
+    #
     # check_auto_defaults_via_tr69_cli(nvg_599_dut, '3', rf, rfa,  'check_auto_defaults_via_tr69_cli')
     # nvg_599_dut.get_auto_setup_ssid_via_tr69_cli('3')
     # nvg_599_dut.rg_setup_without_factory_reset(rf, rfa)
+    # exit()
     # home_ssid_conf, home_password_conf = nvg_599_dut.conf_home_network_ssid_and_password(rf, rfa, home_ssid="default", home_password="default")
     # def conf_auto_setup_ssid_via_tr69_cli(nvg_599_dut, auto_ssid_num, rf, rfa, test_name, max_clients=2):
     # (nvg_599_dut, '3', rf, rfa, 'set_auto_setup_ssid_via_tr69_cli')
@@ -2357,12 +2554,22 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     #nvg_599_dut.rg_setup_without_factory_reset(rf, rfa)
     # exit()
     # nvg_599_dut.tftp_get_file_cli("LP-PPALMER" , "AirTies_Air4920US-AL_FW_xxxxxxxxxxxx.bin", rf, rfa)
-    rf.write('RG Test run Firmware: nvg599-11.5.0h0d49_1.1.bin  Date:' + now +  '\n\n')
+    rf.write('RG Test run Firmware: nvg599-11.5.0h0d53_1.1.bin  Date:' + now +  '\n\n')
     rfa.write(now + '\n')
     sleep(2)
+
+    #load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin", "ATT_4920_8664D4", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin")
+    load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin", "ATT_4920_8664D4", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_2.33.1.2.2112_telnet_enabled_preinstall.bin")
+
+    # get_4920_ip_from_named_4920
+    # load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin")
+    exit()
+
     # execute_factory_reset(nvg_599_dut, rf, rfa, 'execute_factory_reset')
 
-    # tftp_rg_firmware_and_install(nvg_599_dut, "LP-PPALMER", "nvg599-11.5.0h0d49_1.1.bin", rf, rfa,"tftp_rg_firmware_and_install")
+    # tftp_rg_firmware_and_install(nvg_599_dut, "LP-PPALMER", "nvg599-11.5.0h0d53_1.1.bin", rf, rfa,"tftp_rg_firmware_and_install")
+
+
     ##  band5_peers_set_after_airties_association(nvg_599_dut, rf, rfa, "band5_peers_set_after_airties_associationn")athee
     # verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '3', 'ZipKey-PSK', 'Cirrent1', rf, rfa, "verify_auto_ssid_defaults_via_tr69")
     # ##############verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '4', 'ATTPOC', 'Ba1tshop', rf, rfa, "verify_auto_ssid_defaults_via_tr69")
@@ -2370,6 +2577,12 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     # deprecated conf_auto_setup_ssid_via_tr69_cli(nvg_599_dut, "4", rf, rfa, 'conf_auto_setup_ssid_via_tr69_cli')
 
     # def conf_auto_ssid_allowed_ip_and_allowed_port_via_tr69_cli(self, ssid_number, auto_allowed_ip, auto_allowed_port, rf, rfa):
+    remote_manager_smoke(nvg_599_dut, rf, rfa, "remote_manager_smoke")
+    # result = string.ascii_lowercase
+    # print(result)
+
+    url_att_cca_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/cca2G', rf, rfa, "url_att_cca5g_smoke")
+    url_att_cca_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/cca5G', rf, rfa, "url_att_cca2g_smoke")
 
     connect_to_auto_ssid(nvg_599_dut, "3", rf, rfa, "connect_to_auto_ssid", "22.33.44.55", "77")
     test_speedtest_from_android(nvg_599_dut, 'Galaxy-Note8', test_house_devices_static_info, 'test_speedtest_from_android ', rf, rfa)
@@ -2390,8 +2603,8 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     trigger_dfs_channel_change(nvg_599_dut, rf, rfa, 'trigger_dfs_channel_change_from_airties', "ATT_4920_8664D4")
     enable_auto_setup_ssid_via_tr69_cli(nvg_599_dut, '3', rf, rfa, 'conf_auto_setup_ssid_via_tr69_cli', 3)
     enable_auto_setup_ssid_via_tr69_cli(nvg_599_dut, '4', rf, rfa, 'conf_auto_setup_ssid_via_tr69_cli', 3)
-    load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin")
-    execute_factory_reset(nvg_599_dut, rf, rfa, "execute_factory_reset")
+    # load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin")
+    # execute_factory_reset(nvg_599_dut, rf, rfa, "execute_factory_reset")
     # load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin")
     # load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "AirTies_Air4920US-AL_FW_2.33.1.2.2112_telnet_enabled_preinstall.bin")
 

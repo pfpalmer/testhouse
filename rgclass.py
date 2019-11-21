@@ -599,6 +599,23 @@ class Nvg599Class(GatewayClass):
                 # Nvg599Class.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
         return airties_4920_ip_list
 
+    def get_4920_ip_from_named_4920(self, name_of_4920):
+        show_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
+        # # self.ip_lan_connections_dict_cli[connected_device_mac] = {}
+        # ip_lan_connections_dict_cli[connected_device_mac] = {}
+        # ip_lan_connections_dict_cli[connected_device_mac]["IP"] = connected_device_ip
+        # ip_lan_connections_dict_cli[connected_device_mac]["Name"] = connected_device_name
+        # ip_lan_connections_dict_cli[connected_device_mac]["State"] = connected_device_status
+        # ip_lan_connections_dict_cli[connected_device_mac]["DHCP"] = connected_device_dhcp
+        # ip_lan_connections_dict_cli[connected_device_mac]["Port"] = connected_device_port
+        # airties_4920_ip_list = []
+        for key in show_ip_lan_dict.keys():
+            if show_ip_lan_dict[key]["Name"] == name_of_4920:
+                print('found_name:' + str(show_ip_lan_dict[key]['Name']))
+                print('returning:' + str(show_ip_lan_dict[key]['IP']))
+                return show_ip_lan_dict[key]['IP']
+        return None
+
     # review this incomplete method
     def set_fixed_ip_allocation(self):
         # dianostics_link = browser.find_element_by_link_text("Diagnostics")
