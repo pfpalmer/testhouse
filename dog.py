@@ -2442,75 +2442,177 @@ def cap_to_front(s):
     return ''.join(upper_list) + ''.join(lower_list)
 # print(cap_to_front("dOGo"))
 
+
+
 import subprocess
-# p = subprocess.Popen('ping 127.0.0.1')
-#p = subprocess.Popen(['ping','127.0.0.1','-c','1',"-W","2", "-D"])
-# ping_time_regex = re.compile(r'(\[(\d+.\d+\]))', re.DOTALL)
-ping_time_regex = re.compile(r'\[(\d+).+\]', re.DOTALL)
-initial_state = True
 
-if initial_state == True:
-    initial_state = False
 
-    #p = subprocess.check_output(['ping', '192.168.1.111', '-c', '1', "-D"]).decode("utf-8")
-    #ping_time = ping_time_regex.search(p)
-    #ping_time_str = ping_time.group(1)
-    ping_time_last_success_str = 0
+# def connect_to_auto_ssid(nvg_599_dut, auto_ssid_num, rf, rfa, test_name, auto_allowed_ip, auto_allowed_port, max_clients = 2):
+
+
+def band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, test_name,  start_5g_channel, end_5g_channel, airties_name):
+
+    test_status = "Pass"
+    rf.write('Test ' + test_name + ' Airties device:' + airties_name + '\n')
+    print('Test:' + test_name + '\n')
+
+    rf.write('     Set channel to inial value: ' + start_5g_channel + '    :OK\n')
+
+    session = nvg_599_dut.session
+    home_link = session.find_element_by_link_text("Device")
+    home_link.click()
+    current_5g_channel = nvg_599_dut.get_ui_home_network_status_value("ui_channel_5g")
+    # var_type = type(current_5g_channel)
+    # print('type is:' + str(var_type))
+    if current_5g_channel != start_5g_channel:
+        nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, start_5g_channel)
+        print('setting channel to :' + start_5g_channel)
+        print('sleeping five minute to establish initial conditions')
+        sleep(300)
+    else:
+        print('current channel:' + current_5g_channel + ' equals start_channel: ' + start_5g_channel)
+
+    rf.write('     Set channel to inial value:' + start_5g_channel + '    :OK\n')
+
+    # # This is where we change channels
+    # print(' changing channels now Airties:-------------------------------------------------------\n')
+    # print(' changing  Airties channel now: ' + airties_name + ' to channel ' + str(end_5g_channel) +  '\n')
+
+    # nvg_599_dut.login_nvg_599_cli()
+    ip_lan_info_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
+    rf.write('     Change channel to:' + end_5g_channel + '    :OK\n')
+
+    # first translate the device name to a mac using the
+    for x, y in ip_lan_info_dict.items():
+        print(x, y)
+    airties_ip = "0.0.0.0"
+    ip_to_ping = "0.0.0.0"
+
+    for device_mac in ip_lan_info_dict:
+        if airties_name == ip_lan_info_dict[device_mac]['Name']:
+            airties_ip = ip_lan_info_dict[device_mac]['IP']
+            ip_to_ping = ip_lan_info_dict[device_mac]['IP']
+
+            print(' Airties ip:  ' + airties_ip + '\n')
+
+    if airties_ip == "0.0.0.0":
+        rf.write('    ' + 'Airties device not found in sh IP lan: Aborting \n')
+        print('   Airties device not found in sh IP lan: Aborting \n')
+        return "Fail"
+    rf.write('     Airties:' + airties_name + ' has IP:' +  str(ip_to_ping)  +  ':OK\n')
+
+    print(' Airties ip: ' + airties_ip + '\n')
+    print(' Initial band5 channel:' + start_5g_channel + ' set, now changing to  channel:' + end_5g_channel + '\n')
+
+    # nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, end_5g_channel)
+
+
+#-------------------------------------------
+
+    # home_link = session.find_element_by_link_text("Device")
+    # home_link.click()
+    # current_5g_channel = nvg_599_dut.get_ui_home_network_status_value("ui_channel_5g")
+    # # var_type = type(current_5g_channel)
+    # # print('type is:' + str(var_type))
+    # if current_5g_channel != start_5g_channel:
+    #     nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, start_5g_channel)
+    #     print('setting channel to :' + start_5g_channel)
+    # else:
+    #     print('current channel:' + current_5g_channel + ' equals start_channel: ' + start_5g_channel)
+    #
+    # print('sleeping five minute to establish initial conditions')
+    # sleep(300)
+    # we want the IP of the Airties we are going to ping
+
+    # nvg_599_dut.login_nvg_599_cli()
+    # ip_lan_info_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
+    # # first translate the device name to a mac using the
+    # for x, y in ip_lan_info_dict.items():
+    #     print(x, y)
+    # airties_ip = "0.0.0.0"
+    #
+    # for device_mac in ip_lan_info_dict:
+    #     if airties_name == ip_lan_info_dict[device_mac]['Name']:
+    #         airties_ip = ip_lan_info_dict[device_mac]['IP']
+    #         ip_to_ping = ip_lan_info_dict[device_mac]['IP']
+    #
+    #         print(' Airties ip:  ' + airties_ip + '\n')
+    #
+    # if airties_ip == "0.0.0.0":
+    #     rf.write('    ' + 'Airties device not found in sh IP lan: Aborting \n')
+    #     print('   Airties device not found in sh IP lan: Aborting \n')
+    #     return "Fail"
+    #
+    # print(' Airties ip: ' + airties_ip + '\n')
+
+        # ----------------------------------
+
+
+    ping_time_regex = re.compile(r'\[(\d+).+\]', re.DOTALL)
+    """ We go from the start state to the inital_ping_fail state"""
+    state = "start"
+    ping_time_last_success = 0
+    ping_time_after_failure = 0
     while True:
-        try:
-            return_code = 0
-            # p = subprocess.check_output(['ping','128.0.0.1','-c','1',"-W","2", "-D"]).decode("utf-8")
-            # p = subprocess.check_output(['ping','192.168.1.72','-c','1',"-W","4","-D"], timeout=5).decode("utf-8")
-            p = subprocess.check_output(['ping','192.168.1.72','-c','1',"-W","4","-D"], timeout=5).decode("utf-8")
+        if state == "start":
+            n = 0
+            while True:
+                try:
+                    # p = subprocess.check_output(['ping','192.168.1.71','-c','1',"-W","4","-D"], timeout=5).decode("utf-8")
+                    p = subprocess.check_output(['ping', ip_to_ping,'-c','1',"-W","4","-D"], timeout=5).decode("utf-8")
 
-            print('\n-----1\n')
-            print(p)
-            print('-----2\n')
-            ping_time = ping_time_regex.search(p)
-            # ping_last_time = ping_time
-            ping_time_last_success_str = ping_time.group(1)
-            print('ping_timestamp:' + ping_time.group(1) + 'return_code:' + str(return_code))
-            sleep(2)
+                    print('ping count:' + str(n) + '\n')
+                    n += 1
+                    print(p)
+                    ping_time = ping_time_regex.search(p)
+                    ping_time_last_success = ping_time.group(1)
+                    print('last ping_timestamp before failures:' + ping_time.group(1) + 'return_code:')
+                    sleep(1)
+                    if n == 10 :
+                        nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, end_5g_channel)
 
-        except subprocess.CalledProcessError as e:
-            return_code = e.returncode
-            print('return_code:' + str(return_code))
-            print('failure:' + str(e.output))
-            p = str(e.output)
-            print('xxxxxxxxxxxxxxxxxxx', p)
-            #ping_time = ping_time_regex.search(p)
-            #ping_time_first_fail_str = ping_time.group(1)
+                except subprocess.CalledProcessError as e:
+                    state = "initial_ping_fail"
+                    return_code = e.returncode
+                    print('return_code:' + str(state))
+                    break
 
-            if return_code == 0:
-                continue
-            else:
-                print('ping_last_successtime:' + str(ping_time_last_success_str))
-                # print('ping_first_fail:' + str(ping_time_first_fail_str))
-                # print('ping_time:' + str(ping_time))
-                break
+        elif state == "initial_ping_fail":
+            n = 0
+            while True:
+                try:
+                   #  p = subprocess.check_output(['ping','192.168.1.71','-c','1',"-W","4","-D"], timeout=5).decode("utf-8")
+                    p = subprocess.check_output(['ping', ip_to_ping,'-c','1',"-W","4","-D"], timeout=5).decode("utf-8")
+                    ping_time = ping_time_regex.search(p)
+                    ping_time_after_failure = ping_time.group(1)
+                    print('ping_timestamp:after failures: ' + ping_time.group(1) + 'return_code:')
+                    n += 1
+                    if n == 2:
+                        state = "done"
+                        sleep(1)
+                        break
 
-exit()
+                except subprocess.CalledProcessError as e:
+                    state = "initial_ping_fail"
+                    return_code = e.returncode
+                    print('state:' + state + " continuing...")
+                    sleep(1)
+        elif state == "done":
+            # we are done and have the times needed
+            break
+
+    print("after fail:" + str(ping_time_after_failure) + " last success:" + str(ping_time_last_success))
+
+    duration = int(ping_time_after_failure) - int(ping_time_last_success)
+
+    rf.write('     start time:' + ping_time_last_success + ' End time:' +  ping_time_after_failure  +  ':OK\n')
+    rf.write('     Duration:'  + str(duration) + ':OK\n\n')
+
+    print("duration:" + str(duration))
+    return duration
+
 
 # The -c means that the ping will stop afer 1 package is replied
-# and the -W 2 is the timelimit
-# test_string = p.wait()
-# print('----------------\n' + str(test_string))
-print('----------------\n' + str(p) + '\n\n')
-print('-------my rc---------\n' + str(my_rc) + '\n\n')
-
-
-# test_str = str(p.poll())
-#
-# print(str(p.poll()) + '\n')
-# print('---------1\n')
-# print(test_str)
-# print('---------2\n')
-
-# if p.poll():
-#     print('ping not ok')
-# else:
-#     print('ping ok')
-exit()
 
 with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     open('resultsa_file.txt', mode='w', encoding='utf-8') as rfa :
@@ -2519,6 +2621,19 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
 
 
     nvg_599_dut = Nvg599Class()
+
+
+    #def band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, test_name, start_5g_channel,
+                                                         # end_5g_channel, airties_name):
+
+    # band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, '5g airties channel change Non DFS to DFS ping recovery time', "149", "100", "ATT_4920_8664D4")
+    band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, '5g airties channel change Non DFS to Non DFS ping recovery time', "149", "48", "ATT_4920_8664D4")
+
+    exit()
+    band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, '5g airties channel change  DFS to Non DFS ping recovery time', "100", "149", "ATT_4920_8664D4")
+    band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, '5g airties channel change  DFS to  DFS ping recovery time', "100", "132", "ATT_4920_8664D4")
+
+    #band5_channel_change_ping_recovery_timer(nvg_599_dut, rf, rfa, "100", "149", "192.168.1.71")
 
 
     dfs_channel_change(nvg_599_dut, rf, rfa, "dfs_channel_change", "100", "149","ATT_4920_8664D4")

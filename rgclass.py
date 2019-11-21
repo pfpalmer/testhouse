@@ -609,12 +609,22 @@ class Nvg599Class(GatewayClass):
         # ip_lan_connections_dict_cli[connected_device_mac]["DHCP"] = connected_device_dhcp
         # ip_lan_connections_dict_cli[connected_device_mac]["Port"] = connected_device_port
         # airties_4920_ip_list = []
-        for key in show_ip_lan_dict.keys():
-            if show_ip_lan_dict[key]["Name"] == name_of_4920:
+        for key in show_ip_lan_dict:
+            if key["Name"] == name_of_4920:
                 print('found_name:' + str(show_ip_lan_dict[key]['Name']))
                 print('returning:' + str(show_ip_lan_dict[key]['IP']))
                 return show_ip_lan_dict[key]['IP']
         return None
+        for ip_lan_entry in show_ip_lan_dict:
+            if ("ATT_49" in show_ip_lan_dict[ip_lan_entry]['Name']) and (show_ip_lan_dict[ip_lan_entry]['State'] == "on"):
+                # if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
+                # print(ip_lan_entry)
+                # add this to a list which airties_4920
+                print('in for loop' + show_ip_lan_dict[ip_lan_entry]["IP"])
+                airties_4920_ip_list.append(show_ip_lan_dict[ip_lan_entry]["IP"])
+                # self.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
+                # Nvg599Class.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
+        return airties_4920_ip_list
 
     # review this incomplete method
     def set_fixed_ip_allocation(self):
