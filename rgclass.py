@@ -1,5 +1,6 @@
 # from itertools import count
 import subprocess
+from os.path import devnull
 from subprocess import Popen, PIPE
 from openpyxl import Workbook
 from pexpect import pxssh
@@ -2475,6 +2476,49 @@ class Nvg599Class(GatewayClass):
             # self.login_4920('192.168.1.67')
             self.check_if_wifi_warning_displayed()
             return self.session
+
+
+    # import sys
+    def get_ip_from_ping_url(self, url_to_ping):
+        print('get_ip_from_ping_url')
+        # cmd = "ping " + url_to_ping
+        # ping_url_regex = re.compile(r'\[(\d+).+\]', re.DOTALL)
+        ping_url_regex = re.compile(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})',re.DOTALL)
+        # ping_url_regex = re.compile(r'.*\d',re.DOTALL)
+        #ping_url_regex = re.compile(r'\(\d{1,3}\.',re.DOTALL)
+        try:
+            #p = subprocess.check_output(['ping', url_to_ping, '-c', '1']).decode("utf-8")
+            p = subprocess.check_output(['ping', url_to_ping, '-c', '1']).decode("utf-8")
+
+            # p = subprocess.check_output("ping " + url_to_ping +  "-c  1", shell = True, timeout=2).decode("utf-8")
+
+            #output = subprocess.check_output(cmd, shell=True                  print('ping count:' + str(n) + '\n')
+            print('---------------------------------')
+            print(p)
+            print('---------------------------------')
+            url_ip_group = ping_url_regex.search(p)
+            url_ip = url_ip_group.group(1)
+            print('url ip:' + str(url_ip))
+        except subprocess.CalledProcessError as e:
+            print('url ip  error exception:')
+        # cmd = "curl " + url_to_ping
+        # p = subprocess.check_output(['ping', url_to_ping, '-c', '1', "-W", "1", "-D"], timeout=5).decode("utf-8")
+        #pp = subprocess.call("clear")
+        url_ip = "8.8.8.8"
+        try:
+            pp = subprocess.check_output(["curl", url_ip], timeout=2).decode("utf-8")
+        except subprocess.CalledProcessError as e:
+            print('check_out  error exception:' + e.output())
+        # pp = subprocess.check_output("curl 8.8.8.8", shell=True, timeout=2)
+        print('---------------------------------')
+        print('----xxxxxxx-----------------------------')
+        exit()
+        pp = subprocess.check_call("clear", shell=True)
+        print(pp)
+        print('----xxnnnnnnnnxxxxx-----------------------------')
+        print('----xxnnnnnnnnxxxxx-----------------------------')
+        pp = subprocess.check_output(["curl", url_ip], timeout=2).decode("utf-8")
+        print(pp)
 
     def get_active_wifi_network_info(self):
         print('in get_active_wifi_network_info')

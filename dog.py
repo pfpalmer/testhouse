@@ -2424,7 +2424,6 @@ def compare_data(*args):
 # print(a == b)
 #
 # exit()
-# patches
 def cap_to_front(s):
     upper_list = []
     lower_list = []
@@ -2506,48 +2505,6 @@ def band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, test_
 
     # nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, end_5g_channel)
 
-
-#-------------------------------------------
-
-    # home_link = session.find_element_by_link_text("Device")
-    # home_link.click()
-    # current_5g_channel = nvg_599_dut.get_ui_home_network_status_value("ui_channel_5g")
-    # # var_type = type(current_5g_channel)
-    # # print('type is:' + str(var_type))
-    # if current_5g_channel != start_5g_channel:
-    #     nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, start_5g_channel)
-    #     print('setting channel to :' + start_5g_channel)
-    # else:
-    #     print('current channel:' + current_5g_channel + ' equals start_channel: ' + start_5g_channel)
-    #
-    # print('sleeping five minute to establish initial conditions')
-    # sleep(300)
-    # we want the IP of the Airties we are going to ping
-
-    # nvg_599_dut.login_nvg_599_cli()
-    # ip_lan_info_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
-    # # first translate the device name to a mac using the
-    # for x, y in ip_lan_info_dict.items():
-    #     print(x, y)
-    # airties_ip = "0.0.0.0"
-    #
-    # for device_mac in ip_lan_info_dict:
-    #     if airties_name == ip_lan_info_dict[device_mac]['Name']:
-    #         airties_ip = ip_lan_info_dict[device_mac]['IP']
-    #         ip_to_ping = ip_lan_info_dict[device_mac]['IP']
-    #
-    #         print(' Airties ip:  ' + airties_ip + '\n')
-    #
-    # if airties_ip == "0.0.0.0":
-    #     rf.write('    ' + 'Airties device not found in sh IP lan: Aborting \n')
-    #     print('   Airties device not found in sh IP lan: Aborting \n')
-    #     return "Fail"
-    #
-    # print(' Airties ip: ' + airties_ip + '\n')
-
-        # ----------------------------------
-
-
     ping_time_regex = re.compile(r'\[(\d+).+\]', re.DOTALL)
     """ We go from the start state to the inital_ping_fail state"""
     state = "start"
@@ -2560,7 +2517,6 @@ def band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, test_
                 try:
                     # p = subprocess.check_output(['ping','192.168.1.71','-c','1',"-W","4","-D"], timeout=5).decode("utf-8")
                     p = subprocess.check_output(['ping', ip_to_ping,'-c','1',"-W","4","-D"], timeout=5).decode("utf-8")
-
                     print('ping count:' + str(n) + '\n')
                     n += 1
                     print(p)
@@ -2568,8 +2524,9 @@ def band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, test_
                     ping_time_last_success = ping_time.group(1)
                     print('last ping_timestamp before failures:' + ping_time.group(1) + 'return_code:')
                     sleep(1)
-                    if n == 10 :
+                    if n == 1 :
                         nvg_599_dut.ui_set_band_bandwith_channel('5g', 80, end_5g_channel)
+                    sleep(1)
 
                 except subprocess.CalledProcessError as e:
                     state = "initial_ping_fail"
@@ -2612,7 +2569,147 @@ def band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, test_
     return duration
 
 
+# ping_url_regex = re.compile(r'.*\d',re.DOTALL)
+#ping_url_regex = re.compile(r'\(\d{1,3}\.', re.DOTALL)
+# p = "www.google.com123"
+# ping_url_regex = re.compile(r'(\d{1,3})', re.DOTALL)
+# #ping_url_regex = re.compile(r'\[(\d+).+\]', re.DOTALL)
+# url_ip_group = ping_url_regex.search(p)
+# url_ip = url_ip_group.group(1)
+# print('url ip:' + str(url_ip))
+# exit()
+#
+# try:
+#     # p = subprocess.check_output(['ping', url_to_ping, '-c', '1', "-W", "1", "-D"], timeout=5).decode("utf-8")
+#     # output = subprocess.check_output(cmd, shell=True                  print('ping count:' + str(n) + '\n')
+#     print('---------------------------------')
+#     #print(p)
+#     print('---------------------------------')
+#
+#
+#     p = "www.google.com"
+#
+#     # p = "PING www.google.com (172.217.12.36) 56(84) bytes of data.[1574452795.248952] 64 bytes from dfw28s04-in-f4.1e100.net (172.217.12.36): icmp_seq=1 ttl=52 time=13.1 ms"
+#
+#     url_ip_group = ping_url_regex.search(p)
+#     url_ip = url_ip_group.group(1)
+#     print('url ip:' + str(url_ip))
+# except subprocess.CalledProcessError as e:
+#     print('url ip  error exception:')
+
 # The -c means that the ping will stop afer 1 package is replied
+# patches
+
+def chatroom_status(users):
+    if len(users) == 0:
+        print("no users")
+        return("no one online")
+    elif len(users) == 1 :
+        print("1 users")
+        return(users[0] + " online")
+    elif len(users) == 2:
+        return (users[0] + " and " + users[1] + " online")
+    elif len(users) > 2 :
+        numusers = len(users) - 2
+        mylist = []
+        #my_list.append(users[0])
+        my_string = users[0] + ", " + users[1] + " and " + str(numusers) +  " more online"
+        # my_string = str(users[0])
+        print(my_string)
+        # return (users[0] + " , " + users[1]) + "and " + numusers +   " online"
+        return my_string
+
+
+# chatroom_status(["pap_ier44", "townieBOY", "panda321", "motor_bike5", "sandwichmaker833", "violinist91"])
+
+def unique_sort(lst):
+    list_set = set(lst)
+    list_list = list(list_set)
+
+    # list_list = list_list.sort()
+    print(type(list_list))
+    list_list.sort()
+    return list_list
+
+    # exit()
+
+    # new_list = list(list_set)
+    # return new_list.sort()
+
+# exit()
+# unique_sort([1, 4, 4, 4, 4, 4, 3, 2, 1, 2])
+# exit()
+
+def unique_abbrev(abbs, words):
+    words_dict = {}
+    for word in words:
+        words_dict[word] = 0
+
+    for k in words_dict:
+        for ab in abbs:
+            if k.startswith(ab):
+                words_dict[k] = words_dict[k] + 1
+
+    for k in words_dict:
+        if words_dict[k] > 1 :
+            return False
+    return True
+
+# print(unique_abbrev(["ho", "h", "ha"], ["house", "hope", "happy"]))
+# print(unique_abbrev(["b", "c", "ch"], ["broth", "chap", "cardigan"]))
+# print(unique_abbrev(["to", "too", "t"], ["topology", "took", "torrent"]))
+# print(unique_abbrev(["bi", "ba", "bat"], ["big", "bard", "battery"]))
+
+# exit()
+
+def lines_are_parallel(l1, l2):
+    if l1[1] == l2[1]:
+        # print("a\n")
+        return True
+    else:
+        new_list = [ -int(i) for i in l2]
+        if l1[1] == new_list[1]:
+            # print("b\n")
+            #print(str(new_list))
+            return True
+        else:
+            return False
+
+
+# Test.assert_equals(lines_are_parallel([1,2,3], [1,2,4]), True, "Given example 1.")
+# Test.assert_equals(lines_are_parallel([2,4,1], [4,2,1]), False, "Given example 2.")
+# Test.assert_equals(lines_are_parallel([0,1,5], [0,1,5]), True, "Given example 3.")
+# Test.assert_equals(lines_are_parallel([2,5,0], [20,50,10]), True)
+# Test.assert_equals(lines_are_parallel([2,5,0], [-200,-500,10]), True)
+# Test.assert_equals(lines_are_parallel([400000,1,0], [400000,2,0]), False)
+# Test.assert_equals(lines_are_parallel([800,20,0], [40,20,0]), False)
+# Test.assert_equals(lines_are_parallel([400000,1,0], [800000,2,100000]), True)
+# Test.assert_equals(lines_are_parallel([-5,7,100000], [5,-7,-200000]), True)
+
+# print(lines_are_parallel([1,2,3], [1,2,4]))
+# print(lines_are_parallel([2,4,1], [4,2,1]))
+# print(lines_are_parallel([0,1,5], [0,1,5]))
+# print(lines_are_parallel([2,5,0], [20,50,10]))
+# print(lines_are_parallel([2,5,0], [-200,-500,10]))
+# print(lines_are_parallel([400000,1,0], [400000,2,0]))
+# print(lines_are_parallel([800,20,0], [40,20,0]))
+# print(lines_are_parallel([400000,1,0], [800000,2,100000]))
+# print(lines_are_parallel([-5,7,100000], [5,-7,-200000]))
+#
+# exit()
+# def alphabet_soup(txt):
+#     new_list = [x for x in txt]
+#     new_list.sort()
+#     # super_new_list = new_list.join("")
+#     super_new_str = "".join(new_list)
+#
+#
+#     # print(super_new_list)
+#     return super_new_str
+#
+# alphabet_soup("gof")
+#
+# exit()
 
 with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     open('resultsa_file.txt', mode='w', encoding='utf-8') as rfa :
@@ -2621,6 +2718,13 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
 
 
     nvg_599_dut = Nvg599Class()
+    execute_factory_reset(nvg_599_dut, rf, rfa, 'execute_factory_reset')
+    exit()
+
+    # def get_ip_from_ping_url(self, url_to_ping):
+    # nvg_599_dut. go_outside("www.google.com")
+
+    # exit()
 
 
     #def band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, test_name, start_5g_channel,
@@ -2629,7 +2733,7 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     # band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, '5g airties channel change Non DFS to DFS ping recovery time', "149", "100", "ATT_4920_8664D4")
     band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, '5g airties channel change Non DFS to Non DFS ping recovery time', "149", "48", "ATT_4920_8664D4")
 
-    exit()
+    #exit()
     band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, '5g airties channel change  DFS to Non DFS ping recovery time', "100", "149", "ATT_4920_8664D4")
     band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, '5g airties channel change  DFS to  DFS ping recovery time', "100", "132", "ATT_4920_8664D4")
 
@@ -2637,7 +2741,7 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
 
 
     dfs_channel_change(nvg_599_dut, rf, rfa, "dfs_channel_change", "100", "149","ATT_4920_8664D4")
-    exit()
+    # exit()
 
     # nvg_599_dut.setup_tr69_url()
     # nvg_599_dut.login_eco()
