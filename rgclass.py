@@ -84,7 +84,8 @@ airties_4920_defaults = {
                           'state': 'None', 'default_ssid': 'AirTies_SmartMesh_4PNF', 'default_pw': 'kykfmk8997',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', 'ip': 'None',
                           'device_test_name': 'airties_1_5g', 'name': 'ATT_4920_8664D4', 'location': 'master_bedroom'},
-    '88:41:FC:C3:56:C2': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', 'band': '2',
+    '88:41:FC:C3:56:C2': {'device_type': 'airties_4920', 'oper_sys': 'tbd', 'radio': 'abg', ''
+                                                                                            'band': '2',
                           'state': 'None', 'default_ssid': 'AirTies_Air4920_33N3', 'default_pw': 'wthchc7344',
                           'address_type': 'None', 'port': 'None', 'ssid': 'None', 'rssi': 'None', ' ip': 'None',
                           'device_test_name': 'airties_2_2g', 'name': 'ATT_4920_C356C0', 'location': 'master_bedroom'},
@@ -324,7 +325,7 @@ class Nvg599Class(GatewayClass):
     # Should combine these two methods
     def set_all_4920s_to_factory_default(self):
         # show_ip_lan_dict = self.get_rg_sh_ip_lan_info_cli()
-        show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(self)
+        show_ip_lan_dict = Nvg599Class.get_rg_ip_lan_info_dict(self)
         # airties_4920_ip_list = []
         for ip_lan_entry in show_ip_lan_dict:
             if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
@@ -537,8 +538,8 @@ class Nvg599Class(GatewayClass):
 
     def set_4920_ip_list_to_factory_default(self):
         # air_ties_ip_list = []
-        #show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(self)
-        show_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
+        #show_ip_lan_dict = Nvg599Class.get_rg_ip_lan_info_dict(self)
+        show_ip_lan_dict = self.get_rg_ip_lan_info_dict()
 
         # airties_4920_ip_list = []
         for ip_lan_entry in show_ip_lan_dict:
@@ -574,7 +575,7 @@ class Nvg599Class(GatewayClass):
 # the only names are:  ATT_4920_C356C0  or ATT_4920_8664D4
 # patches1
     def get_connected_airties_ip_from_name(self, airties_name):
-        show_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
+        show_ip_lan_dict = self.get_rg_ip_lan_info_dict()
         airties_4920_ip_list = []
         for ip_lan_entry in show_ip_lan_dict:
             # names are:  ATT_4920_C356C0  or ATT_4920_8664D4
@@ -586,8 +587,24 @@ class Nvg599Class(GatewayClass):
                 print('named airties device:' + str(airties_name) + 'not assciated to RG \n')
                 return "0.0.0.0"
 
+    def get_active_airties_dict(self):
+        show_ip_lan_dict = self.get_rg_ip_lan_info_dict()
+        airties_4920_ip_dict = {}
+        for ip_lan_entry in show_ip_lan_dict:
+            if ("ATT_49" in show_ip_lan_dict[ip_lan_entry]['Name']) and (
+                    show_ip_lan_dict[ip_lan_entry]['State'] == "on"):
+                # # if "ATT_4920" in show_ip_lan_dict[ip_lan_entry]["Name"]:
+                # # print(ip_lan_entry)
+                # # add this to a list which airties_4920
+                # print('in for loop' + show_ip_lan_dict[ip_lan_entry]["IP"])
+                # airties_4920_ip_dict.append(show_ip_lan_dict[ip_lan_entry]["IP"])
+                # # self.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
+                # # Nvg599Class.set_4920_to_factory_default(show_ip_lan_dict[ip_lan_entry]["IP"])
+                pass
+        return airties_4920_ip_dict
+
     def get_ip_list_of_4920s(self):
-        show_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
+        show_ip_lan_dict = self.get_rg_ip_lan_info_dict()
         airties_4920_ip_list = []
         for ip_lan_entry in show_ip_lan_dict:
             if ("ATT_49" in show_ip_lan_dict[ip_lan_entry]['Name']) and (show_ip_lan_dict[ip_lan_entry]['State'] == "on"):
@@ -601,7 +618,7 @@ class Nvg599Class(GatewayClass):
         return airties_4920_ip_list
 
     def get_4920_ip_from_named_4920(self, name_of_4920):
-        show_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
+        show_ip_lan_dict = self.get_rg_ip_lan_info_dict()
         # # self.ip_lan_connections_dict_cli[connected_device_mac] = {}
         # ip_lan_connections_dict_cli[connected_device_mac] = {}
         # ip_lan_connections_dict_cli[connected_device_mac]["IP"] = connected_device_ip
@@ -1585,7 +1602,7 @@ class Nvg599Class(GatewayClass):
         test_status = 'Pass'
         telnet_cli_session = self.login_nvg_599_cli()
         # nvg_599_dut.login_nvg_599_cli()
-        ip_lan_info_dict = self.cli_sh_rg_ip_lan_info()
+        ip_lan_info_dict = self.get_rg_ip_lan_info_dict()
         server_ip = "0.0.0.0"
 
         # ip_lan_connections_dict_cli[connected_device_mac] = {}
@@ -3522,9 +3539,9 @@ class Nvg599Class(GatewayClass):
         print('in tftp_get_file \n\n')
         rf.write('    getting TFTP file:' + firmware_to_get + ' from server:' + tftp_server_name )
         rfa.write('   for future use:' )
-        show_ip_lan_dict = self.cli_sh_rg_ip_lan_info()
+        show_ip_lan_dict = self.get_rg_ip_lan_info_dict()
         print('show_ip_lan_dict:' + str(show_ip_lan_dict) + '\n\n')
-        # show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(self)
+        # show_ip_lan_dict = Nvg599Class.get_rg_ip_lan_info_dict(self)
         source_device_ip = 0
         for ip_lan_entry in show_ip_lan_dict:
             print('remote_source: ' + str(tftp_server_name) + 'Name:' + str(
@@ -4250,7 +4267,7 @@ class Nvg599Class(GatewayClass):
         mo1 = status_info_reg_ex.search(status_output)
         return mo1.group(2)
 
-    def cli_sh_rg_ip_lan_info(self):
+    def get_rg_ip_lan_info_dict(self):
         telnet_cli_session =self.login_nvg_599_cli()
         # telnet_cli_session = Nvg599Class.static_login_nvg_599_cli()
         #  = Nvg599Class.login_nvg_599_cli(self)

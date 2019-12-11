@@ -75,7 +75,7 @@ def dfs_channel_change(nvg_599_dut,rf, rfa, test_name, start_5g_channel, end_5g_
     print(' Airties:-------------------------------------------------------\n')
 
     # nvg_599_dut.login_nvg_599_cli()
-    ip_lan_info_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
+    ip_lan_info_dict = nvg_599_dut.get_rg_ip_lan_info_dict()
     # first translate the device name to a mac using the
     for x, y in ip_lan_info_dict.items():
         print(x, y)
@@ -152,7 +152,7 @@ def trigger_dfs_channel_change(nvg_599_dut,rf, rfa, test_name, airties_name = "N
         print(' Airties:-------------------------------------------------------\n')
 
         # nvg_599_dut.login_nvg_599_cli()
-        ip_lan_info_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
+        ip_lan_info_dict = nvg_599_dut.get_rg_ip_lan_info_dict()
         # first translate the device name to a mac using the
         for x, y in ip_lan_info_dict.items():
             print(x, y)
@@ -269,7 +269,7 @@ def tst_ping_ip(nvg_599_dut, ping_history_file, remote_ip):
         print(traceback.format_exc())
 
 def test_ping_device_name(nvg_599_dut, device_name_to_ping):
-    sh_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(nvg_599_dut)
+    sh_ip_lan_dict = Nvg599Class.get_rg_ip_lan_info_dict(nvg_599_dut)
     print('dict type' + str(type(sh_ip_lan_dict)))
     for key in sh_ip_lan_dict:
         # print('key----------------------------------------------' + key)
@@ -850,7 +850,7 @@ def test_speedtest_from_android(nvg_599_dut, device_name, test_house_devices_sta
     #         break
 
     # nvg_599_dut.login_nvg_599_cli()
-    ip_lan_info_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
+    ip_lan_info_dict = nvg_599_dut.get_rg_ip_lan_info_dict()
     # first translate the device name to a mac using the
 
     for x, y in ip_lan_info_dict.items():
@@ -1012,7 +1012,7 @@ def ping_gw_from_4920(nvg_599_dut,rf,rfa, test_name, airties_ip = 'Default'):
     # this is not needed here
     ip_4920 = "None"
     if airties_ip == 'Default':
-        ip_lan_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
+        ip_lan_dict = nvg_599_dut.get_rg_ip_lan_info_dict()
         for dict_key in ip_lan_dict:
             if ("ATT_49" in ip_lan_dict[dict_key]['Name']) and (ip_lan_dict[dict_key]['State'] == "on"):
                 ip_4920 = ip_lan_dict[dict_key]["IP"]
@@ -1055,7 +1055,7 @@ def ping_airties_from_rg(nvg_599_dut,rf, rfa, test_name, airties_ip = 'Default')
     # this is not needed here
     ip_4920 = "None"
     if airties_ip == 'Default':
-        ip_lan_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
+        ip_lan_dict = nvg_599_dut.get_rg_ip_lan_info_dict()
         for dict_key in ip_lan_dict:
             if ("ATT_49"  in ip_lan_dict[dict_key]['Name']) and (ip_lan_dict[dict_key]['State'] == "on"):
                 ip_4920 = ip_lan_dict[dict_key]["IP"]
@@ -1131,7 +1131,7 @@ def verify_airties_hello_packet_count_increasing(nvg_599_dut,rf, rfa, test_name,
     # this is not needed here
     ip_4920 = "None"
     if airties_ip == 'Default':
-        ip_lan_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
+        ip_lan_dict = nvg_599_dut.get_rg_ip_lan_info_dict()
         for dict_key in ip_lan_dict:
             if ("ATT_49"  in ip_lan_dict[dict_key]['Name']) and (ip_lan_dict[dict_key]['State'] == "on"):
                 ip_4920 = ip_lan_dict[dict_key]["IP"]
@@ -1568,7 +1568,7 @@ def local_to_remote_ping(nvg_599_dut, rf, rfa, remote_ip, test_name, number_of_p
 # sleep(30)
 # def ui_set_wifi_password(self, security, password):
 
-#def cli_sh_rg_ip_lan_info(self):
+#def get_rg_ip_lan_info_dict(self):
 #ip_lan_connections_dict_cli
 # Galaxy-S9
 
@@ -1805,9 +1805,39 @@ def enable_guest_network_and_set_passwords(self, rf, rfa, test_name, ssid_passwo
 # #names are:  ATT_4920_C356C0  or ATT_4920_8664D4
 #     def get_ip_connected_airties_by_name(self,airties_name):
 #
+# ddogg
+
 def set_airties_to_factory_default(nvg_599_dut, rf, rfa, test_name, name_of_4920_or_any):
     # def get_ip_connected_airties_by_name(self,airties_name):
     # names are:  ATT_4920_C356C0  or ATT_4920_8664D4
+    airties_ip = None
+    ip_lan_dict = nvg_599_dut.get_rg_ip_lan_info_dict()
+
+    ip_list_4920 = nvg_599_dut.get_ip_list_of_4920s()
+    if len(ip_list_4920) == 0:
+        print('no 4920 ip available, abort   \n')
+        rf.write('     No airties present in lan, aborting test.    :Fail\n')
+        rf.write('     Failed to connect  to changed home ssid.    :Fail\n')
+        rf.write('     No airties devices detected' + '\n')
+        return "Fail"
+
+
+    if name_of_4920_or_any == "any":
+        airties_ip = ip_list_4920[0]
+        print("ip_any:" + airties_ip)
+        # the else we check to se if the named airties deive is on the list
+    else:
+
+
+        ip_list_4920 = nvg_599_dut.get_ip_list_of_4920s()
+        if len(ip_list_4920) == 0:
+            print('no 4920 ip available, abort   \n')
+            rf.write('     No airties present in lan, aborting test.    :Fail\n')
+            rf.write('     Failed to connect  to changed home ssid.    :Fail\n')
+            rf.write('     No airties devices detected' + '\n')
+            return "Fail"
+        else:
+            pass
 
     nvg_599_dut.get_connected_airties_ip_from_name(name_of_4920_or_any)
 
@@ -1817,6 +1847,7 @@ def set_airties_to_factory_default(nvg_599_dut, rf, rfa, test_name, name_of_4920
         rf.write('     No airties present in lan, aborting test.    :Fail\n')
         rf.write('     Failed to connect  to changed home ssid.    :Fail\n')
         rf.write('     No airties devices detected' + '\n')
+    # static_reset_4920()
     #  ip_4920 = ip_list_4920[0]
     #wl_4920_dict = nvg_599_dut.get_4920_ssid(ip_4920)
     # rf.write('     Logging in to airtis with IP' + ip_4920 + '\n')
@@ -2478,7 +2509,7 @@ def band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, test_
     # print(' changing  Airties channel now: ' + airties_name + ' to channel ' + str(end_5g_channel) +  '\n')
 
     # nvg_599_dut.login_nvg_599_cli()
-    ip_lan_info_dict = nvg_599_dut.cli_sh_rg_ip_lan_info()
+    ip_lan_info_dict = nvg_599_dut.get_rg_ip_lan_info_dict()
     rf.write('     Change channel to:' + end_5g_channel + '    :OK\n')
 
     # first translate the device name to a mac using the
@@ -2711,6 +2742,120 @@ def lines_are_parallel(l1, l2):
 #
 # exit()
 
+def factor_chain(lst):
+    for lst_item in lst:
+        if len(lst) == 1 :
+            return True
+        if len(lst) == 2 :
+            previous = lst[lst_item]
+            if lst[i + 1] % previous:
+                return False
+            else:
+                return True
+
+    pass
+
+# dog_list1 = ["a","b","c"]
+#
+# for i in range(5):
+#      print(i)
+# exit()
+
+def list_of_multiples (num, length):
+    # adjust length so length list can be used as multiples
+    comp_test = [x+1 for x in range(length)]
+    my_list = []
+    for i in comp_test:
+        my_list.append(i*num)
+    return my_list
+
+
+# print(list_of_multiples(10,5))
+
+#my_list = [1,2,3]
+
+# comp_test = [x+1 for x in range(5)]
+#
+# for i in comp_test:
+#      print(i)
+# exit()
+
+
+
+#start
+#import copy
+from copy import deepcopy
+def objectToArray (obj):
+    my_list = []
+    my_list_entry = []
+    for key,value in obj.items():
+        #print('key:' + str(key) + ' ')
+        #print('value:' + str(value))
+        my_list_entry.append(deepcopy(key))
+        my_list_entry.append(deepcopy(value))
+        print('my list entry:' + str(my_list_entry))
+        my_list.append(deepcopy(my_list_entry))
+        print('my list:' + str(my_list))
+        my_list_entry.clear()
+    return my_list
+
+#my_dict = {'D':1, 'B':2, 'C':3}
+#print('\n')
+#print('final:' + str(objectToArray(my_dict)))
+#exit()
+
+# Test.assert_equals(no_duplicate_letters("Easy does it."), True)
+# Test.assert_equals(no_duplicate_letters("So far, so good."), False)
+# Test.assert_equals(no_duplicate_letters("Better late than never."), False)
+# Test.assert_equals(no_duplicate_letters("Beat around the bush."), True)
+# Test.assert_equals(no_duplicate_letters("Give them the benefit of the doubt."), False)
+# Test.assert_equals(no_duplicate_letters("Your guess is as good as mine."), False)
+# Test.assert_equals(no_duplicate_letters("Make a long story short."), True)
+# Test.assert_equals(no_duplicate_letters("Go back to the drawing board."), True)
+# Test.assert_equals(no_duplicate_letters("Wrap your head around something."), True)
+# Test.assert_equals(no_duplicate_letters("Get your act together."), False)
+# Test.assert_equals(no_duplicate_letters("To make matters worse."), False)
+# Test.assert_equals(no_duplicate_letters("No pain, no gain."), True)
+# Test.assert_equals(no_duplicate_letters("We'll cross that bridge when we come to it."), False)
+# Test.assert_equals(no_duplicate_letters("Call it a day."), False)
+# Test.assert_equals(no_duplicate_letters("It's not rocket science."), False)
+# Test.assert_equals(no_duplicate_letters("A blessing in disguise."), False)
+# Test.assert_equals(no_duplicate_letters("Get out of hand."), True)
+# Test.assert_equals(no_duplicate_letters("A dime a dozen."), True)
+# Test.assert_equals(no_duplicate_letters("Time flies when you're having fun."), True)
+# Test.assert_equals(no_duplicate_letters("The best of both worlds."), True)
+# Test.assert_equals(no_duplicate_letters("Speak of the devil."), True)
+# Test.assert_equals(no_duplicate_letters("You can say that again."), False)
+
+
+def no_duplicate_letters(phrase):
+  # phrase = re.sub(r'[^a-zA-Z ]','',phrase)
+  return_status = True
+  my_word_list = phrase.split(" ")
+  for word in my_word_list:
+    # get rid of any non apha chars
+    word = re.sub(r'[^a-zA-Z]', '', word)
+
+    word_list = list(word)
+    # my_letter_list = word.split()
+    print(str(word) + ' ')
+    if len(word_list) != len(set(word_list)):
+      return_status = False
+  return return_status
+
+
+# print(str(no_duplicate_letters("easy does it")))
+
+
+
+#my_list = [1,2,3,4,5]
+#my_set_from_list = len(set(my_list))
+#print('set_from_list:' + str(my_set_from_list))
+
+# my_set = (1,2,3,4,5)
+# print(len(my_set))
+exit()
+
 with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     open('resultsa_file.txt', mode='w', encoding='utf-8') as rfa :
     now = datetime.today().strftime("%B %d, %Y,%H:%M")
@@ -2857,7 +3002,7 @@ if send_email == 1:
     #     cli_session.expect("ogin:")
     # def set_all_4920s_to_factory_default(self):
     #     # show_ip_lan_dict = self.get_rg_sh_ip_lan_info_cli()
-    #     show_ip_lan_dict = Nvg599Class.cli_sh_rg_ip_lan_info(self)
+    #     show_ip_lan_dict = Nvg599Class.get_rg_ip_lan_info_dict(self)
     # this works----------------------------------------------------------------------------
     # nvg_599_dut.tftp_get_file_cli('LP-PPALMER', 'AirTies_7381.bin', rf, rfa)
     # nvg_599_dut.install_airties_firmware('192.168.1.68', '/home/palmer/Downloads/AirTies_Air4920US-AL_FW_2.49.2.18.7197_FullImage.bin', rf, rfa)
@@ -3508,7 +3653,7 @@ band2, guest, band5 = nvg_599_dut.get_ui_ssid()
 print('band 2: '+ band2 + '  guest: '+ guest + '  band5: ' + band5)
 
 exit()
-show_ip_lan_dict = nvg_599_dut.cli_sh_rg_ip_lan_info_cli()
+show_ip_lan_dict = nvg_599_dut.get_rg_ip_lan_info_dict()
 
 print(type(show_ip_lan_dict))
 pprint.pprint(show_ip_lan_dict, width = 1)
