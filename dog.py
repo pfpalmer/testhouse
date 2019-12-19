@@ -109,6 +109,10 @@ def trigger_dfs_channel_change(nvg_599_dut,rf, rfa, test_name, airties_name = "N
     var_type = type(current_5g_channel)
     print('type is:' + str(var_type))
 
+    # airties_cli_session = nvg_599_dut.login_4920("192.168.1.72")
+    # exit()
+    # nvg_599_dut.login_nvg_599_cli()
+
     print('current_5g_channel' + current_5g_channel + '\n')
     if current_5g_channel in DFS_CHANNELS:
         result = "Current 5G:" + current_5g_channel + " is a DFS channel"
@@ -146,6 +150,7 @@ def trigger_dfs_channel_change(nvg_599_dut,rf, rfa, test_name, airties_name = "N
         # nvg_599_dut.telnet_cli_session.sendline("wl -i eth1 radar 2")
         nvg_599_dut.telnet_cli_session.sendline("wl -i eth1 radar 2")
         sleep(10)
+        nvg_599_dut.telnet_cli_session.close()
 
     else:
         print(' Airties: ' + airties_name + '\n')
@@ -170,7 +175,7 @@ def trigger_dfs_channel_change(nvg_599_dut,rf, rfa, test_name, airties_name = "N
 
         print(' Airties ip: ' +  airties_ip + '\n')
         print(' This is before (1) \n')
-
+        sleep(60)
         # this doesn't work afer the commit button is pressed for some reason
         airties_cli_session =  nvg_599_dut.login_4920(airties_ip)
         print(' This is a airties session:' + str(airties_cli_session) +  '\n')
@@ -1518,9 +1523,6 @@ def tftp_rg_firmware_and_install(nvg_599_dut, tftp_server_name, rg_firmware, rf,
         # return test_status
     return test_status
 
-
-# Patches2
-
 def enable_auto_setup_ssid_via_tr69_cli(nvg_599_dut, ssid_number, max_clients, rf, rfa, test_name):
     rf.write('Test ' + str(test_name) + '\n')
     test_status = nvg_599_dut.enable_auto_setup_ssid_via_tr69_cli(ssid_number, max_clients, rf, rfa)
@@ -1892,8 +1894,7 @@ def load_airties_firmware(nvg_599_dut, rf, rfa, test_name, name_of_airties_or_an
         #airties_ip = ip_list_4920[0]
         uptime_before_reload = nvg_599_dut.get_4920_uptime(airties_ip)
         print('     uptime_before_reload:' + str(uptime_before_reload) + '\n')
-
-        #print('     uptime_before_reload_reload:' + str(uptime_before_reload) + '\n')
+        # print('     uptime_before_reload_reload:' + str(uptime_before_reload) + '\n')
         rf.write('     uptime_before_reload:' + str(uptime_before_reload) + '\n')
         nvg_599_dut.install_airties_firmware(airties_ip, firmware_to_load, rf, rfa)
         rf.write('     Installed firmware:' + firmware_to_load + '\n')
@@ -2593,7 +2594,7 @@ def band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, test_
 
     duration = int(ping_time_after_failure) - int(ping_time_last_success)
 
-    rf.write('     start time:' + ping_time_last_success + ' End time:' +  ping_time_after_failure  +  ':OK\n')
+    rf.write('     start time:' + str(ping_time_last_success) + ' End time:' +  str(ping_time_after_failure)  +  ':OK\n')
     rf.write('     Duration:'  + str(duration) + ':OK\n\n')
 
     print("duration:" + str(duration))
@@ -2854,6 +2855,70 @@ def no_duplicate_letters(phrase):
 
 # my_set = (1,2,3,4,5)
 # print(len(my_set))
+def digital_vowel_ban(n, ban):
+    number_dict = {'1':'one','2':'two','3':'three', '4':'four', '5':'five', '6':'six','7': 'seven', '8':'eight', '9':'nine', '0':'zero'}
+    number_list = list(str(n))
+    number_list_copy = deepcopy(number_list)
+    print('number_list:' + str(number_list))
+    exit()
+    for num_char in number_list:
+        english_num_word = number_dict[num_char]
+        english_num_word_set = set(english_num_word)
+        if ban in english_num_word_set:
+
+            pass
+        # number_in_english =ban number_dict[number]
+        # number_in_eglish_list = list(number_in_english.split(""))
+        # number_in_eglish_set = set(number_in_english.split(""))
+
+digital_vowel_ban(143,"o")
+exit()
+# Test.assert_equals(digital_vowel_ban(143, "o"), 3, "Example #1")
+# Test.assert_equals(digital_vowel_ban(14266330, "e"), 4266, "Example #2")
+# Test.assert_equals(digital_vowel_ban(4020, "u"), 20, "Example #3")
+# Test.assert_equals(digital_vowel_ban(586, "i"), "Banned Number", "Example #4")
+# Test.assert_equals(digital_vowel_ban(123456789, "i"), 12347)
+# Test.assert_equals(digital_vowel_ban(20442, "o"), "Banned Number")
+# Test.assert_equals(digital_vowel_ban(1100, "u"), 1100)
+# Test.assert_equals(digital_vowel_ban(1993, "e"), "Banned Number")
+# Test.assert_equals(digital_vowel_ban(90160350102, "e"), 62)
+# Test.assert_equals(digital_vowel_ban(79284426, "o"), 7986)
+# Test.assert_equals(digital_vowel_ban(123456789, "a"), 123456789, "triviAl test")
+
+
+
+#exit()
+
+
+
+def num_of_sublists(lst):
+    # print('type:' + str(type(lst)) )
+    for a in lst:
+        # if a != isinstance(type(a),list):
+        # print('a:', a)
+        if  isinstance(a, list):
+            print('type a:' + str(type(a)))
+            return(len(lst))
+            #print('len:' + str(len(lst)))
+        else:
+            return 0
+
+    #number_of_lists = len(lst)
+    #print('len:' + str(len(lst)))
+
+
+# Test.assert_equals(num_of_sublists([[1,2,3], [1,2,3], [1,2,3]]), 3)
+# Test.assert_equals(num_of_sublists([[1,2,3]]), 1)
+# Test.assert_equals(num_of_sublists([1,2,3]), 0)
+# Test.assert_equals(num_of_sublists([[1,2,3], [ 1,2,3 ], [ 1,2,3 ], [1,2,3]]), 4)
+# print(num_of_sublists([1,2,3]))
+# exit()
+# print(num_of_sublists([[1,2,3], [1,2,3], [1,2,3]]))
+# print(num_of_sublists([[1,2,3]]))
+# print(num_of_sublists([1,2,3]))
+# print(num_of_sublists([[1,2,3], [ 1,2,3 ], [ 1,2,3 ], [1,2,3]]))
+
+
 exit()
 
 with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
@@ -2863,44 +2928,22 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
 
 
     nvg_599_dut = Nvg599Class()
-    execute_factory_reset(nvg_599_dut, rf, rfa, 'execute_factory_reset')
+    trigger_dfs_channel_change(nvg_599_dut, rf, rfa, 'trigger_dfs_channel_change_from_airties', "ATT_4920_8664D4")
+
+    # nvg_599_dut.login_4920("192.168.1.73")
     exit()
-
-    # def get_ip_from_ping_url(self, url_to_ping):
-    # nvg_599_dut. go_outside("www.google.com")
-
+    # execute_factory_reset(nvg_599_dut, rf, rfa, 'execute_factory_reset')
     # exit()
-
-
     #def band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, test_name, start_5g_channel,
-                                                         # end_5g_channel, airties_name):
-
-    # band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, '5g airties channel change Non DFS to DFS ping recovery time', "149", "100", "ATT_4920_8664D4")
-    band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, '5g airties channel change Non DFS to Non DFS ping recovery time', "149", "48", "ATT_4920_8664D4")
-
-    #exit()
-    band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, '5g airties channel change  DFS to Non DFS ping recovery time', "100", "149", "ATT_4920_8664D4")
-    band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, '5g airties channel change  DFS to  DFS ping recovery time', "100", "132", "ATT_4920_8664D4")
-
+                                                         # end_5g_channel, airties_name)
     #band5_channel_change_ping_recovery_timer(nvg_599_dut, rf, rfa, "100", "149", "192.168.1.71")
-
-
-    dfs_channel_change(nvg_599_dut, rf, rfa, "dfs_channel_change", "100", "149","ATT_4920_8664D4")
-    # exit()
-
+    # dfs_channel_change(nvg_599_dut, rf, rfa, "dfs_channel_change", "100", "149","ATT_4920_8664D4")
     # nvg_599_dut.setup_tr69_url()
     # nvg_599_dut.login_eco()
     # steering_radio_names_integration_test(nvg_599_dut,rf,rfa,"steering_radio_names_integration_test")
     # guest_client_cannot_ping_rg(nvg_599_dut, rf, rfa, "guest_client_cannot_ping_rg", "default", "default123")
     # def url_att_cca5g_smoke(nvg_599_dut, url_to_return, rf, rfa, test_name):
    #  def remote_manager_smoke(nvg_599_dut, rf, rfa, test_name):
-
-
-
-    # exit()
-    # trigger_dfs_channel_change(nvg_599_dut, rf, rfa, 'trigger_dfs_channel_change_from_rg')
-    # trigger_dfs_channel_change(nvg_599_dut, rf, rfa, 'trigger_dfs_channel_change_from_airties', "ATT_4920_8664D4")
-
 
     #
     # check_auto_defaults_via_tr69_cli(nvg_599_dut, '3', rf, rfa,  'check_auto_defaults_via_tr69_cli')
@@ -2918,34 +2961,34 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     #nvg_599_dut.rg_setup_without_factory_reset(rf, rfa)
     # exit()
     # nvg_599_dut.tftp_get_file_cli("LP-PPALMER" , "AirTies_Air4920US-AL_FW_xxxxxxxxxxxx.bin", rf, rfa)
-    rf.write('RG Test run Firmware: nvg599-11.5.0h0d53_1.1.bin  Date:' + now +  '\n\n')
+    rf.write('RG Test run Firmware: nvg599-11.6.0h0d1_1.1.bin  Date:' + now +  '\n\n')
     rfa.write(now + '\n')
-    sleep(2)
+    sleep(1)
 
     #load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin", "ATT_4920_8664D4", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin")
-    load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin", "ATT_4920_8664D4", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_2.33.1.2.2112_telnet_enabled_preinstall.bin")
+    #load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin", "ATT_4920_8664D4", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_2.33.1.2.2112_telnet_enabled_preinstall.bin")
 
-    # get_4920_ip_from_named_4920
     # load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin")
-    exit()
 
     # execute_factory_reset(nvg_599_dut, rf, rfa, 'execute_factory_reset')
-
-    # tftp_rg_firmware_and_install(nvg_599_dut, "LP-PPALMER", "nvg599-11.5.0h0d53_1.1.bin", rf, rfa,"tftp_rg_firmware_and_install")
-
 
     ##  band5_peers_set_after_airties_association(nvg_599_dut, rf, rfa, "band5_peers_set_after_airties_associationn")athee
     # verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '3', 'ZipKey-PSK', 'Cirrent1', rf, rfa, "verify_auto_ssid_defaults_via_tr69")
     # ##############verify_auto_ssid_defaults_via_tr69(nvg_599_dut, '4', 'ATTPOC', 'Ba1tshop', rf, rfa, "verify_auto_ssid_defaults_via_tr69")
     # #################depracated use enable conf_auto_setup_ssid_via_tr69_cli(nvg_599_dut, '3', rf, rfa, 'conf_auto_setup_ssid_via_tr69_cli')
-    # deprecated conf_auto_setup_ssid_via_tr69_cli(nvg_599_dut, "4", rf, rfa, 'conf_auto_setup_ssid_via_tr69_cli')
-
     # def conf_auto_ssid_allowed_ip_and_allowed_port_via_tr69_cli(self, ssid_number, auto_allowed_ip, auto_allowed_port, rf, rfa):
-    remote_manager_smoke(nvg_599_dut, rf, rfa, "remote_manager_smoke")
-    # result = string.ascii_lowercase
-    # print(result)
 
-    url_att_cca_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/cca2G', rf, rfa, "url_att_cca5g_smoke")
+    # tftp_rg_firmware_and_install(nvg_599_dut, "LP-PPALMER", "nvg599-11.6.0h0d1_1.1.bin", rf, rfa,"tftp_rg_firmware_and_install")
+
+    band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, '5g airties channel change Non DFS to DFS ping recovery time', "149", "100", "ATT_4920_8664D4")
+    band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, '5g airties channel change Non DFS to Non DFS ping recovery time', "149", "48", "ATT_4920_8664D4")
+    # exit()
+    band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, '5g airties channel change  DFS to Non DFS ping recovery time', "100", "149", "ATT_4920_8664D4")
+    band5_channel_change_airties_ping_recovery_timer(nvg_599_dut, rf, rfa, '5g airties channel change  DFS to  DFS ping recovery time', "100", "132", "ATT_4920_8664D4")
+    # exit()
+    remote_manager_smoke(nvg_599_dut, rf, rfa, "remote_manager_smoke")
+    url_att_cca_smoke(nvg_599_dut, 'ht'
+                                   'tp://192.168.1.254/ATT/cca2G', rf, rfa, "url_att_cca5g_smoke")
     url_att_cca_smoke(nvg_599_dut, 'http://192.168.1.254/ATT/cca5G', rf, rfa, "url_att_cca2g_smoke")
 
     connect_to_auto_ssid(nvg_599_dut, "3", rf, rfa, "connect_to_auto_ssid", "22.33.44.55", "77")
@@ -2967,10 +3010,10 @@ with open('results_file.txt', mode = 'w', encoding = 'utf-8') as rf, \
     trigger_dfs_channel_change(nvg_599_dut, rf, rfa, 'trigger_dfs_channel_change_from_airties', "ATT_4920_8664D4")
     enable_auto_setup_ssid_via_tr69_cli(nvg_599_dut, '3', rf, rfa, 'conf_auto_setup_ssid_via_tr69_cli', 3)
     enable_auto_setup_ssid_via_tr69_cli(nvg_599_dut, '4', rf, rfa, 'conf_auto_setup_ssid_via_tr69_cli', 3)
-    # load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin")
-    # execute_factory_reset(nvg_599_dut, rf, rfa, "execute_factory_reset")
-    # load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin")
-    # load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "AirTies_Air4920US-AL_FW_2.33.1.2.2112_telnet_enabled_preinstall.bin")
+    load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin")
+    load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "/home/palmer/Downloads/AirTies_Air4920US-AL_FW_3.67.8.3.7623.bin")
+    load_airties_firmware(nvg_599_dut, rf, rfa, "load_airties_firmware", "any", "AirTies_Air4920US-AL_FW_2.33.1.2.2112_telnet_enabled_preinstall.bin")
+    execute_factory_reset(nvg_599_dut, rf, rfa, "execute_factory_reset")
 
 
 if send_email == 1:

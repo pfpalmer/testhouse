@@ -3665,12 +3665,25 @@ class Nvg599Class(GatewayClass):
 
     def login_4920(self, ip_4920):
         print('In login_4920' + '\n')
-        self.telnet_cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
-        self.telnet_cli_session.expect("ogin:")
-        self.telnet_cli_session.sendline('root')
-        self.telnet_cli_session.expect("#")
+        #self.telnet_cli_session = pexpect.spawn("telnet " + ip_4920, encoding='utf-8')
+        # def login_nvg_599_cli(self):
+        #     print('In login_nvg_cli')
+        #     self.telnet_cli_session = pexpect.spawn("telnet 192.168.1.254", encoding='utf-8')
+        #     self.telnet_cli_session.expect("ogin:")
+        #     self.telnet_cli_session.sendline('admin')
+        #     self.telnet_cli_session.expect("ord:")
+        #self.airties_ap_cli_session = None
+
+
+        self.airties_ap_cli_session = pexpect.spawn("telnet 192.168.1.73", encoding='utf-8')
+
+        self.airties_ap_cli_session.expect("ogin:")
+        self.airties_ap_cli_session.sendline('root')
+        self.airties_ap_cli_session.expect("#")
         #self.telnet_cli_session.sendline('wl -i wl1 status')
-        return self.telnet_cli_session
+        print('logged in' + '\n')
+
+        return self.airties_ap_cli_session
 
     @staticmethod
     def static_reset_4920(ip_4920):
