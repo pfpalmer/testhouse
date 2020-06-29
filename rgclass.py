@@ -3144,6 +3144,7 @@ class Nvg599Class(GatewayClass):
 
     def run_speed_test_cli(self, speed_test_ip):
         print('in run_speedtest_cli')
+
         # speed_test_ip = "192.168.1.255"
         # ddd = f"{speed_test_ip} is a test"
         # ssh_session = pexpect.spawn("ssh arris@192.168.1.239", encoding='utf-8',timeout=120)
@@ -4435,6 +4436,8 @@ class Nvg599Class(GatewayClass):
         stdout = proc.communicate()[0]
         print('stdout' + stdout)
 
+
+# def convert()
 #        cmd = "sudo /etc/init.d/network-manager  stop"
 #         try:
 #             output = subprocess.check_output(cmd, shell=True)
